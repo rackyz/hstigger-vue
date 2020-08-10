@@ -2,16 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <!-- index 页面不进行缓存 -->
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="content-type" content="no-cache, must-revalidate" />
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT" />
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+  
+    <!-- import vue-design -->
+    <link rel="stylesheet" href="//unpkg.com/view-design/dist/styles/iview.css">
+    <script src="//vuejs.org/js/vue.min.js"></script>
+    <script src="//unpkg.com/view-design/dist/iview.min.js"></script>
+    <!-- import axios.js -->
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+    <!-- import moment.js -->
+    <script src="https://cdn.bootcss.com/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdn.bootcss.com/moment.js/2.24.0/locale/zh-cn.js"></script>
+    <link rel="stylesheet" href="/css/index.css" />
+    
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
+    <div id="app">
+      <!-- 以前内容是vue加载过程中及加载失败时显示 -->
+      <div class='app-loading-wrapper'>
+        <div class='app-content'>
+          <div class='app-loading-text'>系统加载中 <br /><span class="app-loading-text-en">LOADING</span></div>
+          <div class='spinner'>
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+          </div>
+      
+      
+          <div class='app-footer'>
+            <span class='app-title'>本平台由<span class="hl"> 宁波高专建设监理有限公司 </span>提供技术支持</span> <br />
+            地址：<span class='hl'>中国·浙江宁波市鄞州区前河南路88号新洲银座14楼</span></span><span style='margin-left:0.5rem'>电话：<span
+                class='hl'>0574-87297325</span></span> <span style='margin-left:0.5rem;'>传真：<span
+                class='hl'>0574-87297325</span></span><br />
+            <span class='hl'>COPYRIGHT</span> © <span class='hl'>2019-2021宁波高专建设监理有限公司</span> <span
+              style='margin-left:0.5rem'><a href="http://www.beian.miit.gov.cn"
+                >浙ICP备18011212号-3</a></span><br />
+            <span style='color:#aaa;font-size:0.7rem;'>
+              推荐使用 <a href="http://zzlatm.gicp.net:10000/public/upload/20190916/20190916_5d7f2f83da6e8.exe">Google浏览器
+                - Chrome</a> 或 <a href="http://www.firefox.com.cn/"> 火狐浏览器 - Firefox</a>
+              等符合最新国际标准的浏览器<br />如果您的页面停留于此长时间未跳转，请尝试更换浏览器</span>
+          </div>
+        </div>
+
+    </div>
     <!-- built files will be auto injected -->
   </body>
 </html>

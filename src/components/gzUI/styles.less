@@ -1,0 +1,362 @@
+@primary: rgb(9, 107, 204);
+@error: rgb(138, 7, 7);
+@warning: rgb(238, 152, 13);
+@info: rgb(13, 206, 240);
+@success: rgb(14, 175, 36);
+@failed: rgb(194, 18, 18);
+@shadow: rgb(22, 22, 22);
+@frame: #eee;
+@modal-label: rgb(71, 70, 70);
+@modal-value: rgb(2, 2, 2);
+
+.l-form .ivu-col {
+  min-height: 60px;
+  
+}
+
+.l-form-buttons{
+  .ivu-btn{
+    border-radius: 0;
+  }
+
+  .ivu-btn[focus]{
+    border:none;
+    outline:none;
+  }
+}
+
+.l-form{
+  .ivu-btn{
+    border-radius: 0 !important;
+  }
+}
+
+.gz-form-item-disabled {
+  pointer-events: none;
+}
+
+
+.gz-form-item {
+  background: #fff;
+  position: relative;
+  height: 100%;
+  min-height: 60px;
+  width: 100%;
+  border: 1px solid #ccc;
+
+  input[active]{
+    background:rgb(234, 234, 191);
+  }
+
+  input[focus]{
+    background:rgb(234, 234, 191) !important;
+  }
+
+  input:disabled {
+    color: #333;
+    cursor: text;
+
+  }
+
+  input[disabled] {
+    color: #333;
+    cursor: text;
+    background: #fff;
+  }
+
+  .ivu-select-selection {
+
+    input {
+      background: none;
+      text-overflow: ellipsis;
+      color: #333;
+      -webkit-text-fill-color: #333;
+    }
+  }
+
+
+  .gz-form-item {
+    border: none;
+    
+  }
+
+  .gz-require {
+    color: red;
+  }
+
+  .gz-label {
+    position: absolute;
+    color: #aaa;
+    left: 0.25rem;
+    top: 0.25rem;
+    z-index: 10;
+    font-size: 0.8rem;
+    transition: all 0.5s;
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .gz-label-empty {
+    position: absolute;
+    font-size: 1.2rem;
+    margin: 1rem auto;
+    text-align: left;
+    left: 0.5rem;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transition: all 0.5s;
+  }
+
+  .gz-clear {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    height: 20px;
+    width: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+
+    i {
+      padding: 1px;
+      background: rgba(200, 200, 200, 0.2);
+      border: 1px solid #dfdfdf;
+      color: #aaa;
+      font-size: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    i:hover {
+      background: yellow;
+    }
+  }
+
+  .gz-error {
+    position: absolute;
+    right: 0px;
+    top: -20px;
+    color: red;
+    font-size: 10px;
+  }
+
+  .gz-form-content {
+    overflow: hidden;
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .gz-form-value {
+    padding: 10px;
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #333;
+  }
+
+  .gz-select-mark {
+    position: absolute;
+    color: #aaa;
+    text-shadow: 0 0 1px #333;
+    right: 5px;
+    top: 10px;
+    bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .op-image {
+    left: 0px !important;
+  }
+}
+
+.l-modal-error {
+  .ivu-modal-header {
+    background: rgb(253, 201, 201);
+  }
+
+  .ivu-modal {
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+    animation: headShake 1s;
+  }
+}
+
+
+@keyframes headShake {
+  0% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0)
+  }
+
+  6.5% {
+    -webkit-transform: translateX(-6px) rotateY(-9deg);
+    transform: translateX(-6px) rotateY(-9deg)
+  }
+
+  18.5% {
+    -webkit-transform: translateX(5px) rotateY(7deg);
+    transform: translateX(5px) rotateY(7deg)
+  }
+
+  31.5% {
+    -webkit-transform: translateX(-3px) rotateY(-5deg);
+    transform: translateX(-3px) rotateY(-5deg)
+  }
+
+  43.5% {
+    -webkit-transform: translateX(2px) rotateY(3deg);
+    transform: translateX(2px) rotateY(3deg)
+  }
+
+  50% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0)
+  }
+}
+
+.l-form-errorbox {
+  border: 1px solid rgb(165, 81, 81);
+  margin-top: 10px;
+  border-radius: 3px;
+  background: rgb(243, 222, 222);
+  color: red;
+  padding: 10px;
+
+  .l-form-error-item {
+    margin-left: 20px;
+  }
+}
+
+.gz-form-item:hover,
+.gz-form-item:focus,
+.gz-form-item-focused {
+  background: rgb(248, 248, 184);
+
+}
+
+.gz-form-item:hover {
+  .gz-clear {
+    transition: all 0.3;
+    opacity: 1;
+
+  }
+}
+
+.gz-form-item-error {
+  border: 1px solid rgb(255, 75, 75);
+
+  .gz-error-msg {
+    opacity: 1;
+  }
+}
+
+
+
+// override ivu-styles
+.ivu-modal-content {
+
+  filter: drop-shadow(2px 2px 5px #444);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+  border-radius: 10px;
+  border: 3px solid #fff;
+  
+
+  .ivu-modal-body {
+    margin: 0;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  .ivu-modal-confirm {
+    margin: 0;
+    padding: 0;
+
+  }
+
+  .ivu-modal-header,
+  .ivu-modal-confirm-head {
+    background: linear-gradient(to right,@primary,lighten(@primary,20%));
+    
+
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+
+    border-bottom: 1px solid #ddd;
+
+    font-weight: normal;
+    color:#fff;
+
+    .ivu-modal-header-inner {
+       color:#fff;
+      font-weight: normal;
+      margin-left: 5px;
+      font-size: 14px;
+
+    }
+
+    .ivu-modal-confirm-head-icon {
+      font-size: 20px;
+      top: 0;
+      margin: 0;
+    }
+
+    .ivu-modal-head-title,
+    .ivu-modal-confirm-head-title {
+      margin-left: 5px;
+
+      .ivu-modal-head-title-inner {
+        font-size: 18px;
+      }
+
+      color:#fff;
+    }
+  }
+
+  .ivu-modal-close {
+    right: 0px;
+    top: 0px;
+
+    .ivu-icon-ios-close {
+      color: #333;
+      font-size: 28px;
+    }
+  }
+
+  .ivu-modal-body,
+  .ivu-modal-confirm-body {
+    padding: 0.5rem 1rem;
+    color: #000;
+    padding-top: 1rem;
+  }
+
+
+  .ivu-modal-footer,
+  .ivu-modal-confirm-footer {
+    margin: 0;
+    padding: 0.25rem;
+  }
+
+  .ivu-btn-primary {
+    border: 1px solid rgba(61, 62, 63, 0.5);
+     background: @primary;
+  }
+
+  .ivu-btn-primary:hover {
+    transition: all 0.5s;
+    filter:brightness(1.2);
+  }
+}

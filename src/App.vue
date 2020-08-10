@@ -1,28 +1,41 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <transition name="fade">
+    <router-view />
+  </transition>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  export default {
+    name: 'App',
+    metaInfo: {
+      title: '首页',
+      titleTemplate: '%s | 项目管理平台',
+      htmlAttrs: { lang: 'en' },
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+    },
   }
-}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="less">
+  @import "../public/css/transitions.less";
+  @import "../src/components/gzUI/styles.less";
+  @import "../public/css/styles.less";
+  
+ 
+  .extra-padding{
+    padding-bottom: 96px !important;
+    padding-top: 96px !important;
+  }
+
+  @media screen and (max-width: 959px){
+    .extra-padding{
+      padding-top: 48px !important;
+      padding-bottom: 48px !important;
+    }
+  }
 </style>
+
+
