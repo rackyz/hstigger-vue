@@ -7,6 +7,8 @@ import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 import iView from 'iview'
 import PuzzleVerification from 'vue-puzzle-verification'
+
+
 // Automatically loads and bootstraps files
 // in the "./src/components/base" folder.
 const requireComponent = require.context('@/components/base', true, /\.vue$/)
@@ -18,10 +20,10 @@ for (const file of requireComponent.keys()) {
         .replace(/^\.\//, '')
         .replace(/\.\w+$/, '')
     const componentName = upperFirst(camelCase(name))
-    console.log(componentName)
-
+    console.log('REGISTER:',componentName)
     Vue.component(`Base${componentName}`, componentConfig.default || componentConfig)
 }
+
 
 // Setup iVIew UI
 Vue.use(iView)
@@ -62,8 +64,18 @@ Vue.prototype.RouteTo = function (path, newtab = false) {
         });
         window.open(routerUrl.href, "_blank");
     } else {
-        this.$route.push(path)
+        this.$router.push(path)
     }
 
 
 }
+
+Vue.directive('transfer',{
+    inserted:el=>{
+        el.parentElement.removeChild(el)
+        document.body.appendChild(el)
+        
+    }
+})
+
+console.log("PLUGINS INIT SUCCESS")

@@ -1,10 +1,16 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import iView from 'iview'
-
+import upperFirst from 'lodash/upperFirst'
+import camelCase from 'lodash/camelCase'
 Vue.use(Router);
 Vue.use(iView);
 
+
+// Read apps
+// Automatically loads and bootstraps files
+// in the "./src/components/base" folder.
+import {APP_ROUTES} from './plugins/apps'
 
 let router = new Router({
 
@@ -12,6 +18,15 @@ let router = new Router({
   routes: [{
       path: '/',
       component: resolve => require(['@pages/Login.vue'], resolve),
+    },
+    {
+      path: '/dashboard',
+      component: resolve => require(['@pages/Index.vue'], resolve),
+      children: [{
+        path: '/dashboard',
+        component: resolve => require(['@pages/Dashboard.vue'], resolve),
+      },
+      ...APP_ROUTES]
     },
     {
       path: '*',

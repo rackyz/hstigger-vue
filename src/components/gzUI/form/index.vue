@@ -155,7 +155,6 @@ export default {
         handleSubmit(){
             let model = this.submit()
             if(model){
-                console.log('$emit:',model)
                 if(this.data)
                     model.id = this.data.id
                 this.$emit("submit",model)
@@ -173,7 +172,6 @@ export default {
                  this.checkors.forEach(v=>{
                     if(v.remote){
                         remote = true
-                        console.log("REMOTE:start")
                         errors[v.key] == 'loading'
                         v.check(model[v.key]).then(res=>{
                             if(!res){
@@ -214,7 +212,6 @@ export default {
             }
         },
         reset(formData){
-            console.log('reset:',formData,this.formControl)
             if(this.formControl){
                 this.formControl.reset(formData || this.data)
             }
@@ -269,7 +266,7 @@ export default {
                             }                            
                         }
 
-                        if(formItem.option && that.store){
+                        if(formItem.option && that.$store){
                          option[key].store = that.$store.getters
                         }
                         let label = formItem.label?formItem.label:""
@@ -347,13 +344,11 @@ export default {
                         this.errors = {}
                         this.model = {}
                         if(!this.formData.id)
-                           console.log("init",this.formData.parent_id)
                             this.$nextTick(()=>{
                                 keys.map(v=>v.slice(2,v.length-2)).forEach(k=>{
                             
                                 if(this.initData[k] !== undefined && this.formData[k] == undefined && this.model[k] == undefined){
                                  
-                                console.log("set",k,)
                                  this.set(k,this.initData[k])
                                 }
                                 })

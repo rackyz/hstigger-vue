@@ -1,9 +1,7 @@
-import axios from 'axios'
-import Vue from 'vue'
-import config from '../config'
-import APIs from '../api'
+const axios = require('axios')
+const config = require('../config')
 
-let axiosClient = axios.create({
+export var axiosClient = axios.create({
   baseURL: process.env.NODE_ENV !== 'production'?config.devServer:config.prodServer,
   timeout: config.timeout
 })
@@ -47,40 +45,9 @@ axiosClient.interceptors.response.use(data => {
   return Promise.reject(err);
 })
 
-let requestAPI = {}
-
-const MakeAxoisRequest = (token)=>({id,query,data})=>{
-  let [,method,url_pattern] = /^(.*)\/(.*)/.match(token)
-  if(id != undefined)
-    url_pattern = url_pattern.replace(`:id`,id)
-  
-  if(Object.keys(query).length > 0){
-    url_pattern += Object.keys(query).map(v=>`${v}=${query[v]}`).join('&')
-  }
-  let url = url_pattern
-  console.error('[parse]:',token,method,url)
-  return axiosClient.request({
-    url,
-    method,
-    data,
-  })
-}
 
 
-Object.entries(APIs).forEach(([key,token])=>{
-  console.log(key,token)
-  requestAPI[key] = MakeAxoisRequest(token)
-})
-
-Vue.prototype.$api = requestAPI
-
-
-var axiosCOSClient = axios.create({
+export var axiosCOSClient = axios.create({
   baseURL: config.cosServer
 })
-
-export default {
-   axiosClient,
-   axiosCOSClient
-}
 

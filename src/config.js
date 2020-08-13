@@ -1,6 +1,6 @@
 module.exports = {
   // axios 配置参数
-  devServer: 'http://192.168.14.40:5858/', 
+  devServer: 'http://192.168.14.40:5858', 
   prodServer: "https://www.nbgzpmis.xyz:10000",
   timeout:5000,
   defaultHeaders:{

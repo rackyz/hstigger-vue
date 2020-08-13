@@ -14,7 +14,7 @@ html,body{
   justify-content: center;
   flex-direction: column;
 
-  background: linear-gradient(to bottom right, rgb(255, 255, 255), rgb(236, 236, 236));
+  background: linear-gradient(to bottom to right, rgb(255, 255, 255), rgb(236, 236, 236));
 }
 
 

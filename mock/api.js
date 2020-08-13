@@ -1,10 +1,9 @@
-
-import {axiosClient,axiosCosClient} from '@/plugins/axios'
+const config = require('@/config')
 const PACKS = {
   CORE_API:{
     // core
     LOGIN: "POST /sessions",
-    WHO_IS: "GET /sessions/current",
+    WHO_AM_I: "GET /sessions/current",
     //
   },
 
@@ -13,7 +12,8 @@ const PACKS = {
   }
 }
 
-export const getAPI = function(api_name, {
+
+const getAPI = function(api_name, {
   param,
   query
 } = {}, pack_name = 'CORE_API', ) {
@@ -25,10 +25,8 @@ export const getAPI = function(api_name, {
   if (!api_path)
     throw (`API_NAME(${api_name}) is not defined`)
   let [method, path] = api_path.split(' ')
-  if(!method || !path)
-    throw (`INCORRECT API_PATH : ${api_path}`)
   apiObject = {
-    method : method.toLowerCase(),
+    method:method.toLowerCase(),
     url: path
   }
 
@@ -44,22 +42,11 @@ export const getAPI = function(api_name, {
     apiObject.url = apiObject.url + keys.map(key => `${key}=${query[key]}`).join('&')
   }
 
+  apiObject.url = server + apiObject.url
+
   return apiObject
 }
-export const request = (api_name, {
-  param,
-  query,
-  data,
- 
-}={}, PACK = 'CORE_API') => {
-  let apiObject = getAPI(api_name, {
-    PACK,
-    param,
-    query
-  })
-  return axiosClient.request({
-    ...apiObject,
-    data
-  })
-}
 
+export default {
+  getAPI
+} 

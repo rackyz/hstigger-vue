@@ -230,6 +230,7 @@ export default {
             padding:0 0.5rem;
             padding-right:1.2rem;
             padding-top:1rem;
+             text-align: left;
         }
 
         textarea{

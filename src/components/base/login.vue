@@ -1,10 +1,9 @@
 
 <template>
     <div class="l-login">
-      <div class="system-name" style="margin-bottom:10px;">
-         项目管理平台 <span class="version">v1.0.0</span>
-      </div>
+      
       <gLogin :loading="loading" @submit="submitForm" @forget="forget"/>
+      
       <Modal v-model="isVerificationShow" footer-hide width="430">
         <PuzzleVerification
             :puzzleImgList="puzzleImgList"
@@ -107,23 +106,15 @@ export default {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
-
+    .gz-form-content{
+        input{
+        background:none !important;
+    }
+    }
 
 }
 
-.system-name{
-  font-size:30px;
-  color:#333;
-  text-shadow: 1px 1px 1px #aaa;
-}
-.version{
-  padding:0px 5px;
-  background:#333;
-  color:#fff;
-  font-size:10px;
-  border-radius: 3px;
-  font-weight: normal;
-}
+
+
 
 </style>
