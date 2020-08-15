@@ -22,11 +22,7 @@ let router = new Router({
     {
       path: '/dashboard',
       component: resolve => require(['@pages/Index.vue'], resolve),
-      children: [{
-        path: '/dashboard',
-        component: resolve => require(['@pages/Dashboard.vue'], resolve),
-      },
-      ...APP_ROUTES]
+      children: [...APP_ROUTES]
     },
     {
       path: '*',

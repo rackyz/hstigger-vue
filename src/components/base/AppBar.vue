@@ -16,21 +16,21 @@
 <template>
   <div class="l-app-bar">
     <div class="l-left">
-      <BaseLogo style="width:140px;"></BaseLogo>
+      <BaseLogo class='d-none d-sm-block' style="width:160px;"></BaseLogo>
       <!-- Menu Button -->
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
       <!-- Message -->
-      <Badge count='5' type='primary' style="margin-right:20px;">
-        <div class='text-btn'>
+      <Badge :count='5' type='primary' style="margin-right:20px;">
+        <div class='text-btn' @click="RouteTo('/message')">
           <Icon custom="gzicon gzi-mail" size="18" />
         </div>
       </Badge>
       
       <div class="text-btn text-btn-dropdown text-btn-dropdown-active">
         <BaseAvatar :size="30" style='margin-right:5px;'></BaseAvatar>
-        {{session.name}}
+        <span class='d-none d-sm-block'>{{session.name}}</span>
       </div>
      
       <!-- User -->
@@ -46,7 +46,7 @@
         <Col :span="6" style="min-width:200px;">
           <div class="l-app-group">
               <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
+                <Icon :custom="`gzicon gzi-${'desktop'}`"></Icon>项目管理
               </div>
               <div class="l-app-group-list">
                   <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>

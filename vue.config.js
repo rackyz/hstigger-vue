@@ -78,7 +78,7 @@ const Chained = config=>{
   // WARNING:xx.js was preloaded using link preload but not used within a few seconds from the window 's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
   config.plugins.delete('preload')
 
-  config.devServer.port(88)
+  config.devServer.port(80)
     .hot(true)
 
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="l-logo flex-wrap">
     <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1597294262168&di=766402bd010bddcbdebb401f0f16f510&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201606%2F18%2F20160618173836_mxY4d.gif" />
-    <a href="/index">信息平台</a>
+    <a href="/index">企业信息平台</a>
   </div>
  
 </template>
@@ -21,7 +21,7 @@
   img{
     width:30px;
     height:30px;
-    margin-right:5px;
+    margin-right:10px;
     border:2px solid #222;
   }
 

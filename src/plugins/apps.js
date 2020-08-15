@@ -106,6 +106,6 @@ Object.keys(fileMap).forEach(k => {
 
 
 
-export let APP_GROUPS = Object.values(groupMap)
+export let APP_GROUPS = Object.values(groupMap).filter(v=>v.subs)
 
 console.log('APP-GROUPS:', APP_GROUPS)

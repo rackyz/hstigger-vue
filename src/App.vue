@@ -9,7 +9,7 @@
     name: 'App',
     metaInfo: {
       title: '首页',
-      titleTemplate: '%s | 项目管理平台',
+      titleTemplate: '%s | 企业信息平台',
       htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
