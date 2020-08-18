@@ -5,14 +5,19 @@
 
 const API = require('@/api')
 const crypto = require('crypto')
-import {
-  APP_GROUPS
-} from '@/plugins/apps'
-
 const state = {
   session:{},
   types:[],
-  app_groups: APP_GROUPS
+  app_groups: [
+    {
+      name:'财务管理',
+      icon:'ios-dollar',
+      subs:[{
+        name:'小微项目票据管理',
+        path:'/tiny-project-bill'
+      }]
+    }
+  ]
 }
 
 

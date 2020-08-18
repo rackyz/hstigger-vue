@@ -2,7 +2,7 @@
 <template>
     <div class="l-login">
       
-      <gLogin :loading="loading" @submit="submitForm" @forget="forget"/>
+      <gLogin :loading="loading" @submit="submitForm" />
       
       <Modal v-model="isVerificationShow" footer-hide width="430">
         <PuzzleVerification
@@ -33,66 +33,19 @@ export default {
         }
     },
     components:{gLogin,PuzzleVerification},
-    mounted(){
-        let skey = localStorage.getItem("kt-token")
-        let path = localStorage.getItem("last-route-path")
-        var that = this
-        if(skey){
-            this._whoami(skey).then(()=>{
-                if(!path || path == '/')
-                    path = "/dashboard"
-                that.$router.push(path)
-            })
-        }
-        
-    },
     methods: {
-        ...mapActions('user', {
-            login: 'login',
-            _whoami:"whoami",
-            logout: 'logout',
-            forgetPassword:"forgetPassword"
-        }),
         handleSuccess(){
+
         },
-        submitForm(formData) {
+        submitForm(model) {
             this.loading = true
-            this.error = false
-            var that = this
-            
-            this.login(formData).then(() => {
-                this.$Notice.success({
-                    title: '登录成功'
-                })
-                setTimeout(() => { 
-                    this.loading = false; 
-                    that.$router.push("/dashboard")
-                }, 1000)
-            }).catch(e => {
-                this.error = true;
-                this.$Modal.error({
-                    title: '登录失败',
-                    content: e
-                })
-                setTimeout(() => { this.loading = false }, 1000)
-            })    
-        },
-        forget(formData){
-            this.loading = true
-            let phone = formData.phone
-            this.forgetPassword(phone).then(()=>{
-                 this.$Modal.success({
-                    title:"操作成功",
-                    content: '您的密码已发送至:'+phone+",请收到之后，及时进行修改"
-                })
+            this.$store.dispatch('core/login',model).then(session=>{
+                this.Success('登陆成功')
+                this.RouteTo('/core')
             }).catch(e=>{
-                 this.error = true;
-                this.$Modal.error({
-                    title: '发送失败',
-                    content: e
-                })
-            }).finally(()=>{
-                 setTimeout(() => { this.loading = false }, 1000)
+                this.Error(e)
+            }).finally(e=>{
+                this.loading = false
             })
         }
     }

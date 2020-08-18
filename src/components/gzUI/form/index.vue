@@ -294,7 +294,7 @@ export default {
                         if(!control){
                             console.error(`[renderForm]: control (${formItem.control}) has not mapeed ControlItem`)
                         }else{
-                            replaced = `<${control} :class="errors.${key}?'gz-form-item-error':''" :index='0' :value='model.${key}==undefined?formData.${key}:model.${key}' label='${label}' :editable='${editable}' :error="errors.${key}" :parent='formData' :option='option.${key}' :ref="ref" @change='handleChange("${key}",$event)'></${control}>`
+                            replaced = `<${control} :class="errors.${key}?'gz-form-item-error':''" :index='0' :value='model.${key}==undefined?formData.${key}:model.${key}' label='${label}' :editable='${editable}' :error="errors.${key}" :parent='formData' :option='option.${key}' :ref="ref" @change='handleChange("${key}",$event)' @enter='handleEnter'></${control}>`
                         }
                     }else{
                         console.error(`[renderForm]:key (${key}) has not been defined`)
@@ -376,6 +376,10 @@ export default {
                         this.set(key,newVal)
                         that.$emit('error-submit',that.errors)
                         that.$emit('change',this.model)
+                    },
+                    handleEnter(){
+                        console.log('Form Enter Detected')
+                        that.handleSubmit()
                     }
             }})
 

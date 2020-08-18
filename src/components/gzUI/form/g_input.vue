@@ -1,7 +1,6 @@
 <style lang="less">
 .l-gz-input{
     position: relative;
-
  .ivu-input-number{
             width:100%;
             position:absolute;
@@ -58,7 +57,55 @@
          box-shadow: none !important;
     }
 
+   .ivu-input-wrapper{
+            width:100% !important;
+            height:100% !important;
+            position:absolute !important;
+            
+            left:0 !important;
+            right:0 !important;
+            top:0 !important;
+            bottom:0 !important;
+            border:none !important;
+            font-size:1.2rem;
+            padding:0 0.5rem !important;
+            padding-right:1.2rem !important;
+            padding-top:1rem !important;
+             text-align: left;
+             .ivu-input{
+                   border-color:rgba(0,0,0,0);
+                     background:red;
+                    width:100%;
+                    height:100%;
+                    position:absolute;
+                    left:0;
+                    right:0;
+                    top:0;
+                    bottom:0;
+                    border:none;
+                    font-size:1.2rem;
+                    padding:0 1.2rem;
+                    padding-top:1rem;
+                    background:none;
+                      box-shadow: none;
+             }
+             .ivu-input:focus{
+                 border:none;
+                 
+             }
+        }
+
    
+}
+
+.ivu-input-wrapper:focus{
+    border:none;   
+    
+        box-shadow: none;
+    .ivu-input{
+        border:none;
+        box-shadow: none;
+    } 
 }
 
 </style>
@@ -89,7 +136,7 @@
         </template>
         <template v-else>
             <div class='word' v-show="option.maxlen" >{{value ? value.length : 0}} {{option.maxlen?'/ '+option.maxlen:''}} 字</div>
-            <input :value='value' :type="option.type=='number' || option.type=='password'?option.type:'text'" @input='handleChange' :tabindex="index" @focus='handleInputFocus' @blur='hanleInputBlur' :disabled="!editable" :maxlength="option.maxlen" />
+            <Input :value='value' :type="option.type=='number' || option.type=='password'?option.type:'text'" @on-change='handleChange'  @on-focus='handleInputFocus' @on-blur='hanleInputBlur' :disabled="!editable" :maxlength="option.maxlen" @on-enter='handleEnter' />
     </template> 
     </template>
     
@@ -205,6 +252,11 @@ export default {
         },
         hanleInputBlur(){
             this.focused = false
+        },
+        handleEnter(){
+            console.log('ENTER')
+            if(this.option.enter)
+                this.$emit('enter')
         }
     }
     
@@ -217,21 +269,7 @@ export default {
         overflow: hidden;
         min-height:60px;
 
-        input{
-            width:100%;
-            height:100%;
-            position:absolute;
-            left:0;
-            right:0;
-            top:0;
-            bottom:0;
-            border:none;
-            font-size:1.2rem;
-            padding:0 0.5rem;
-            padding-right:1.2rem;
-            padding-top:1rem;
-             text-align: left;
-        }
+     
 
         textarea{
             width:100%;

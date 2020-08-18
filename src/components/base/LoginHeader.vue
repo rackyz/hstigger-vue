@@ -1,6 +1,6 @@
 <template>
   <div class="system-name">
-    项目管理平台 <span class="version">v1.0.0</span>
+    企业信息平台 <span class="version">v1.0.0</span>
   </div>
 </template>
 

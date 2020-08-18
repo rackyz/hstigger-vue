@@ -6,6 +6,7 @@
       :form="loginFormDef"
       :data="model"
       editable
+      @submit='Submit'
     />
     <div>
      <Row
@@ -20,6 +21,7 @@
         class='login-btn'
         size='large'
         icon="ios-log-in"
+        :loading="loading"
         ghost
          style="width:100%"
         @click="Submit"
@@ -31,7 +33,7 @@
     >
       <Col
         :span="24"
-      ><div class="forget-btn">忘记账号或者密码?</div>
+      ><div class="forget-btn" :z-index='1'>忘记账号或者密码?</div>
       </Col>
     </Row></div>
    
@@ -55,7 +57,8 @@ export default {
             label: "密码",
             control: 'input',
             option: {
-              type: "password"
+              type: "password",
+              enter:true
             }
           }
         },
@@ -65,6 +68,11 @@ export default {
       }
     }
 
+  },
+  props:{
+    loading:{
+      type:Boolean
+    }
   },
   components: { gForm },
   methods:{
@@ -76,14 +84,8 @@ export default {
         this.Error('请输入密码')
       }
 
-     
-      this.$store.dispatch('core/login',model).then(session=>{
-        this.Success('登陆成功')
-        this.RouteTo('dashboard')
-      }).catch(e=>{
-        this.Error(e)
-      })
-    }
+      this.$emit('submit',model)
+    },
   }
 }
 </script>
