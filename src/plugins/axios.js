@@ -8,6 +8,7 @@ export var axiosClient = axios.create({
 
 // 初始化头部配置
 axiosClient.defaults.headers = config.defaultHeaders
+axiosClient.defaults.headers.Authorization = 'Bearer login'
 
 // axios 请求 预处理
 axiosClient.interceptors.request.use(config => {

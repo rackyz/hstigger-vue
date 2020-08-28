@@ -41,7 +41,7 @@ const actions = {
       }).catch(reject)
     })
   },
-  login({commit},{account,password}){
+  login({commit},{user,password}){
      var md5 = crypto.createHash("md5")
      md5.update(password)
      password = md5.digest('hex')
@@ -50,7 +50,7 @@ const actions = {
     return new Promise((resolve, reject) => {
        API.request('LOGIN', {
            data: {
-             account,
+             user,
              password
            }
          }).then(res => {

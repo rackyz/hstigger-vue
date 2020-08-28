@@ -47,9 +47,9 @@ export default {
     return {
       model:{},
       loginFormDef: {
-        layout: `<div><Row><Col :span="24">{{account}}</Col></Row><Row style="margin-top:10px"><Col :span="24">{{password}}</Col></Row></div>`,
+        layout: `<div><Row><Col :span="24">{{user}}</Col></Row><Row style="margin-top:10px"><Col :span="24">{{password}}</Col></Row></div>`,
         def: {
-          account: {
+          user: {
             label: "用户名",
             control: 'input'
           },
@@ -78,7 +78,7 @@ export default {
   methods:{
     Submit(){
       let model = this.$refs.form.submit()
-      if(!model.account){
+      if(!model.user){
         this.Error('请输入用户名')
       }else if(!model.password){
         this.Error('请输入密码')
