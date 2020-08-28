@@ -18,109 +18,98 @@
 </style>
 <template>
   <div class="l-menu  ">
-    
-    <div class='text-btn text-btn-dropdown' :class="{'text-btn-dropdown-active':open}" @click="open=!open">
+     <!-- Dashboard Button -->
+    <a class='text-btn' @click="RouteTo('/core/dashboard')" style='margin:0 15px;margin-left:5px;'>
+      <Icon custom="gzicon gzi-desktop" size="16" style='margin-right:6px' /> 工作台
+    </a>
+    <!-- Base Menu Button -->
+    <div class='text-btn text-btn-dropdown'  style='margin-right:0px;' :class="{'text-btn-dropdown-active':open}" @click="open=!open">
        <Icon custom="gzicon gzi-apps" size="16" style='margin-right:5px' />
       菜单
     </div>
+   
+    <!-- Seperator -->
     <div class='seperator  d-none d-sm-block' />
-     <a class='text-btn d-none d-sm-block' href='/dashboard' style='margin-right:15px;'>
-      <Icon custom="gzicon gzi-desktop" size="16" style='margin-right:5px' /> 工作台
-    </a>
-    <template v-for='m in menus'>
-      <a class='text-btn d-none d-sm-block' style='margin-right:10px;padding:0 5px;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.route'  @click="value?remove(m):''">
-        {{m.title}}
+    
+    <!-- Accelerators -->
+    <template v-for='m in acc_apps'>
+      <a class='text-btn d-none d-sm-block' :class="{'text-button-deleting':showAppSelector}" style='margin-right:10px;padding:0 5px;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.key'  @click="showAppSelector?removeAcc(m.key):RouteTo(m.path)">
+        {{m.name}}
       </a>
     </template>
+    <!-- Accerlator Config Button -->
     <div class='text-btn  d-none d-sm-block'>
-      <Icon type="md-add" size="16" @click="$emit('input',true)" />
+      <Icon type="md-add" size="16" @click="onShowAccConfig" />
     </div>
 
-    <!-- Menu -->
-    <div class="l-menu-mask"  v-show="open" @click.prevent='open=false'/>
-    <div class="l-menu-wrap"  v-show="open">
-        <div class='l-menu-search'>
-          <Input :autofocus='true' class="l-menu-input" search placeholder="搜索平台的功能/项目/人员" />
-        </div>
+
+    <!-- Transfer Menu -->
+    
+    <div class="l-menu-mask"  v-show="open" @click.prevent='open=false' v-transfer/>
+     <transition name='move-up'>
+    <div class="l-menu-wrap"  v-show="open" v-transfer>
+        <BaseLogo class='d-block d-sm-none' style="margin-top:10px;"></BaseLogo>
+
         <div class="l-list-wrap">
-      
-        <Row>
-        <Col :span="6" style="min-width:150px;">
-          <template v-for="group in app_groups">
-          <div class="l-app-group" :key='group.name'>
-              <div class="l-app-group-title">
-                <Icon :custom="`gzicon gzi-${group.icon}`"></Icon>{{group.name}}
-              </div>
-              <div class="l-app-group-list">
-                  <template v-for="appItem in group.subs">
-                  <a class='text-btn' :key='appItem.key' :href='appItem.path'>{{appItem.name}}</a>
-                  </template>
-              </div>
-            
-          </div>
-          </template>
-        </Col>
-        <Col :span="6" style="min-width:150px;">
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <a>进度管理</a>
-                  <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a>
-              </div>
-            
-          </div>
-        </Col>
-        <Col :span="6" style="min-width:150px;">
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <a>进度管理</a>
-                  <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a>
-              </div>
-            
-          </div>
-        </Col>
-        <Col :span="6" style="min-width:150px;">
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <a>进度管理</a>
-                  <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a> <a>进度管理</a>
-              </div>
-            
-          </div>
-        </Col>
-        </Row>
+           <Input :autofocus='true' style='margin:20px 0' class="l-menu-input" clearable v-model="filterMenu" search placeholder="输入模块关键字搜索" />
+           <ColumnList :data="app_groups" tmpl="BaseTmplMenuGroup" :filter="filterMenu" />
         </div>
-       
     </div>
+     </transition>
+
+    <!-- Transfer Menu - Accelerator Configuration -->
+    <transition name='fade' mode='out-in' appear>
+    <div class="l-app-selector" v-show="showAppSelector">
+      <div class="l-list-wrap">
+      <Row style="margin:0 145px; max-width: 1000px;">
+        <div style="padding:20px 0px;color:#aaa;font-size:13px;">首页链接添加 ({{acc_config_list.length}}/10)</div>
+        <ColumnList :data="app_groups" :checked="checked" editable tmpl="BaseTmplMenuGroup" @on-event='onCheckChange' />
+      </Row>
+      </div>
+      <Row style="display:flex;justify-content:center;border-top:1px solid #333;height:80px;align-items:center;">
+        <Button type='primary' style="margin-right:30px;border-radius:0;width:80px;" @click="onChangeAccelerators">保存</Button>
+        <Button ghost style="border-radius:0;width:80px;" @click="showAppSelector=false">取消</Button>
+      </Row>
+    </div>
+    </transition> 
   </div>
 </template>
 
 <script>
 import {mapGetters} from 'vuex'
+import ColumnList from '@components/gzUI/layout/ColumnList'
 export default {
   
   data(){
     return{
       open:false,
+      showAppSelector:false,
+      filterMenu:"",
+      checked:{},
       menus:[{
         title:'后台',
         route:'/admin'
       },{
         title:'开发者模式',
         route:'/dev'
-      }]
+      }],
+      model:{}
     }
   },
   computed:{
-    ...mapGetters('core',['app_groups'])
+    ...mapGetters('core',['apps','app_groups','acc_list']),
+    acc_apps(){
+      if(this.showAppSelector)
+        return this.acc_config_list.map(v=>this.apps[v]).filter(v=>v)
+      else
+        return this.acc_list.map(v=>this.apps[v]).filter(v=>v)
+    },
+    acc_config_list(){
+      return Object.keys(this.checked)
+    }
+  },
+  components:{
+    ColumnList
   },
   props:{
     value:{
@@ -129,9 +118,33 @@ export default {
     }
   },
   methods:{
-    remove(m){
-      alert('remove '+m.title)
-    }
+    removeAcc(key){
+      this.$delete(this.checked,key)
+    },
+    onShowAccConfig(){
+      console.log('this.acclist',this.acc_list)
+      this.checked = {}
+      this.acc_list.forEach(v=>{
+        this.$set(this.checked,v,true)
+      })
+      this.showAppSelector = true
+    },
+    onCheckChange(e){
+      console.log('check_changed',e)
+      if(e.type == 'select'){
+        this.$set(this.checked,e.key,true)
+      }else{
+        this.$delete(this.checked,e.key)
+      }
+    },
+    onChangeAccelerators(){
+      this.$store.dispatch('core/saveAcc',this.acc_config_list).then(res=>{
+        this.showAppSelector=false
+      }).catch(e=>{
+        this.Error('快捷应用保存失败:'+e)
+      })
+      
+    },
   }
 }
 </script>
@@ -154,6 +167,11 @@ export default {
     padding:30px 50px;padding-bottom:20px;
   }
  
+}
+
+.text-button-deleting{
+  border:1px dashed #fff;
+  padding:2px 8px !important;
 }
 
 
@@ -202,36 +220,6 @@ export default {
     border-radius: 10px;
   }
 
-  .l-app-group{
-    color:#aaa;
-    .l-app-group-title{
-      font-weight: bold;
-      color:#888;
-      font-size:13px;
-      margin:10px 0;
-      display: flex;
-      align-items: center;
-      text-shadow: 1px 1px 1px #333;
-      i{
-        font-size:18px;
-        margin-right:10px;
-      }
-    }
-    .l-app-group-list{
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      font-size:13px;
-      color:#ddd;
-       .l-app-check{
-         height:25px;
-        font-size:12px;
-        
-      }
-
-        
-    }
-  }
 
 @media screen and (max-width:768px){
   .l-menu-wrap{
@@ -255,12 +243,54 @@ export default {
     }
   }
 
-  .l-app-group-title{
+  
+}
+
+
+.l-app-selector{
+  position: fixed;
+  z-index:10;
+  top:44px;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#111;
+  .l-list-wrap{
+   
+    position: relative;
+    height:calc(100% - 80px);
+    overflow:hidden;overflow-y:auto;
     margin:5px;
+
+
   }
-  .l-app-group-list{
-    padding-left:20px;
+
+  .l-list-wrap::-webkit-scrollbar {
+  /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    padding:2px;
+    left:2px;
+    right:2px;
+    margin:2px;
   }
+
+  
+  .l-list-wrap::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    background   : linear-gradient(to bottom,#333,rgb(46, 46, 46));
+    width:4px;
+  }
+  .l-list-wrap::-webkit-scrollbar-track:hover{
+    background:#aaa;
+  }
+  .l-list-wrap::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    background:none;
+    border-radius: 10px;
+  }
+
+ 
 }
 
 </style>

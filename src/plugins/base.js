@@ -3,30 +3,11 @@
 
 // Imports
 import Vue from 'vue'
-import upperFirst from 'lodash/upperFirst'
-import camelCase from 'lodash/camelCase'
-import iView from 'iview'
+
 import PuzzleVerification from 'vue-puzzle-verification'
 
 
-// Automatically loads and bootstraps files
-// in the "./src/components/base" folder.
-const requireComponent = require.context('@/components/base', true, /\.vue$/)
 
-for (const file of requireComponent.keys()) {
-    const componentConfig = requireComponent(file)
-    const name = file
-        .replace(/index.js/, '')
-        .replace(/^\.\//, '')
-        .replace(/\.\w+$/, '')
-    const componentName = upperFirst(camelCase(name))
-    console.log('REGISTER:',componentName)
-    Vue.component(`Base${componentName}`, componentConfig.default || componentConfig)
-}
-
-
-// Setup iVIew UI
-Vue.use(iView)
 
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
@@ -79,3 +60,5 @@ Vue.directive('transfer',{
 })
 
 console.log("PLUGINS INIT SUCCESS")
+
+export default Vue

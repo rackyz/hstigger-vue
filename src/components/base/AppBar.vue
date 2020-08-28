@@ -16,150 +16,33 @@
 <template>
   <div class="l-app-bar">
     <div class="l-left">
-      <BaseLogo class='d-none d-sm-block' style="width:160px;"></BaseLogo>
+      
       <!-- Menu Button -->
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
       <!-- Message -->
       <Badge :count='5' type='primary' style="margin-right:20px;">
-        <div class='text-btn' @click="RouteTo('/message')">
+        <div class='text-btn' @click="RouteTo('/core/message')">
           <Icon custom="gzicon gzi-mail" size="18" />
         </div>
       </Badge>
       
-      <div class="text-btn text-btn-dropdown text-btn-dropdown-active">
-        <BaseAvatar :size="30" style='margin-right:5px;'></BaseAvatar>
-        <span class='d-none d-sm-block'>{{session.name}}</span>
-      </div>
-     
       <!-- User -->
+      <Dropdown ref='dm' trigger='hover' placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onClickUserMenu'>
+        <a href="javascript:void(0)" class="text-btn text-btn-dropdown" :class="{'text-btn-dropdown-active':showUserMenu}">
+          <BaseAvatar :size="30" style='margin-right:5px;'></BaseAvatar>
+          <span class='d-none d-sm-block'>{{session.name}}</span>
+        </a>
+         <DropdownMenu slot="list">
+            <DropdownItem ref='m1' name='self'>个人中心</DropdownItem>
+            <DropdownItem ref='m2' name='logout' divided>退出</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     </div>
 
 
-    <!-- Transfer Models -->
-    <div class="l-app-selector" v-show="open_selector">
-      <div class="l-list-wrap">
-      
-      <Row style="margin:0 145px; max-width: 1000px;">
-        <div style="padding:40px 0px;color:#aaa;font-size:13px;">首页链接添加 (2/10)</div>
-        <Col :span="6" style="min-width:200px;">
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon :custom="`gzicon gzi-${'desktop'}`"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div>
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div>
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div>
-          <div class="l-app-group"  style="min-width:200px;">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div>
-        </Col>
-        <Col :span="6"  style="min-width:200px;" ><div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div>
-          <div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div></Col>
-        <Col :span="6"  style="min-width:200px;" ><div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div></Col>
-        <Col :span="6" ><div class="l-app-group">
-              <div class="l-app-group-title">
-                <Icon custom="gzicon gzi-pm2"></Icon>项目管理
-              </div>
-              <div class="l-app-group-list">
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-                  <Checkbox class='l-app-check' v-model="model.v1">进度管理</Checkbox>
-              </div>
-            
-          </div></Col>
-      </Row>
-      </div>
-      <Row style="display:flex;justify-content:center;border-top:1px solid #333;height:80px;align-items:center;">
-        <Button type='primary' style="margin-right:30px;border-radius:0;width:80px;" @click="open_selector=false">保存</Button>
-        <Button ghost style="border-radius:0;width:80px;" @click="open_selector=false">取消</Button>
-      </Row>
-    </div>
+   
     
   </div>
 </template>
@@ -170,6 +53,7 @@ export default {
   data(){
     return {
       open_selector:false,
+      showUserMenu:false,
       model:{}
     }
     
@@ -187,7 +71,21 @@ export default {
         // this.RouteTo('/login')
       })
     }
+
+    // 暂时处理dropdown一个bug，子菜单父对象无法正常绑定
+    this.$refs.m1.$parent = this.$refs.dm
+    this.$refs.m2.$parent = this.$refs.dm
     
+  },
+  methods:{
+    onClickUserMenu(e){
+      if(e == 'logout'){
+        this.$store.dispatch('core/logout')
+        this.RouteTo('/login')
+      }
+      else
+        this.RouteTo('/core/'+e)
+    }
   }
 }
 </script>
@@ -201,6 +99,7 @@ export default {
   left:0;
   right:0;
   top:0;
+  z-index:1000;
 
   display: flex;
   justify-content: space-between;
@@ -215,78 +114,4 @@ export default {
   }
 }
 
-.l-app-selector{
-  position: fixed;
-  z-index:10;
-  top:44px;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#111;
-  .l-list-wrap{
-   
-    position: relative;
-    height:calc(100% - 80px);
-    overflow:hidden;overflow-y:auto;
-    margin:5px;
-
-
-  }
-
-  .l-list-wrap::-webkit-scrollbar {
-  /*滚动条整体样式*/
-    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
-    padding:2px;
-    left:2px;
-    right:2px;
-    margin:2px;
-  }
-
-  
-  .l-list-wrap::-webkit-scrollbar-thumb {
-    /*滚动条里面小方块*/
-    border-radius: 10px;
-    background   : linear-gradient(to bottom,#333,rgb(46, 46, 46));
-    width:4px;
-  }
-  .l-list-wrap::-webkit-scrollbar-track:hover{
-    background:#aaa;
-  }
-  .l-list-wrap::-webkit-scrollbar-track {
-    /*滚动条里面轨道*/
-    background:none;
-    border-radius: 10px;
-  }
-
-  .l-app-group{
-    color:#aaa;
-    .l-app-group-title{
-      font-weight: bold;
-      color:#aaa;
-      font-size:13px;
-      margin:10px 0;
-      i{
-        font-size:18px;
-        margin-right:5px;
-      }
-    }
-    .l-app-group-list{
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      font-size:12px;
-      color:#ddd;
-      padding-left:10px;
-       .l-app-check{
-         height:25px;
-        font-size:12px;
-        
-      }
-
-        
-    }
-  }
-
- 
-}
 </style>
