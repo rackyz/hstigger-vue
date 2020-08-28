@@ -1,8 +1,25 @@
 /** AUTOMATIC GENERIT ROUTE-MAP */
-
 /** Page-route
  *  
  */
+import upperFirst from 'lodash/upperFirst'
+import camelCase from 'lodash/camelCase'
+// Automatically loads and bootstraps files
+// in the "./src/components/base" folder.
+const requireComponent = require.context('@/components/base', true, /\.vue$/)
+
+for (const file of requireComponent.keys()) {
+  const componentConfig = requireComponent(file)
+  const name = file
+    .replace(/index.js/, '')
+    .replace(/^\.\//, '')
+    .replace(/\.\w+$/, '')
+  const componentName = upperFirst(camelCase(name))
+  Vue.component(`Base${componentName}`, componentConfig.default || componentConfig)
+}
+
+
+
 const files = require.context('@/pages', true, /\.vue$/)
 const fileMap = {}
 for (const rawfilePath of files.keys()) {
@@ -55,7 +72,6 @@ for (const rawfilePath of files.keys()) {
       delete route.parent
     
   }
-  console.log(filePath, fileName,route)
   fileMap[filePath] = route
 }
 
@@ -77,4 +93,13 @@ Object.keys(fileMap).forEach(k => {
   }
 })
 
-console.log('APP-ROUTES:', APP_ROUTES)
+let core = APP_ROUTES.find(v=>v.path == '/core')
+let iframe = core.children.find(v=>v.path == '/core/iframecontainer')
+core.redirect = core.path + '/dashboard'
+core.children.push({
+  component:iframe.component,
+  path:'/app/:appkey'
+})
+
+
+export default Vue

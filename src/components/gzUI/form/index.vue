@@ -330,7 +330,6 @@ export default {
             Object.assign(data,this.form.controller)
             that.formControl = new Vue({
                 parent:that,
-                el:this.$refs.formlay,
                 template,
                 data,
                 store:this.$store,
@@ -383,6 +382,7 @@ export default {
                     }
             }})
 
+            that.formControl.$mount(this.$refs.formlay)
         },
        
     }

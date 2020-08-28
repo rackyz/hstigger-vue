@@ -50,7 +50,7 @@ export const request = (api_name, {
   param,
   query,
   data,
- 
+  headers
 }={}, PACK = 'CORE_API') => {
   let apiObject = getAPI(api_name, {
     PACK,
@@ -59,7 +59,8 @@ export const request = (api_name, {
   })
   return axiosClient.request({
     ...apiObject,
-    data
+    data,
+    headers
   })
 }
 

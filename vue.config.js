@@ -3,7 +3,6 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const path = require('path')
 const config = require('./src/config')
 const clean = new CleanWebpackPlugin()
-const apiMocker = require('mocker-api')
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -60,7 +59,8 @@ const Chained = config=>{
 
   // CDN引入 - 名称映射
   config.externals({
-    "iview": "iview",
+    "vue": "Vue",
+    "iview":"view-design",
     "moment": "moment",
     "axios": "axios"
   })
