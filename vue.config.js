@@ -60,7 +60,7 @@ const Chained = config=>{
   // CDN引入 - 名称映射
   config.externals({
     "vue": "Vue",
-    "iview":"view-design",
+    "iview":"iview",
     "moment": "moment",
     "axios": "axios"
   })

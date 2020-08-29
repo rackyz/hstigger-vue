@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Router from 'vue-router'
-import iView from 'view-design'
+import iView from 'iview'
 import {
   APP_ROUTES,
   APP_PUBLIC_ROUTES

@@ -11,7 +11,6 @@
             :onSuccess="handleSuccess"
             width="400"
             height="230"
-
           />
       </Modal>
      

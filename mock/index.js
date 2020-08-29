@@ -28,26 +28,16 @@ MOCK_API('LOGIN', req => {
     password
   } = JSON.parse(req.body)
 
-<<<<<<< HEAD
-  if (user == 'admin' && password == ADMIN_PASS)
-      return ReturnData({
-        id:1,
-        name:'马骍',
-        role:[1]
-      })
-  else if (user == 'test' && password == TEST_PASS)
-=======
-  let user = users.find(v=>v.user == account)
-  if(!user)
+  let current_user = users.find(v=>v.user == account)
+  if (!current_user)
     return ThrowError('用户名不存在')
 
-  if (password == user.pass)
->>>>>>> 89722c66716996c9a48384bc19ccade7da2b9974
+  if (password == current_user.pass)
       return ReturnData({
-        id:user.id,
-        name:user.name,
-        role:user.role,
-        user:user.user
+        id: current_user.id,
+        name: current_user.name,
+        role: current_user.role,
+        user: current_user.user
       })
   else
       return ThrowError('密码错误')
