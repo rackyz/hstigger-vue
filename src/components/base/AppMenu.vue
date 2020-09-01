@@ -52,7 +52,7 @@
 
         <div class="l-list-wrap">
            <Input :autofocus='true' style='margin:20px 0' class="l-menu-input" clearable v-model="filterMenu" search placeholder="输入模块关键字搜索" />
-           <ColumnList :data="app_groups" tmpl="BaseTmplMenuGroup" :filter="filterMenu" />
+           <hs-columnlist :data="app_groups" tmpl="BaseTmplMenuGroup" :filter="filterMenu" />
         </div>
     </div>
      </transition>
@@ -63,7 +63,7 @@
       <div class="l-list-wrap">
       <Row style="margin:0 145px; max-width: 1000px;">
         <div style="padding:20px 0px;color:#aaa;font-size:13px;">首页链接添加 ({{acc_config_list.length}}/10)</div>
-        <ColumnList :data="app_groups" :checked="checked" editable tmpl="BaseTmplMenuGroup" @on-event='onCheckChange' />
+        <hs-columnlist :data="app_groups" :checked="checked" editable tmpl="BaseTmplMenuGroup" @on-event='onCheckChange' />
       </Row>
       </div>
       <Row style="display:flex;justify-content:center;border-top:1px solid #333;height:80px;align-items:center;">
@@ -77,7 +77,6 @@
 
 <script>
 import {mapGetters} from 'vuex'
-import ColumnList from '@components/gzUI/layout/ColumnList'
 export default {
   
   data(){
@@ -107,9 +106,6 @@ export default {
     acc_config_list(){
       return Object.keys(this.checked)
     }
-  },
-  components:{
-    ColumnList
   },
   props:{
     value:{

@@ -1,5 +1,6 @@
 
-import {axiosClient,axiosCosClient} from '@/plugins/axios'
+import AxiosClient from '@/plugins/axios'
+
 const PACKS = {
   CORE_API:{
     // core
@@ -50,14 +51,14 @@ export const request = (api_name, {
   param,
   query,
   data,
-  headers
+  headers = {}
 }={}, PACK = 'CORE_API') => {
   let apiObject = getAPI(api_name, {
     PACK,
     param,
     query
   })
-  return axiosClient.request({
+  return AxiosClient.axios.request({
     ...apiObject,
     data,
     headers

@@ -2,7 +2,7 @@
 <template>
     <div class="l-login">
       
-      <gLogin :loading="loading" @submit="submitForm" />
+      <hs-login :loading="loading" @submit="submitForm" />
       
       <Modal v-model="isVerificationShow" footer-hide width="430">
         <PuzzleVerification
@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import gLogin from '@components/gzUI/section/gLogin'
 import PuzzleVerification from 'vue-puzzle-verification'
 import { mapActions } from 'vuex'
 
@@ -31,7 +30,7 @@ export default {
             puzzleImgList:['https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/code.jpg']
         }
     },
-    components:{gLogin,PuzzleVerification},
+    components:{PuzzleVerification},
     methods: {
         handleSuccess(){
 

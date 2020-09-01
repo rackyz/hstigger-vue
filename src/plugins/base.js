@@ -3,12 +3,7 @@
 
 // Imports
 import Vue from 'vue'
-
 import PuzzleVerification from 'vue-puzzle-verification'
-
-
-
-
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
 

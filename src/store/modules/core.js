@@ -3,8 +3,6 @@
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
 
-import { resolve } from 'path'
-
 const API = require('@/api')
 const crypto = require('crypto')
 const state = {
@@ -145,10 +143,9 @@ const actions = {
     })
   },
   login({commit},{user,password}){
-     var md5 = crypto.createHash("md5")
-     md5.update(password)
-     password = md5.digest('hex')
-     console.log("md5:",password)
+    var md5 = crypto.createHash("md5")
+    md5.update(password)
+    password = md5.digest('hex')
 
     return new Promise((resolve, reject) => {
        API.request('LOGIN', {

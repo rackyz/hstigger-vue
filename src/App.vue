@@ -21,7 +21,6 @@
 
 <style lang="less">
   @import "../public/css/transitions.less";
-  @import "../src/components/gzUI/styles.less";
   @import "../public/css/styles.less";
   
  

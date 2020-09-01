@@ -13,6 +13,9 @@
 export default {
   metaInfo:{
     title:"首页"
+  },
+  mounted(){
+    this.$store.dispatch('core/whoami')
   }
 }
 </script>

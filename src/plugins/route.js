@@ -18,8 +18,6 @@ for (const file of requireComponent.keys()) {
   Vue.component(`Base${componentName}`, componentConfig.default || componentConfig)
 }
 
-
-
 const files = require.context('@/pages', true, /\.vue$/)
 const fileMap = {}
 for (const rawfilePath of files.keys()) {

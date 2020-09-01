@@ -1,8 +1,8 @@
 const axios = require('axios')
 const config = require('../config')
 
-export var axiosClient = axios.create({
-  baseURL: process.env.NODE_ENV !== 'production'?config.devServer:config.prodServer,
+var axiosClient = axios.create({
+  baseURL: config.Server,
   timeout: config.timeout
 })
 
@@ -48,7 +48,12 @@ axiosClient.interceptors.response.use(data => {
 
 
 
-export var axiosCOSClient = axios.create({
+var axiosCOSClient = axios.create({
   baseURL: config.cosServer
 })
+
+export default {
+  axios:axiosClient,
+  cos:axiosCOSClient
+}
 

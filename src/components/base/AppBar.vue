@@ -16,7 +16,7 @@
 <template>
   <div class="l-app-bar">
     <div class="l-left">
-      
+       <BaseLogo class='d-none d-sm-block' style="margin-right:20px;"></BaseLogo>
       <!-- Menu Button -->
       <BaseAppMenu v-model="open_selector" />
     </div>

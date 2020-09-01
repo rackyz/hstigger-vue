@@ -57,13 +57,15 @@ const Chained = config=>{
       }
     ])
 
-  // CDN引入 - 名称映射
-  config.externals({
-    "vue": "Vue",
-    "iview":"iview",
-    "moment": "moment",
-    "axios": "axios"
-  })
+   // CDN引入 - 名称映射
+   config.externals({
+     "vue": "Vue",
+     "iview": "iview",
+     "hsui": "hsui",
+     "moment": "moment",
+     "axios": "axios"
+   })
+
 
   config.module.rule('eslint').clear()
 
