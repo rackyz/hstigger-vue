@@ -1,7 +1,7 @@
 <template>
   <Layout style='height:100%;'>
     <BaseAppBar style='width:100%;'></BaseAppBar>
-    <div style='margin-top:44px;height:100%;width:100%;position:relative;'>
+    <div style='margin-top:44px;height:100%;width:100%;position:relative;' v-if='session.token'>
       <router-view></router-view>
     </div>
     
@@ -10,9 +10,13 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   metaInfo:{
     title:"首页"
+  },
+  computed:{
+    ...mapGetters('core',['session'])
   },
   mounted(){
     this.$store.dispatch('core/whoami')

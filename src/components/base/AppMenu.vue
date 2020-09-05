@@ -151,7 +151,7 @@ export default {
 }
 .l-menu-wrap{
   position: fixed;
-  z-index:20;
+   z-index:999;
   background:rgb(33, 39, 51);
   top:44px;
   left:70px;
@@ -173,7 +173,7 @@ export default {
 
 .l-menu-mask{
   position: fixed;
-  z-index:19;
+  z-index:901;
   left:0;
   right:0;
   top:44px;
@@ -245,7 +245,7 @@ export default {
 
 .l-app-selector{
   position: fixed;
-  z-index:10;
+  z-index:999;
   top:44px;
   left:0;
   right:0;

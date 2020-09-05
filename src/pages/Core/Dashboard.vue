@@ -6,14 +6,37 @@
     <Col :span='5'>
         <Card class="panel"  style='width:100%;height:100px;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);'>
         <div style='padding:10px;padding-top:0;'>
-          早上好,<a>胡佳翰</a>
+          早上好, <a>{{session.name}}</a>
           <h3>2020年9月1日</h3>
        </div>
       
     </Card>
-    <Card class="panel"  style='width:100%;height:20px;border:none;color:#fff;border-radius:0' padding="5">
+    <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
+      <div class='l-list'>
         
-         <Icon custom='gzicon gzi-xiangmu' />
+        <div class='action-button'>
+          <Icon custom='gzicon gzi-jianbao' color='#45556E' size='32' />
+          发布通知
+        </div>
+
+        <div class='action-button'>
+          <Icon custom='gzicon gzi-xiangmu' color='#45556E' size='32' />
+          布置任务
+        </div>
+
+        <div class='action-button'>
+          <Icon custom='gzicon gzi-Building-' color='#45556E' size='32' />
+          创建项目
+        </div>
+
+        <div class='action-button'>
+          <Icon custom='gzicon gzi-xiangmu2' color='#45556E' size='32' />
+          上传档案
+        </div>
+
+      </div>
+        
+         
     </Card>
      <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" @on-click='onClickNotice'>
          <Carousel autoplay v-model="value2" loop style='width:100%;margin-bottom:10px;'  autoplay-speed='10000' height='250' dots='outside'>
@@ -46,7 +69,31 @@
       临时文件/共享文件
     </Card>
     </Col>
-    <Col :span='13'><Card class="panel" style="width:100%;border:none;height:750px">
+    <Col :span='13'>
+    <Row :gutter="10">
+      <Col :span='6'>
+      <Card>
+        当前工作
+      </Card>
+      
+      </Col>
+      <Col :span='6'>
+       <Card>
+        紧急/即将到期
+      </Card>
+      </Col>
+      <Col :span='6'>
+       <Card>
+        已完成
+      </Card>
+      </Col>
+      <Col :span='6'>
+       <Card>
+        所有工作
+      </Card>
+      </Col>
+    </Row>
+    <Card class="panel" style="width:100%;border:none;height:750px;margin-top:10px;">
       <BaseCalendar style='height:600px' />
     </Card>
 
@@ -149,7 +196,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['userinfo'])
+    ...mapGetters('core',['session'])
   },
   metaInfo:{
     title:'工作台'
@@ -163,5 +210,26 @@ export default {
   font-size:16px;
   margin:5px 0;
   text-overflow: ellipsis;
+}
+
+.action-button{
+  display:flex;
+  flex-direction: column;
+  width:60px;
+  height:60px;
+  font-size:12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button:hover{
+  filter:brightness(1.5);
+  cursor: pointer;
+}
+
+.action-button:active{
+  position: relative;
+  bottom:-1px;
+  right:-1px;
 }
 </style>

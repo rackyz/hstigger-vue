@@ -6,12 +6,26 @@ const PACKS = {
     // core
     LOGIN: "POST /sessions",
     WHO_IS: "GET /sessions/current",
-    //
+    GET_ACCLERATES: "GET /acclerates",
+    SAVE_ACCELERATES: "POST /accelerates",
+    GET_USERS:"GET /users",
+    ADD_USER:"POST /users",
+    PATCH_USER:"PATCH /users/:id",
+    DEL_USER:"DEL /users/:id",
+    DEL_USERS:"DEL /users",
+    // MESSAGE
+    GET_MESSAGES: "GET /messages",
+    READ_MEESAGE: "PATCH /messages/:id"
   },
 
   FILE_API:{
 
   }
+}
+
+export const SetAuthorization = function(token){
+  console.log('set:',token)
+  AxiosClient.axios.defaults.headers.Authorization = token
 }
 
 export const getAPI = function(api_name, {

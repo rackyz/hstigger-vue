@@ -21,8 +21,11 @@
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
+       <div class='text-btn' @click="showDebug = !showDebug" style='margin-right:15px;'>
+          <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
+        </div>
       <!-- Message -->
-      <Badge :count='5' type='primary' style="margin-right:20px;">
+      <Badge :count='session.unread_msg_count' type='primary' style="margin-right:20px;">
         <div class='text-btn' @click="RouteTo('/core/message')">
           <Icon custom="gzicon gzi-mail" size="18" />
         </div>
@@ -41,26 +44,64 @@
       </Dropdown>
     </div>
 
-
+    <!-- DEBUG MODAL -->
+      <Modal title="调试"  footer-hide draggable v-model="showDebug" v-show='session.id'>
+          <div style="padding:10px;padding-left:120px;">
+          用户: <Select style='display:inline-block;width:200px;' transfer :value="session.id"  @on-change="Debug_ChangeUser"> <Option :key="d.id" :name="d.id" v-for="d in users" :value="d.id">
+                {{d.name}}
+          </Option>
+          </Select><br />
+              部门: <Select ref='debug_deps' style='display:inline-block;width:300px;margin-top:5px;' multiple transfer :value="session.deps"  @on-select="Debug_ChangeDep"> <Option :key="d.id" :name="d.id" v-for="d in deps" :value="d.id">
+                      {{d.name}}
+              </Option>
+          </Select><br />
+              角色: <Select  ref='debug_roles' style='display:inline-block;width:300px;margin-top:5px;' multiple transfer :value="session.roles"  @on-select="Debug_ChangeRole"> <Option :key="d.id" :name="d.id" v-for="d in roles" :value="d.id">
+                      {{d.name}}
+          </Option>
+          </Select>
+          <hs-avatar :userinfo="session" :size="80" style="position:absolute;left:20px;top:45px;" />
+          <br />
+          <div class="log">
+            {{session.unread_msg_count}}
+              </div>
+                  </div>
+      </Modal>
    
-    
+      <div class='l-login-mask' v-show="!session.id"  >
+          <div class="login">
+          <BaseLoginHeader />
+          <p style='color:#aaa'>您的登录状态已过期，请重新登录</p>
+          <BaseLogin style="margin-top:20px;" />  
+          <BaseOAuthLogin style='margin-top:20px;' />
+      </div>
+      </div>
+     
   </div>
 </template>
 
 <script>
 import {mapGetters} from 'vuex'
+import Login from "@pages/Login.vue"
 export default {
   data(){
     return {
       open_selector:false,
       showUserMenu:false,
+      showDebug:false,
       model:{}
+
     }
     
   },
+  components:{
+    Login
+  },
   computed:{
     ...mapGetters('core',{
-      session:'session'
+      session:'session',
+      users:'users',
+      deps:'deps',
+      roles:'roles'
     })
   },
   mounted(){
@@ -72,9 +113,6 @@ export default {
       })
     }
 
-    // 暂时处理dropdown一个bug，子菜单父对象无法正常绑定
-    this.$refs.m1.$parent = this.$refs.dm
-    this.$refs.m2.$parent = this.$refs.dm
     
   },
   methods:{
@@ -85,6 +123,15 @@ export default {
       }
       else
         this.RouteTo('/core/'+e)
+    },
+    Debug_ChangeUser(e){
+
+    },
+    Debug_ChangeDep(e){
+
+    },
+    Debug_ChangeRole(e){
+
     }
   }
 }
@@ -111,6 +158,16 @@ export default {
     color:#fff;
     font-size:12px;
     margin:0 6px;
+  }
+
+  .l-login-mask{
+    z-index:1052;
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:rgba(33,33,33,0.8);
   }
 }
 

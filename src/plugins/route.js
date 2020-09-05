@@ -72,7 +72,7 @@ for (const rawfilePath of files.keys()) {
   }
   fileMap[filePath] = route
 }
-
+console.log(fileMap)
 export let APP_ROUTES = []
 Object.keys(fileMap).forEach(k => {
   let route = fileMap[k]
@@ -80,11 +80,17 @@ Object.keys(fileMap).forEach(k => {
     let parentRoute = fileMap[route.parent]
     if (!parentRoute)
       throw ('APP-Parent is not exist:' + route.parent)
+
+    console.log(route.path)
     if (parentRoute.children) {
       parentRoute.children.push(route)
     } else {
-      parentRoute.children = [route]
-      parentRoute.redirect = route.path
+      parentRoute.children = [{
+          path: parentRoute.path,
+          redirect: route.path
+        }
+        ,route
+      ]
     }
   } else {
     APP_ROUTES.push(route)
@@ -98,6 +104,8 @@ core.children.push({
   component:iframe.component,
   path:'/app/:appkey'
 })
+
+console.log(APP_ROUTES)
 
 
 export default Vue

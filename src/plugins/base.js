@@ -4,8 +4,10 @@
 // Imports
 import Vue from 'vue'
 import PuzzleVerification from 'vue-puzzle-verification'
+import {request} from '../api'
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
+
 
 // Predefined Some Easy Prompt Methods based on iview
 Vue.prototype.Confirm = function (content, cb) {
@@ -33,6 +35,8 @@ Vue.prototype.Error = function (content) {
     }, 1000)
 }
 
+Vue.prototype.Request = request
+
 Vue.prototype.RouteTo = function (path, newtab = false) {
     if (newtab) {
         let routerUrl = this.$router.resolve({
@@ -40,7 +44,8 @@ Vue.prototype.RouteTo = function (path, newtab = false) {
         });
         window.open(routerUrl.href, "_blank");
     } else {
-        this.$router.push(path)
+        if(this.$route.path != path)
+            this.$router.push(path)
     }
 
 

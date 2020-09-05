@@ -8,6 +8,9 @@ const crypto = require('crypto')
 const state = {
   session:{},
   types:[],
+  users:[],
+  deps:[],
+  roles:[],
   apps:{
     "meeting-room-reservation":{
       key: "meeting-room-reservation",
@@ -18,7 +21,7 @@ const state = {
     },
     "tiny-project-bill": {
       key: "tiny-project-bill",
-      name: '小微项目票据管理',
+      name: '小微项目管理',
       path: '/app/tiny-project-bill',
       version: '1.0.0'
     },
@@ -49,6 +52,18 @@ const state = {
       path:'/app/task',
       version:'1.0.0'
     },
+    "notice": {
+      key: 'notice',
+      name: '通知',
+      path: '/app/notice',
+      version: '1.0.0'
+    },
+    "meeting": {
+      key: 'meeting',
+      name: '会议记录',
+      path: '/app/meeting',
+      version: '1.0.0'
+    },
     "archive": {
       key: 'archive',
       name: '档案管理',
@@ -56,12 +71,23 @@ const state = {
       version: '1.0.0',
       dev: true
     },
+    "disk":{
+      key:'disk',
+      name:"临时文件存储",
+      path:'/app/disk',
+      version:'1.0.0'
+    },
     "projects":{
       key:'projects',
-      name:'项目综合管理',
+      name:' 工程项目管理',
       path:'/app/projects',
       version:'2.0.0',
       dev: true
+    },
+    "admin":{
+      key:"admin",
+      name:"后台管理",
+      path:"/core/admin",
     },
     "it-projects":{
       key:"it-projects",
@@ -76,16 +102,47 @@ const state = {
       path:'/app/it-request',
       version:'1.0.0',
       dev:true
+    },
+    "depEarly": {
+      key: 'depEarly',
+      name: "前期部",
+      path: '/app/dep-early',
+      version: '1.0.0',
+    },
+    "dep-chief-engineer": {
+      key: 'dep-chief-engineer',
+      name: "总师部",
+      path: '/app/dep-chief-engineer',
+      version: '1.0.0',
+    },
+    "depFinance": {
+      key: 'depFinance',
+      name: "财务室内",
+      path: '/app/dep-finance',
+      version: '1.0.0',
+    },
+    "depManagement": {
+      key: 'depManagement',
+      name: "经营部",
+      path: '/app/dep-management',
+      version: '1.0.0',
     }
   },
   app_groups: [
     {
       name:"通用模块",
       icon:'supervisor',
-      subs: ['task','archive']
+      subs: ['notice', 'task', 'meeting','disk', 'archive']
     },
     {
-      name:'工程项目管理',
+      name:"部门模块",
+      icon:'depart',
+      subs: ['depCEO','depChiefEngineer',
+        'depEarly', 'depFinance', 'depManagement'
+      ]
+    },
+    {
+      name:'总控',
       icon:'xiangmu1',
       subs:['projects']
     },
@@ -99,9 +156,9 @@ const state = {
       icon:'money',
       subs:['project-bill','tiny-project-bill','claim-back','fi-report']
     },{
-      name:"开发管理",
+      name:"开发与后台管理",
       icon:'parameter',
-      subs:['it-projects','it-request']
+      subs:['admin','it-projects','it-request']
     }
   ],
   acc_list: []
@@ -120,18 +177,28 @@ const getters = {
   },
   acc_list(state){
     return state.acc_list
+  },
+  users(state){
+    return state.users
+  },
+  deps(state){
+    return state.deps
+  },
+  roles(state){
+    return state.roles
   }
 }
 
 const actions = {
   whoami({commit}){
     let token = localStorage.getItem('hs-token')
+    console.log('token:',token)
     return new Promise((resolve,reject)=>{
       if(!token)
         reject()
       let data = {}
       let headers = {
-        Authentication: token
+        Authorization: token
       }
       if (process.env.VUE_APP_MOCK)
         data.token = token
@@ -155,7 +222,7 @@ const actions = {
            }
          }).then(res => {
           let session = res.data.data
-          commit('save',session)
+          localStorage.setItem('hs-token', session.token)
           resolve(session)
        }).catch(reject)
     })
@@ -169,17 +236,38 @@ const actions = {
   saveAcc({commit},acc_list){
     // REMOTE 
     return new Promise((resolve,reject)=>{
-       commit('saveAcc', acc_list)
-       resolve()
+      API.request('SAVE_ACCELERATES',{
+        data:acc_list
+      }).then(res=>{
+          commit('saveAcc', acc_list)
+          resolve()
+      }).catch(reject)
     })
    
+  },
+  GetUsers({commit}){
+    return new Promise((resolve,reject)=>{
+      API.request('GET_USERS').then(res=>{
+        commit('saveUsers',res.data.data)
+        resolve()
+      }).catch(reject)
+    })
   }
 }
 
 const mutations = {
   save(state,session){
-    localStorage.setItem('hs-token',session.id)
+    API.SetAuthorization(session.token)
+    localStorage.setItem('hs-token',session.token)
+    
     state.session = session
+    if(session.system){
+      state.users = session.system.users
+      state.roles = session.system.roles
+      state.deps = session.system.deps
+    }
+
+    mutations.saveAcc(state,session.acclist)
   },
   logout(state){
     state.session = {}
@@ -188,6 +276,9 @@ const mutations = {
   saveAcc(state, acc_list) {
     console.log('save_list',acc_list)
     state.acc_list = [...acc_list]
+  },
+  saveUsers(state,users){
+    state.users = users
   }
 }
 
