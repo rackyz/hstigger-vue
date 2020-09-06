@@ -63,33 +63,97 @@
     </Carousel>
   <div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div>
      <div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div><div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div><div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div><div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div><div>  <a href='#'>这种通知要注意把要求和措施部 <span style='float:right'>2020/7/12</span></a></div>
-       
+       <div style='text-align:right;margin-top:10px;'><a href='#' >查看更多</a></div>
     </Card>
   <Card class="panel" style="width:100%;border:none;height:280px;margin-top:10px;">
-      临时文件/共享文件
+      临时文件 <a href='#' style='float:right'>查看全部</a>
+      <List>
+        <ListItem>
+            <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="项目名称" description="This is description, this is description." />
+        </ListItem>
+        <ListItem>
+            <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="This is title" description="This is description, this is description." />
+        </ListItem>
+        <ListItem>
+            <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="This is title" description="This is description, this is description." />
+            <template slot="action">
+                <li>
+                    <a href="">Edit</a>
+                </li>
+                <li>
+                    <a href="">More</a>
+                </li>
+            </template>
+        </ListItem>
+        <ListItem>
+            <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="This is title" description="This is description, this is description." />
+            <template slot="action">
+                <li>
+                    <a href="">Edit</a>
+                </li>
+                <li>
+                    <a href="">More</a>
+                </li>
+            </template>
+        </ListItem>
+    </List>
     </Card>
     </Col>
     <Col :span='13'>
     <Row :gutter="10">
-      <Col :span='6'>
-      <Card>
+      <Col :span='4'>
+      <Card class='l-count-card'>
+        
         当前工作
+        <div class='l-count'>
+          321
+        </div>
+      </Card>
+        </Col>
+      <Col :span='4'>
+       <Card class='l-count-card' style='background:darkred;'>
+        
+        紧急
+        <div class='l-count'>
+          321
+        </div>
       </Card>
       
       </Col>
-      <Col :span='6'>
-       <Card>
-        紧急/即将到期
+      <Col :span='4'>
+       <Card class='l-count-card' style='background:rgb(78, 73, 3);'>
+        
+        即将超期
+        <div class='l-count'>
+          321
+        </div>
       </Card>
       </Col>
-      <Col :span='6'>
-       <Card>
+      <Col :span='4'>
+       <Card class='l-count-card' style='background:darkred;'>
+        <Icon type='ios-document' />
+        已超期
+        <div class='l-count'>
+          321
+        </div>
+      </Card>
+      </Col>
+      <Col :span='4'>
+       <Card class='l-count-card' style='background:darkgreen;'>
+        
         已完成
+        <div class='l-count'>
+          321
+        </div>
       </Card>
       </Col>
-      <Col :span='6'>
-       <Card>
-        所有工作
+       <Col :span='4'>
+       <Card class='l-count-card' style='background:#666;'>
+        
+        已中止
+        <div class='l-count'>
+          321
+        </div>
       </Card>
       </Col>
     </Row>
@@ -100,7 +164,8 @@
     </Col></Col>
     <Col :span='6'>
      
-    <Card class="panel" style="width:100%;border:none;height:350px;">
+    <Card class="panel" style="width:100%;border:none;">
+      <div style='margin-bottom:10px;'>审核</div>
       <ButtonGroup>
         <Button type='primary'>进行中</Button>
         <Button>待审核</Button>
@@ -145,7 +210,9 @@
     </ButtonGroup>
         <List>
         <ListItem>
-            <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="项目名称" description="This is description, this is description." />
+            <div class='l-project'>
+              奉化中学
+            </div>
         </ListItem>
         <ListItem>
             <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="This is title" description="This is description, this is description." />
@@ -231,5 +298,29 @@ export default {
   position: relative;
   bottom:-1px;
   right:-1px;
+}
+
+.l-count-card{
+  font-size:15px;
+  background:rgb(197, 89, 1);
+  color:#ddd;
+  line-height:20px;
+
+  i{
+    position: absolute;
+    font-size:80px;
+    left:0px;
+    top:10px;
+    color:rgba(255,255,255,0.3);
+  }
+}
+
+
+.l-count{
+  font-size:30px;
+  text-align: right;
+  width:100%;
+  color:#fff;
+  text-shadow: 1px 1px 1px #333;
 }
 </style>

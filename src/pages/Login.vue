@@ -6,7 +6,6 @@
           <BaseLogin style="margin-top:20px;" />  
           <BaseOAuthLogin style='margin-top:20px;' />
       </div>
-     
    </div>
 </template>
 <script>
