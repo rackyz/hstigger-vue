@@ -9,7 +9,7 @@ const PACKS = {
     GET_ACCLERATES: "GET /acclerates",
     SAVE_ACCELERATES: "POST /accelerates",
     GET_USERS:"GET /users",
-    ADD_USER:"POST /users",
+    POST_USER:"POST /users",
     PATCH_USER:"PATCH /users/:id",
     DEL_USER:"DEL /users/:id",
     DEL_USERS:"DEL /users",

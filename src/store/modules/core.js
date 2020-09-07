@@ -186,7 +186,7 @@ const getters = {
   },
   roles(state){
     return state.roles
-  }
+  },
 }
 
 const actions = {

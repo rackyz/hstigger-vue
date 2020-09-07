@@ -26,7 +26,7 @@
 </style>
 <template>
   <Layout>
-    <Sider width='300' style='background:#fff;filter:drop-shadow(0 2px 16px #dfdfdf);position:fixed;top:44px;
+    <Sider width='300' style='background:#fff;filter:drop-shadow(0 2px 16px #dfdfdf)top:44px;
     bottom:0;'>
       <div class='l-title'><Icon custom='gzicon gzi-mail'></Icon> 系统消息</div>
        <List style='background:#aaa;position:relative;height:calc(100% - 70px);overflow-y:auto;' :loading="loading" >
@@ -42,20 +42,22 @@
      <div class='l-footer'>{{items.length}}条消息, {{items.filter(v=>!v.readtime).length}}条未读</div>
     </Sider>
     <Content>
-        <Card class='hs-doc' v-if='selected' style='margin:20px auto;max-width:900px;min-height:900px;border-radius:0;' shadow>
+        <Card class='hs-doc' v-if='selected' style='margin:10px;min-height:900px;' shadow>
 
         <div class="header" style='text-align:center;border-bottom:2px dashed #ddd;color:#aaa;'>
             <h4>系统消息</h4>
             <div class='info' style='font-size:12px;margin:10px 0;'>
               <div>发布人 管理员</div>
               <div>发布时间 2020年3月8日</div>
-
             </div>
         
         </div>
         <transition name='fade'>
           <div class="content" style='padding:20px;font-size:16px;color:#aaa;'>
             {{selected.content}}
+          </div>
+          <div class='footer'>
+            已阅读:342
           </div>
         </transition>
       </Card>

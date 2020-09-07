@@ -85,3 +85,46 @@ body {
   color:#aaa;
   height:100%;
 }
+
+
+
+.list-item {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.list-item:hover {
+  background: rgb(223, 227, 229);
+
+  transition: all 0.1s;
+}
+
+.list-item-selected {
+  
+  border: 3px solid rgb(43, 167, 255) !important;
+}
+
+.list-item-selected:after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  bottom: -12px;
+  width: 24px;
+  height: 24px;
+  transform: rotateZ(45deg);
+  background: rgb(43, 167, 255);
+}
+
+.list-item-selected:before {
+  content: "\F375";
+  font-family: Ionicons;
+  position: absolute;
+  right: 1px;
+  bottom: 5px;
+  width: 10px;
+  height: 10px;
+  color: #fff;
+  z-index: 10;
+}
