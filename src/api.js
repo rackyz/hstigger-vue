@@ -11,8 +11,8 @@ const PACKS = {
     GET_USERS:"GET /users",
     POST_USER:"POST /users",
     PATCH_USER:"PATCH /users/:id",
-    DEL_USER:"DEL /users/:id",
-    DEL_USERS:"DEL /users",
+    DEL_USER:"DELETE /users/:id",
+    DEL_USERS:"POST /users",
     // MESSAGE
     GET_MESSAGES: "GET /messages",
     READ_MEESAGE: "PATCH /messages/:id"
@@ -50,13 +50,13 @@ export const getAPI = function(api_name, {
   if (param) {
     let keys = Object.keys(param)
     keys.forEach(key => {
-      apiObject.url = apiObject.replace(':' + key, param[key])
+      apiObject.url = apiObject.url.replace(':' + key, param[key])
     })
   }
 
   if (query) {
     let keys = Object.keys(query)
-    apiObject.url = apiObject.url + keys.map(key => `${key}=${query[key]}`).join('&')
+    apiObject.url = apiObject.url +'?' +  keys.map(key => `${key}=${query[key]}`).join('&')
   }
 
   return apiObject

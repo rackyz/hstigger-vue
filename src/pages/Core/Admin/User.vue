@@ -4,17 +4,17 @@
       <h4><Icon type='md-person' /> 用户管理</h4>
       
   </Card>
-  <Card style='margin:10px;margin-bottom:0;margin-top:0;height:calc(100% - 200px);border:none;border-radius:0;' padding='0'>
+  <Card style='margin:10px;margin-bottom:0;margin-top:0;height:calc(100% - 200px);border:none;border-radius:0;' padding='0'  >
       <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled' />
       <a style='position:absolute;right:10px;top:35px;font-size:14px;color:skyblue;'><Icon type='md-document' /> 下载导入用表格模板</a>
-      <div class='filter-wrap' style='padding:10px;background:#eee;'>
+      <div class='filter-wrap' style='padding:10px;background:#eee;' @click="selected=null">
         <Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
       </div>
       <List split :loading='loading'>
        <template v-for='user in filterdUsers'>
 
-          <a @click='selected = user' :key='user.id'>
-        <ListItem :key='user.id' style='padding:20px;' class='list-item' :class='selected==user?"list-item-selected":""'>
+          <a @click.stop='onSelect(user)'  :key='user.id'>
+        <ListItem :key='user.id' style='padding:20px;' class='list-item' :class='(multiple?selected.includes(user):selected==user)?"list-item-selected":""'>
             <ListItemMeta :title="`${user.user} / ${user.name}`">
             <hs-avatar :userinfo='user' size='35' slot='avatar' style='margin-top:2px'></hs-avatar>
           
@@ -49,12 +49,12 @@ import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
-      users:[],
       selected:null,
       loading:false,
       hidingLocked:false,
       searchText:null,
       showUnsafe:false,
+      multiple:false,
       showModal:false,
       current:{},
       tools:[
@@ -87,6 +87,14 @@ export default {
         name:"导入",
         icon:'ios-folder-open'
       },{
+        key:'multiple',
+        name:"多选",
+        icon:'ios-people'
+        },{
+        key:'unmultiple',
+        name:"取消多选",
+        icon:'ios-people-outline'
+        },{
         key:'refresh',
         name:"刷新",
         icon:'md-refresh'
@@ -98,11 +106,21 @@ export default {
   },
   computed:{
     ...mapGetters('core',['deps','roles']),
+    ...mapGetters('admin',['users']),
     toolEnabled(){
-      if(this.selected)
-        return [1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,1]
-      else
-        return [1,0,0,0,0,0,1,1]
+      if(this.multiple){
+        if(this.selected.length > 0){
+           return [1,0,1,1,this.selected.state == 0,this.selected.state==1, 1,0,1,1]
+        }else{
+           return [1,0,0,0,0,0,1,0,1,1]
+        }
+      }else{
+         if(this.selected)
+          return [1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,!this.multiple,this.multiple,1]
+        else
+          return [1,0,0,0,0,0,1,!this.multiple,this.multiple,1]
+      }
+     
     },
     user_form(){
       return {
@@ -185,6 +203,19 @@ export default {
     }
   },
   methods:{
+    onSelect(e){
+      if(this.multiple){
+        if(this.selected.includes(e))
+          this.selected.splice(this.selected.findIndex(v=>v==e),1)
+        else
+          this.selected.push(e)
+      }else{
+        if(this.selected == e)
+          this.selected = null
+        else
+          this.selected = e
+      }
+    },
     GetStateColor(s){
       if(s == 0)
         return 'yellowgreen'
@@ -203,8 +234,8 @@ export default {
     },
     getData(){
        this.loading = true
-      this.Request('GET_USERS').then(res=>{
-        this.users = res.data.data
+      this.$store.dispatch('admin/ListUsers').then(res=>{
+       
       }).finally(e=>{
         this.loading = false
       })
@@ -218,6 +249,38 @@ export default {
         this.showModal = true
       }else if(e == 'refresh'){
         this.getData()
+      }else if(e == 'lock'){
+        this.$store.dispatch('admin/LockUser',this.selected.id)
+      }else if(e == 'unlock'){
+        this.$store.dispatch('admin/UnlockUser',this.selected.id)
+      }else if(e == 'resetpass'){
+        this.$store.dispatch('admin/ResetPassword',this.selected.id)
+      }else if(e == 'delete'){
+        this.Confirm('确定要删除该用户?',()=>{
+          if(this.multiple){
+            this.$store.dispatch('admin/DeleteUsers',this.selected.map(v=>v.id)).then(res=>{
+              this.Success('删除成功')
+            }).catch(e=>{
+              this.Error(e)
+            })
+          }else{
+            this.$store.dispatch('admin/DeleteUser',this.selected.id).then(res=>{
+              this.Success('删除成功')
+            }
+              
+            ).catch(e=>{
+              this.Error(e)
+            })
+          }
+        })
+       
+        
+      }else if(e == 'multiple'){
+        this.multiple = true
+        this.selected = []
+      }else if(e == 'unmultiple'){
+        this.multiple = false
+        this.selected = null
       }
     },
      patchUser(item){
@@ -225,18 +288,10 @@ export default {
             if(this.current.id){
                 item.id = this.current.id
             }
-            this.Request(item.id?'PATCH_USER':'POST_USER',{data:item}).then(res=>{
+            this.$store.dispatch('admin/PatchUser',item).then(res=>{
                 that.Success(item.id?"修改成功":"新增用户成功")
                 that.showModal = false
                 that.current = {}
-
-                let item =Object.assign({},item,res.data.data)
-                let index = that.users.findIndex(v=>v.id == item.id)
-                if(index != -1)
-                 that.users.splice(index,1,item)
-                else
-                  that.users.splice(that.users.length-1,0,item)
-
             }).catch(e=>{
                 if(typeof(e) == "string" && e.includes('{')){
                    e = JSON.parse(e)
@@ -245,7 +300,6 @@ export default {
                     return
                    }
                 }
-
                 that.Error(e)
             })
         }

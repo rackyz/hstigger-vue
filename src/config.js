@@ -1,7 +1,7 @@
 module.exports = {
   // axios 配置参数
   Server: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz:10000"
- :'http://127.0.0.1:5858',
+ :'http://192.168.14.40:5858',
   timeout:5000,
   defaultHeaders:{
       "api-version": "v0"
