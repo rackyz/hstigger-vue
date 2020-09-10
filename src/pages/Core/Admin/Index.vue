@@ -28,6 +28,10 @@ export default {
         icon:'bar-chart',
         path:'/core/admin/dashboard'
       },{
+        name:"账号与权限",
+        icon:'apps',
+        is_group:true,
+        subs:[{
         name:'用户管理',
         icon:"user",
         path:'/core/admin/user'
@@ -35,30 +39,55 @@ export default {
         name:'部门管理',
         icon:"organization",
         path:'/core/admin/dep'
-      },
+      }
       ,{
         name:'角色权限',
         icon:"quanxianliebiao",
         path:'/core/admin/role'
-      },{
-        name:'项目管理',
-        icon:'apps',
-        is_group:true,
-        subs:[{
-          name:'布局 Layout',
-          path:'/layout',
-          icon:'interface'
-        }]
+      }]
         },{
-          name:"HSUI 组件",
+          name:"数据管理",
           is_group:true,
           subs:[
           {
-        name:'菜单',
+        name:'项目',
+        path:'/menu',
+        icon:'xiangmu'
+      },{
+        name:'任务流程',
+        path:'/menu',
+        icon:'xiangmu'
+      },{
+        name:'审批',
+        path:'/menu',
+        icon:'xiangmu'
+      },{
+        name:'档案资料',
+        path:'/menu',
+        icon:'xiangmu'
+      },{
+        name:'临时文件',
+        path:'/menu',
+        icon:'xiangmu'
+      },{
+        name:'工作',
         path:'/menu',
         icon:'xiangmu'
       }]
-      }]
+      },{
+        name:'系统维护',
+        icon:'apps',
+        is_group:true,
+        subs:[{
+          name:'系统日志',
+          path:'/layout',
+          icon:'interface'
+        },{
+          name:'备份和恢复',
+          path:'/layout',
+          icon:'interface'
+        }]
+        },]
     }
    
   },

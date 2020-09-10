@@ -29,7 +29,7 @@ const actions = {
   },
   PatchUser({commit},data){
     return new Promise((resolve,reject)=>{
-      if(data.id){
+      if(!data.id){
            API.request('POST_USER', {
              data
            }).then(res => {
@@ -87,11 +87,11 @@ const mutations = {
     state.users = users
   },
   saveUser(state,user){
-    console.log('save:',user)
+    
     let index = state.users.findIndex(v=>v.id == user.id)
     if(index != -1){
-      let user = Object.assign({},state.users[index],user)
-      state.users.splice(index,1,user)
+      let item = Object.assign({},state.users[index],user)
+      state.users.splice(index,1,item)
     }
     else
       state.users.push(user)

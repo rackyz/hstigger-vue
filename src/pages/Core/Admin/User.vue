@@ -1,13 +1,11 @@
 <template>
 <div style='height:100%;'>
-  <Card style='margin:10px;margin-bottom:0;border-radius:0;background:#23334c;color:#fff;border-top-left-radius:10px;border-top-right-radius:10px;'>
-      <h4><Icon type='md-person' /> 用户管理</h4>
-      
-  </Card>
-  <Card style='margin:10px;margin-bottom:0;margin-top:0;height:calc(100% - 200px);border:none;border-radius:0;' padding='0'  >
+ 
+  <Card style='margin:10px;border:none;border-radius:0;' padding='0'  >
+     <div style='padding:10px;border-bottom:1px solid #dfdfdf;'><Icon type='md-person' /> 用户管理</div>
       <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled' />
-      <a style='position:absolute;right:10px;top:35px;font-size:14px;color:skyblue;'><Icon type='md-document' /> 下载导入用表格模板</a>
-      <div class='filter-wrap' style='padding:10px;background:#eee;' @click="selected=null">
+      <a style='position:absolute;right:10px;top:85px;font-size:14px;color:#63738c;'><Icon type='md-download' /> 下载导入用表格模板</a>
+      <div class='filter-wrap' style='padding:5px;border-bottom:1px solid #dfdfdf;' @click="selected=null">
         <Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
       </div>
       <List split :loading='loading'>
@@ -15,11 +13,11 @@
 
           <a @click.stop='onSelect(user)'  :key='user.id'>
         <ListItem :key='user.id' style='padding:20px;' class='list-item' :class='(multiple?selected.includes(user):selected==user)?"list-item-selected":""'>
-            <ListItemMeta :title="`${user.user} / ${user.name}`">
+            <ListItemMeta :title="`${user.user}(账号) / ${user.name}`">
             <hs-avatar :userinfo='user' size='35' slot='avatar' style='margin-top:2px'></hs-avatar>
           
             <div class="description" slot='description' style='font-size:12px;line-height:12px;'>
-                <div class='state-mark' :style='`background:${GetStateColor(user.state)}`'></div>{{GetStateText(user.state)}} | <span style='margin:0 5px;' :style='`color:${user.passweak?"darkred":"darkgreen"}`'>{{user.passweak?'初始密码':'安全'}}</span> | {{user.lastlogin_at?moment(user.lastlogin_at).fromNow():'未登录'}}
+                <div class='state-mark' :style='`background:${GetStateColor(user.state)}`'></div>{{GetStateText(user.state)}} | <span style='margin:0 5px;' :style='`color:${user.passweak?"darkred":"darkgreen"}`'>{{user.passweak?'初始密码':'安全'}}</span> | {{user.lastlogin_at?moment(user.lastlogin_at).fromNow() + ' 登录':'未登录'}}
             </div>
            
             </ListItemMeta>
@@ -189,7 +187,7 @@ export default {
     },
     filterdUsers(){
       return this.users.filter(v=>{
-        if(this.searchText && !v.name.includes(this.searchText.trim()))
+        if(this.searchText && !v.name.includes(this.searchText.trim()) && !v.user.includes(this.searchText.trim()))
           return false
         
         if(this.showUnsafe && !v.passweak)
