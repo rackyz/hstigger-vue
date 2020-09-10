@@ -57,13 +57,14 @@ for (const rawfilePath of files.keys()) {
 
   if (fileName == 'index') {
     if(route.parent){
-      route.path = '/'+route.parent
+      route.path = '/' + route.parent
       filePath = route.parent
+      route.name = route.parent + '/index'
     }
     else
       route.path = '/'
 
-    if(route.parent &&route.parent.includes('/')){
+    if(route.parent && route.parent.includes('/')){
       let parentIndex = route.parent.lastIndexOf('/')
       route.parent = route.parent.slice(0,parentIndex)
     }else
@@ -72,7 +73,7 @@ for (const rawfilePath of files.keys()) {
   }
   fileMap[filePath] = route
 }
-console.log(fileMap)
+
 export let APP_ROUTES = []
 Object.keys(fileMap).forEach(k => {
   let route = fileMap[k]
@@ -80,8 +81,6 @@ Object.keys(fileMap).forEach(k => {
     let parentRoute = fileMap[route.parent]
     if (!parentRoute)
       throw ('APP-Parent is not exist:' + route.parent)
-
-    console.log(route.path)
     if (parentRoute.children) {
       parentRoute.children.push(route)
     } else {
@@ -97,6 +96,8 @@ Object.keys(fileMap).forEach(k => {
   }
 })
 
+console.log('ROUTE INIT SUCCESS:',APP_ROUTES)
+
 let core = APP_ROUTES.find(v=>v.path == '/core')
 let iframe = core.children.find(v=>v.path == '/core/iframecontainer')
 core.redirect = core.path + '/dashboard'
@@ -105,7 +106,6 @@ core.children.push({
   path:'/app/:appkey'
 })
 
-console.log(APP_ROUTES)
 
 
 export default Vue

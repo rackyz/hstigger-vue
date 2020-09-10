@@ -24,7 +24,6 @@ const PACKS = {
 }
 
 export const SetAuthorization = function(token){
-  console.log('set:',token)
   AxiosClient.axios.defaults.headers.Authorization = token
 }
 
@@ -50,13 +49,15 @@ export const getAPI = function(api_name, {
   if (param) {
     let keys = Object.keys(param)
     keys.forEach(key => {
-      apiObject.url = apiObject.url.replace(':' + key, param[key])
+      if(keys)
+        apiObject.url = apiObject.url.replace(':' + key, param[key])
     })
   }
 
   if (query) {
     let keys = Object.keys(query)
-    apiObject.url = apiObject.url +'?' +  keys.map(key => `${key}=${query[key]}`).join('&')
+    if(keys)
+      apiObject.url = apiObject.url +'?' +  keys.map(key => `${key}=${query[key]}`).join('&')
   }
 
   return apiObject

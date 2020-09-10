@@ -3,7 +3,7 @@
    <div class="page">
       <div class="login">
           <BaseLoginHeader />
-          <BaseLogin style="margin-top:20px;" />  
+          <BaseLogin style="margin-top:20px;" :routeTo="'/core'" />  
           <BaseOAuthLogin style='margin-top:20px;' />
       </div>
    </div>

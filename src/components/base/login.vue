@@ -1,7 +1,6 @@
 
 <template>
     <div class="l-login">
-      
       <hs-login :loading="loading" @submit="submitForm" />
       
       <Modal v-model="isVerificationShow" footer-hide width="430">
@@ -30,16 +29,37 @@ export default {
             puzzleImgList:['https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/code.jpg']
         }
     },
+    props:{
+        routeTo:{
+            type:String
+        }
+    },
     components:{PuzzleVerification},
     methods: {
         handleSuccess(){
 
         },
         submitForm(model) {
-            this.loading = true
+           
+            if(!model.user){
+                this.Error("请输入用户名")
+                return
+            }
+            if(!model.password){
+                this.Error("请输入密码")
+                return
+            }
+
+             this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
                 this.Success('登陆成功')
-                this.RouteTo('/core')
+                if(this.routeTo){
+                    
+                    this.RouteTo(this.routeTo)
+                }else{
+                    location.reload()
+                    
+                }
             }).catch(e=>{
                 this.Error(e)
             }).finally(e=>{

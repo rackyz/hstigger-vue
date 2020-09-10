@@ -67,7 +67,7 @@
                   </div>
       </Modal>
    
-      <div class='l-login-mask' v-show="!session.id"  >
+      <div class='l-login-mask' v-show="!isLogin"  >
           <div class="login">
           <BaseLoginHeader />
           <p style='color:#aaa'>您的登录状态已过期，请重新登录</p>
@@ -101,13 +101,14 @@ export default {
       session:'session',
       users:'users',
       deps:'deps',
-      roles:'roles'
+      roles:'roles',
+      isLogin:'isLogin'
     })
   },
   mounted(){
     if(!this.session.id){
       this.$store.dispatch('core/whoami').then(()=>{
-        this.Success('登录成功')
+        
       }).catch(e=>{
         // this.RouteTo('/login')
       })

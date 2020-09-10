@@ -26,10 +26,10 @@
            
             <template slot="action">
                 <li>
-                    {{user.deps.map(d=>deps.find(v=>v.id == d).name).join(',') || '无部门'}}
+                    {{user.deps && user.deps.length > 0 ? user.deps.map(d=>deps.find(v=>v.id == d).name).join(',') : '无部门'}}
                 </li>
                 <li>
-                    {{user.roles.map(d=>roles.find(v=>v.id == d).name).join(',') || '无角色'}}
+                    {{user.roles && user.roles.length > 0 ?user.roles.map(d=>roles.find(v=>v.id == d).name).join(',') : '无角色'}}
                 </li>
             </template>
             
@@ -39,7 +39,7 @@
     </List>
   </Card>
 
-   <hs-modal-form ref="form"  :title="current && current.id?'修改信息':'新增用户'" v-model="showModal" :width="420"  style="margin:10px" :form="user_form" :data="current"  editable  @on-submit="patchUser" @on-event='handleEvent' />
+   <hs-modal-form ref="form"  :title="(current && current.id?'修改信息':'新增用户') + showModal" v-model="showModal" :width="420"  style="margin:10px" :form="user_form" :data="current"  editable  @on-submit="patchUser" @on-event='handleEvent' />
 </div>
   
 </template>
@@ -243,6 +243,7 @@ export default {
     onEvent(e){
       console.log(e)
       if(e == 'add'){
+        this.current = null
         this.showModal = true
       }else if(e == 'edit'){
         this.current = this.selected
@@ -284,25 +285,26 @@ export default {
       }
     },
      patchUser(item){
-            var that = this
-            if(this.current.id){
-                item.id = this.current.id
-            }
-            this.$store.dispatch('admin/PatchUser',item).then(res=>{
-                that.Success(item.id?"修改成功":"新增用户成功")
-                that.showModal = false
-                that.current = {}
-            }).catch(e=>{
-                if(typeof(e) == "string" && e.includes('{')){
-                   e = JSON.parse(e)
-                   if(e.key){
-                    that.$refs.form.setError(e.key,e.error)
-                    return
-                   }
-                }
-                that.Error(e)
-            })
+       console.log('patch:',item)
+        var that = this
+        if(this.current && this.current.id){
+            item.id = this.current.id
         }
+        this.$store.dispatch('admin/PatchUser',item).then(res=>{
+            that.Success(item.id?"修改成功":"新增用户成功")
+            that.showModal = false
+            that.current = {}
+        }).catch(e=>{
+            if(typeof(e) == "string" && e.includes('{')){
+                e = JSON.parse(e)
+                if(e.key){
+                that.$refs.form.setError(e.key,e.error)
+                return
+                }
+            }
+            that.Error(e)
+        })
+      }
   }
 }
 </script>

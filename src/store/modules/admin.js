@@ -87,6 +87,7 @@ const mutations = {
     state.users = users
   },
   saveUser(state,user){
+    console.log('save:',user)
     let index = state.users.findIndex(v=>v.id == user.id)
     if(index != -1){
       let user = Object.assign({},state.users[index],user)

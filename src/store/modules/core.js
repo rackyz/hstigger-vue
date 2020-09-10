@@ -10,6 +10,7 @@ const state = {
   types:[],
   users:[],
   deps:[],
+  isLogin:false,
   roles:[],
   apps:{
     "meeting-room-reservation":{
@@ -166,6 +167,9 @@ const state = {
 
 
 const getters = {
+  isLogin(state){
+    return state.isLogin;
+  },
   session(state){
     return state.session
   },
@@ -192,7 +196,6 @@ const getters = {
 const actions = {
   whoami({commit}){
     let token = localStorage.getItem('hs-token')
-    console.log('token:',token)
     return new Promise((resolve,reject)=>{
       if(!token)
         reject()
@@ -202,8 +205,10 @@ const actions = {
       }
       if (process.env.VUE_APP_MOCK)
         data.token = token
+
       API.request('WHO_IS', {data,headers}).then(res => {
         let session = res.data.data
+         commit('login')
         commit('save', session)
         resolve(session)
       }).catch(reject)
@@ -223,6 +228,7 @@ const actions = {
          }).then(res => {
           let session = res.data.data
           localStorage.setItem('hs-token', session.token)
+          commit('login')
           resolve(session)
        }).catch(reject)
     })
@@ -256,6 +262,9 @@ const actions = {
 }
 
 const mutations = {
+  login(state){
+    state.isLogin = true
+  },
   save(state,session){
     API.SetAuthorization(session.token)
     localStorage.setItem('hs-token',session.token)
@@ -270,11 +279,11 @@ const mutations = {
     mutations.saveAcc(state,session.acclist)
   },
   logout(state){
+     state.isLogin = false
     state.session = {}
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {
-    console.log('save_list',acc_list)
     state.acc_list = [...acc_list]
   },
   saveUsers(state,users){
