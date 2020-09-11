@@ -2,12 +2,12 @@
   <Row :gutter='10' style='margin:10px;'>
     <Col :span='4'>
       <Card>
-        用户数
+        用户数 {{users.length}}
       </Card>
     </Col>
      <Col :span='4'>
       <Card>
-        项目数
+        项目数 {{projects.length}}
       </Card>
     </Col>
      <Col :span='4'>
@@ -35,10 +35,14 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   metaInfo:{
     title:'后台',
     group:'Admin'
+  },
+  computed:{
+    ...mapGetters('admin',['users'])
   }
 }
 </script>
