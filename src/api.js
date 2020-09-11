@@ -12,7 +12,7 @@ const PACKS = {
     POST_USER:"POST /users",
     PATCH_USER:"PATCH /users/:id",
     DEL_USER:"DELETE /users/:id",
-    DEL_USERS:"POST /users",
+    DEL_USERS:"POST /users/delete",
     // MESSAGE
     GET_MESSAGES: "GET /messages",
     READ_MEESAGE: "PATCH /messages/:id"

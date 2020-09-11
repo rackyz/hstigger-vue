@@ -27,6 +27,11 @@ const actions = {
        }).catch(reject)
     })
   },
+  CreateUsers({commit},data){
+    return new Promise((resolve,reject)=>{
+      resolve(data.map(v=>v%3))
+    })
+  },
   PatchUser({commit},data){
     return new Promise((resolve,reject)=>{
       if(!data.id){
@@ -55,8 +60,8 @@ const actions = {
   UnlockUser({commit},id){
     return actions.PatchUser({commit},{id,state:0})
   },
-  ResetPassword({commit},id){
-    return actions.PatchUser({commit},{id,password:'123456'})
+  ResetPassword({commit},{id,password='123456'}){
+    return actions.PatchUser({commit},{id,password})
   },
   DeleteUser({commit},id){
      return new Promise((resolve, reject) => {

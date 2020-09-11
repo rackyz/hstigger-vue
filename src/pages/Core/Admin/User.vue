@@ -37,23 +37,64 @@
     </List>
   </Card>
 
-   <hs-modal-form ref="form"  :title="(current && current.id?'修改信息':'新增用户') + showModal" v-model="showModal" :width="420"  style="margin:10px" :form="user_form" :data="current"  editable  @on-submit="patchUser" @on-event='handleEvent' />
+   <hs-modal-form ref="form"  :title="(current && current.id?'修改信息':'新增用户')" v-model="showModal" :width="420"  style="margin:10px" :form="user_form" :data="current"  editable  @on-submit="patchUser" @on-event='handleEvent' />
+
+    <hs-modal-form ref="formpwd"  :title="`修改密码:${selected?selected.name:''}`" v-model="showModalPassword" :width="320"  style="margin:10px" :form="user_password_form" :data="current"  editable  @on-submit="patchUserPassword" @on-event='handleEvent' />
+
+    <!-- 从文件导入状态对话框 -->
+    <Modal
+        v-model="modalImporting"
+        width="600"
+        transfer
+        :z-index='2'
+        :footer-hide="importState != 3"
+    >
+        <p
+            slot="header"
+            style="color:#f60;text-align:center"
+        >
+            <Icon type="ios-information-circle"></Icon>
+            <span>导入数据</span>
+        </p>
+        <div style="text-align:center;font-size:0.85rem;">
+            <p
+                style='color:red;font-weight:bold;margin-bottom:0.25rem;font-size:14px;text-align:left;padding:5px 30px;padding-top:15px;'
+                :style="importState===2?'color:green':''"
+            >{{importStateStr}}</p>
+            <div style='text-align:left;padding:10px;font-size:12px;max-height:300px;overflow-y:auto;background:#fff;padding:10px;margin:10px 30px;'>
+              <p v-for='(u,i) in importData' :key='u.name'>
+              [{{i+1}}] {{u.user}} / {{u.name}} <span style='float:right;' :style='`color:${cannotImport(u)?"red":"blue"}`'>{{cannotImport(u)?cannotImport(u):'可导入'}}</span>
+            </p>
+           
+            </div>
+             <Button  style='height:40px;margin:10px;width:90%;' @click='importAll' v-if='importData && importData.length'>导入所有账号</Button>
+        </div>
+
+        <input ref='fileLoader' v-show='false' type='file' accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*.csv"  @change='parse' />
+    </Modal>
+    
 </div>
   
 </template>
 
 <script>
 import {mapGetters} from 'vuex'
+import XLSX from 'xlsx'
 export default {
   data(){
     return {
       selected:null,
       loading:false,
       hidingLocked:false,
+      importData:[],
       searchText:null,
       showUnsafe:false,
       multiple:false,
       showModal:false,
+      showModalPassword:false,
+      modalImporting:false,
+      importStateStr:"",
+      importState:0,
       current:{},
       tools:[
       {
@@ -73,6 +114,10 @@ export default {
         name:"重置密码",
         icon:'md-key'
       },{
+        key:'resetpwdto',
+        name:"修改密码",
+        icon:'ios-key'
+        },{
         key:'lock',
         name:"禁用",
         icon:'md-lock'
@@ -91,6 +136,7 @@ export default {
         },{
         key:'unmultiple',
         name:"取消多选",
+        color:'yellogreen',
         icon:'ios-people-outline'
         },{
         key:'refresh',
@@ -108,17 +154,40 @@ export default {
     toolEnabled(){
       if(this.multiple){
         if(this.selected.length > 0){
-           return [1,0,1,1,this.selected.state == 0,this.selected.state==1, 1,0,1,1]
+           return [1,0,1,1,0,this.selected.state == 0,this.selected.state==1, 1,0,1,1]
         }else{
-           return [1,0,0,0,0,0,1,0,1,1]
+           return [1,0,0,0,0,0,0,1,0,1,1]
         }
       }else{
          if(this.selected)
-          return [1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,!this.multiple,this.multiple,1]
+          return [1,1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,!this.multiple,this.multiple,1]
         else
-          return [1,0,0,0,0,0,1,!this.multiple,this.multiple,1]
+          return [1,0,0,0,0,0,0,1,!this.multiple,this.multiple,1]
       }
      
+    },
+    user_password_form(){
+      return {
+        layout:"<div><Row><Col :span='24'>{{password}}</Col></Row><Row style='margin-top:10px'><Col :span='24'>{{passwordAgain}}</Col></Row></div>",
+        def:{
+          password:{
+            label:"输入密码",
+            control:"input",
+            option:{
+              type:'password',
+              require:true
+            }
+          },
+          passwordAgain:{
+            label:"密码确认",
+            control:"input",
+            option:{
+              type:'password',
+              require:true
+            }
+          }
+        }
+      }
     },
     user_form(){
       return {
@@ -201,6 +270,12 @@ export default {
     }
   },
   methods:{
+    cannotImport(user){
+      if(this.users.find(v=>v.user == user.user))
+        return '用户名重复'
+      else if(this.users.find(v=>v.phone == user.phone))
+        return '电话号码重复'
+    },
     onSelect(e){
       if(this.multiple){
         if(this.selected.includes(e))
@@ -213,6 +288,13 @@ export default {
         else
           this.selected = e
       }
+    },
+    importAll(){
+      var that = this
+      this.$store.dispatch('admin/CreateUsers',this.importData).then(results=>{
+        let succees = results.filter(v=>v == 0)
+        that.importStateStr = `导入完毕,成功导入${succees.length}个账户`
+      })
     },
     GetStateColor(s){
       if(s == 0)
@@ -231,7 +313,7 @@ export default {
         return '锁定'
     },
     getData(){
-       this.loading = true
+      this.loading = true
       this.$store.dispatch('admin/ListUsers').then(res=>{
        
       }).finally(e=>{
@@ -252,8 +334,19 @@ export default {
         this.$store.dispatch('admin/LockUser',this.selected.id)
       }else if(e == 'unlock'){
         this.$store.dispatch('admin/UnlockUser',this.selected.id)
-      }else if(e == 'resetpass'){
-        this.$store.dispatch('admin/ResetPassword',this.selected.id)
+      }else if(e == 'resetpwd'){
+        if(this.multiple){
+          this.Confirm(`确定要重置<span style="color:red">${this.selected.join(',')}等${this.selected.length}</span>用户的密码?`,
+            ()=>this.$store.dispatch('admin/Resetpassword',this.selected.map(v=>v.id))
+          )
+        }else{
+          this.Confirm(`确定要重置用户<span style="color:red">${this.selected.name}</span>的密码?`,
+            ()=>this.$store.dispatch('admin/Resetpassword',[this.selected.id])
+          )
+        }
+        this.$store.dispatch('admin/ResetPassword',{id:this.selected.id})
+      }else if(e== 'resetpwdto'){
+        this.showModalPassword = true
       }else if(e == 'delete'){
         this.Confirm('确定要删除该用户?',()=>{
           if(this.multiple){
@@ -272,7 +365,9 @@ export default {
             })
           }
         })
-       
+      }else if(e == 'import'){
+        console.log(this.$refs.fileLoader)
+        this.$refs.fileLoader.click()
         
       }else if(e == 'multiple'){
         this.multiple = true
@@ -281,6 +376,72 @@ export default {
         this.multiple = false
         this.selected = null
       }
+    },
+
+file2Xce(file){
+    let wb = null
+    return new Promise(function (resolve, reject) {
+        const reader = new FileReader()
+        reader.onload = function (e) {
+            const data = e.target.result
+            wb = XLSX.read(data, {
+                type: 'binary'
+            })
+            const result = []
+            wb.SheetNames.forEach((sheetName) => {
+                result.push({
+                    sheetName: sheetName,
+                    sheet: XLSX.utils.sheet_to_json(wb.Sheets[sheetName])
+                })
+            })
+            resolve(result)
+        }
+        reader.readAsBinaryString(file)
+    })
+
+},
+    parse(file) {
+            file = this.$refs.fileLoader.files[0]
+            console.log(file)
+            var that = this
+            this.modalImporting = true
+            this.importStateStr = "正在分析文件... 请耐心等待"
+            // 打开loading对话框
+            
+            this.file2Xce(file).then(tabJson => {
+                if (tabJson && tabJson.length > 0) {
+                    that.importStateStr = "正在上传数据..."
+                    let users = tabJson[0].sheet.map(v=>({
+                      name:v['姓名'],
+                      phone:v['电话'],
+                      password:v['密码'],
+                      user:v['电话']
+                    }))
+                    that.importStateStr = `已从文件中提取${users.length}个账号`
+                    that.importState = 2
+                    that.importData = users
+                    console.log(users)
+                }
+            })
+        },
+    patchUserPassword(item){
+      var that = this
+      if(item.password != item.passwordAgain){
+        this.$refs.formpwd.setError('passwordAgain','两次密码不一致,请检查')
+        return
+      }
+
+      if(this.selected && this.selected.id){
+        item.id = this.selected.id
+        this.$store.dispatch('admin/ResetPassword',item).then(res=>{
+          that.Success('修改成功')
+          that.showModalPassword = false
+        }).catch(e=>{
+          that.Error(e)
+        })
+      }
+
+     
     },
      patchUser(item){
        console.log('patch:',item)
