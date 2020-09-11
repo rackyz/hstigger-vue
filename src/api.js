@@ -10,6 +10,7 @@ const PACKS = {
     SAVE_ACCELERATES: "POST /accelerates",
     GET_USERS:"GET /users",
     POST_USER:"POST /users",
+    POST_USERS:"POST /users/create-users",
     PATCH_USER:"PATCH /users/:id",
     DEL_USER:"DELETE /users/:id",
     DEL_USERS:"POST /users/delete",

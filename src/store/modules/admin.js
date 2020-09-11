@@ -29,7 +29,16 @@ const actions = {
   },
   CreateUsers({commit},data){
     return new Promise((resolve,reject)=>{
-      resolve(data.map(v=>v%3))
+      API.request('POST_USERS',{data}).then(res=>{
+        let users = res.data.data
+        users.filter(v=>v.id).forEach(u=>{
+          commit('saveUser',u)
+        })
+        resolve(res.data.data)
+      }).catch(e=>{
+        if(typeof e == 'object' && e.error)
+          reject(e.error)
+      })
     })
   },
   PatchUser({commit},data){

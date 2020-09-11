@@ -3,10 +3,13 @@
  
   <Card style='margin:10px;border:none;border-radius:0;' padding='0'  >
      <div style='padding:10px;border-bottom:1px solid #dfdfdf;'><Icon type='md-person' /> 用户管理</div>
-      <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled' />
-      <a style='position:absolute;right:10px;top:85px;font-size:14px;color:#63738c;'><Icon type='md-download' /> 下载导入用表格模板</a>
+     <Affix :offset-top="40">
+      <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled'  style='background:#fff' />
+     </Affix>
+      <a href="https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx" style='position:absolute;right:10px;top:85px;font-size:14px;color:#63738c;'><Icon type='md-download' /> 下载导入用表格模板</a>
       <div class='filter-wrap' style='padding:5px;border-bottom:1px solid #dfdfdf;' @click="selected=null">
-        <Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
+        <Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup style='margin-right:5px;'><Button  @click='selected=filterdUsers || []' v-show='multiple'>全部选中</Button><Button v-show='multiple' @click='selected=[]'>清空选择</Button></ButtonGroup><ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
+        {{typeof(selected)}}
       </div>
       <List split :loading='loading'>
        <template v-for='user in filterdUsers'>
@@ -58,16 +61,21 @@
         </p>
         <div style="text-align:center;font-size:0.85rem;">
             <p
-                style='color:red;font-weight:bold;margin-bottom:0.25rem;font-size:14px;text-align:left;padding:5px 30px;padding-top:15px;'
-                :style="importState===2?'color:green':''"
+                style='color:#333;margin-bottom:0.25rem;font-size:14px;text-align:left;padding:5px 30px;padding-top:15px;'
             >{{importStateStr}}</p>
             <div style='text-align:left;padding:10px;font-size:12px;max-height:300px;overflow-y:auto;background:#fff;padding:10px;margin:10px 30px;'>
               <p v-for='(u,i) in importData' :key='u.name'>
-              [{{i+1}}] {{u.user}} / {{u.name}} <span style='float:right;' :style='`color:${TestImportState(u)?"red":"blue"}`'>{{TestImportState(u)?TestImportState(u):'可导入'}}</span>
+              [{{i+1}}] {{u.user}} / {{u.name}} 
+              <template v-if='u.state == undefined'>
+              <span style='float:right;' :style='`color:${TestImportState(u)?"red":"green"}`'>{{TestImportState(u)?TestImportState(u):'可导入'}}</span>
+              </template>
+              <template v-else>
+                  <span style='float:right;' :style='`color:${u.state?"red":"blue"}`'>{{u.state?'创建失败':'创建成功'}}</span>
+              </template>
             </p>
            
             </div>
-             <Button  style='height:40px;margin:10px;width:90%;' @click='importAll' v-if='importData && importData.length'>导入所有账号</Button>
+             <Button style='height:40px;margin:10px;width:90%;' @click='importAllUsers' v-if='importState == 2 && importData && importData.length' :disabled='importableUsers.length == 0' :loading='loadingImport'>导入账号({{importableUsers.length}})</Button>
         </div>
 
         <input ref='fileLoader' v-show='false' type='file' accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*.csv"  @change='parse' />
@@ -83,6 +91,7 @@ import XLSX from 'xlsx'
 export default {
   data(){
     return {
+      loadingImport:false,
       selected:null,
       loading:false,
       hidingLocked:false,
@@ -95,6 +104,7 @@ export default {
       modalImporting:false,
       importStateStr:"",
       importState:0,
+      importStates:[],
       current:{},
       tools:[
       {
@@ -153,7 +163,7 @@ export default {
     ...mapGetters('admin',['users']),
     toolEnabled(){
       if(this.multiple){
-        if(this.selected.length > 0){
+        if(this.selected && this.selected.length > 0){
            return [1,0,1,1,0,this.selected.state == 0,this.selected.state==1, 1,0,1,1]
         }else{
            return [1,0,0,0,0,0,0,1,0,1,1]
@@ -256,7 +266,7 @@ export default {
     },
     filterdUsers(){
       return this.users.filter(v=>{
-        if(this.searchText && !v.name.includes(this.searchText.trim()) && !v.user.includes(this.searchText.trim()))
+        if(this.searchText && (!v.name || !v.name.includes(this.searchText.trim())) && (!v.user || !v.user.includes(this.searchText.trim())))
           return false
         
         if(this.showUnsafe && !v.passweak)
@@ -266,7 +276,10 @@ export default {
           return false
 
         return true
-      })
+      }) || []
+    },
+    importableUsers(){
+      return this.importData.filter(v=>!this.TestImportState(v))
     }
   },
   methods:{
@@ -289,11 +302,26 @@ export default {
           this.selected = e
       }
     },
-    importAll(){
+    importAllUsers(){
       var that = this
-      this.$store.dispatch('admin/CreateUsers',this.importData).then(results=>{
+      this.loadingImport = true
+       let users = this.importData.filter(v=>!this.TestImportState(v))
+      this.$store.dispatch('admin/CreateUsers',users).then(results=>{
+
         let succees = results.filter(v=>v == 0)
+        let map = {}
         that.importStateStr = `导入完毕,成功导入${succees.length}个账户`
+        that.importStates = results
+        users.forEach((v,i)=>{
+          v.state = results[i].id ? 0 : 1
+        })
+         that.importState = 3
+      }).catch(e=>{
+        this.Error(e)
+        this.modalImporting = false
+        this.getData()
+      }).finally(e=>{
+        this.loadingImport = false 
       })
     },
     GetStateColor(s){
@@ -321,7 +349,7 @@ export default {
       })
     },
     onEvent(e){
-      console.log(e)
+      var that = this
       if(e == 'add'){
         this.current = null
         this.showModal = true
@@ -348,15 +376,15 @@ export default {
       }else if(e== 'resetpwdto'){
         this.showModalPassword = true
       }else if(e == 'delete'){
-        this.Confirm('确定要删除该用户?',()=>{
+        this.Confirm(this.multiple?`确定要删除<span style='color:red;margin:0 2px;font-weight:bold'>${this.selected.slice(0,3).map(v=>v.name).join(', ')}</span>等${this.selected.length}个账号`:`确定要删除该用户${this.selected.name}?`,()=>{
           if(this.multiple){
-            this.$store.dispatch('admin/DeleteUsers',this.selected.map(v=>v.id)).then(res=>{
+            this.$store.dispatch('admin/DeleteUsers',that.selected.map(v=>v.id)).then(res=>{
               this.Success('删除成功')
             }).catch(e=>{
               this.Error(e)
             })
           }else{
-            this.$store.dispatch('admin/DeleteUser',this.selected.id).then(res=>{
+            this.$store.dispatch('admin/DeleteUser',that.selected.id).then(res=>{
               this.Success('删除成功')
             }
               
@@ -366,7 +394,6 @@ export default {
           }
         })
       }else if(e == 'import'){
-        console.log(this.$refs.fileLoader)
         this.$refs.fileLoader.click()
         
       }else if(e == 'multiple'){
@@ -402,13 +429,13 @@ file2Xce(file){
 },
     parse(file) {
             file = this.$refs.fileLoader.files[0]
-            console.log(file)
             var that = this
             this.modalImporting = true
             this.importStateStr = "正在分析文件... 请耐心等待"
             // 打开loading对话框
             
             this.file2Xce(file).then(tabJson => {
+
                 if (tabJson && tabJson.length > 0) {
                     that.importStateStr = "正在上传数据..."
                     let users = tabJson[0].sheet.map(v=>({
@@ -420,8 +447,9 @@ file2Xce(file){
                     that.importStateStr = `已从文件中提取${users.length}个账号`
                     that.importState = 2
                     that.importData = users
-                    console.log(users)
                 }
+            }).finally(e=>{
+              that.$refs.fileLoader.value = ''
             })
         },
     patchUserPassword(item){
@@ -442,12 +470,6 @@ file2Xce(file){
       }
 
      
-    },
-    importAll(){
-      let users = this.importData.filter(v=>this.TestImportState(v))
-      this.$store.dispatch('admin/CreateUsers',users).then(results=>{
-
-      })
     },
      patchUser(item){
        console.log('patch:',item)
