@@ -7,7 +7,7 @@
     </Col>
      <Col :span='4'>
       <Card>
-        项目数 {{projects.length}}
+        项目数
       </Card>
     </Col>
      <Col :span='4'>

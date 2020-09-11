@@ -92,7 +92,7 @@ export default {
    
   },
   metaInfo:{
-    title:'后台容器'
+    title:'后台管理'
   },
   computed:{
     ActivePath(){

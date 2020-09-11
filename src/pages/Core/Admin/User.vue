@@ -63,7 +63,7 @@
             >{{importStateStr}}</p>
             <div style='text-align:left;padding:10px;font-size:12px;max-height:300px;overflow-y:auto;background:#fff;padding:10px;margin:10px 30px;'>
               <p v-for='(u,i) in importData' :key='u.name'>
-              [{{i+1}}] {{u.user}} / {{u.name}} <span style='float:right;' :style='`color:${cannotImport(u)?"red":"blue"}`'>{{cannotImport(u)?cannotImport(u):'可导入'}}</span>
+              [{{i+1}}] {{u.user}} / {{u.name}} <span style='float:right;' :style='`color:${TestImportState(u)?"red":"blue"}`'>{{TestImportState(u)?TestImportState(u):'可导入'}}</span>
             </p>
            
             </div>
@@ -270,7 +270,7 @@ export default {
     }
   },
   methods:{
-    cannotImport(user){
+    TestImportState(user){
       if(this.users.find(v=>v.user == user.user))
         return '用户名重复'
       else if(this.users.find(v=>v.phone == user.phone))
@@ -442,6 +442,12 @@ file2Xce(file){
       }
 
      
+    },
+    importAll(){
+      let users = this.importData.filter(v=>this.TestImportState(v))
+      this.$store.dispatch('admin/CreateUsers',users).then(results=>{
+
+      })
     },
      patchUser(item){
        console.log('patch:',item)
