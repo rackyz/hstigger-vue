@@ -1,15 +1,15 @@
 <template>
-  <Layout style='flex-direction:row;'>
+  <Layout style='flex-direction:row;overflow:hidden;'>
     
-     <hs-menu :data="menus" title="后台管理" @on-select='onClickMenu' :current="ActivePath" />
+     <hs-menu style='min-width:200px;' :data="menus" title="后台管理" @on-select='onClickMenu' :current="ActivePath" />
      
      
-       <transition name='fadeIn'>
-         <Content>
-            <router-view></router-view>
-         </Content>
-          
-       </transition>
+    <transition name='fadeIn'>
+      <Content>
+        <router-view></router-view>
+      </Content>
+      
+    </transition>
      
   
      

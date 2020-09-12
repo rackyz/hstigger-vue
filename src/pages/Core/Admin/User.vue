@@ -1,17 +1,21 @@
 <template>
-<div style='height:100%;'>
+<div style='position:relative;height:100%;'>
  
-  <Card style='margin:10px;border:none;border-radius:0;' padding='0'  >
+  <div style='margin:10px;border:none;border-radius:0;position:relative;height:100%;overflow-y:auto;' padding='0'  >
+  
+       <div style='background:#fff;position:absolute;top:0;left:0;right:0;height:152px;' >
      <div style='padding:10px;border-bottom:1px solid #dfdfdf;'><Icon type='md-person' /> 用户管理</div>
-     <Affix :offset-top="40">
-      <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled'  style='background:#fff' />
-     </Affix>
+     
+      <hs-toolbar :data="tools" @event='onEvent' :enabled='toolEnabled'  />
+      
       <a href="https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx" style='position:absolute;right:10px;top:85px;font-size:14px;color:#63738c;'><Icon type='md-download' /> 下载导入用表格模板</a>
       <div class='filter-wrap' style='padding:5px;border-bottom:1px solid #dfdfdf;' @click="selected=null">
-        <Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup style='margin-right:5px;'><Button  @click='selected=filterdUsers || []' v-show='multiple'>全部选中</Button><Button v-show='multiple' @click='selected=[]'>清空选择</Button></ButtonGroup><ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
+        <ButtonGroup style='margin-right:5px;'><Button  @click='selected=filterdUsers || []' v-show='multiple'>全部选中</Button><Button v-show='multiple' @click='selected=[]'>清空选择</Button></ButtonGroup><Button style='margin-right:5px;' type='error' v-show='multiple' @click='multiple=false'>取消批量操作</Button><Input v-model='searchText' search style='width:200px' clearable /> <ButtonGroup><Button :type='hidingLocked?"primary":""' @click='hidingLocked=!hidingLocked'>隐藏已禁用</Button></ButtonGroup><Button :type='showUnsafe?"primary":""' @click='showUnsafe = !showUnsafe' style='margin-left:5px;'>密码未修改</Button>
         {{typeof(selected)}}
       </div>
-      <List split :loading='loading'>
+     </div>
+     <div style='padding-top:140px;height:calc(100% - 140px);'>
+      <List split :loading='loading' >
        <template v-for='user in filterdUsers'>
 
           <a @click.stop='onSelect(user)'  :key='user.id'>
@@ -38,7 +42,8 @@
         </a>
             </template>
     </List>
-  </Card>
+    </div>
+  </div>
 
    <hs-modal-form ref="form"  :title="(current && current.id?'修改信息':'新增用户')" v-model="showModal" :width="420"  style="margin:10px" :form="user_form" :data="current"  editable  @on-submit="patchUser" @on-event='handleEvent' />
 
@@ -141,13 +146,8 @@ export default {
         icon:'ios-folder-open'
       },{
         key:'multiple',
-        name:"多选",
+        name:"批量操作",
         icon:'ios-people'
-        },{
-        key:'unmultiple',
-        name:"取消多选",
-        color:'yellogreen',
-        icon:'ios-people-outline'
         },{
         key:'refresh',
         name:"刷新",
@@ -170,9 +170,9 @@ export default {
         }
       }else{
          if(this.selected)
-          return [1,1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,!this.multiple,this.multiple,1]
+          return [1,1,1,1,1,this.selected.state == 0,this.selected.state==1, 1,1,1]
         else
-          return [1,0,0,0,0,0,0,1,!this.multiple,this.multiple,1]
+          return [1,0,0,0,0,0,0,1,1,1]
       }
      
     },
@@ -289,10 +289,14 @@ export default {
       else if(this.users.find(v=>v.phone == user.phone))
         return '电话号码重复'
     },
+    onSelectAll(){
+      this.selected = this.filterdUsers
+    },
     onSelect(e){
       if(this.multiple){
-        if(this.selected.includes(e))
-          this.selected.splice(this.selected.findIndex(v=>v==e),1)
+        let index = this.selected.findIndex(v=>v.id==e.id)
+        if(index != -1)
+          this.selected.splice(index,1)
         else
           this.selected.push(e)
       }else{
