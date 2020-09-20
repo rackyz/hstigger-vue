@@ -14,8 +14,9 @@
         {{typeof(selected)}}
       </div>
      </div>
-     <div style='padding-top:140px;height:calc(100% - 140px);'>
-      <List split :loading='loading' >
+     <div style='padding-top:160px;height:calc(100% - 140px);'>
+      <hs-list mode='list' :data="filterUsers" :option="{tmpl:'BaseUser'}" @event="onUserEvent" />
+      <!-- <List split :loading='loading' >
        <template v-for='user in filterdUsers'>
 
           <a @click.stop='onSelect(user)'  :key='user.id'>
@@ -41,7 +42,7 @@
         </ListItem>
         </a>
             </template>
-    </List>
+    </List> -->
     </div>
   </div>
 
