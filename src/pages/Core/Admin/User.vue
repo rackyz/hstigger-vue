@@ -2,7 +2,7 @@
   <div style='position:relative;height:100%;'>
 
     <div
-      style='margin:10px;border:none;border-radius:0;position:relative;height:100%;overflow-y:auto;'
+      style='margin:10px;border:1px solid #aaa;border-radius:0;position:relative;height:100%;overflow-y:auto;'
       padding='0'
     >
 
@@ -23,13 +23,18 @@
           <Icon type='md-download' /> 下载导入用表格模板</a>
 
       </div>
-      <div class="hs-fulltable" style='padding-top:108px;height:calc(100% - 20px);overflow:hidden;position:relative;'>
-        <hs-list
+      <div class="hs-fulltable" style='padding-top:108px;height:calc(100% - 70px);overflow:hidden;background:#ddd;position:relative;'>
+        {{selected}}
+        <hs-table
+          style='margin:10px;'
+          :columns="columns"
           :data="filterdUsers"
-          style="border:none;width:100%;margin:0;max-height:calc(100% - 86px);overflow:hidden;"
           :selectable="multiple?'multiple':'single'"
+          :selection="selected"
           :option="{tmpl:'BaseUser',modes}"
+          full
           @event="onUserEvent"
+
         >
           <div
             class='filter-wrap'
@@ -68,8 +73,11 @@
             </Button>
           </div>
 
-        </hs-list>
+        </hs-table>
     
+       
+      </div>
+      
         <div style='height:50px;background:#fff;display:flex;justify-content:center;border-top:1px solid #dfdfdf;align-items:center;'>
 
           <Page
@@ -82,8 +90,6 @@
             show-total
           />
         </div>
-       
-      </div>
     </div>
 
     <hs-modal-form
@@ -192,14 +198,10 @@ export default {
       importStateStr: "",
       importState: 0,
       importStates: [],
-      modes: [
-        
-        { 
-            type: 'table', 
-            tmpl: [
+      columns:[
               { type: 'index', title: '序号' },
                { type: 'text', key: 'user', width: 150, title: '用户名' }, 
-              { type: 'text', key: 'name', width: 80, title: '名称' }, 
+              { type: 'text', key: 'name', width: 80, title: '姓名' }, 
                 { type: 'text', key: 'phone', width: 150, title: '联系电话' }, 
                  { type: 'state', title: '用户等级', key: 'level', width: 120,option:{states: ['游客','合作单位','实习','员工','老员工','管理层','董事长','顾问']} },
               { type: 'state', title: '密码安全', key: 'passweak', width: 80, option:{states: ['未修改', '已修改']} },
@@ -207,10 +209,9 @@ export default {
               { type: 'state', title: '账号状态', key: 'state', width: 80,option:{states: ['锁定', '正常']} },
               { type: 'list', title: '角色权限', key: 'roles',width:200,option:{states: ['锁定', '正常']} },
               { type: 'list', title: '所属部门', key: 'deps', width:200,option:{states: ['锁定', '正常']} },
-              { key: 'last_login_at', type: 'time',width:150,title: "最后登录" }
-            ], 
-            icon: 'md-calendar' 
-        }],
+              { key: 'last_login_at', type: 'time',title: "最后登录" }
+            ],
+      
       current: {},
       tools: [
         {
@@ -265,7 +266,7 @@ export default {
     toolEnabled() {
       if (this.multiple) {
         if (this.selected && this.selected.length > 0) {
-          return [1, 0, 1, 1, 0, this.selected.state == 0, this.selected.state == 1, 1, 0, 1, 1]
+          return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1]
         } else {
           return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1]
         }
@@ -391,26 +392,12 @@ export default {
         return '电话号码重复'
     },
     onSelectAll() {
-      this.selected = this.filterdUsers
+      this.selected = this.filterdUsers.map(v=>v.id)
     },
     onUserEvent(e) {
       console.log(e)
       if(e && e.type == 'select')
-        this.selected = e.param
-    },
-    onSelect(e) {
-      if (this.multiple) {
-        let index = this.selected.findIndex(v => v.id == e.id)
-        if (index != -1)
-          this.selected.splice(index, 1)
-        else
-          this.selected.push(e)
-      } else {
-        if (this.selected == e)
-          this.selected = null
-        else
-          this.selected = e
-      }
+        this.selected = e.data
     },
     importAllUsers() {
       var that = this
@@ -460,22 +447,25 @@ export default {
     },
     onEvent(e) {
       var that = this
+      
+      let selected = this.selectable == 'multiple' ? this.selected.map(v=>this.users.find(item=>item.id == v)).filter(v=>v):this.users.find(v=>item=>item.id == v)
+
       if (e == 'add') {
         this.current = null
         this.showModal = true
       } else if (e == 'edit') {
-        this.current = this.selected
+        this.current = selected
         this.showModal = true
       } else if (e == 'refresh') {
         this.getData()
       } else if (e == 'lock') {
-        this.$store.dispatch('admin/LockUser', this.selected.id)
+        this.$store.dispatch('admin/LockUser', this.selected)
       } else if (e == 'unlock') {
-        this.$store.dispatch('admin/UnlockUser', this.selected.id)
+        this.$store.dispatch('admin/UnlockUser', this.selected)
       } else if (e == 'resetpwd') {
         if (this.multiple) {
-          this.Confirm(`确定要重置<span style="color:red">${this.selected.join(',')}等${this.selected.length}</span>用户的密码?`,
-            () => this.$store.dispatch('admin/Resetpassword', this.selected.map(v => v.id))
+          this.Confirm(`确定要重置<span style="color:red">${this.selected.map(v=>this.users.find(item=>item.id == v).name).join(',')}等${this.selected.length}</span>用户的密码?`,
+            () => this.$store.dispatch('admin/Resetpassword', this.selected)
           )
         } else {
           this.Confirm(`确定要重置用户<span style="color:red">${this.selected.name}</span>的密码?`,
@@ -609,12 +599,17 @@ export default {
 <style lang="less" scoped>
 .description {
   display: flex;
+  
   align-items: center;
 }
 .state-mark {
   width: 9px;
   height: 9px;
   margin-right: 5px;
+}
+
+.filter-wrap{
+  background:#fff;
 }
 
 .list-item {
