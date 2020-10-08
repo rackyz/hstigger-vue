@@ -1,9 +1,9 @@
 <template>
   <div class='user-item' @click='$emit("event",{type:"select",param:data})'>
-    <hs-avatar :userinfo='data' :size='40' />
+    <hs-avatar :userinfo='data' :size='40' style='margin-right:5px;min-width:40px;' />
     <div class='user-info'>
-       <div class='user-dep'>
-        
+       <div class='user-account'>
+           {{data.user}}
       </div>
       <div class='user-name'>
            {{data.name}}
@@ -39,6 +39,11 @@ export default {
   padding:0 5px;
 }
 .user-dep{
+  font-size:12px;
+  color:#3af;
+}
+
+.user-account{
   font-size:12px;
   color:#3af;
 }

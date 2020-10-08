@@ -1,6 +1,6 @@
 <template>
   <div class="l-logo flex-wrap">
-    <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1597294262168&di=766402bd010bddcbdebb401f0f16f510&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201606%2F18%2F20160618173836_mxY4d.gif" />
+    <img src="https://file-1301671707.cos.ap-chengdu.myqcloud.com/nbgz.png" />
     <a href="/core">企业信息平台</a>
     <span class='l-version'>v 1.0.0</span>
   </div>
@@ -23,8 +23,8 @@
   img{
     width:30px;
     height:30px;
-    margin-right:10px;
-    border:2px solid #222;
+    margin-right:5px;
+    border:1px solid rgb(0, 100, 131);
   }
 
   a{

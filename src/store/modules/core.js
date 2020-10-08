@@ -190,7 +190,7 @@ const getters = {
   },
   roles(state){
     return state.roles
-  },
+  }
 }
 
 const actions = {
@@ -271,9 +271,13 @@ const mutations = {
     
     state.session = session
     if(session.system){
+      
+
       state.users = session.system.users
       state.roles = session.system.roles
       state.deps = session.system.deps
+
+      state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))
     }
 
     mutations.saveAcc(state,session.acclist)
