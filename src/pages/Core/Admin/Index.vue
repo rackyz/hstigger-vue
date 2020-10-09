@@ -51,27 +51,31 @@ export default {
           subs:[
           {
         name:'项目',
-        path:'/menu',
+        path:'/core/admin/project',
         icon:'xiangmu'
       },{
-        name:'任务流程',
-        path:'/menu',
+        name:'工作流(配置)',
+        path:'/core/admin/flow',
         icon:'xiangmu'
       },{
-        name:'审批',
-        path:'/menu',
+        name:'工作流(实例)',
+        path:'/core/admin/flowdata',
         icon:'xiangmu'
       },{
         name:'档案资料',
-        path:'/menu',
+        path:'/core/admin/archive',
         icon:'xiangmu'
       },{
         name:'临时文件',
-        path:'/menu',
+        path:'/core/admin/file',
         icon:'xiangmu'
       },{
-        name:'工作',
-        path:'/menu',
+        name:'计划任务',
+        path:'/core/admin/task',
+        icon:'xiangmu'
+      },{
+          name:'计划任务',
+        path:'/core/admin/task',
         icon:'xiangmu'
       }]
       },{
@@ -80,11 +84,11 @@ export default {
         is_group:true,
         subs:[{
           name:'系统日志',
-          path:'/layout',
+          path:'/core/admin/log',
           icon:'interface'
         },{
           name:'备份和恢复',
-          path:'/layout',
+          path:'/core/admin/maintain',
           icon:'interface'
         }]
         },]

@@ -4,13 +4,24 @@
 
 const API = require('@/api')
 const state = {
-  users:[]
+  users:[],
+  deps:[],
+  roles:[],
 }
 
 const getters = {
   users(state){
     return state.users
-  }
+  },
+  roles(state){
+    return state.roles
+  },
+  deps(state){
+    return state.deps
+  },
+  getRoles: state => type_id => {
+    return state.roles.filter(v => v.type_id == type_id)
+  },
 }
 
 const actions = {
@@ -93,7 +104,46 @@ const actions = {
         resolve()
       }).catch(reject)
     })
-  }
+  },
+
+  // ROLE
+  queryRoles:({commit})=>{
+    return new Promise((resolve,reject)=>{
+      return API.request('GET_ROLES').then(res=>{
+        let items = res.data.data
+        commit('saveRoles', items)
+        resolve()
+      }).catch(reject)
+    })
+  },
+    patchRole: ({
+      commit
+    }, item) => {
+      return new Promise((resolve, reject) => {
+        let role = {
+          icon: item.icon,
+          type_id: item.type_id,
+          name: item.name,
+          color: item.color,
+          desc: item.desc
+        }
+        if (item.id) {
+          let id = item.id
+          return API.request('UPDATE_ROLE', {param:{id},data:role}).then(res => {
+            commit('saveRole')
+            resolve()
+          }).catch(reject)
+        }else{
+          return API.request('CREATE_ROLE',{data:role}).then(res=>{
+            let updateInfo = res.data.data
+            Object.assign(item, updateInfo)
+            commit('saveRole', item)
+            resolve()
+          }).catch(reject)
+        }
+
+      })
+    },
 }
 
 const mutations = {
@@ -110,6 +160,7 @@ const mutations = {
     else
       state.users.push(user)
   },
+  
   deleteUser(state,id){
     let index = state.users.findIndex(v => v.id == id)
     if (index != -1) {
@@ -120,7 +171,18 @@ const mutations = {
     ids.forEach(v=>{
       mutations.deleteUser(state,v)
     })
-  }
+  },
+  saveRoles(state, items) {
+    state.roles = items
+  },
+  saveRole(state, role) {
+     let index = state.roles.findIndex(v => v.id == role.id)
+     if (index != -1) {
+       let item = Object.assign({}, state.roles[index], role)
+       state.roles.splice(index, 1, item)
+     } else
+       state.roles.push(role)
+  },
 }
 
 export default {

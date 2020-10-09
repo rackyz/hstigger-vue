@@ -33,8 +33,17 @@
     transition: all 0.3s;
 }
 
+.ivu-tabs-tab-active{
+   border-color:#aaa;
+}
+
+.ivu-tabs-tabpane{
+    border:1px solid #dfdfdf;
+    border-top:none;
+}
+
 .l-list-item-card-selected{
-    border:2px solid rgb(10, 190, 255) !important;
+    border:2px solid rgb(101, 102, 102) !important;
     transition: all 0.3s;
 }
 
@@ -61,7 +70,7 @@
 }
 </style>
 <template>
-  <div class="l-page dashboard" >
+  <div class="hs-container" >
      <Card style="margin:10px;font-size:25px;">
         角色权限
         <div style="font-size:14px;color:#888;">配置角色、部门的权限，为用户分配角色</div>
@@ -78,7 +87,7 @@
                         <div class="l-list-item-card" :class="{'l-list-item-card-selected':selected == r}" :key="r.id">
                             <Icon :type="r.icon" size='45' :color="r.color" />
                             <div class="name">{{r.name}}</div>
-                            <div style="text-align:center"><a @click="Config(r)">配置</a> | <a @click="Edit(r)">修改</a><template v-if="r.id>1000"> | <a @click="Delete(r)">删除</a></template></div>
+                            <div style="text-align:center"><a href="#" @click="Config(r)">配置</a> | <a href="#" @click="Edit(r)">修改</a><template v-if="r.id>1000"> | <a href="#" @click="Delete(r)">删除</a></template></div>
                             <div style="text-align:center;font-size:12px;color:#aaa">{{r.desc}}</div>
                         </div>
                         </template>
@@ -149,22 +158,29 @@
       
 
       <!-- modal -->
-    
-    <Modal v-model="showModalConfig" :title="`配置角色 / ${role.name}`" footer-hide>
+    <hs-modal-form
+        ref="form"
+        :title="!role.id?'新建角色':'编辑角色'"
+        v-model="showModal"
+        :width="420"
+        style="margin: 10px"
+        :form="roleForm"
+        :data="role"
+        editable
+        @on-submit="Patch"
+    />
+
+    <Modal v-model="showModalConfig" :title="`配置角色 / ${role.name}`" footer-hide width="800">
         <div class="l-toolbox l-list">
                 <div class="l-tool">
                     <Icon type="md-document" size="25" />
                     <div class="label">保存</div>
                     </div>
         </div>
-        <div style="height:400px;padding:20px;">
+        <div style="height:400px;padding:20px;background:#fff;">
             自由权限系统后续加入
         </div>    
     </Modal> 
-
-     <Modal v-model="showModal" :title="!role.id?'新建角色':'编辑角色'"  footer-hide>
-     <gzForm style="margin:10px;" editable ref="form" :form="roleForm" :data="role" @on-submit="Patch" />
-     </Modal>
   </div>
 </template>
 
@@ -189,7 +205,7 @@ export default {
         }
     },
     computed:{
-        ...mapGetters("core",['users','roles']),
+        ...mapGetters("admin",['roles','getRoles']),
         tableDef(){
             return {
     key: "user",
@@ -413,10 +429,10 @@ export default {
             return this.getRoles(this.type_id)
         },
         user_table() {
-           return tableDef.cols
+           return this.tableDef.cols
         },
         user_form(){
-            return tableDef.form
+            return this.tableDef.form
         },
         roleForm(){
            return {
@@ -463,7 +479,13 @@ export default {
             }
          }
     },
+    mounted(){
+        this.getData()
+    },
     methods:{
+        getData(){
+            this.$store.dispatch('admin/queryRoles')
+        },
         Add(){
             this.role = {}
             this.showModal = true
@@ -480,7 +502,7 @@ export default {
             if(!e.id)
                 e.type_id = this.type_id
             console.log("PATCH:",e)
-            this.$store.dispatch('user/patchRole',e).then(role=>{
+            this.$store.dispatch('admin/patchRole',e).then(role=>{
                 this.Success(e.id?'修改成功':'添加完成')
                 this.showModal = false
                 this.role = {}
@@ -497,7 +519,7 @@ export default {
         Delete(item){
             var that = this
             this.Confirm(`确定删除角色<span style='margin:0 3px;color:red;'>${item.name}</span>?`,()=>{
-                 that.$store.dispatch('user/delRole',item.id).then(e=>{
+                 that.$store.dispatch('admin/delRole',item.id).then(e=>{
                 that.Success('删除成功')
             }).catch(e=>{
                 that.Error(e)

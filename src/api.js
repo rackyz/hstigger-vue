@@ -16,7 +16,13 @@ const PACKS = {
     DEL_USERS:"POST /users/delete",
     // MESSAGE
     GET_MESSAGES: "GET /messages",
-    READ_MEESAGE: "PATCH /messages/:id"
+    READ_MEESAGE: "PATCH /messages/:id",
+    // admin
+    GET_ROLES:"GET /roles",
+    CREATE_ROLE:"POST /roles",
+    DEL_ROLE:"DELTE /roles/:id",
+    UPDATE_ROLE:"PATCH /roles/:id",
+
   },
 
   FILE_API:{

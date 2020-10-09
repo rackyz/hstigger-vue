@@ -41,8 +41,6 @@
 				style="margin-left: 5px"
 				>密码未修改
 			</Button>
-
-			{{ current }}
 		</div>
     <!-- table -->
 		<div

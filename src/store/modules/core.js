@@ -190,7 +190,10 @@ const getters = {
   },
   roles(state){
     return state.roles
-  }
+  },
+ getRoles: state => type_id => {
+   return state.roles.filter(v => v.type_id == type_id)
+ },
 }
 
 const actions = {
