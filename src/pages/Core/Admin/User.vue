@@ -102,9 +102,10 @@
     <!-- modal for changing user password -->
 		<hs-modal-form
 			ref="formpwd"
-			:title="`修改密码:${selected ? selected.name : ''}`"
+			:title="`修改密码${selected_user ? (':'+selected_user.name) : ''}`"
 			v-model="showModalPassword"
 			:width="320"
+     
 			style="margin: 10px"
 			:form="user_password_form"
 			:data="current"
@@ -218,29 +219,12 @@ export default {
 					width: 110,
 					title: "姓名",
 					linkEvent: true,
-					option: { align: "center",getters:"core/users" },
+					option: { align: "center",getters:"admin/users" },
 				},
 				{ type: "text", key: "user", width: 150, title: "用户名" },
 			
 				{ type: "text", key: "phone", width: 150, title: "联系电话" },
-				{
-					type: "state",
-					title: "用户等级",
-					key: "level",
-					width: 120,
-					option: {
-						states: [
-							"游客",
-							"合作单位",
-							"实习",
-							"员工",
-							"老员工",
-							"管理层",
-							"董事长",
-							"顾问",
-            ]
-					},
-				},
+			
 			
 				{
 					type: "list",
@@ -268,14 +252,14 @@ export default {
 					title: "密码安全",
 					key: "passweak",
 					width: 100,
-					option: { states: ["默认密码", "安全"],colors:['darkred','darkgreen'] },
+					option: { states: ["安全","默认密码"],colors:['darkgreen','darkred'] },
 				},
 
 				{
 					type: "state",
 					title: "账号状态",
 					key: "state",
-					width: 80,
+					width: 120,
 					option: { states: ["正常",'锁定','异常'],colors:['darkgreen','darkred','orange'] },
 				},
         
@@ -352,7 +336,11 @@ export default {
 					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1];
 				}
 			} else {
-        if (this.selected){
+        if (this.selected ){
+          if(this.selected.includes('sys')){
+            return [1, 1, 0, 0, 0, 0, 0, 1, 1, 1];
+          }
+
           let state = this.users.find(v=>v.id == this.selected).state
 					return [
 						1,
@@ -487,7 +475,14 @@ export default {
      */
 		importableUsers() {
 			return this.importData.filter((v) => !this.TestImportState(v));
-		},
+    },
+    selected_user(){
+      if(Array.isArray(this.selected)){
+        return this.selected.map(id=>this.users.find(v=>v.id == id)).filter(v=>v)
+      }else{
+        return this.users.find(v=>v.id == this.selected)
+      }
+    }
 	},
 	methods: {
     /**
@@ -551,7 +546,7 @@ export default {
 					this.loadingImport = false;
 				});
 		},
-		GetStateColor(s) {
+  		GetStateColor(s) {
 			if (s == 0) return "yellowgreen";
 			else if (s == 1) return "darkred";
 			else return "orange";
@@ -581,12 +576,12 @@ export default {
       var that = this;
       let selected_id = this.selected
 			let selected =
-				this.selectable == "multiple"
-					? selected_ids
+				(this.multiple
+					? (selected_id
 							.map((v) => this.users.find((item) => item.id == v))
-							.filter((v) => v)
-					: this.users.find((v) => v.id == selected_id);
-
+							.filter((v) => v))
+					: (this.users.find((v) => v.id == selected_id)))
+      console.log("current-selected:",selected)
 			if (e == "add") {
 				this.current = null;
 				this.showModal = true;
@@ -603,9 +598,9 @@ export default {
 				if (this.multiple) {
 					this.Confirm(
 						`确定要重置<span style="color:red">${selected
-							.map((v) => this.users.find((item) => item.id == v).name)
+							.map(v => v.name)
 							.join(",")}等${selected.length}</span>用户的密码?`,
-						() => this.$store.dispatch("admin/Resetpassword", this.selected)
+						() => this.$store.dispatch("admin/Resetpassword", selected_id)
 					);
 				} else {
 					this.Confirm(

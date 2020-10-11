@@ -23,6 +23,8 @@ const PACKS = {
     DEL_ROLE:"DELTE /roles/:id",
     UPDATE_ROLE:"PATCH /roles/:id",
 
+    GET_LOGS:"GET /logs",
+    GET_LOG:"GET /logs/:id"
   },
 
   FILE_API:{

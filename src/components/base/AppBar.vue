@@ -34,7 +34,7 @@
       <!-- User -->
       <Dropdown ref='dm' trigger='hover' placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onClickUserMenu'>
         <a href="javascript:void(0)" class="text-btn text-btn-dropdown" :class="{'text-btn-dropdown-active':showUserMenu}">
-          <BaseAvatar :size="30" style='margin-right:5px;'></BaseAvatar>
+          <BaseAvatar :size="30" style='margin-right:5px;' :userinfo="session"></BaseAvatar>
           <span class='d-none d-sm-block'>{{session.name}}</span>
         </a>
          <DropdownMenu slot="list">
@@ -108,7 +108,7 @@ export default {
   mounted(){
     if(!this.session.id){
       this.$store.dispatch('core/whoami').then(()=>{
-        
+
       }).catch(e=>{
         // this.RouteTo('/login')
       })

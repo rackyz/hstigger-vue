@@ -53,37 +53,23 @@ const state = {
       path:'/app/task',
       version:'1.0.0'
     },
-    "notice": {
-      key: 'notice',
-      name: '通知',
-      path: '/app/notice',
-      version: '1.0.0'
-    },
-    "meeting": {
-      key: 'meeting',
-      name: '会议记录',
-      path: '/app/meeting',
-      version: '1.0.0'
-    },
     "archive": {
       key: 'archive',
-      name: '档案管理',
+      name: '资料库',
       path: '/app/task',
-      version: '1.0.0',
-      dev: true
+      version: '1.0.0'
     },
     "disk":{
       key:'disk',
-      name:"临时文件存储",
+      name:"网络硬盘",
       path:'/app/disk',
       version:'1.0.0'
     },
     "projects":{
       key:'projects',
-      name:' 工程项目管理',
+      name:'项目管理',
       path:'/app/projects',
-      version:'2.0.0',
-      dev: true
+      version:'2.0.0'
     },
     "admin":{
       key:"admin",
@@ -92,17 +78,30 @@ const state = {
     },
     "it-projects":{
       key:"it-projects",
-      name:'开发项目管理',
+      name:'软件项目',
       path:'/app/it-projects',
       version:'1.0.0',
-      dev: true
+    }, "sz-projects": {
+      key: "it-projects",
+      name: '市政监理',
+      path: '/app/it-projects',
+      version: '1.0.0',
+    }, "fj-projects": {
+      key: "it-projects",
+      name: '房建监理',
+      path: '/app/it-projects',
+      version: '1.0.0',
+    }, "bim-projects": {
+      key: "it-projects",
+      name: 'BIM项目',
+      path: '/app/it-projects',
+      version: '1.0.0',
     },
     "it-request":{
       key:'it-request',
       name:"需求工单",
       path:'/app/it-request',
       version:'1.0.0',
-      dev:true
     },
     "depEarly": {
       key: 'depEarly',
@@ -143,23 +142,24 @@ const state = {
       ]
     },
     {
-      name:'总控',
+      name:'业务模块',
       icon:'xiangmu1',
-      subs:['projects']
+      subs: ['projects'
+      ]
     },
     {
-      name:'行政管理',
+      name:'行政综合',
       icon:'jinxingzhong',
       subs:['meeting-room-reservation']
     },
     {
-      name:'财务管理',
+      name:'财务报销',
       icon:'money',
-      subs:['project-bill','tiny-project-bill','claim-back','fi-report']
+      subs:['project-bill','claim-back','fi-report']
     },{
-      name:"开发与后台管理",
+      name:"平台研发",
       icon:'parameter',
-      subs:['admin','it-projects','it-request']
+      subs:['admin','it-request']
     }
   ],
   acc_list: []
