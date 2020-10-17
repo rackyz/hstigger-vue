@@ -71,10 +71,6 @@
 </style>
 <template>
   <div class="hs-container" >
-     <Card style="margin:10px;font-size:25px;">
-        角色权限
-        <div style="font-size:14px;color:#888;">配置角色、部门的权限，为用户分配角色</div>
-      </Card>
        <Row :gutter="10" style="margin:5px;">
           <Col :span='24'>
           <Tabs type="card" :value="type_id" :animated="false" @on-click='type_id=$event' >

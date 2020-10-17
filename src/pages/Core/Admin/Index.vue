@@ -6,6 +6,7 @@
      
     <transition name='fadeIn'>
       <Content>
+        	<div class="hs-caption" v-if="ActiveMenu"><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" /> {{ActiveMenu.name}}</div>
         <router-view></router-view>
       </Content>
       
@@ -50,33 +51,46 @@ export default {
           is_group:true,
           subs:[
           {
-        name:'项目',
+        name:'项目管理',
         path:'/core/admin/project',
         icon:'xiangmu'
       },{
         name:'工作流(配置)',
         path:'/core/admin/flow',
-        icon:'xiangmu'
+        icon:'shenjing'
       },{
         name:'工作流(实例)',
-        path:'/core/admin/flowdata',
-        icon:'xiangmu'
+        path:'/core/admin/flowinstance',
+        icon:'lianjieliu'
       },{
         name:'档案资料',
         path:'/core/admin/archive',
-        icon:'xiangmu'
+        icon:'xiangmu2'
       },{
-        name:'临时文件',
+        name:'文件管理',
         path:'/core/admin/file',
-        icon:'xiangmu'
+        icon:'file'
       },{
         name:'计划任务',
         path:'/core/admin/task',
+        icon:'renwujincheng'
+      },{
+          name:'数据记录',
+        path:'/core/admin/record',
+        icon:'jiludanzilishijilu'
+      }]
+      },{
+          name:"应用管理",
+          is_group:true,
+          subs:[
+          {
+        name:'项目管理',
+        path:'/core/admin/project',
         icon:'xiangmu'
       },{
-          name:'计划任务',
-        path:'/core/admin/task',
-        icon:'xiangmu'
+        name:'工作流(配置)',
+        path:'/core/admin/flow',
+        icon:'shenjing'
       }]
       },{
         name:'系统维护',
@@ -85,11 +99,11 @@ export default {
         subs:[{
           name:'系统日志',
           path:'/core/admin/log',
-          icon:'interface'
+          icon:'rizhi'
         },{
           name:'备份和恢复',
           path:'/core/admin/maintain',
-          icon:'interface'
+          icon:'config'
         }]
         },]
     }
@@ -99,6 +113,21 @@ export default {
     title:'后台管理'
   },
   computed:{
+    MenuMap(){
+      let map = {}
+      this.menus.forEach(v=>{
+        map[v.path] = v
+        if(Array.isArray(v.subs)){
+          v.subs.forEach(s=>{
+            map[s.path] = s
+          })
+        }
+      })
+      return map
+    },
+    ActiveMenu(){
+      return this.MenuMap[this.ActivePath]
+    },
     ActivePath(){
       return this.$route.path
     }

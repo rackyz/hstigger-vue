@@ -59,6 +59,5 @@ Vue.directive('transfer',{
     }
 })
 
-console.log("PLUGINS INIT SUCCESS")
 
 export default Vue

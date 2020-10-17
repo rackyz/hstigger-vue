@@ -9,6 +9,7 @@ const PACKS = {
     GET_ACCLERATES: "GET /acclerates",
     SAVE_ACCELERATES: "POST /accelerates",
     GET_USERS:"GET /users",
+    GET_USER:"GET /users/:id",
     POST_USER:"POST /users",
     POST_USERS:"POST /users/create-users",
     PATCH_USER:"PATCH /users/:id",
@@ -24,7 +25,10 @@ const PACKS = {
     UPDATE_ROLE:"PATCH /roles/:id",
 
     GET_LOGS:"GET /logs",
-    GET_LOG:"GET /logs/:id"
+    GET_LOG:"GET /logs/:id",
+
+    GET_DUMPS: "GET /backups",
+    MAKE_DUMP: "GET /tools/mysqldump"
   },
 
   FILE_API:{
@@ -77,6 +81,7 @@ const PACKS = {
     data,
     headers = {}
   }={}, PACK = 'CORE_API') => {
+    console.log("REQUEST:",api_name,'param:',param,'query:',query,'data:',data,'headers:',headers)
     let apiObject = getAPI(api_name, {
       PACK,
       param,

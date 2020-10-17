@@ -144,6 +144,15 @@ const actions = {
 
       })
     },
+
+    // LOGS
+    queryLogs({commit}){
+      return new Promise((resolve,reject)=>{
+        return API.request('GET_LOGS').then(res=>{
+          commit('saveLogs',r)
+        })
+      })
+    }
 }
 
 const mutations = {

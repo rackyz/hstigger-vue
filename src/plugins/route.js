@@ -39,9 +39,9 @@ for (const rawfilePath of files.keys()) {
     path: '/' + filePath,
     component: resolve => require(['@pages/' + rawfilePath.slice(2)], resolve)
   }
-
+  let meta = null
   if (fileContent.default && fileContent.default.metaInfo) {
-    let meta = fileContent.default.metaInfo
+    meta = fileContent.default.metaInfo
     
     if (meta.title)
       route.name = meta.title
@@ -63,6 +63,10 @@ for (const rawfilePath of files.keys()) {
     }
     else
       route.path = '/'
+
+    if (meta && meta.route) {
+      route.path += meta.route
+    }
 
     if(route.parent && route.parent.includes('/')){
       let parentIndex = route.parent.lastIndexOf('/')

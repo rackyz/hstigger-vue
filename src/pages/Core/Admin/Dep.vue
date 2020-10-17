@@ -1,12 +1,11 @@
 <template>
 	<div class="hs-conatiner" padding='0'>
-		<div class="hs-caption"><Icon custom="gzicon gzi-organization" /> 部门管理</div>
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff;"
 			:data="tools"
 			@event="onToolEvent"
-			
+			:enabled="toolEnabled"
 		/>
     <div style="background:#fff;height:calc(100% - 85px);position:relative;">
         <div style='position:absolute;left:0;top:0;bottom:0;width:200px;border-right:1px solid #dfdfdf;padding:10px;'>

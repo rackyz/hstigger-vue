@@ -1,6 +1,6 @@
 <template>
 	<div class="hs-conatiner">
-		<div class="hs-caption"><Icon type="md-person" /> 用户管理</div>
+	
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff;"
@@ -508,14 +508,15 @@ export default {
      *              - select
      *              - open
      */
-		onTableEvent(e) {
+		onTableEvent(e,params) {
+      console.log(e,params)
       if(!e)
         return
 
       if (e.type == "select") 
         this.selected = e.data;
-      else if( e.type == "open")
-        console.log("open:",e)
+      else if( e == "open")
+        this.RouteTo('/core/users/'+params.id,true)
     },
     /**
      * @method importAllUsers
@@ -581,7 +582,7 @@ export default {
 							.map((v) => this.users.find((item) => item.id == v))
 							.filter((v) => v))
 					: (this.users.find((v) => v.id == selected_id)))
-      console.log("current-selected:",selected)
+      
 			if (e == "add") {
 				this.current = null;
 				this.showModal = true;

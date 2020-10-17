@@ -1,5 +1,6 @@
 <template>
 	<div class="hs-conatiner" padding='0'>
+		<div class="hs-caption"><Icon custom="gzicon gzi-xiangmu" />  项目管理</div>
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff;"
