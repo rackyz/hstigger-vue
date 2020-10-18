@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class='hs-container hs-container-scrollable'>
   <Row :gutter='10' style='margin:10px 5px;'>
     <Col :span='4'>
       <Card style='height:80px;'>

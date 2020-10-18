@@ -1,5 +1,5 @@
 <template>
-	<div class="hs-conatiner">
+	<div class="hs-conatiner hs-conatiner-scrollable">
 	
     <!-- tool bar -->
 		<hs-toolbar

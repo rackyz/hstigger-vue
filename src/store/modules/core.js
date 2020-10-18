@@ -12,44 +12,12 @@ const state = {
   deps:[],
   isLogin:false,
   roles:[],
+  projects:[],
   apps:{
-    "meeting-room-reservation":{
-      key: "meeting-room-reservation",
-      name:'会议室预约',
-      path: '/app/meeting-room-reservation',
-      version:'1.0.4',
-      dev: true
-    },
-    "tiny-project-bill": {
-      key: "tiny-project-bill",
-      name: '小微项目管理',
-      path: '/app/tiny-project-bill',
-      version: '1.0.0'
-    },
-    "project-bill":{
-      key: "project-bill",
-      name:"开票管理",
-      path:'/app/tiny-project-bill',
-      version:'1.0.0',
-      dev: true
-    },
-    "claim-back": {
-      key: "claim-back",
-      name: "报销管理",
-      path: '/app/tiny-project-bill',
-      version: '1.0.0',
-      dev: true
-    },
-    "fi-report":{
-      key: "fi-report",
-      name: "财务综合报表",
-      path: '/app/tiny-project-bill',
-      version: '1.0.0',
-      dev: true
-    },
+   
     "task":{
       key:'task',
-      name:'工作流',
+      name:'任务与计划',
       path:'/app/task',
       version:'1.0.0'
     },
@@ -76,32 +44,12 @@ const state = {
       name:"后台管理",
       path:"/core/admin",
     },
-    "it-projects":{
-      key:"it-projects",
-      name:'软件项目',
-      path:'/app/it-projects',
-      version:'1.0.0',
-    }, "sz-projects": {
-      key: "it-projects",
-      name: '市政监理',
-      path: '/app/it-projects',
-      version: '1.0.0',
-    }, "fj-projects": {
-      key: "it-projects",
-      name: '房建监理',
-      path: '/app/it-projects',
-      version: '1.0.0',
-    }, "bim-projects": {
-      key: "it-projects",
-      name: 'BIM项目',
-      path: '/app/it-projects',
-      version: '1.0.0',
-    },
     "it-request":{
       key:'it-request',
       name:"需求工单",
       path:'/app/it-request',
       version:'1.0.0',
+      dev:true
     },
     "depEarly": {
       key: 'depEarly',
@@ -117,7 +65,7 @@ const state = {
     },
     "depFinance": {
       key: 'depFinance',
-      name: "财务室内",
+      name: "财务室",
       path: '/app/dep-finance',
       version: '1.0.0',
     },
@@ -157,7 +105,7 @@ const state = {
       icon:'money',
       subs:['project-bill','claim-back','fi-report']
     },{
-      name:"平台研发",
+      name:"系统配置",
       icon:'parameter',
       subs:['admin','it-request']
     }
@@ -191,9 +139,25 @@ const getters = {
   roles(state){
     return state.roles
   },
- getRoles: state => type_id => {
-   return state.roles.filter(v => v.type_id == type_id)
- },
+  projects(){
+    return state.projects
+  },
+  getTypes:(state)=>key=>{
+    let typeRoot = state.types.find(v=>v.key == key)
+    if(typeRoot)
+        return state.types.filter(v=>v.parent_id == typeRoot.id)
+    else
+        throw(`KEY=${key} 不存在`)
+    },
+    types(state){
+        return state.types
+    },
+    keys(state){
+        return state.types.filter(v=>v.key)
+    },
+  getRoles: state => type_id => {
+    return state.roles.filter(v => v.type_id == type_id)
+  },
 }
 
 const actions = {
@@ -261,7 +225,80 @@ const actions = {
         resolve()
       }).catch(reject)
     })
-  }
+  },
+  GetTypes({commit}){
+    return new Promise((resolve,reject)=>{
+      API.request('GET_TYPES').then(res=>{
+        commit('saveTypes',res.data.data)
+        resolve()
+      }).catch(reject)
+    })
+  },
+  Patch({commit},item){
+    return new Promise((resolve,reject)=>{
+        if(item.id){
+              return API.request('PATCH_TYPE',{param:{id},data:item}).then(res => {
+                  let udpateInfo = res.data.data
+                  if (udpateInfo)
+                      Object.assign(item, udpateInfo)
+                  commit('localPatchType', item)
+                  resolve(item)
+              }).catch(reject)
+        }else{
+             return API.request('POST_TYPE', {data:item}).then(res => {
+                 let udpateInfo = res.data.data
+                 Object.assign(item, udpateInfo)
+                 commit('localPatchType', item)
+                 resolve(item)
+             }).catch(reject)
+        }
+    })
+},
+Delete({commit},ids){
+    let idlist = ids.join(',')
+    return new Promise((resolve,reject)=>{
+        return API.request('DEL_TYPES',{param:{id:idlist}}).then(res => {
+            commit('localDeleteType', ids)
+            resolve(ids)
+        }).catch(reject)
+    })
+},
+  addConcernProject: ({
+    commit
+  }, project_ids) => {
+      return new Promise((resolve, reject) => {
+          API.request(`ADD_CONCERN_PROJECTS`,{data:project_ids}).then(profile => {
+              commit('AddConcernProjects', project_ids)
+              resolve()
+          }).catch(e => {
+              reject(e)
+          })
+      })
+  },
+  removeConcernProject: ({
+      commit
+  }, project_ids) => {
+      return new Promise((resolve, reject) => {
+        API.request(`DEL_CONCERN_PROJECTS`, {data:project_ids}).then(profile => {
+              commit('DelConcernProjects', project_ids)
+              resolve()
+          }).catch(e => {
+              reject(e)
+          })
+      })
+  },
+  resetConcernProject: ({
+      commit
+  }, project_ids) => {
+      return new Promise((resolve, reject) => {
+        API.request(`RESET_CONCERN_PROJECTS`, {data:project_ids}).then(profile => {
+              commit('ResetConcernProject', project_ids)
+              resolve()
+          }).catch(e => {
+              reject(e)
+          })
+      })
+  },
 }
 
 const mutations = {
@@ -295,7 +332,66 @@ const mutations = {
   },
   saveUsers(state,users){
     state.users = users
-  }
+  },
+  saveTypes(state,data){
+    data.forEach(v=>{
+      v.count = 0
+    })
+    data.forEach(v=>{
+        if(v.parent_id){
+          let t = data.find(x=>x.id == v.parent_id)
+          if(t)
+                t.count++
+        }
+    })
+    state.types = data
+  },
+  localPatchTypes(state,item){
+       
+
+    let index = state.types.findIndex(v=>v.id == item.id)
+    if(index != -1){
+        item = Object.assign({}, state.types[index], item)
+        state.types.splice(index, 1, item)
+    }
+    else{
+        state.types.splice(state.types.length - 1, 0, item)
+        if (item && item.parent_id) {
+            let index = state.types.findIndex(v => v.id == item.parent_id)
+            if (index != -1) {
+                state.types[index].count++
+            }
+        }
+    }
+},
+localDeleteTypes(state,ids){
+    ids.forEach(id=>{
+         let index = state.types.findIndex(v => v.id == id)
+         if (index != -1)
+             state.types.splice(index, 1)
+    })
+   
+},
+
+  // Concerned Projects
+  AddConcernProjects: (state, ids = []) => {
+    state.session.concerned = state.session.concerned.concat(ids)
+    let session = Object.assign({}, state.session)
+    state.session = session
+
+  },
+  DelConcernProjects: (state, ids = []) => {
+      ids.forEach(v => {
+          let index = state.session.concerned.findIndex(s => s == v)
+          if (index != -1)
+              state.session.concerned.splice(index, 1)
+      })
+      let session = Object.assign({}, state.session)
+      state.session = session
+  },
+  ResetConcernProject: (state, ids = []) => {
+      state.session.concerned = ids
+  },
 }
 
 export default {

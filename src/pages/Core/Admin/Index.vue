@@ -97,6 +97,10 @@ export default {
         icon:'apps',
         is_group:true,
         subs:[{
+          name:'类型管理',
+          path:'/core/admin/type',
+          icon:'rizhi'
+        },{
           name:'系统日志',
           path:'/core/admin/log',
           icon:'rizhi'
