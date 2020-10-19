@@ -1,6 +1,5 @@
 <template>
 	<div class="hs-conatiner" padding='0'>
-		<div class="hs-caption"><Icon custom="gzicon gzi-xiangmu" />  项目管理</div>
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff;"
@@ -39,7 +38,18 @@
              <hs-table :columns="columns" :data="projects" :onEvent='onTableEvent' />
         
     </div>
-  
+  <hs-modal-form
+			ref="form"
+			:title="editingItem && editingItem.id ? '修改' : '新增'"
+			v-model="showModalCreate"
+			:width="800"
+			style="margin: 10px"
+			:form="form"
+			:data="editingItem"
+			editable
+			@on-submit="onPatch"
+			@on-event="onEvent"
+		/>
   
 </div>
 </template>
@@ -50,7 +60,87 @@ export default {
   data(){
     return {
       loading:false,
+      showModalCreate:false,
+      editingItem:{},
       currentDep:null,
+      form:{
+        layout: `<div><Row :gutter='10'>
+                <Col :span='8'>{{code}}</Col>
+                <Col :span='16'>{{name}}</Col>
+                </Row>
+                <Row :gutter='10' style='margin-top:10px'>
+                <Col :span='7'>{{date}}</Col>
+                <Col :span='10'>{{type}}</Col>
+                <Col :span='7'>{{type2}}</Col>
+                </Row>
+                <Row :gutter='10' style='margin-top:10px'>
+                <Col :span='24'>{{note}}</Col>
+                </Row>
+                <Row :gutter='10' style='margin-top:10px'>
+                <Col :span='24' style='height:200px' >{{files}}</Col></Row></div>`,
+        def: {
+            code: {
+                label: "档案编号",
+                control: 'input',
+                option: {
+                    required: true
+                }
+            },
+            name: {
+                label: "档案名称",
+                control: 'input',
+
+                option: {
+                    required: true
+                }
+            },
+            date: {
+                label: "档案日期",
+                control: "select",
+                option: {
+
+                    type: 'date'
+                }
+            },
+            type: {
+                label: "档案分类",
+                control: 'select',
+                option: {
+                    required: true,
+                    getters: "kernel/types",
+                    key: "archive_type"
+                }
+            },
+            type2: {
+                label: "档案类型",
+                control: 'select',
+                option: {
+                    required: true,
+                    getters: "kernel/types",
+                    key: "archive_type2"
+                }
+            },
+            note: {
+                label: "备注",
+                control: 'input',
+                option: {
+                    type: "textarea",
+                    height: 100
+                }
+            },
+            files: {
+                label: "附件",
+                control: "files",
+                option: {
+                    required: true,
+                    list: true
+                }
+            }
+        },
+        option: {
+            editable: true
+        }
+      },
       columns:[{
         type:"index",
         title:"序号",
@@ -105,7 +195,10 @@ export default {
   },
   methods:{
     onToolEvent(e){
-
+      if(e == 'add'){
+        this.showModalCreate =  true
+        this.editingItem = {}
+      }
     },
     toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH

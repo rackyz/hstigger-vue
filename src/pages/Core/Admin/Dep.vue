@@ -5,7 +5,6 @@
 			style="background: #fff;"
 			:data="tools"
 			@event="onToolEvent"
-			:enabled="toolEnabled"
 		/>
     <div style="background:#fff;height:calc(100% - 85px);position:relative;">
         <div style='position:absolute;left:0;top:0;bottom:0;width:200px;border-right:1px solid #dfdfdf;padding:10px;'>
@@ -62,7 +61,13 @@ export default {
   },
   methods:{
     onToolEvent(e){
+      if(e == 'add'){
 
+      }else if(e == 'edit'){
+        
+      }else if(e == 'delete'){
+
+      }
     },
     toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH

@@ -100,7 +100,6 @@ Object.keys(fileMap).forEach(k => {
   }
 })
 
-console.log('ROUTE INIT SUCCESS:',APP_ROUTES)
 
 let core = APP_ROUTES.find(v=>v.path == '/core')
 let iframe = core.children.find(v=>v.path == '/core/iframecontainer')

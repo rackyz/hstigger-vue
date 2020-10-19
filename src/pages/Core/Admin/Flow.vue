@@ -38,7 +38,18 @@
              <hs-table :columns="columns" :data="projects" :onEvent='onTableEvent' />
         
     </div>
-  
+    <hs-modal-form
+			ref="form"
+			:title="editingItem && editingItem.id ? '修改' : '新增'"
+			v-model="showModalCreate"
+			:width="800"
+			style="margin: 10px"
+			:form="form"
+			:data="editingItem"
+			editable
+			@on-submit="onPatch"
+			@on-event="onEvent"
+		/>
   
 </div>
 </template>
@@ -49,26 +60,90 @@ export default {
   data(){
     return {
       loading:false,
+      editingItem:{},
+      showModalCreate:false,
       currentDep:null,
+      form: {
+        def: {
+            type: {
+                label: "类型",
+                editable: true,
+                control: "select",
+                option: {
+                    options: ['企业管理', '人事管理', '项目管理']
+                }
+            },
+            name: {
+                label: "名称",
+                editable: true,
+                control: "input",
+                option: {}
+            },
+            desc: {
+                label: "描述",
+                editable: true,
+                control: "input",
+                option: {
+                   type:"textarea",
+                   height:200
+                }
+            }
+        },
+        layout: `<div>
+        <Row :gutter='10'>
+        <Col span='8'>{{type}}</Col><Col span='16'>{{name}}</Col>
+        </Row>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{desc}}</Col>
+        </Row></div>`,
+
+        option: {}
+    },
       columns:[{
-        type:"index",
-        title:"序号",
-        key:"id"
-      },{
-        type:"type",
-        title:"项目类型",
-        width:120,
-        key:"type"
-      },{
-        type:"text",
-        title:"项目名称",
-        key:"name"
-      },{
-        type:"user",
-        title:"创建人",
-        width:100,
-        key:"created_by"
-      }],
+            key: 'id',
+            title: '序号',
+            type: 'index',
+            width: 60
+        }, {
+            key: 'type',
+            title: '类型',
+            type: 'type',
+            width: 150,
+            option: {
+                base: 20000
+            }
+
+        }, {
+            key: 'name',
+            title: '名称',
+            type: 'text',
+            option: {
+                align: "center"
+            }
+        }, {
+            key: 'instanceCount',
+            title: '实例数',
+            type: 'text',
+            width: 150,
+            option:{
+                align: "center",
+                defaultValue: "0"
+            }
+        },{
+            key:"local",
+            title:"本地",
+            type:"bool",
+            width:80
+        },{
+            key: 'updator',
+            title: '上传者',
+            type: 'user',
+            width: 150
+        }, {
+            key: 'updateTime',
+            title: '上传时间',
+            type: 'time',
+            width: 150
+        }],
 
     tools: [
 				{
@@ -103,8 +178,12 @@ export default {
     }
   },
   methods:{
-    onToolEvent(e){
-
+     onToolEvent(e){
+      console.log(e)
+      if(e == 'add'){
+        this.showModalCreate = true
+        this.editingItem = {}
+      }
     },
     toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH

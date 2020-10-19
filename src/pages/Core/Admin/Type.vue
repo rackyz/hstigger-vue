@@ -1,32 +1,19 @@
 <template>
-  <div class="l-page dashboard" >
-     <Card style="margin:10px;font-size:25px;">
-        类型管理
-        <div style="font-size:14px;color:#888;">系统基础的类型数据都在此页进行配置,您可以对非系统类型进行修改并制定标识颜色</div>
-      </Card>
+  <div class="hs-container hs-container-scroll">
+        <Alert style="margin:10px;" show-icon>系统基础的类型数据都在此页进行配置,您可以对非系统类型进行修改并制定标识颜色</Alert>
        <Row :gutter="10" style="margin:5px;">
-        <Col :span="5">
+        <Col :span="4">
        <Card title="类型列表" icon='md-list'>
-          <hs-tree :data="keys" selection="selectedKey" @on-select-node='selectedKey={}' />
+          <hs-tree :data="keys" selection="selectedKey" @on-select='selectedKey=$event' />
         </Card>
         </Col>
 
-        <Col :span='19'>
+        <Col :span='20'>
       <Card :padding="0">
-            <div slot="title" style='padding:4px 2px;color:#083964;font-size:16px;'><Icon type='ios-pricetag' style='margin-right:5px' /> {{selectedKey.name}} ({{selectedKey.count}})</div>
-            <hs-toolbar v-if="ToolEnabled" :data="tools" :enabled="ToolEnabled" @event="onEvent" />
-           
-             <div class="l-list" style="padding:20px;">
-                <template v-for="r in getTypes(selectedKey.id)">
-                <div class="l-list-item l-list-item-type" :class="{'l-system':r.system,'l-list-item-selected':selection.includes(r)}" :key="r.id" @click='Select(r)'>
-                    <Icon type="ios-pricetag" size='20' :color="r.color" />
-                    <div class="name">{{r.name}}</div>
-                </div>
-                </template>
-                    
-                    
-            </div>
-            
+            <div slot="title" style='padding:4px 2px;color:#083964;font-size:16px;'><Icon type='ios-pricetag' style='margin-right:5px' /> {{selectedKey.name || "未选择"}} ({{selectedKey.count || 0}})</div>
+            <hs-toolbar :data="tools" :enabled="ToolEnabled" @event="onEvent" v-show="selectedKey&&selectedKey.id" />
+
+            <hs-list :data="getTypes(selectedKey.key)" :option="{tmpl:'BaseType'}" selectable='multiple' style='border:none' />
       </Card>
       </Col>
       </Row>
@@ -96,7 +83,7 @@ export default {
                 
             ],
             typeForm:{
-              layout:`<Row  :gutter="10"><Col :span="18">{{name}}</Col><Col :span="6">{{color}}</Col></Row>`,
+              layout:`<Row  :gutter="10"><Col :span="12">{{name}}</Col><Col :span="6">{{icon}}</Col><Col :span="6">{{color}}</Col></Row>`,
               def:{
                 name:{
                   label:"类型名称",
@@ -106,10 +93,20 @@ export default {
                     required:true
                   }
                 },
+                icon:{
+                    label:"图标",
+                    control:"select",
+                    option:{
+                        type:"icon",
+                        options:['md-tag','md-star'],
+                        defaultValue:'md-tag'
+                    }
+                },
                 color:{
                   label:"颜色",
-                  control:"color",
+                  control:"select",
                   option:{
+                    type:"color",
                     defaultValue:"#333333"
                   }
                 }
@@ -137,7 +134,7 @@ export default {
             }else{
                 permit =  [add,0,0]
             }
-            console.log(permit.join(''))
+
             if(permit.join('').includes('1'))
                 return permit
         }

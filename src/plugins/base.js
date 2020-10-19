@@ -2,11 +2,13 @@
 
 
 // Imports
-import Vue from 'vue'
-import PuzzleVerification from 'vue-puzzle-verification'
-import {request} from '../api'
+const Vue = require('vue')
+const PuzzleVerification = require('vue-puzzle-verification')
+import Clients from './axios'
+import moment from 'moment'
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
+Vue.prototype.moment = moment
 
 
 // Predefined Some Easy Prompt Methods based on iview
@@ -34,8 +36,10 @@ Vue.prototype.Error = function (content) {
         })
     }, 1000)
 }
-
-Vue.prototype.Request = request
+// API transfer
+Object.entries(Clients).forEach(([k,v])=>{
+    Vue.prototype[k] = v
+})
 
 Vue.prototype.RouteTo = function (path, newtab = false) {
     if (newtab) {
@@ -59,5 +63,8 @@ Vue.directive('transfer',{
     }
 })
 
+process.env.VUE_APP_MOCK && require('../../mock/index.js')
+
+Vue.config.productionTip = false
 
 export default Vue

@@ -99,7 +99,7 @@ export default {
         subs:[{
           name:'类型管理',
           path:'/core/admin/type',
-          icon:'rizhi'
+          icon:'tag'
         },{
           name:'系统日志',
           path:'/core/admin/log',

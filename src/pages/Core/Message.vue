@@ -86,7 +86,7 @@ export default {
   methods:{
     getData(){
       this.loading = true
-      this.Request('GET_MESSAGES').then(res=>{
+      this.CORE.GET_MESSAGES().then(res=>{
         this.items = res.data.data
       }).finally(e=>{
         this.loading = false

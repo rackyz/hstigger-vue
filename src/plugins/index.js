@@ -2,4 +2,4 @@
 
 import './base'
 import './meta'
-import './axios'
+require('./axios')

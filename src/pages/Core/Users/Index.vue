@@ -72,7 +72,7 @@ export default {
   methods:{
     getData(){
       this.loading = true
-      this.Request('GET_USER',{param:{id:this.user_id}}).then(res=>{
+      this.CORE.GET_USER({param:{id:this.user_id}}).then(res=>{
         this.userinfo = res.data.data
         
       }).finally(e=>{

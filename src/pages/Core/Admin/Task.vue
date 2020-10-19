@@ -39,6 +39,18 @@
         
     </div>
   
+  <hs-modal-form
+			ref="form"
+			:title="editingItem && editingItem.id ? '修改' : '新增'"
+			v-model="showModalCreate"
+			:width="800"
+			style="margin: 10px"
+			:form="form"
+			:data="editingItem"
+			editable
+			@on-submit="onPatch"
+			@on-event="onEvent"
+		/>
   
 </div>
 </template>
@@ -49,6 +61,8 @@ export default {
   data(){
     return {
       loading:false,
+      editingItem:{},
+      showModalCreate:false,
       currentDep:null,
       columns:[{
         type:"index",
@@ -87,7 +101,124 @@ export default {
 					icon: "md-trash",
 				},
 				
-			]}
+      ],form:{
+      layout: `<div>
+        <Row :gutter='10'>
+        <Col span='24'>{{title}}</Col>
+        </Row><Row :gutter='10'  style='margin-top:10px;'>
+        <Col span='8'>{{stype}}</Col><Col span='8'>{{type_id}}</Col><Col span='8'>{{charger}}</Col>
+        </Row>
+        <Row :gutter='10' style='margin-top:10px;'>
+        <Col span='12'>{{project}}</Col> <Col span='12'>{{dep}}</Col>
+        </Row>
+        <Row :gutter='10' style='margin-top:10px;'>
+        <Col span='12'>{{startTime}}</Col><Col span='12'>{{deadline}}</Col>
+        </Row>
+        <Row :gutter='10' style='margin-top:10px;'>
+        <Col>{{content}}</Col>
+        </Row> <Row :gutter='10' style='margin-top:10px;'>
+        <Col>{{files}}</Col>
+        </Row></div>`,
+
+    def: {
+        title: {
+            label: "标题",
+            editable: true,
+            control: "input",
+
+            option: {
+                required: true
+            }
+        },
+        stype: {
+            label: "工作类型",
+            editable: true,
+            control: "select",
+            option: {
+                getters: 'kernel/worktypes',
+                required: true
+            }
+        },
+        type_id: {
+            label: "工作分类",
+            editable: true,
+            control: "select",
+            option: {
+                getters: 'kernel/types',
+
+                key: 'task_type',
+                required: true
+            }
+        },
+        project: {
+            label: "项目",
+            editable: true,
+            control: "select",
+            option: {
+                getters: 'project/list',
+                multiple: true
+            }
+        },
+        dep: {
+            label: "部门",
+            editable: true,
+            control: "select",
+            option: {
+                getters: 'kernel/groups',
+                multiple: true
+            }
+        },
+        projectMul: {
+            label: "克隆",
+            editable: true,
+            control: "bool"
+        },
+        charger: {
+            label: "负责人",
+            editable: true,
+            control: "select",
+            option: {
+                getters: 'kernel/userAsOptions',
+                required: true
+            }
+        },
+        startTime: {
+            label: '开始日期',
+            control: 'select',
+            option:{
+              type:"date"
+            }
+        },
+        deadline: {
+            label: '结束日期',
+             control: 'select',
+            option:{
+              type:"date"
+            }
+        },
+        content: {
+            label: "内容描述",
+            editable: true,
+            control: "input",
+            option: {
+                type: 'md',
+                height: 300
+            }
+        },
+        files: {
+            label: "附件",
+            control: "files",
+            option: {
+                type: 'list'
+            }
+        }
+
+
+    }
+      }
+      
+      }
+      
   },
   mounted(){
     
@@ -104,7 +235,11 @@ export default {
   },
   methods:{
     onToolEvent(e){
-
+      console.log(e)
+      if(e == 'add'){
+        this.showModalCreate = true
+        this.editingItem = {}
+      }
     },
     toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH

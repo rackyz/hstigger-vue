@@ -104,7 +104,7 @@ export default {
           return h('span',{style:{color:'dark'}},[h('Icon',{props:{custom:"gzicon gzi-rizhi"},style:{marginRight:"3px"}}),node.name]);
         },
         getData(){
-            this.Request('GET_LOGS').then(res=>{
+            this.CORE.GET_LOGS().then(res=>{
               let list = res.data.data
              
                list.sort((a,b)=>a>b?1:-1)
@@ -147,7 +147,7 @@ export default {
         getLogData(node){
           this.selected = node
           if(node && node.id){
-              this.Request('GET_LOG',{param:{id:node.id}}).then(res=>{
+              this.CORE.GET_LOG({param:{id:node.id}}).then(res=>{
               this.log = {...this.list.find(v=>v.id == node.id),data:res.data.data}
             })
           }

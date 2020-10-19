@@ -1,6 +1,6 @@
 
 
-import Vuex from 'vuex'
+const Vuex = require('vuex')
 const debug = process.env.NODE_ENV !== 'production'
 
 let moduleFiles = require.context('./modules',true, /\.js$/)
@@ -12,7 +12,6 @@ moduleFiles.keys().forEach(f=>{
   if(file && file.default)
     modules[key] = file.default 
 })
-console.log('STORE INIT SUCCESS')
 
 export default new Vuex.Store({
   modules,

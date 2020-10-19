@@ -2,8 +2,7 @@
 /** Store.Core
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
-
-const API = require('@/api')
+import API from '@/plugins/axios'
 const state = {
     list:[]
 }
@@ -21,7 +20,6 @@ const getters = {
         return state[id]
     },
     getByIds:(state)=>(ids=[])=>{
-        console.log('getBYIDS:',ids)
         return state.list.filter(v=>ids.includes(v.id))
     },
     getStateText:(state)=>(s=0)=>{
@@ -37,7 +35,7 @@ const getters = {
 const actions = {
     get:({commit},id)=>{
         return new Promise((resolve,reject)=>{
-            API.request(`GET_PROJECT`,{param:{id},query:{q:"full"}}).then(res=>{
+            API.CORE.GET_PROJECT({param:{id},query:{q:"full"}}).then(res=>{
                 let item = res.data.data
 
                 item.positions = [{
@@ -100,7 +98,7 @@ const actions = {
     },
     getList({commit}){
         return new Promise((resolve,reject)=>{
-          API.request("GET_PROJECTS").then(res=>{
+          API.CORE.GET_PROJECTS().then(res=>{
                 commit("saveList",res.data.data)
                 resolve(res.data.data)
             }).catch(reject)
@@ -108,7 +106,7 @@ const actions = {
     },
     create({commit,dispatch},projectItem){
         return new Promise((resolve,reject)=>{
-          API.request("POST_PROJECT",{data:projectItem}).then(res=>{
+          API.CORE.POST_PROJECT(projectItem).then(res=>{
                 let id = res.data.data
                 projectItem.id = id
                 dispatch('user/addConcernProject', [id], {
@@ -120,8 +118,9 @@ const actions = {
         })
     },
     patch({commit},projectItem){
+        console.log('patch:',projectItem)
         return new Promise((resolve, reject) => {
-          API.request("PATCH_PROJECT",{param:{id:projectItem.id},data:projectItem}).then(res => {
+          API.CORE.PATCH_PROJECT(projectItem,{param:{id:projectItem.id}}).then(res => {
                 commit("save", projectItem)
                 resolve()
             }).catch(reject)
@@ -166,7 +165,6 @@ const mutations = {
             Vue.set(state, item.id, fullItem)
     }
 }
-
 export default {
     namespaced: true,
     state,

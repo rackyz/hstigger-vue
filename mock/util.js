@@ -1,15 +1,10 @@
-const config = require('@/config')
+
 const Mock = require('mockjs')
-const API = require('@/api')
+const AxiosClients = require('@/plugins/axios')
 
 Mock.setup({
   timeout: '300-600'
 })
-
-
-let server = config.devServer
-if (process.env.NODE_ENV == 'production')
-  server = config.prodServer
 
 const ThrowError = (message) => {
   return {
@@ -24,10 +19,9 @@ const ReturnData = (data) => {
   }
 }
 
-const MOCK_API = (api_name, cb) => {
-  let api = API.getAPI(api_name)
-  api.url = server + api.url
-  Mock.mock(api.url, api.method, cb)
+const MOCK_API = (server_name,api_name, cb) => {
+  let api = AxiosClients[server_name].getAPI(api_name)
+  Mock.mock(api.fullURL, api.method, cb)
 }
 
 module.exports = {

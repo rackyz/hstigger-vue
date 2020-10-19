@@ -2,7 +2,7 @@
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
 
-const API = require('@/api')
+import API from '@/plugins/axios'
 const state = {
   users:[],
   deps:[],
@@ -27,7 +27,7 @@ const getters = {
 const actions = {
   ListUsers({commit}){
     return new Promise((resolve,reject)=>{
-       API.request('GET_USERS', {
+       API.CORE.GET_USERS({
           query: {
             q: 'full'
           }
@@ -40,7 +40,7 @@ const actions = {
   },
   CreateUsers({commit},data){
     return new Promise((resolve,reject)=>{
-      API.request('POST_USERS',{data}).then(res=>{
+      API.CORE.POST_USERS(data).then(res => {
         let users = res.data.data
         users.filter(v=>v.id).forEach(u=>{
           commit('saveUser',u)
@@ -55,18 +55,17 @@ const actions = {
   PatchUser({commit},data){
     return new Promise((resolve,reject)=>{
       if(!data.id){
-           API.request('POST_USER', {
+           API.CORE.POST_USER(
              data
-           }).then(res => {
+           ).then(res => {
              commit('saveUser',Object.assign({},data,res.data.data))
              resolve()
            }).catch(reject)
       }else{
-         API.request('PATCH_USER', {
+         API.CORE.PATCH_USER(data, {
            param: {
              id: data.id
-           },
-           data
+           }
          }).then(res => {
            commit('saveUser', Object.assign({}, data, res.data.data))
            resolve()
@@ -85,7 +84,7 @@ const actions = {
   },
   DeleteUser({commit},id){
      return new Promise((resolve, reject) => {
-       API.request('DEL_USER', {
+       API.CORE.DEL_USER({
          param: {
            id
          }
@@ -97,9 +96,7 @@ const actions = {
   },
   DeleteUsers({commit},ids){
     return new Promise((resolve,reject)=>{
-      API.request('DEL_USERS',{
-        data:ids
-      }).then(res=>{
+      API.CORE.DEL_USERS(ids).then(res => {
         commit('deleteUsers',ids)
         resolve()
       }).catch(reject)
@@ -109,7 +106,7 @@ const actions = {
   // ROLE
   queryRoles:({commit})=>{
     return new Promise((resolve,reject)=>{
-      return API.request('GET_ROLES').then(res=>{
+      return API.CORE.GET_ROLES().then(res => {
         let items = res.data.data
         commit('saveRoles', items)
         resolve()
@@ -129,12 +126,16 @@ const actions = {
         }
         if (item.id) {
           let id = item.id
-          return API.request('UPDATE_ROLE', {param:{id},data:role}).then(res => {
+          return API.CORE.UPDATE_ROLE(role, {
+              param: {
+                id
+              }
+            }).then(res => {
             commit('saveRole')
             resolve()
           }).catch(reject)
         }else{
-          return API.request('CREATE_ROLE',{data:role}).then(res=>{
+          return API.CORE.CREATE_ROLE(role).then(res => {
             let updateInfo = res.data.data
             Object.assign(item, updateInfo)
             commit('saveRole', item)
@@ -148,7 +149,7 @@ const actions = {
     // LOGS
     queryLogs({commit}){
       return new Promise((resolve,reject)=>{
-        return API.request('GET_LOGS').then(res=>{
+        return API.CORE.GET_LOGS().then(res => {
           commit('saveLogs',r)
         })
       })

@@ -2,8 +2,7 @@
 /** Store.Core
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
-
-const API = require('@/api')
+import API from '@/plugins/axios'
 const crypto = require('crypto')
 const state = {
   session:{},
@@ -146,8 +145,10 @@ const getters = {
     let typeRoot = state.types.find(v=>v.key == key)
     if(typeRoot)
         return state.types.filter(v=>v.parent_id == typeRoot.id)
-    else
-        throw(`KEY=${key} 不存在`)
+    else{
+      console.error("KEY is not exist:",key)
+      return []
+    }
     },
     types(state){
         return state.types
@@ -173,9 +174,9 @@ const actions = {
       if (process.env.VUE_APP_MOCK)
         data.token = token
 
-      API.request('WHO_IS', {data,headers}).then(res => {
+      API.CORE.WHO_IS({headers}).then(res => {
         let session = res.data.data
-         commit('login')
+        commit('login')
         commit('save', session)
         resolve(session)
       }).catch(reject)
@@ -187,12 +188,10 @@ const actions = {
     password = md5.digest('hex')
 
     return new Promise((resolve, reject) => {
-       API.request('LOGIN', {
-           data: {
+       API.CORE.LOGIN({
              user,
              password
-           }
-         }).then(res => {
+           }).then(res => {
           let session = res.data.data
           localStorage.setItem('hs-token', session.token)
           commit('login')
@@ -209,9 +208,7 @@ const actions = {
   saveAcc({commit},acc_list){
     // REMOTE 
     return new Promise((resolve,reject)=>{
-      API.request('SAVE_ACCELERATES',{
-        data:acc_list
-      }).then(res=>{
+      API.CORE.SAVE_ACCELERATES(acc_list).then(res=>{
           commit('saveAcc', acc_list)
           resolve()
       }).catch(reject)
@@ -220,7 +217,7 @@ const actions = {
   },
   GetUsers({commit}){
     return new Promise((resolve,reject)=>{
-      API.request('GET_USERS').then(res=>{
+      API.CORE.GET_USERS().then(res=>{
         commit('saveUsers',res.data.data)
         resolve()
       }).catch(reject)
@@ -228,7 +225,7 @@ const actions = {
   },
   GetTypes({commit}){
     return new Promise((resolve,reject)=>{
-      API.request('GET_TYPES').then(res=>{
+      API.CORE.GET_TYPES().then(res=>{
         commit('saveTypes',res.data.data)
         resolve()
       }).catch(reject)
@@ -237,7 +234,7 @@ const actions = {
   Patch({commit},item){
     return new Promise((resolve,reject)=>{
         if(item.id){
-              return API.request('PATCH_TYPE',{param:{id},data:item}).then(res => {
+              return API.CORE.PATCH_TYPE(item,{param:{id}}).then(res => {
                   let udpateInfo = res.data.data
                   if (udpateInfo)
                       Object.assign(item, udpateInfo)
@@ -245,7 +242,7 @@ const actions = {
                   resolve(item)
               }).catch(reject)
         }else{
-             return API.request('POST_TYPE', {data:item}).then(res => {
+             return API.CORE.POST_TYPE(item).then(res => {
                  let udpateInfo = res.data.data
                  Object.assign(item, udpateInfo)
                  commit('localPatchType', item)
@@ -257,7 +254,7 @@ const actions = {
 Delete({commit},ids){
     let idlist = ids.join(',')
     return new Promise((resolve,reject)=>{
-        return API.request('DEL_TYPES',{param:{id:idlist}}).then(res => {
+        return API.CORE.DEL_TYPES({param:{id:idlist}}).then(res => {
             commit('localDeleteType', ids)
             resolve(ids)
         }).catch(reject)
@@ -267,7 +264,7 @@ Delete({commit},ids){
     commit
   }, project_ids) => {
       return new Promise((resolve, reject) => {
-          API.request(`ADD_CONCERN_PROJECTS`,{data:project_ids}).then(profile => {
+          API.CORE.ADD_CONCERN_PROJECTS(project_ids).then(profile => {
               commit('AddConcernProjects', project_ids)
               resolve()
           }).catch(e => {
@@ -279,7 +276,7 @@ Delete({commit},ids){
       commit
   }, project_ids) => {
       return new Promise((resolve, reject) => {
-        API.request(`DEL_CONCERN_PROJECTS`, {data:project_ids}).then(profile => {
+        API.CORE.DEL_CONCERN_PROJECTS(project_ids).then(profile => {
               commit('DelConcernProjects', project_ids)
               resolve()
           }).catch(e => {
@@ -291,7 +288,7 @@ Delete({commit},ids){
       commit
   }, project_ids) => {
       return new Promise((resolve, reject) => {
-        API.request(`RESET_CONCERN_PROJECTS`, {data:project_ids}).then(profile => {
+        API.CORE.RESET_CONCERN_PROJECTS(project_ids).then(profile => {
               commit('ResetConcernProject', project_ids)
               resolve()
           }).catch(e => {
@@ -301,12 +298,26 @@ Delete({commit},ids){
   },
 }
 
+const SaveTypes = data=>{
+   data.forEach(v => {
+     v.count = 0
+   })
+   data.forEach(v => {
+     if (v.parent_id) {
+       let t = data.find(x => x.id == v.parent_id)
+       if (t)
+         t.count++
+     }
+   })
+   return data
+}
+
 const mutations = {
   login(state){
     state.isLogin = true
   },
   save(state,session){
-    API.SetAuthorization(session.token)
+    API.CORE.SetAuthorization(session.token)
     localStorage.setItem('hs-token',session.token)
     
     state.session = session
@@ -316,6 +327,12 @@ const mutations = {
       state.users = session.system.users
       state.roles = session.system.roles
       state.deps = session.system.deps
+
+      
+
+      state.types = SaveTypes(session.system.types)
+
+      state.projects = session.system.projects
 
       state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))
     }
