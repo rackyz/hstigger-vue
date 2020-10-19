@@ -34,9 +34,9 @@
 			</Button>
 		</div>
     <div style="background:#ddd;height:calc(100% - 130px);position:relative;">
-      
+    
              <hs-table :columns="columns" :data="projects" :onEvent='onEvent' />
-        
+       
     </div>
   
 
@@ -44,7 +44,7 @@
 			ref="form"
 			:title="editingItem && editingItem.id ? '修改' : '新增'"
 			v-model="showModalCreate"
-			:width="800"
+			:width="500"
 			style="margin: 10px"
 			:form="form"
 			:data="editingItem"
@@ -73,11 +73,23 @@ export default {
         type:"type",
         title:"项目类型",
         width:120,
-        key:"type"
+        key:"project_type",
+        option:{
+          
+          getters:'core/types'
+        }
       },{
         type:"text",
         title:"项目名称",
         key:"name"
+      },{
+        type:"type",
+        title:"项目状态",
+        key:"state_type",
+        option:{
+          
+          options:['准备中','进行中','已结束']
+        }
       },{
         type:"user",
         title:"创建人",
@@ -105,7 +117,7 @@ export default {
       ],
       form:{
         title: '项目基本情况',
-        layout: "<div><Row :gutter='10'><Col :span='4'>{{code}}</Col><Col :span='20'>{{name}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='8'>{{buildtype}}</Col><Col :span='8'>{{managetype}}</Col><Col :span='8'>{{position}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='12'>{{investionSide}}</Col><Col :span='12'>{{constructionSide}}</Col></Row><Row  :gutter='10' style='margin-top:10px'><Col :span='12'>{{supervisorSide}}</Col></Row><Row  :gutter='10' style='margin-top:10px'><Col :span='8'>{{amount}}</Col><Col :span='8'>{{area}}</Col><Col :span='8'>{{buildingArea}}</Col></Row><Row style='margin-top:10px'><Col :span='24'>{{address}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24' style='height:200px' >{{desc}}</Col></Row><Row style='margin-top:10px'><Col>{{images}}</Row></Col></Row></div>",
+        layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='18'><Row :gutter='10'><Col :span='12'>{{code}}</Col><Col :span='12'>{{project_type}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{name}}</Col></Row></Col><Col :span='6'>{{avatar}}</Col></Row></div>",
         def: {
             code: {
                 label: "项目编号",
@@ -122,83 +134,19 @@ export default {
                     required: true
                 }
             },
-            buildtype: {
+            project_type: {
                 label: "建筑类型",
                 control: 'select',
                 option: {
-                    getters: 'core/types',
-                    key: "buildType"
+                    getters: 'core/getTypes',
+                    key:"project_type",
+                    required:true
                 }
             },
-            amount: {
-                label: "投资金额",
-                control: "input",
-                option: {
-                    type: "amount"
-                }
-            },
-            area: {
-                label: "用地面积(平米)",
-                control: "input",
-                option: {
-                    type: "number"
-                }
-            },
-            buildingArea: {
-                label: "建筑面积(平米)",
-                control: "input",
-                option: {
-                    type: "number"
-                }
-            },
-            managetype: {
-                label: "管理类型",
-                control: 'select',
-                option: {
-                    getters: 'core/types',
-                    key: "manageType"
-                }
-            },
-            position: {
-                label: "项目地点",
-                control: 'input'
-            },
-            address: {
-                label: "项目地址",
-                control: "input",
-                option: {
-                    maxlen: 255
-                }
-            },
-            desc: {
-                label: "项目简介",
-                control: "input",
-                option: {
-                    type: "textarea"
-                }
-            },
-            constructionSide: {
-                label: "建设单位",
-                control: "input"
-            },
-            investionSide: {
-                label: "投资单位",
-                control: "input"
-            },
-            supervisorSide: {
-                label: "监理单位",
-                control: "input"
-            },
-            images: {
-                label: "效果图",
-                control: "files",
-                option: {
-                    maxlen: 5,
-                    type: 'image',
-                    multiple: true
-                }
+            avatar:{
+              label:"封面图片",
+              control:"image"
             }
-
         },
         option: {
             editable: true
@@ -210,7 +158,8 @@ export default {
     this.$store.dispatch('project/getList')
   },
   computed:{
-    ...mapGetters("projects",["list"]),
+    ...mapGetters("project",{
+      "projects":"list"}),
     filteredUsers(){
         if(this.currentDep)
             return this.users.find(v=>v.deps.include(this.currentDep))
@@ -240,7 +189,7 @@ export default {
       this.$store.dispatch('project/patch',item).then(res=>{
         this.Success('项目创建成功')
       }).catch(e=>{
-        this.Error('项目创建失败:',e)
+        this.Error('项目创建失败 ',e)
       })
     }, 
     onDelete(){

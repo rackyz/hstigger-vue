@@ -120,10 +120,22 @@ const actions = {
     patch({commit},projectItem){
         console.log('patch:',projectItem)
         return new Promise((resolve, reject) => {
-          API.CORE.PATCH_PROJECT(projectItem,{param:{id:projectItem.id}}).then(res => {
-                commit("save", projectItem)
-                resolve()
-            }).catch(reject)
+            if(projectItem.id){
+                API.CORE.PATCH_PROJECT(projectItem,{param:{id:projectItem.id}}).then(res => {
+                    let updateInfo = res.data.data
+                    Object.assign(projectItem,updateInfo)
+                    commit("save", projectItem)
+                    resolve()
+                }).catch(reject)
+            }else{
+                API.CORE.POST_PROJECT(projectItem).then(res => {
+                    let updateInfo = res.data.data
+                    Object.assign(projectItem,updateInfo)
+                    commit("save", projectItem)
+                    resolve()
+                }).catch(reject)
+            }
+          
         })
     }
   

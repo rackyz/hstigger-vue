@@ -2,7 +2,7 @@ module.exports = {
   Servers:[{
       Name:"CORE",
       Connection: {
-        baseURL: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz:10000" : 'http://192.168.14.40:5858',
+        baseURL: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz:10000" : 'http://localhost:5858',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"
@@ -46,6 +46,7 @@ module.exports = {
         GET_PROJECTS: "GET /projects",
         GET_PROJECT: "GET /projects/:id",
         POST_PROJECT: "POST /projects",
+        PATCH_PROJECT: "PATCH /projects/:id",
         DEL_PROJECT: "DELETE /projects/:id",
 
         // 
