@@ -35,7 +35,7 @@
 		</div>
     <div style="background:#ddd;height:calc(100% - 130px);position:relative;">
     
-             <hs-table :columns="columns" :data="projects" :onEvent='onEvent' />
+             <hs-table :columns="columns" :data="projects" :onEvent="onTableEvent" />
        
     </div>
   
@@ -44,7 +44,7 @@
 			ref="form"
 			:title="editingItem && editingItem.id ? '修改' : '新增'"
 			v-model="showModalCreate"
-			:width="500"
+			:width="450"
 			style="margin: 10px"
 			:form="form"
 			:data="editingItem"
@@ -58,6 +58,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import FormDef_ProjectCreate from '@/forms/project'
 export default {
   data(){
     return {
@@ -70,6 +71,14 @@ export default {
         title:"序号",
         key:"id"
       },{
+        type:"text",
+        title:"项目编号",
+        key:"code",
+        width:100,
+        option:{
+          align:'center'
+        }
+      },{
         type:"type",
         title:"项目类型",
         width:120,
@@ -79,22 +88,42 @@ export default {
           getters:'core/types'
         }
       },{
-        type:"text",
-        title:"项目名称",
-        key:"name"
-      },{
         type:"type",
-        title:"项目状态",
-        key:"state_type",
+        title:"服务类型",
+        width:120,
+        key:"service_type",
         option:{
           
-          options:['准备中','进行中','已结束']
+          getters:'core/types'
+        }
+      },{
+        type:"text",
+        title:"项目名称",
+        linkEvent:true,
+        key:"name"
+      },{
+        type:"state",
+        title:"项目状态",
+        key:"state_type",
+        width:120,
+        option:{
+          
+          states:['准备中','进行中','已结束']
         }
       },{
         type:"user",
         title:"创建人",
         width:100,
-        key:"created_by"
+        key:"created_by",
+        width:150,
+        option:{
+          getters:'core/users'
+        }
+      },{
+        type:'time',
+        title:'创建时间',
+        key:'created_at',
+        width:120
       }],
 
     tools: [
@@ -115,43 +144,9 @@ export default {
 				},
 				
       ],
-      form:{
-        title: '项目基本情况',
-        layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='18'><Row :gutter='10'><Col :span='12'>{{code}}</Col><Col :span='12'>{{project_type}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{name}}</Col></Row></Col><Col :span='6'>{{avatar}}</Col></Row></div>",
-        def: {
-            code: {
-                label: "项目编号",
-                control: 'input',
-                option: {
-                    required: true
-                }
-            },
-            name: {
-                label: "项目名称",
-                control: 'input',
-
-                option: {
-                    required: true
-                }
-            },
-            project_type: {
-                label: "建筑类型",
-                control: 'select',
-                option: {
-                    getters: 'core/getTypes',
-                    key:"project_type",
-                    required:true
-                }
-            },
-            avatar:{
-              label:"封面图片",
-              control:"image"
-            }
-        },
-        option: {
-            editable: true
-        }
-    }}
+      form:FormDef_ProjectCreate
+      
+      }
     
   },
   mounted(){
@@ -168,6 +163,22 @@ export default {
     }
   },
   methods:{
+    /**
+     * @method onTableEvent
+     * @description handle table event stuff
+     *              - select
+     *              - open
+     */
+		onTableEvent(e,params) {
+      console.log(e,params)
+      if(!e)
+        return
+
+      if (e.type == "select") 
+        this.selected = e.data;
+      else if( e == "open")
+        this.RouteTo('/core/projects/'+params.id,true)
+    },
     onToolEvent(e){
       console.log(e)
       if(e == 'add'){
@@ -188,6 +199,7 @@ export default {
     onPatch(item){
       this.$store.dispatch('project/patch',item).then(res=>{
         this.Success('项目创建成功')
+        this.showModalCreate = false
       }).catch(e=>{
         this.Error('项目创建失败 ',e)
       })

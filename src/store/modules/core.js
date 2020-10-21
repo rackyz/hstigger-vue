@@ -150,6 +150,9 @@ const getters = {
       return []
     }
     },
+     getTypesByID: (state) => id => {
+        return state.types.filter(v => v.parent_id == id)
+     },
     types(state){
         return state.types
     },

@@ -51,22 +51,28 @@ for (const rawfilePath of files.keys()) {
       route.public = meta.public
   }
 
+  
+
   if (lastSlashIndex != -1) {
-    route.parent = filePath.slice(0, lastSlashIndex)
+    route.parent = '/' + filePath.slice(0, lastSlashIndex)
+    if (meta && meta.route) {
+      route.parent += meta.route
+      route.path = route.parent + '/' + fileName
+    }
   }
 
   if (fileName == 'index') {
     if(route.parent){
-      route.path = '/' + route.parent
+      route.path =  route.parent
       filePath = route.parent
-      route.name = route.parent + '/index'
+      if(!route.name)
+        route.name = route.parent + '/index'
+      route.parent = filePath.slice(0, lastSlashIndex-1)
     }
     else
       route.path = '/'
 
-    if (meta && meta.route) {
-      route.path += meta.route
-    }
+  
 
     if(route.parent && route.parent.includes('/')){
       let parentIndex = route.parent.lastIndexOf('/')
@@ -75,6 +81,9 @@ for (const rawfilePath of files.keys()) {
       delete route.parent
     
   }
+
+  
+
   fileMap[filePath] = route
 }
 
@@ -99,7 +108,7 @@ Object.keys(fileMap).forEach(k => {
     APP_ROUTES.push(route)
   }
 })
-
+console.log('ROUTE:', APP_ROUTES)
 
 let core = APP_ROUTES.find(v=>v.path == '/core')
 let iframe = core.children.find(v=>v.path == '/core/iframecontainer')
@@ -108,6 +117,7 @@ core.children.push({
   component:iframe.component,
   path:'/app/:appkey'
 })
+
 
 
 

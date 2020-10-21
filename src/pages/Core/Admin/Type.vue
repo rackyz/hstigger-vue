@@ -4,7 +4,7 @@
        <Row :gutter="10" style="margin:5px;">
         <Col :span="4">
        <Card title="类型列表" icon='md-list'>
-          <hs-tree :data="keys" selection="selectedKey" @on-select='selectedKey=$event' />
+          <hs-tree :data="hs.makeTree(keys)" selection="selectedKey" @on-select='selectedKey=$event' />
         </Card>
         </Col>
 
