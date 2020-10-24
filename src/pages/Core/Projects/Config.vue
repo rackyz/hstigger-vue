@@ -1,10 +1,15 @@
 <template>
   <div class="hs-container hs-container-scroll" style='height:100%;position:relative;background:#eee;'>
     
-     <div style="position:absolute;right:0;bottom:0;top:0;left:0px;padding:10px;">
-        基础信息
-        <hs-form :form='form' :formData='project' style='width:700px' editable />
-     </div>
+     <Card style="margin:10px;">
+       <Tabs value="name1">
+        <TabPane label="基础信息" name="name1"><hs-form :form='form' :formData='project' style='width:700px;margin:10px;' editable /></TabPane>
+        <TabPane label="标签二" name="name2">标签二的内容</TabPane>
+        <TabPane label="标签三" name="name3">标签三的内容</TabPane>
+    </Tabs>
+        
+        
+     </Card>
   </div>
 </template>
 

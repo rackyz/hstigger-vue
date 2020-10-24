@@ -508,15 +508,14 @@ export default {
      *              - select
      *              - open
      */
-		onTableEvent(e,params) {
-      console.log(e,params)
+		onTableEvent(e) {
       if(!e)
         return
 
       if (e.type == "select") 
         this.selected = e.data;
-      else if( e == "open")
-        this.RouteTo('/core/users/'+params.id,true)
+      else if( e.type == "open" && e.data)
+        this.RouteTo('/core/users/'+e.data.id,true)
     },
     /**
      * @method importAllUsers

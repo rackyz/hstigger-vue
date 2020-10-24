@@ -1,6 +1,6 @@
 export default {
   title: '项目基本情况',
-  layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='10'>{{code}}</Col><Col :span='14'>{{name}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='10'>{{project_type}}</Col><Col :span='10'>{{service_type}}</Col><Col :span='4'>{{avatar}}</Col></Row></div>",
+  layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='6'>{{code}}</Col><Col :span='18'>{{name}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='6'>{{project_type}}</Col><Col :span='6'>{{charger}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{desc}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{images}}</Col></Row></div>",
   def: {
     code: {
       label: "项目编号",
@@ -37,9 +37,31 @@ export default {
         labelKey: 'name'
       }
     },
+    charger:{
+      label:"项目负责人",
+      control:'select',
+      option:{
+        getters:'core/users'
+      }
+    },
+    desc:{
+      label:"项目简介",
+      control:"input",
+      option:{
+        type:'textarea',
+        height:300
+      }
+    },
     avatar: {
       label: "封面",
       control: "image"
+    },
+    images:{
+      label:'项目图片',
+      control:'files',
+      option:{
+        type:'image'
+      }
     }
   },
   option: {

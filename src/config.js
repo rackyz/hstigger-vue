@@ -49,6 +49,16 @@ module.exports = {
         PATCH_PROJECT: "PATCH /projects/:id",
         DEL_PROJECT: "DELETE /projects/:id",
 
+        GET_NEWS: "GET /news",
+
+        GET_NOTICES: "GET /notices",
+
+        // FLOWS
+        GET_FLOWS: "GET /flows",
+        CREATE_FLOW: "POST /flows",
+        UPDATE_FLOW: "PATCH /flows/:id",
+        DEL_FLOW: "DELETE /flows/:id",
+
         // 
         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
         DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",

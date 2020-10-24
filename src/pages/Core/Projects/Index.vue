@@ -20,10 +20,12 @@
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;'>
-         <hs-menu style='min-width:150px;width:150px;' :data="menus" @on-select='onClickMenu' :current="ActivePath" >
-           
-     </hs-menu>
+         <hs-menu style='min-width:150px;width:150px;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
+        </hs-menu>
+        
+        <div class='l-menu'>
 
+        </div>
    
      
       <transition name='fadeIn'>
@@ -32,6 +34,10 @@
         </Content>
         
       </transition>
+
+      <hs-menu style='min-width:150px;width:250px;' :data="menus2" @on-select='onClickMenu' :current="ActivePath" >
+       
+      </hs-menu>
       </Layout>
 
       
@@ -46,7 +52,7 @@ export default {
     return {
       showProjects:false,
        menus:[{
-        name:'总览',
+        name:'项目总览',
         is_group:true,
         subs:[{
           name:'项目总览',
@@ -58,7 +64,7 @@ export default {
           key:'dashboard'
         }]
       },{
-        name:'业务',
+        name:'综合管理',
         is_group:true,
         subs:[{
           name:'项目进度',
@@ -77,7 +83,7 @@ export default {
           key:'management'
         }]
       },{
-        name:'配置',
+        name:'系统配置',
         is_group:true,subs:[{
           name:'项目角色',
           icon:'role',
@@ -86,6 +92,58 @@ export default {
           name:'项目配置',
           icon:'config',
           key:'config'
+        }]
+      }],
+      menus2:[{
+        name:'我的',
+        is_group:true,
+        subs:[{
+          name:'我的任务',
+          icon:'bar-chart',
+          key:'profile',
+          count:15
+        },{
+          name:'我的收藏',
+          icon:'xiangmu1',
+          key:'dashboard'
+        }]
+      },{
+        name:'计划/任务',
+        is_group:true,
+        subs:[{
+          name:'发布通知',
+          icon:'xiangmu',
+          key:'tasks'
+        },{name:'项目人员',
+        icon:'user',
+        key:'employees'}
+        ,{
+          name:'项目资料',
+          icon:'xiangmu2',
+          key:'management'
+        },{
+          name:'项目文件',
+          icon:'file',
+          key:'management'
+        }]
+      },{
+        name:'数据/记录',
+        is_group:true,
+        subs:[{
+          name:'发布通知',
+          icon:'xiangmu',
+          key:'tasks'
+        },{name:'项目人员',
+        icon:'user',
+        key:'employees'}
+        ,{
+          name:'项目资料',
+          icon:'xiangmu2',
+          key:'management'
+        },{
+          name:'项目文件',
+          icon:'file',
+          key:'management'
         }]
       }]
     }
@@ -119,6 +177,18 @@ export default {
     },
     project(){
       return this.$store.getters['project/get'](this.id)
+    },
+    RouteMenu(){
+      return this.menus.map(v=>{
+        if(v.subs){
+          v.subs.forEach(b=>{
+            b.path = '/core/projects/'+this.id+'/'+b.key
+            console.log(b)
+          })
+        }
+        return v
+        
+      })
     }
   },
   mounted(){
@@ -130,15 +200,7 @@ export default {
       this.$store.dispatch('project/get',this.id)
     },
     RouteMenu(){
-      this.menus.forEach(v=>{
-        if(v.subs){
-          v.subs.forEach(b=>{
-            b.path = '/core/projects/'+this.id+'/'+b.key
-            console.log(b)
-          })
-        }
-        
-      })
+      
     },
     onClickMenu(e){
       this.RouteTo(e)

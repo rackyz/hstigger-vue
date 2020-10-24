@@ -24,6 +24,17 @@
        <div class='text-btn' @click="showDebug = !showDebug" style='margin-right:15px;'>
           <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
         </div>
+      <Badge :count='1' type='error' style='margin-right:20px;'>
+       <div class='text-btn' @click="showDebug = !showDebug" >
+          <Icon custom='gzicon gzi-lianjieliu' size="18" :color="showDebug?'yellowgreen':''" />
+        </div>
+         </Badge>
+<Badge :count='3' type='warning' style='margin-right:20px;'>
+         <div class='text-btn' @click="showDebug = !showDebug">
+          <Icon custom='gzicon gzi-eventavailable' size="18" :color="showDebug?'yellowgreen':''" />
+        </div>
+</Badge>
+      
       <!-- Message -->
       <Badge :count='session.unread_msg_count' type='primary' style="margin-right:20px;">
         <div class='text-btn' @click="RouteTo('/core/message')">
