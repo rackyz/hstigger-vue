@@ -88,6 +88,49 @@ const getters = {
           event: '项目竣工，开票30.0万',
           date: '2020-08-28'
         },]
+    },
+    getOrderList:state=>{
+        return [{
+            id:1,
+            project:'奉化中学',
+            value:'32.3万'
+        },{
+            id:2,
+            project:'钟公庙中学',
+            value:'21.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        },{
+            id:1,
+            project:'钟公庙中学',
+            value:'12.3万'
+        }]
     }
 }
 

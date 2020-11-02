@@ -97,6 +97,14 @@ export default {
         icon:'apps',
         is_group:true,
         subs:[{
+          name:'企业信息',
+          path:'/core/admin/config',
+          icon:'controls-5'
+        },{
+          name:'数据迁移',
+          path:'/core/admin/tool',
+          icon:'codelibrary-fill'
+        },{
           name:'类型管理',
           path:'/core/admin/type',
           icon:'tag'

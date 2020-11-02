@@ -34,8 +34,20 @@ const state = {
     },
     "projects":{
       key:'projects',
-      name:'项目管理',
-      path:'/core/projectmanager',
+      name:'营业综合',
+      path:'/core/bi/panel',
+      version:'2.0.0'
+    },
+    "charts":{
+      key:'projects',
+      name:'图表分析',
+      path:'/core/bi/chart',
+      version:'2.0.0'
+    },
+    "data":{
+      key:'projects',
+      name:'数据分析',
+      path:'/core/bi/dataanalysize',
       version:'2.0.0'
     },
     "admin":{
@@ -91,7 +103,7 @@ const state = {
     {
       name:'业务模块',
       icon:'xiangmu1',
-      subs: ['projects'
+      subs: ['projects','charts','data'
       ]
     },
     {

@@ -92,8 +92,11 @@ Object.keys(fileMap).forEach(k => {
   let route = fileMap[k]
   if (route.parent) {
     let parentRoute = fileMap[route.parent]
-    if (!parentRoute)
-      throw ('APP-Parent is not exist:' + route.parent)
+    if (!parentRoute){
+      let parentIndex = route.parent.lastIndexOf('/')
+      route.parent = route.parent.slice(0,parentIndex)
+      parentRoute = fileMap[route.parent]
+    }
     if (parentRoute.children) {
       parentRoute.children.push(route)
     } else {
