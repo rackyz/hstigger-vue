@@ -29,6 +29,65 @@ const getters = {
     getStateColor:(state)=>(s=0)=>{
         const colors = ['#00000077', '#ffa70475', '#034a03b3', '#33556696']
         return colors[s]
+    },
+
+    // statistic
+    getCount:(state)=>(year=moment().year())=>{
+        return 383
+    },
+    getAmount: (state) => (year = moment().year())=>{
+        return 203452341
+    },
+    getHumans: (state) => (year = moment().year()) => {
+        return 432
+    },
+    getBills: (state) => (year = moment().year()) => {
+      return 80034231
+    },
+    getCost: (state) => (year = moment().year()) => {
+      return 23245321
+    },
+    getTransferred: (state) => (year = moment().year()) => {
+      return 68455668
+    },
+
+    getActivities:state=>{
+        return [{
+            id:21,
+            project_name:'奉化中学',
+            event:'项目竣工，开票30.0万',
+            date:'2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '上传了年度计划',
+          date: '2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '上传了会议记录',
+          date: '2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '上传了人员计划',
+          date: '2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '更新了月度人员计划',
+          date: '2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '项目竣工，开票30.0万',
+          date: '2020-08-28'
+        }, {
+          id: 21,
+          project_name: '奉化中学',
+          event: '项目竣工，开票30.0万',
+          date: '2020-08-28'
+        },]
     }
 }
 

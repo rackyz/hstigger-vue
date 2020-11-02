@@ -35,7 +35,7 @@ const state = {
     "projects":{
       key:'projects',
       name:'项目管理',
-      path:'/app/projects',
+      path:'/core/projectmanager',
       version:'2.0.0'
     },
     "admin":{
