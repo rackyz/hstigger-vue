@@ -10,6 +10,8 @@ module.exports = {
       },
       API: {
         // core
+        GET_LOGIN_SETTING: "GET /settings/login",
+
         LOGIN: "POST /sessions",
         WHO_IS: "GET /sessions/current",
         GET_ACCLERATES: "GET /acclerates",
