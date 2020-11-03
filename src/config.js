@@ -2,7 +2,7 @@ module.exports = {
   Servers:[{
       Name:"CORE",
       Connection: {
-        baseURL: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz:10000" : 'http://localhost:5858',
+        baseURL: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz" : 'http://localhost:5858',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"

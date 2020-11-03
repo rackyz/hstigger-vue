@@ -18,19 +18,22 @@ const state = {
       key:'task',
       name:'任务与计划',
       path:'/app/task',
-      version:'1.0.0'
+      version:'1.0.0',
+       dev: true
     },
     "archive": {
       key: 'archive',
       name: '资料库',
       path: '/app/task',
-      version: '1.0.0'
+      version: '1.0.0',
+       dev: true
     },
     "disk":{
       key:'disk',
       name:"网络硬盘",
       path:'/app/disk',
-      version:'1.0.0'
+      version:'1.0.0',
+       dev: true
     },
     "projects":{
       key:'projects',
@@ -67,17 +70,19 @@ const state = {
       name: "前期部",
       path: '/app/dep-early',
       version: '1.0.0',
+       dev: true
     },
     "dep-chief-engineer": {
       key: 'dep-chief-engineer',
       name: "总师部",
       path: '/app/dep-chief-engineer',
       version: '1.0.0',
+       dev: true
     },
     "depFinance": {
       key: 'depFinance',
       name: "财务室",
-      path: '/app/dep-finance',
+      path: '/core/fi/dashboard',
       version: '1.0.0',
     },
     "depManagement": {
@@ -85,6 +90,7 @@ const state = {
       name: "经营部",
       path: '/app/dep-management',
       version: '1.0.0',
+       dev: true
     }
   },
   app_groups: [

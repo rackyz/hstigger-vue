@@ -1,5 +1,5 @@
 <template>
-<Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 30px);overflow-y:auto;'>
+<Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 10px);overflow-y:auto;'>
 
 
   <Row :key='i' :gutter="10" style='margin:10px;'>
@@ -111,14 +111,46 @@
     </Col></Col>
     <Col :span='6'>
      <Card class="panel" style="width:100%;border:none;" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 流程/审核 <span style='float:right'>MORE</span></div>
-     
+     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right'>MORE</span></div>
+     <template v-for="(fi,i) in flowInstances">
+       <div class='fi-item' :key='fi.id'>
+         <Icon :custom='`gzicon gzi-${fi.icon}`' size='25' />
+         <div class='fi-info'>
+           <div class='fi-flowinfo'>
+             [{{fi.name}}]{{fi.nodeName}}
+           </div>
+           <div class='fi-desc'>  
+             {{fi.desc}}
+           </div>
+         </div>
+         <div class='fi-date'>
+           <div class='fi-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
+           <div class='fi-executor'>{{fi.executor}}</div>
+         </div>
+       </div>
+     </template>
      
     </Card>
     
     <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0'>
-      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日安排 <span style='float:right'>MORE</span></div>
-     
+      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'><Icon custom='gzicon gzi-config' size='15' style='margin-left:5px;'></Icon></a></span></div>
+     <template v-for="(fi,i) in tasks">
+       <div class='ti-item' :key='fi.id'>
+         <div class='ti-icon'>{{fi.iconText}}</div>
+         <div class='ti-info'>
+           <div class='ti-flowinfo'>
+             {{fi.root}}
+           </div>
+           <div class='ti-desc'>  
+             {{fi.desc}}
+           </div>
+         </div>
+         <div class='ti-date'>
+           <div class='ti-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
+           <div class='ti-executor'>{{fi.state}}</div>
+         </div>
+       </div>
+     </template>
     </Card>
     </Col>
   </Row>
@@ -138,7 +170,57 @@ import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
-      isConfiguring:false
+      isConfiguring:false,
+      //examples
+      flowInstances:[{
+        id:1,
+        name:'项目计划审核',
+        nodeName:'主管部门审核',
+        executor:'超级管理员',
+        icon:'gongzuobaogao',
+        desc:'奉化中学'
+
+      },{
+        id:2,
+        name:'项目计划审核',
+        nodeName:'主管部门审核',
+        executor:'超级管理员',
+        icon:'gongzuobaogao',
+        date:'2020/11/2 12:00:00',
+        desc:'钟公庙中学'
+        
+      },{
+        id:3,
+        name:'项目计划审核',
+        nodeName:'主管部门审核',
+        executor:'超级管理员',
+        deadline:'2020/11/4 12:00:00',
+        icon:'gongzuobaogao',
+        desc:'新星商业1#地块'
+        
+      },],
+      tasks:[{
+        id:12,
+        type:'year',
+        iconText:'年',
+        root:'项目签约计划',
+        desc:'[奉化中学] 桩基阶段',
+        deadline:'2020/11/5'
+      },{
+        id:13,
+        type:'month',
+        iconText:'月',
+        root:'项目收款计划',
+        desc:'[奉化中学] 桩基完成后15日内收款 32.3万(10%)',
+        deadline:'2020/11/5'
+      },{
+        id:16,
+        type:'day',
+        iconText:'日',
+        root:'个人计划',
+        desc:'联系客户解决水管排水的问题',
+        deadline:'2020/11/5'
+      }]
     }
   },
   computed:{
@@ -146,6 +228,17 @@ export default {
   },
   metaInfo:{
     title:'工作台'
+  },
+  methods:{
+    getTimeString(date,deadline){
+      let now = moment()
+      if(deadline){
+        return '截止:'+moment(deadline).fromNow()
+      }else if(date)
+        return moment(date).fromNow()
+      else
+        return '-'
+    }
   }
 }
 </script>
@@ -209,5 +302,120 @@ export default {
   border-bottom:1px solid #eee;
   width:inherit !important;
   text-align: left;
+}
+
+
+.fi-item{
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding:5px;
+  padding-left:45px;
+  margin-bottom:2px;
+  border-bottom:1px solid #dfdfdf;
+  height:45px;
+ 
+  i{
+    position: absolute;
+    left:0px;
+    top:0px;
+    bottom:0;
+    color:#fff;
+    text-shadow: 1px 1px 1px #333;
+    font-size:30px;
+    width:40px;
+    line-height:47px;
+    border-right:2px solid #fff;
+    background:rgb(1, 134, 230);
+  }
+
+  .fi-flowinfo{
+    font-size:12px;
+    font-family: '宋体';
+    color:#aaa;
+  }
+
+  .fi-date{
+    text-align: right;
+    .fi-deadline{
+      font-size:10px;
+      color:red;
+    }
+  }
+
+  .fi-desc{
+    font-size:14px;
+     font-family: '宋体';
+  }
+
+  .fi-executor{
+    font-size:12px;
+    color:#3af;
+  }
+}
+
+.fi-item:hover{
+  filter:brightness(1.2);
+  transition:all 0.5s;
+  cursor: pointer;
+}
+
+.ti-item{
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding:5px;
+  padding-left:45px;
+  margin-bottom:2px;
+  border-bottom:1px solid #dfdfdf;
+  height:45px;
+ 
+  .ti-icon{
+    position: absolute;
+    left:0px;
+    top:0px;
+    bottom:0;
+    color:#fff;
+    text-shadow: 1px 1px 1px #333;
+    font-size:18px;
+    text-align: center;
+    width:40px;
+    line-height:47px;
+    border-right:2px solid #fff;
+    background:rgb(1, 134, 230);
+  }
+
+  .ti-flowinfo{
+    font-size:12px;
+    font-family: '宋体';
+    color:#aaa;
+  }
+
+  .ti-date{
+    text-align: right;
+    .ti-deadline{
+      font-size:10px;
+      color:red;
+    }
+  }
+
+  .ti-desc{
+    font-size:14px;
+     font-family: '宋体';
+     overflow: hidden;
+     text-overflow: ellipsis;
+     height:20px;
+  }
+
+  .ti-executor{
+    font-size:12px;
+    color:#3af;
+  }
+}
+
+.ti-item:hover{
+  filter:brightness(1.2);
+  transition:all 0.5s;
+  cursor: pointer;
 }
 </style>

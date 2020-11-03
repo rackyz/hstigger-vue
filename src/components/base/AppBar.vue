@@ -72,9 +72,8 @@
           </Select>
           <hs-avatar :userinfo="session" :size="80" style="position:absolute;left:20px;top:45px;" />
           <br />
-          <div class="log">
-            {{session.unread_msg_count}}
-              </div>
+          <pre class="debug-log">SESSION:{{session}}
+              </pre>
                   </div>
       </Modal>
    
@@ -85,7 +84,7 @@
           <BaseLogin style="margin-top:20px;" />  
           <BaseOAuthLogin style='margin-top:20px;' />
       </div>
-      </div>
+    </div>
      
   </div>
 </template>
@@ -99,6 +98,7 @@ export default {
       open_selector:false,
       showUserMenu:false,
       showDebug:false,
+      isInit:false,
       model:{}
 
     }
@@ -181,6 +181,19 @@ export default {
     bottom:0;
     background:rgba(33,33,33,0.8);
   }
+
+ 
 }
+
+ .debug-log{
+    max-height:400px;
+    overflow:auto;
+    font-size:10px;
+    font-family: 'Courier New', Courier, monospace;
+    padding:10px;
+    background:#fff;
+    margin-top:10px;
+    border:1px solid #aaa;
+  }
 
 </style>

@@ -4,6 +4,10 @@
          <div class='ei-title'>企业经营综合情况
            <div class='sub'>ENTERPRISE OPERATION STATUS</div>
          </div>
+         <ButtonGroup class='ei-flat-wrap'>
+           <Button @click='RouteTo("/core/bi/chart")'>图表分析</Button>
+           <Button @click='RouteTo("/core/bi/dataanalysize")'>数据分析</Button>
+         </ButtonGroup>
            <Row :gutter='20' style='width:1300px;margin:0 auto;z-index:100;'>
       <Col :span='4'>
         <div class='count-card' :class="{'count-card-active':currentModule==0}" @click='currentModule=0'><Icon custom='gzicon gzi-Building-'></Icon>项目 <span class='ei-count'>{{getCount(currentYear)}}<div class='unit'>个</div></span>
@@ -285,6 +289,8 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding:0 20px;
+  position: relative;
+  z-index: 1000;
 }
 
 
@@ -424,6 +430,13 @@ i{
 .ol-value{
   color:rgb(10, 121, 29);
   font-weight: bold;
+}
+
+.ei-flat-wrap{
+  position: absolute;
+  top:65px;
+  left:50px;
+  z-index: 1000;
 }
 
 </style>
