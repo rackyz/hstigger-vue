@@ -38,10 +38,8 @@
             :onSuccess="handleVerificationSuccess"
           />
 
-            <hs-modal-form class-name='login-modal' title="注册账号" width='600'  v-model='isRegistering' :form="registerForm" :data="registerFormData"  @submit='onSubmitRegister' @cancel='isRegistering=false'  editable></hs-modal-form>
-     <div class='hs-debug'>
-         {{forgetFormData}}
-    </div>
+            <hs-modal-form class-name='login-modal' title="注册账号" width='600'  v-model='isRegistering' :form="registerForm" :data="registerFormData"  @on-submit='OnSubmitRegister' @cancel='isRegistering=false'  editable></hs-modal-form>
+    
     </div>
 
     
@@ -265,6 +263,7 @@ export default {
             })
         },
         OnSubmitRegister(model){
+            console.log('outer:',model)
             this.CORE.REGISTER(model).then(res=>{
                 this.Success('注册成功')
                 this.isRegistering = false
