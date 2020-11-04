@@ -81,8 +81,7 @@
           <div class="login">
           <BaseLoginHeader />
           <p style='color:#aaa'>您的登录状态已过期，请重新登录</p>
-          <BaseLogin style="margin-top:20px;" />  
-          <BaseOAuthLogin style='margin-top:20px;' />
+          <BaseLogin style="margin-top:20px;" />
       </div>
     </div>
      

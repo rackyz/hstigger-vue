@@ -11,6 +11,11 @@ module.exports = {
       API: {
         // core
         GET_LOGIN_SETTING: "GET /settings/login",
+        GET_EIP_STATUS: "GET /settings/status",
+        SEND_VERIFY_CODE: "POST /settings/vcode",
+        VERIFY_FORGET_VCODE: "POST /settings/forget",
+        CHANGE_PWD: "POST /settings/changepwd",
+        REGISTER: "POST /settings/register",
 
         LOGIN: "POST /sessions",
         WHO_IS: "GET /sessions/current",

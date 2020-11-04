@@ -13,7 +13,7 @@
     <div class="l-login">
       <hs-login :loading="loading" @submit="prepareSubmitForm" />
         <div class='flex-wrap flex-between' style='width:100%;font-size:16px;margin-top:5px;overflow:hidden;'>
-        <div class="forget-btn" @click='isForgetting=true'>忘记账号或者密码?</div>
+        <div class="forget-btn" @click='isForgetting=true;'>忘记账号或者密码?</div>
       <div class="forget-btn" @click='isRegistering=true' v-show='setting.ENABLE_REGISTER'>注册账号</div>
       </div>
       
@@ -23,9 +23,9 @@
           
         </div>
 
-          <hs-modal-form class-name='login-modal' title="密码找回" width='500'  v-model='isForgetting' :form="forgetForm" :data="forgetFormData" :env='{cooldown,can_send:forgetFormData.account}' @submit='onSubmitForget' @cancel='isForgetting=false' @event='onForgetFormEvent' editable></hs-modal-form>
+          <hs-modal-form class-name='login-modal' title="密码找回" width='500'  v-model='isForgetting' :form="forgetForm" :data="forgetFormData" :env='forgetFormEnv' @on-submit='OnSubmitForget' @cancel='isForgetting=false' @event='onForgetFormEvent' editable></hs-modal-form>
           
-         
+          <hs-modal-form ref='change_pwd_form' class-name='login-modal' title="输入新密码" width='500'  v-model='isChangePwd' :form="changePwdForm" :data="changePwdFormData"  @on-submit='onSubmitChangingPwd' @cancel='isChangePwd=false'  editable></hs-modal-form>
 
         <PuzzleVerification
             v-model='isVerificationShow'
@@ -38,9 +38,13 @@
             :onSuccess="handleVerificationSuccess"
           />
 
-            <hs-modal-form class-name='login-modal' title="注册账号" width='600'  v-model='isRegistering' :form="registerForm" :data="registerFormData" :env='{cooldown,can_send:registerFormData.phone}' @submit='onSubmitRegister' @cancel='isRegistering=false' @event='onRegisterFormEvent' editable></hs-modal-form>
-     
+            <hs-modal-form class-name='login-modal' title="注册账号" width='600'  v-model='isRegistering' :form="registerForm" :data="registerFormData"  @submit='onSubmitRegister' @cancel='isRegistering=false'  editable></hs-modal-form>
+     <div class='hs-debug'>
+         {{forgetFormData}}
     </div>
+    </div>
+
+    
 </template>
 
 <script>
@@ -62,8 +66,12 @@ export default {
             registerFormData:{},
             isForgetting:false,
             isRegistering:false,
+            forgetFormEnv:{},
             server_down:true,
-            can_send:false,
+            isChangePwd:false,
+            changePwdFormData:{},
+
+            regFormEnv:{},
             puzzleImgList:['https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/spring.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/summer.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/autum.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/winter.png'],
             forgetForm:{
                 layout:`<div style='padding-left:150px;position:relative;'><img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/pass.jpg' style='width:135px;height:140px;position:absolute;left:0px;top:0px;filter:drop-shadow(1px 1px 1px #333);border:3px solid #fff;' /><div style='margin-bottom:5px;font-size:14px;'>请输入您的<span style='color:red'>账号</span>或<span style='color:red'>手机号</span></div>
@@ -71,8 +79,8 @@ export default {
                     <Col :span='24'>{{account}}</Col></Row>
                     <div style='padding:5px 0'>发送至您手机短信的<span style='color:red'>验证码</span></div>
                     <Row :gutter='12'>
-                    <Col :span='16'>{{verify_code}}</Col>
-                    <Col :span='8'><Button long type='warn' style='height:40px;border:none;font-size:16px;border-radius:5px;' :disabled='!env.can_send || env.cooldown' @click='onEvent({type:"sendVerifyCode"})'>发送<span v-if='env.cooldown'>({{env.cooldown}}s)</span></Button></Col>
+                    <Col :span='16'>{{vcode}}</Col>
+                    <Col :span='8'><Button long type='warn' style='height:40px;border:none;font-size:16px;border-radius:5px;' :disabled='!model.account || env.cooldown' @click='onEvent({type:"sendVerifyCode",data:model.account})'>发送<span v-if='env.cooldown'>({{env.cooldown}}s)</span></Button></Col>
                 </Row></div>`,
                 def:{
                     account:{
@@ -81,7 +89,7 @@ export default {
                             required:true,
                         }
                     },
-                    verify_code:{
+                    vcode:{
                         control:'input',
                         option:{
                              required:true,
@@ -93,32 +101,16 @@ export default {
                     submitText:'下一步',
                     hideReset:true
                 }
-            },
-            registerForm:{
-                layout:`<div style='position:relative;padding-left:300px;'><div style='position:absolute;left:0px;bottom:0px;top:0px;width:290px;padding:40px 30px;background:linear-gradient(to bottom, rgba(5, 59, 68, 0.15) 0%, #094155 100%), radial-gradient(at top center, rgba(194, 214, 234, 0.4) 0%, rgba(90, 148, 207, 0.4) 120%) #394865;color:#fff;'><span style='color:#fff;background:#ffffff33;padding:5px 10px;'>个人账号权限(体验)</span><br /> <br /> <Icon type='md-checkmark' style='color:lightgreen' /> 可创办5个项目<br /><Icon type='md-checkmark' style='color:lightgreen' /> 可创办1企业(10人)<br /><Icon type='md-checkmark' style='color:lightgreen' /> 企业数据分析工具<br /><Icon type='md-checkmark' style='color:lightgreen' /> 可作为员工/客户加入企业，同企业正常业务交互<br /><Icon type='md-checkmark' style='color:lightgreen' /> 个人网盘1GB<br /></div><div style='margin-bottom:5px;font-size:14px;'>请输入您的<span style='color:red'>手机号</span></div>
+            },changePwdForm:{
+                layout:`<div style='padding-left:150px;position:relative;'><img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/pass.jpg' style='width:135px;height:140px;position:absolute;left:0px;top:0px;filter:drop-shadow(1px 1px 1px #333);border:3px solid #fff;' /><div style='margin-bottom:5px;font-size:14px;'>请输入新密码</span></div>
                 <Row :gutter='12' >
-                    <Col :span='24'>{{account}}</Col></Row>
-                    <div style='padding:5px 0'>发送至您手机短信的<span style='color:red'>验证码</span></div>
+                    <Col :span='24'>{{password}}</Col></Row>
+                    <div style='padding:5px 0'>请再输一遍</div>
                     <Row :gutter='12'>
-                    <Col :span='12'>{{verify_code}}</Col>
-                    <Col :span='12'><Button long type='warn' style='height:40px;border:none;font-size:16px;border-radius:5px;' :disabled='!env.can_send || env.cooldown' @click='onEvent({type:"sendVerifyCode"})'>发送<span v-if='env.cooldown'>({{env.cooldown}}s)</span></Button></Col>
-                </Row>  <div style='padding:5px 0'>输入密码</div><Row :gutter='12' >
-                    <Col :span='24'>{{password}}</Col></Row> <div style='padding:5px 0'>请在输入一次</div><Row :gutter='12' >
-                    <Col :span='24'>{{password_confirm}}</Col></Row></div>`,
+                    <Col :span='24'>{{password_confirm}}</Col>
+                   
+                </Row></div>`,
                 def:{
-                    account:{
-                        control:'input',
-                        option:{
-                            required:true,
-                        }
-                    },
-                    verify_code:{
-                        control:'input',
-                        option:{
-                             required:true,
-                            maxlen:6
-                        }
-                    },
                     password:{
                         control:'input',
                         option:{
@@ -135,8 +127,35 @@ export default {
                     }
                 },
                 option:{
-                    submitText:'注册',
+                    submitText:'提交',
                     hideReset:true
+                }
+            },
+            registerForm:{
+                layout:`<div style='position:relative;padding-left:300px;height:300px;'><div style='position:absolute;left:0px;bottom:0px;top:0px;right:0px;padding:30px;background:linear-gradient(to bottom, rgba(5, 59, 68, 0.15) 0%, #094155 100%), radial-gradient(at top center, rgba(194, 214, 234, 0.4) 0%, rgba(90, 148, 207, 0.4) 120%) #394865;color:#fff;'><span style='color:#fff;background:#ffffff33;padding:5px 10px;line-height:35px'>个人账号权限(体验)</span><br />  <Icon type='md-checkmark' style='color:lightgreen' /> <span style=''>可创办5个项目</span><br /><Icon type='md-checkmark' style='color:lightgreen' /> 可创办1企业(10人)<br /><Icon type='md-checkmark' style='color:lightgreen' /> 企业数据分析工具<br /><Icon type='md-checkmark' style='color:lightgreen' /> 可作为员工/客户加入企业<br /><Icon type='md-checkmark' style='color:lightgreen' /> 个人网盘1GB<br />
+                
+                 <div class='flex-wrap' style='width:100%;justify-content:center;margin-top:15px;'>
+                 <div style='width:250px;border-radius:10px;overflow:hidden;'>
+                {{phone}}
+                </div>
+                <Button class='login-btn' style='height:58px;border-radius:10px !important;margin-left:10px;background: linear-gradient(to bottom right, #1c80c7, #07d3c5);font-size:20px;color:#fff;border:none;overflow:hidden;' @click='submit'>一键注册</Button>
+                </div></div>
+
+               
+               
+                </div> </div>`,
+                def:{
+                    phone:{
+                        label:'输入手机号',
+                        control:'input',
+                        option:{
+                            required:true,
+                            maxlen:11
+                        }
+                    }
+                },
+                option:{
+                    hideAction:true
                 }
             }
         }
@@ -148,14 +167,38 @@ export default {
     },
     components:{PuzzleVerification},
     mounted(){
-        this.CORE.GET_LOGIN_SETTING().then(res=>{
-            this.setting = res.data.data || {}
-            this.server_down = false
-        }).catch(e=>{
-            this.Error('服务器连接失败,请检查网络')
-        })
+        this.GetServerState()
     },
     methods: {
+        onSubmitChangingPwd(model){
+            if(model.password != model.password_confirm){
+                this.$refs.change_pwd_form.setError('password_confirm','两次密码不一致，请修改')
+                return
+            }
+            model.account = this.forgetFormData.acount || 'root'
+            model.password = this.hs.MD5(model.password)
+            this.CORE.CHANGE_PWD(model).then(res=>{
+                this.Success('密码修改成功')
+                this.isChangePwd = false
+            }).catch(e=>{
+                this.Error(e)
+            })
+        },
+        GetServerState(){
+            var that = this
+            this.CORE.GET_LOGIN_SETTING().then(res=>{
+                this.setting = res.data.data || {}
+                this.server_down = false
+                if(this.InternalChecker)
+                    clearInterval(this.InternalChecker)
+            }).catch(e=>{
+                this.Error('服务器连接失败,请检查网络')
+                if(!this.InternalChecker)
+                    this.InternalChecker = setInterval(()=>{
+                        that.GetServerState()
+                    },30000)
+            })
+        },
         handleVerificationSuccess(e){
             console.log('verify:',e)
             if(this.isVerificationShow){
@@ -165,7 +208,40 @@ export default {
                
         },
         onForgetFormEvent(e){
-            console.log('forget:',e)
+            if(e.type == "sendVerifyCode"){
+                var that = this
+                console.log({account:e.data})
+                this.CORE.SEND_VERIFY_CODE({account:e.data}).then(res=>{
+                    this.$set(that.forgetFormEnv,'cooldown',60)
+                    if(!that.IntervalCoolDown)
+                        that.IntervalCoolDown = setInterval(()=>{
+                           this.$set(that.forgetFormEnv,'cooldown',that.forgetFormEnv.cooldown-1)
+                            if(that.forgetFormEnv.cooldown <= 0){
+                                this.$set(that.forgetFormEnv,'cooldown',null)
+                                clearInterval(that.IntervalCoolDown)
+                            }
+                             
+                        },1000)
+                }).catch(e=>{
+                    this.Error(e)
+                })
+            } else if(e.type == 'sendPhoneVCode'){
+                 this.CORE.SEND_PHONE_CODE({phone:e.data}).then(res=>{
+                    this.$set(that.regFormEnv,'cooldown',60)
+                    if(!that.IntervalCoolDown)
+                        that.IntervalCoolDown = setInterval(()=>{
+                           this.$set(that.forgetFormEnv,'cooldown',that.forgetFormEnv.cooldown-1)
+                            if(that.forgetFormEnv.cooldown <= 0){
+                                this.$set(that.forgetFormEnv,'cooldown',null)
+                                clearInterval(that.IntervalCoolDown)
+                            }
+                             
+                        },1000)
+                }).catch(e=>{
+                    this.Error(e)
+                })
+            }  
+           
         },
         prepareSubmitForm(model){
             if(this.isVerifyMode){
@@ -176,17 +252,40 @@ export default {
             }
             
         },
+        OnSubmitForget(model){
+            var that = this
+            this.CORE.VERIFY_FORGET_VCODE(model).then(res=>{
+                this.isForgetting = false
+                this.isChanging = true
+                setTimeout(() => {
+                   that.isChangePwd = true 
+                }, 500);
+            }).catch(e=>{
+                this.Error(e)
+            })
+        },
+        OnSubmitRegister(model){
+            this.CORE.REGISTER(model).then(res=>{
+                this.Success('注册成功')
+                this.isRegistering = false
+            }).catch(e=>{
+                this.Error(e)
+            })
+        },
         submitForm(model) {
+            this.forgetFormData = {account:model.user}
             if(!model.user){
                 this.Error("请输入用户名")
                 return
             }
+            
             if(!model.password){
                 this.Error("请输入密码")
                 return
             }
 
-             this.loading = true
+        
+            this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
                 this.Success('登陆成功')
                 if(this.routeTo){
