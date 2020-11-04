@@ -8,6 +8,13 @@
     }
     
 }
+
+
+.oauth-icon:hover{
+    color:rgb(35, 240, 255) !important;
+    transition: all 0.5s;
+    cursor: pointer;
+}
 </style>
 <template>
     <div class="l-login">
@@ -18,8 +25,14 @@
       </div>
       
     <div class='oauth-wrap' style='margin-top:20px;' v-if='setting.ENABLE_OAUTH_LOGIN'>
-        OAUTH 2.0 第三方登录区域
-    </div><div class='states-wrap' :style='`background:${server_down?"darkred":"yellowgreen"}`'>
+        <div><Icon custom='gzicon gzi-huowudui' size='23' style='margin-right:10px' color='rgb(35, 240, 255)' />第三方平台登录</div>
+        <div class='flex-wrap'>
+        <template v-for='oi in oauthItems'>
+            <Icon :custom='`gzicon gzi-${oi.icon}`' :size='oi.size || 23' color='rgba(200,200,200,0.5)' :key='oi.icon' style='margin:0 5px;' class='oauth-icon' />
+        </template>
+        </div>
+    </div>
+    <div class='states-wrap' :style='`background:${server_down?"darkred":"yellowgreen"}`'>
           
         </div>
 
@@ -68,6 +81,20 @@ export default {
             server_down:true,
             isChangePwd:false,
             changePwdFormData:{},
+            oauthItems:[{
+                icon:'qq',
+                title:"QQ登录"
+            },{
+                icon:'wechat',
+                title:"微信登录",
+                size:27
+            },{
+                icon:'dingding-o',
+                title:"钉钉登录"
+            },{
+                icon:'QR-code',
+                title:'手机扫码'
+            }],
 
             regFormEnv:{},
             puzzleImgList:['https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/spring.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/summer.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/autum.png','https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/winter.png'],
@@ -130,7 +157,7 @@ export default {
                 }
             },
             registerForm:{
-                layout:`<div style='position:relative;padding-left:300px;height:300px;'><div style='position:absolute;left:0px;bottom:0px;top:0px;right:0px;padding:30px;background:linear-gradient(to bottom, rgba(5, 59, 68, 0.15) 0%, #094155 100%), radial-gradient(at top center, rgba(194, 214, 234, 0.4) 0%, rgba(90, 148, 207, 0.4) 120%) #394865;color:#fff;'><span style='color:#fff;background:#ffffff33;padding:5px 10px;line-height:35px'>个人账号权限(体验)</span><br />  <Icon type='md-checkmark' style='color:lightgreen' /> <span style=''>可创办5个项目</span><br /><Icon type='md-checkmark' style='color:lightgreen' /> 可创办1企业(10人)<br /><Icon type='md-checkmark' style='color:lightgreen' /> 企业数据分析工具<br /><Icon type='md-checkmark' style='color:lightgreen' /> 可作为员工/客户加入企业<br /><Icon type='md-checkmark' style='color:lightgreen' /> 个人网盘1GB<br />
+                layout:`<div style='position:relative;padding-left:300px;height:300px;'><div style='position:absolute;left:-10px;bottom:-10px;top:-10px;right:-10px;padding:30px;background:linear-gradient(to bottom, rgba(5, 59, 68, 0.15) 0%, #094155 100%), radial-gradient(at top center, rgba(194, 214, 234, 0.4) 0%, rgba(90, 148, 207, 0.4) 120%) #394865;color:#fff;'><span style='color:#fff;background:#ffffff33;padding:5px 10px;line-height:35px'>个人账号权限(体验)</span><br />  <Icon type='md-checkmark' style='color:lightgreen' /> <span style=''>可创办5个项目</span><br /><Icon type='md-checkmark' style='color:lightgreen' /> 可创办1企业(10人)<br /><Icon type='md-checkmark' style='color:lightgreen' /> 企业数据分析工具<br /><Icon type='md-checkmark' style='color:lightgreen' /> 可作为员工/客户加入企业<br /><Icon type='md-checkmark' style='color:lightgreen' /> 个人网盘1GB<br />
                 
                  <div class='flex-wrap' style='width:100%;justify-content:center;margin-top:15px;'>
                  <div style='width:250px;border-radius:10px;overflow:hidden;'>
@@ -335,7 +362,11 @@ export default {
   height:50px;
   color:#aaa;
   text-align: center;
+   display: flex;
+    justify-content: space-between;
+    padding:0 20px;
 }
+
 
 .states-wrap{
     text-align: center;
@@ -346,6 +377,7 @@ export default {
     height:8px;
     border-radius:10px;
     filter:drop-shadow(-1px -1px 1px #000);
+    
 }
 
 
