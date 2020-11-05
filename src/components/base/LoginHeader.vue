@@ -1,6 +1,10 @@
 <template>
   <div class="system-name">
-    企业信息平台 <span class="version">v1.0.0</span>
+    
+    <div class="caption">企业信息平台</div> 
+    <div class="version">
+     NINGBO GAOZHUAN EIP PLATFORM <span style='color:gold'>v1.0</span>
+    </div>
   </div>
 </template>
 
@@ -14,15 +18,30 @@ export default {
 
 
 .system-name{
-  font-size:30px;
+ 
   color:#fff;
+  display:flex;
+  flex-direction:column;
+  .caption{
+     font-size:40px;
+    text-shadow:1px 1px 1px #000;
+  }
+
+  
 }
 .version{
-  padding:0px 5px;
-  background:#333;
-  color:#fff;
   font-size:10px;
-  border-radius: 3px;
-  font-weight: normal;
+  
+     margin-top:-5px;
+  border-radius: 5px;
+  line-height:20px;
+  padding:0;
+  padding-right:5px;
+  color:#aaa;
+  i{
+    position:relative;
+    top:-1px;
+    padding:0px 1px;
+  }
 }
 </style>

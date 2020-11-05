@@ -1,7 +1,9 @@
 <template>
   <Layout style='height:100%;'>
     <BaseAppBar style='width:100%;'></BaseAppBar>
+   
     <div style='margin-top:44px;height:100%;width:100%;position:relative;' v-if='session.token'>
+       <BaseLoadingBar />
       <router-view></router-view>
     </div>
     
