@@ -58,6 +58,7 @@ export default {
     data: function () {
         return {
             loading: false,
+            currentAccount:"",
             setting:false,
             error:false,
             enableRegister:true,
@@ -99,9 +100,7 @@ export default {
                 this.$refs.change_pwd_form.setError('password_confirm','两次密码不一致，请修改')
                 return
             }
-            model.account = this.forgetFormData.acount || 'root'
-            model.password = this.hs.MD5(model.password)
-            this.CORE.CHANGE_PWD(model).then(res=>{
+            this.CORE.CHANGE_PWD({account: this.currentAccount,password:this.hs.MD5(model.password)}).then(res=>{
                 this.Success('密码修改成功')
                 this.isChangePwd = false
             }).catch(e=>{
@@ -134,9 +133,9 @@ export default {
         onForgetFormEvent(e){
             if(e.type == "sendVerifyCode"){
                 var that = this
-                console.log({account:e.data})
+                this.currentAccount = e.data
                 this.CORE.SEND_VERIFY_CODE({account:e.data}).then(res=>{
-                    this.$set(that.forgetFormEnv,'cooldown',60)
+                    this.$set(that.forgetFormEnv,'cooldown',15)
                     if(!that.IntervalCoolDown)
                         that.IntervalCoolDown = setInterval(()=>{
                            this.$set(that.forgetFormEnv,'cooldown',that.forgetFormEnv.cooldown-1)
@@ -150,8 +149,9 @@ export default {
                     this.Error(e)
                 })
             } else if(e.type == 'sendPhoneVCode'){
+                
                  this.CORE.SEND_PHONE_CODE({phone:e.data}).then(res=>{
-                    this.$set(that.regFormEnv,'cooldown',60)
+                    this.$set(that.regFormEnv,'cooldown',15)
                     if(!that.IntervalCoolDown)
                         that.IntervalCoolDown = setInterval(()=>{
                            this.$set(that.forgetFormEnv,'cooldown',that.forgetFormEnv.cooldown-1)
@@ -213,6 +213,8 @@ export default {
             this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
                 this.Success('登陆成功')
+                if(!session.last_login_at)
+                    this.routeTo = '/core/welcome'
                 if(this.routeTo){
                     
                     this.RouteTo(this.routeTo)
