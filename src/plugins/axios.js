@@ -9,7 +9,6 @@ config.Servers.forEach((server,i)=>{
 
   // 初始化头部配置
   axiosClient.defaults.headers = server.Connection.defaultHeaders || {}
-  axiosClient.defaults.headers.Authorization = 'Bearer login'
 
   // axios 请求 预处理
   axiosClient.interceptors.request.use(config => {

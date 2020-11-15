@@ -100,12 +100,16 @@ Object.keys(fileMap).forEach(k => {
     if (parentRoute.children) {
       parentRoute.children.push(route)
     } else {
+      if(parentRoute.path != '/core'){
       parentRoute.children = [{
           path: parentRoute.path,
           redirect: route.path
         }
         ,route
       ]
+      }else{
+        parentRoute.children = [route]
+      }
     }
   } else {
     APP_ROUTES.push(route)
@@ -120,6 +124,8 @@ core.children.push({
   component:iframe.component,
   path:'/app/:appkey'
 })
+
+console.log('CORE:',core)
 
 
 

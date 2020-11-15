@@ -204,6 +204,7 @@ export default {
                 return
             }
             
+            
             if(!model.password){
                 this.Error("请输入密码")
                 return
@@ -213,13 +214,13 @@ export default {
             this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
                 this.Success('登陆成功')
-                if(!session.last_login_at)
+                console.log("login",session)
+                if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'
                 if(this.routeTo){
-                    
                     this.RouteTo(this.routeTo)
                 }else{
-                    location.reload()
+                    window.location.reload()
                 }
             }).catch(e=>{
                 if(e == "tokenoutofdate"){

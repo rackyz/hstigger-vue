@@ -2,7 +2,7 @@ module.exports = {
   Servers:[{
       Name:"CORE",
       Connection: {
-        baseURL: process.env.NODE_ENV == 'production' ? "https://www.nbgzpmis.xyz" : 'http://localhost:5858',
+        baseURL: process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"
@@ -11,16 +11,17 @@ module.exports = {
       API: {
         // core
         GET_LOGIN_SETTING: "GET /settings/login",
-        GET_EIP_STATUS: "GET /settings/status",
-        SEND_VERIFY_CODE: "POST /settings/vcode",
-        VERIFY_FORGET_VCODE: "POST /settings/forget",
-        CHANGE_PWD: "POST /settings/changepwd",
-        REGISTER: "POST /settings/register",
+        SEND_VERIFY_CODE: "POST /sessions/forget-vcode",
+        VERIFY_FORGET_VCODE: "POST /sessions/forget",
+        CHANGE_PWD: "POST /sessions/changepwd",
+        REGISTER: "POST /sessions/register",
 
         LOGIN: "POST /sessions",
         WHO_IS: "GET /sessions/current",
-        GET_ACCLERATES: "GET /acclerates",
-        SAVE_ACCELERATES: "POST /accelerates",
+        GET_ACCLERATES: "GET /users/self/menus",
+        SAVE_ACCELERATES: "POST /users/self/menus",
+        GET_ACTIONS: "GET /users/self/action-menus",
+        SAVE_ACTIONS: "GET /users/self/action-menus",
         GET_USERS: "GET /users",
         GET_USER: "GET /users/:id",
         POST_USER: "POST /users",

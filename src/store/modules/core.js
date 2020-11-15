@@ -197,8 +197,10 @@ const actions = {
 
       API.CORE.WHO_IS({headers}).then(res => {
         let session = res.data.data
+        console.log('session:',session)
         commit('login')
         commit('save', session)
+        commit('saveAcc',session.user_menus)
         resolve(session)
       }).catch(reject)
     })
@@ -210,7 +212,7 @@ const actions = {
 
     return new Promise((resolve, reject) => {
        API.CORE.LOGIN({
-             user,
+             account:user,
              password
            }).then(res => {
           let session = res.data.data
@@ -229,7 +231,7 @@ const actions = {
   saveAcc({commit},acc_list){
     // REMOTE 
     return new Promise((resolve,reject)=>{
-      API.CORE.SAVE_ACCELERATES(acc_list).then(res=>{
+      API.CORE.SAVE_ACCELERATES({value:acc_list}).then(res=>{
           commit('saveAcc', acc_list)
           resolve()
       }).catch(reject)
@@ -358,7 +360,7 @@ const mutations = {
       state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))
     }
 
-    mutations.saveAcc(state,session.acclist)
+    mutations.saveAcc(state,session.user_menus)
   },
   logout(state){
      state.isLogin = false
@@ -366,6 +368,7 @@ const mutations = {
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {
+    console.log('save-acc:',acc_list)
     state.acc_list = [...acc_list]
   },
   saveUsers(state,users){

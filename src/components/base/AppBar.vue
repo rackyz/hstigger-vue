@@ -12,6 +12,31 @@
              height:9px;
            }
          }
+
+          .ivu-select-dropdown{
+            margin-top:15px;
+             background:#23334c;
+    color:#fff;
+            li,ul{
+               background:#23334c;
+               border-color:#23334c;
+    color:#fff;
+            }
+            li:hover{
+              filter:brightness(1.2);
+               background:#23334c;
+            color:#fff;
+            }
+            .ivu-dropdown-item-divided:before{
+              background:#000;
+              height:1px;
+              border:none;
+              border-top:1px solid #333;
+
+              margin:0 1px;
+            }
+   
+  }
 </style>
 <template>
   <div class="l-app-bar">
@@ -21,15 +46,24 @@
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
+
+           <div class='spinner'  v-if='loading'>
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+          </div>
+
        <div class='text-btn' @click="showDebug = !showDebug" style='margin-right:15px;'>
           <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
         </div>
-      <Badge :count='1' type='error' style='margin-right:20px;'>
+      <Badge :count='session.flow_count' type='error' style='margin-right:20px;'>
        <div class='text-btn' @click="showDebug = !showDebug" >
           <Icon custom='gzicon gzi-lianjieliu' size="18" :color="showDebug?'yellowgreen':''" />
         </div>
          </Badge>
-<Badge :count='3' type='warning' style='margin-right:20px;'>
+<Badge :count='session.task_count' type='warning' style='margin-right:20px;'>
          <div class='text-btn' @click="showDebug = !showDebug">
           <Icon custom='gzicon gzi-eventavailable' size="18" :color="showDebug?'yellowgreen':''" />
         </div>
@@ -45,14 +79,16 @@
       <!-- User -->
       <Dropdown ref='dm' trigger='hover' placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onClickUserMenu'>
         <a href="javascript:void(0)" class="text-btn text-btn-dropdown" :class="{'text-btn-dropdown-active':showUserMenu}">
-          <BaseAvatar :size="30" style='margin-right:5px;' :userinfo="session"></BaseAvatar>
-          <span class='d-none d-sm-block'>{{session.name}}</span>
+          <BaseAvatar :size="25" style='margin-right:8px;' :userinfo="session"></BaseAvatar>
+          <span class='d-none d-sm-block'>{{session.user}}</span>
         </a>
          <DropdownMenu slot="list">
             <DropdownItem ref='m1' name='self'>个人中心</DropdownItem>
             <DropdownItem ref='m2' name='logout' divided>退出</DropdownItem>
         </DropdownMenu>
       </Dropdown>
+
+   
     </div>
 
     <!-- DEBUG MODAL -->
@@ -98,6 +134,7 @@ export default {
       showUserMenu:false,
       showDebug:false,
       isInit:false,
+      loading:false,
       model:{}
 
     }
@@ -117,10 +154,14 @@ export default {
   },
   mounted(){
     if(!this.session.id){
+      this.loading = true
       this.$store.dispatch('core/whoami').then(()=>{
 
-      }).catch(e=>{
-        // this.RouteTo('/login')
+      }).finally(e=>{
+        setTimeout(() => {
+          this.loading = false
+        }, 2000);
+        
       })
     }
 
@@ -194,5 +235,18 @@ export default {
     margin-top:10px;
     border:1px solid #aaa;
   }
+
+
+  .spinner{
+    height:15px;
+    
+    div{
+      background:yellowgreen;
+      margin-right:3px;
+      width:2px;
+    }
+  }
+
+ 
 
 </style>
