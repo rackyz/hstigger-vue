@@ -12,6 +12,7 @@ const state = {
   isLogin:false,
   roles:[],
   projects:[],
+  current_enterprise:null,
   apps:{
    
     "task":{
@@ -135,6 +136,13 @@ const getters = {
   isLogin(state){
     return state.isLogin;
   },
+  my_enterprises(state){
+    if(state.session.enterprises)
+      return state.session.my_enterprises.map(v=>state.session.enterprises.find(e=>e.id == v)).filter(v=>v)
+  },
+  current_enterprise(state){
+    return state.current_enterprise
+  },
   session(state){
     return state.session
   },
@@ -183,7 +191,7 @@ const getters = {
 }
 
 const actions = {
-  whoami({commit}){
+  whoami({commit,dispatch}){
     let token = localStorage.getItem('hs-token')
     return new Promise((resolve,reject)=>{
       if(!token)
@@ -195,14 +203,32 @@ const actions = {
       if (process.env.VUE_APP_MOCK)
         data.token = token
 
+      let current_enterprise_id = localStorage.getItem('current_enterprise')
+      
+     
+
       API.CORE.WHO_IS({headers}).then(res => {
         let session = res.data.data
         console.log('session:',session)
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
+        if (!current_enterprise_id || session.enterprises.find(v => v.id == current_enterprise_id) == null)
+          if(session.my_enterprises.length > 0)
+            current_enterprise_id = session.my_enterprises[0]
+
+        dispatch('SetCurrentEnterprise', current_enterprise_id)
         resolve(session)
       }).catch(reject)
+    })
+  },
+  SetCurrentEnterprise({
+      commit
+    }, ent_id) {
+    return new Promise((resolve,reject)=>{
+      API.CORE.SetEnterprise(ent_id)
+      commit('SetCurrentEnterprise', ent_id)
+      resolve()
     })
   },
   login({commit},{user,password}){
@@ -338,6 +364,11 @@ const SaveTypes = data=>{
 const mutations = {
   login(state){
     state.isLogin = true
+  },
+  SetCurrentEnterprise(state, ent_id) {
+   
+    localStorage.setItem('current_enterprise',ent_id)
+    state.current_enterprise = ent_id
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)

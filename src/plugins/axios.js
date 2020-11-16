@@ -86,6 +86,10 @@ config.Servers.forEach((server,i)=>{
     axiosClient.defaults.headers.Authorization = token
   }
 
+  client.SetEnterprise = function(ent_id){
+    axiosClient.defaults.headers.Enterprise = ent_id
+  }
+
   Object.entries(server.API).forEach(([k,v]) => {
     client[k] = (data, config) => {
       let apiObject = getAPI(k, config)

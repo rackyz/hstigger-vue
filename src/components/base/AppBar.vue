@@ -41,7 +41,15 @@
 <template>
   <div class="l-app-bar">
     <div class="l-left">
+       <Dropdown ref='dm' trigger='hover' placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise'>
        <BaseLogo class='d-none d-sm-block' style="margin-right:20px;"></BaseLogo>
+        <DropdownMenu slot="list">
+           <DropdownItem ref='m1'  :name='null' v-show='current_enterprise != null'><img style='width:30px;height:30px;margin-right:3px;' src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" /> 个人模式</DropdownItem>
+          <template v-for='e in my_enterprises'>
+            <DropdownItem ref='m1' :key='e.id' :name='e.id' v-show='e.id != current_enterprise'><img style='width:30px;height:30px;margin-right:3px;' :src="e.avatar" /> {{e.name}}</DropdownItem>
+          </template>
+        </DropdownMenu>
+      </Dropdown>
       <!-- Menu Button -->
       <BaseAppMenu v-model="open_selector" />
     </div>
@@ -59,13 +67,13 @@
           <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
         </div>
       <Badge :count='session.flow_count' type='error' style='margin-right:20px;'>
-       <div class='text-btn' @click="showDebug = !showDebug" >
-          <Icon custom='gzicon gzi-lianjieliu' size="18" :color="showDebug?'yellowgreen':''" />
+       <div class='text-btn' @click="RouteTo('/core/flow')" >
+          <Icon custom='gzicon gzi-lianjieliu' size="18"  />
         </div>
          </Badge>
 <Badge :count='session.task_count' type='warning' style='margin-right:20px;'>
-         <div class='text-btn' @click="showDebug = !showDebug">
-          <Icon custom='gzicon gzi-eventavailable' size="18" :color="showDebug?'yellowgreen':''" />
+         <div class='text-btn' @click="RouteTo('/core/task')">
+          <Icon custom='gzicon gzi-eventavailable' size="18"  />
         </div>
 </Badge>
       
@@ -81,6 +89,7 @@
         <a href="javascript:void(0)" class="text-btn text-btn-dropdown" :class="{'text-btn-dropdown-active':showUserMenu}">
           <BaseAvatar :size="25" style='margin-right:8px;' :userinfo="session"></BaseAvatar>
           <span class='d-none d-sm-block'>{{session.user}}</span>
+          
         </a>
          <DropdownMenu slot="list">
             <DropdownItem ref='m1' name='self'>个人中心</DropdownItem>
@@ -149,7 +158,9 @@ export default {
       users:'users',
       deps:'deps',
       roles:'roles',
-      isLogin:'isLogin'
+      isLogin:'isLogin',
+      my_enterprises:'my_enterprises',
+      current_enterprise:"current_enterprise"
     })
   },
   mounted(){
@@ -168,6 +179,9 @@ export default {
     
   },
   methods:{
+    onSelectEnterprise(e){
+      this.$store.dispatch('core/SetCurrentEnterprise',e)
+    },
     onClickUserMenu(e){
       if(e == 'logout'){
         this.$store.dispatch('core/logout')
