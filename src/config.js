@@ -31,6 +31,16 @@ module.exports = {
         DEL_USERS: "POST /users/delete",
         ADD_USER_CONCERNED_PROJECT: "",
 
+
+        GET_ACCOUNTS: "GET /accounts",
+        POST_ACCOUNT: "POST /accounts",
+
+        GET_ENTERPRISES: "GET /enterprises",
+        GET_ENTERPRISE: "GET /enterprrises",
+        POST_ENTERPRISE: "POST /enterprises",
+        DEL_ENTERPRISE: "DEL /enterprises",
+        PATCH_ENTERPRISE: "PATCH /enterprises",
+
         GET_TYPES: "GET /types",
         PATCH_TYPES: "PATCH /types/:id",
         DEL_TYPES: "DELETE /types/:id",

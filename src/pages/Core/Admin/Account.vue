@@ -1,9 +1,9 @@
 <template>
-	<div class="hs-conatiner hs-conatiner-scrollable">
+	<div class="hs-conatiner hs-conatiner-scrollable" >
 	
     <!-- tool bar -->
 		<hs-toolbar
-			style="background: #fff;"
+			style="background: #fff"
 			:data="tools"
 			@event="onToolEvent"
 			:enabled="toolEnabled"
@@ -45,7 +45,7 @@
     <!-- table -->
 		<div
 			style="
-				height: calc(100% - 215px);
+				height: calc(100% - 160px);
 				overflow: hidden;
 				background: #ddd;
 				position: relative;
@@ -55,7 +55,7 @@
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="columns"
-				:data="filterdUsers"
+				:data="filterdAccounts"
 				:paged="false"
 				:selectable="multiple ? 'multiple' : 'single'"
 				:selection="selected"
@@ -77,7 +77,7 @@
 			"
 		>
 			<Page
-				:total="filterdUsers.length"
+				:total="filterdAccounts.length"
 				size="small"
 				:page-size="100"
 				:page-size-opts="[20, 50, 100]"
@@ -93,6 +93,7 @@
 			v-model="showModal"
 			:width="420"
 			style="margin: 10px"
+			footer-hide
 			:form="user_form"
 			:data="current"
 			editable
@@ -171,11 +172,11 @@
 				</div>
 				<Button
 					style="height: 40px; margin: 10px; width: 90%"
-					@click="importAllUsers"
+					@click="importAllAccounts"
 					v-if="importState == 2 && importData && importData.length"
-					:disabled="importableUsers.length == 0"
+					:disabled="importableAccounts.length == 0"
 					:loading="loadingImport"
-					>导入账号({{ importableUsers.length }})</Button
+					>导入账号({{ importableAccounts.length }})</Button
 				>
 			</div>
 
@@ -197,6 +198,8 @@ import { mapGetters } from "vuex";
 export default {
 	data() {
 		return {
+			accounts:[],
+
 			loadingImport: false,
 			selected: null,
 			loading: false,
@@ -213,55 +216,45 @@ export default {
 			importStates: [],
 			columns: [
         { type: "index", title: "序号" },
-        	{
-					type: "user",
-					key: "id",
-					width: 110,
-					title: "姓名",
-					linkEvent: true,
-					option: { align: "center",getters:"admin/users" },
+        	
+				{ type: "text", key: "user", width: 150, title: "用户名",
+				render(h,param){
+					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar,frame:param.row.frame}})
+					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px",fontWeight:"bold"}},param.row.user)
+					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
+				}},
+			{
+					type: "type",
+					title: "账户类型",
+					key: "passweak",
+					width: 100,
+					option: { getters:"core/AccountType" },
 				},
-				{ type: "text", key: "user", width: 150, title: "用户名" },
-			
+
 				{ type: "text", key: "phone", width: 150, title: "联系电话" },
-			
-			
-				{
-					type: "list",
-					title: "角色权限",
-					key: "roles",
-					width: 200,
-					option: { getters:'core/roles' },
-				},
-				{
-					type: "list",
-					title: "所属部门",
-					key: "deps",
-					width: 200,
-						option: { getters:'core/deps' },
-        },
-        { key: "wechat", type: "time", title: "微信绑定",width:80 },
-         { key: "dingding", type: "time", title: "钉钉绑定",width:80  },
-          { key: "qq", type: "time", title: "QQ绑定",width:80  },
-        { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
-         { key: "created_at", type: "time",title: "注册时间",option:{
+				 { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
+         { key: "created_at", type: "time",title: "注册时间",width:100,option:{
            type:'date'
          } },
         	{
 					type: "state",
 					title: "密码安全",
-					key: "passweak",
+					key: "changed",
 					width: 100,
-					option: { states: ["安全","默认密码"],colors:['darkgreen','darkred'] },
+					option: { states: ["未修改","已修改"],colors:['darkred','darkgreen'] },
 				},
 
 				{
 					type: "state",
 					title: "账号状态",
-					key: "state",
+					key: "locked",
 					width: 120,
-					option: { states: ["正常",'锁定','异常'],colors:['darkgreen','darkred','orange'] },
+					option: { states: ["正常",'锁定'],colors:['darkgreen','darkred'] },
 				},
+			
+				
+        { key: "oauth", type: "time", title: "第三方绑定"},
+       
         
 			],
 
@@ -325,8 +318,7 @@ export default {
     this.$refs.table.calcTableHeight()
 	},
 	computed: {
-		...mapGetters("core", ["deps", "roles"]),
-		...mapGetters("admin", ["users"]),
+		...mapGetters('core',['getType']),
 		toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
 			if (this.multiple) {
@@ -341,7 +333,7 @@ export default {
             return [1, 1, 0, 0, 0, 0, 0, 1, 1, 1];
           }
 
-          let state = this.users.find(v=>v.id == this.selected).state
+          let state = this.accounts.find(v=>v.id == this.selected).state
 					return [
 						1,
 						1,
@@ -409,51 +401,53 @@ export default {
 							required: true,
 						},
 					},
-					roles: {
-						label: "角色",
-						control: "select",
-						option: {
-							getters: "core/roles",
-							multiple: true,
-						},
+					type:{
+						label:"账户类型",
+						control:"select",
+						option:{
+							getters:"core/AccountType"
+						}
+					},
+					frame:{
+						label:"边框",
+						editable:true,
+						control:'image'
 					},
 					avatar: {
 						label: "头像",
 						editable: true,
 						control: "image",
 					},
-					deps: {
-						label: "部门",
-						control: "select",
-						option: {
-							getters: "core/deps",
-							multiple: true,
-						},
-					},
 					phone: {
 						label: "电话",
 						control: "input",
 					},
+					email:{
+						label: "邮箱",
+						control: "input",
+					}
 				},
-				layout: `<div>
+				layout: `<div style='padding-left:90px;position:relative;'>
+				<div style='position:absolute;left:0px;top:0px;width:80px;height:80px;'>{{avatar}}<div style='height:10px;'></div>{{frame}}</div>
         <Row :gutter='10'>
-        <Col span='10'>{{user}}</Col><Col span='10'>{{name}}</Col><Col span='4'>{{avatar}}</Col>
+        <Col span='12'>{{type}}</Col><Col span='12'>{{user}}</Col>
         </Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='12'>{{phone}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{deps}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{roles}}</Col>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{phone}}</Col>
+        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{email}}</Col>
         </Row></div>`,
 
-				option: {},
+				option: {
+					hideReset:true
+				},
 			};
     },
     /**
      * @computed filteredUsers
      * @description find users after many filters
      */
-		filterdUsers() {
+		filterdAccounts() {
 			return (
-				this.users.filter((v) => {
+				this.accounts.filter((v) => {
 					if (
 						this.searchText &&
 						(!v.name || !v.name.includes(this.searchText.trim())) &&
@@ -473,14 +467,14 @@ export default {
      * @computed importableUsers
      * @description find users which can be imported in user-data from file
      */
-		importableUsers() {
+		importableAccounts() {
 			return this.importData.filter((v) => !this.TestImportState(v));
     },
     selected_user(){
       if(Array.isArray(this.selected)){
-        return this.selected.map(id=>this.users.find(v=>v.id == id)).filter(v=>v)
+        return this.selected.map(id=>this.accounts.find(v=>v.id == id)).filter(v=>v)
       }else{
-        return this.users.find(v=>v.id == this.selected)
+        return this.accounts.find(v=>v.id == this.selected)
       }
     }
 	},
@@ -490,9 +484,9 @@ export default {
      * @description Test user-data to show state with mistakes
      */
 		TestImportState(user) {
-      if (this.users.find((v) => v.user == user.user)) 
+      if (this.accounts.find((v) => v.user == user.user)) 
         return "用户名重复";
-			else if (this.users.find((v) => v.phone == user.phone))
+			else if (this.accounts.find((v) => v.phone == user.phone))
 				return "电话号码重复";
     },
     /** 
@@ -500,7 +494,7 @@ export default {
      * @description binding 'select all' button for select all current users
      */
 		onSelectAll() {
-			this.selected = this.filterdUsers.map((v) => v.id);
+			this.selected = this.filterdAccounts.map((v) => v.id);
     },
     /**
      * @method onTableEvent
@@ -524,15 +518,15 @@ export default {
 		importAllUsers() {
 			var that = this;
 			this.loadingImport = true;
-			let users = this.importData.filter((v) => !this.TestImportState(v));
+			let accounts = this.importData.filter((v) => !this.TestImportState(v));
 			this.$store
-				.dispatch("admin/CreateUsers", users)
+				.dispatch("admin/CreateUsers", accounts)
 				.then((results) => {
 					let succees = results.filter((v) => v == 0);
 					let map = {};
 					that.importStateStr = `导入完毕,成功导入${succees.length}个账户`;
 					that.importStates = results;
-					users.forEach((v, i) => {
+					accounts.forEach((v, i) => {
 						v.state = results[i].id ? 0 : 1;
 					});
 					that.importState = 3;
@@ -562,12 +556,11 @@ export default {
      */
 		getData() {
 			this.loading = true;
-			this.$store
-				.dispatch("admin/ListUsers")
-				.then((res) => {})
-				.finally((e) => {
+			this.CORE.GET_ACCOUNTS().then(res=>{
+					this.accounts = res.data.data
+			}).finally(()=>{
 					this.loading = false;
-				});
+			})
     },
     /** @method onToolEvent
      *  @description handle toolbar event
@@ -578,9 +571,9 @@ export default {
 			let selected =
 				(this.multiple
 					? (selected_id
-							.map((v) => this.users.find((item) => item.id == v))
+							.map((v) => this.accounts.find((item) => item.id == v))
 							.filter((v) => v))
-					: (this.users.find((v) => v.id == selected_id)))
+					: (this.accounts.find((v) => v.id == selected_id)))
       
 			if (e == "add") {
 				this.current = null;
@@ -673,15 +666,15 @@ export default {
 				.then((tabJson) => {
 					if (tabJson && tabJson.length > 0) {
 						that.importStateStr = "正在上传数据...";
-						let users = tabJson[0].sheet.map((v) => ({
+						let accounts = tabJson[0].sheet.map((v) => ({
 							name: v["姓名"],
 							phone: v["电话"],
 							password: v["密码"],
 							user: v["电话"],
 						}));
-						that.importStateStr = `已从文件中提取${users.length}个账号`;
+						that.importStateStr = `已从文件中提取${accounts.length}个账号`;
 						that.importState = 2;
-						that.importData = users;
+						that.importData = accounts;
 					}
 				})
 				.finally((e) => {

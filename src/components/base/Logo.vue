@@ -2,7 +2,7 @@
   <div class="l-logo flex-wrap">
     <template v-if='!ent'>
       <img src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" />
-      <span style='color:rgb(35, 240, 255)'>个人模式</span>
+      <span style='color:#fff'>个人模式</span>
       <Icon type='ios-arrow-down' style='position:relative;top:-2px;font-weight:normal;margin-left:5px;' size='12' v-show='my_enterprises.length > 0' />
     </template>
     <template v-else>
