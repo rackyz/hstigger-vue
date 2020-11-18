@@ -33,7 +33,9 @@ module.exports = {
 
 
         GET_ACCOUNTS: "GET /accounts",
-        POST_ACCOUNT: "POST /accounts",
+        POST_ACCOUNTS: "POST /accounts",
+        PATCH_ACCOUNT: "PATCH /accounts/:id",
+        DEL_ACCOUNT: "DEL /accounts/:id",
 
         GET_ENTERPRISES: "GET /enterprises",
         GET_ENTERPRISE: "GET /enterprrises",

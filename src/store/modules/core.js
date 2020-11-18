@@ -13,6 +13,7 @@ const state = {
   roles:[],
   projects:[],
   current_enterprise:null,
+  my_enterprises:[],
   apps:{
    
     "task":{
@@ -134,11 +135,10 @@ const state = {
 
 const getters = {
   isLogin(state){
-    return state.isLogin;
+    return state.isLogin
   },
   my_enterprises(state){
-    if(state.session.enterprises)
-      return state.session.my_enterprises.map(v=>state.session.enterprises.find(e=>e.id == v)).filter(v=>v)
+    return state.my_enterprises
   },
   current_enterprise(state){
     return state.current_enterprise
@@ -373,25 +373,14 @@ const mutations = {
   save(state,session){
     API.CORE.SetAuthorization(session.token)
     localStorage.setItem('hs-token',session.token)
-    
     state.session = session
-    if(session.system){
-      
-
-      state.users = session.system.users
-      state.roles = session.system.roles
-      state.deps = session.system.deps
-
-      
-
-      state.types = SaveTypes(session.system.types)
-
-      state.projects = session.system.projects
-
-      state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))
-    }
-
-    mutations.saveAcc(state,session.user_menus)
+    state.users = session.users
+    if (Array.isArray(session.my_enterprises))
+      return state.my_enterprises = session.my_enterprises.map(
+        v => session.enterprises.find(e => e && e.id == v))
+    state.types = SaveTypes(session.types)
+    // state.projects = session.projects
+    // state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))  
   },
   logout(state){
      state.isLogin = false

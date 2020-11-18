@@ -156,7 +156,51 @@ body {
 
 .ivu-select-dropdown{
   border:1px solid #888;
-  border-bottom-color:#333;
-  border-right-color:#333;
-  filter:drop-shadow(1px 1px 5px #000);
+  border-bottom-color:#aaa;
+  border-right-color:#aaa;
+  filter:drop-shadow(1px 1px 2px #ddd);
+  margin-top:-15px;
+}
+
+
+.animation-split(@n,@i:1) when(@i <= @n){
+  &:nth-child(@{i}n){
+    animation-duration: (@i)*3s;
+  }
+  .animation-split(@n, (@i+1))
+}
+
+.hs-light{
+  >*{
+    display: inline-block;
+    width:6px;
+    height:6px;
+    border-left:1px solid #000;
+    border-top:1px solid #000;
+    border-right:1px solid #666;
+    border-bottom:1px solid #666;
+    border-radius:3px;
+    background:rgb(21, 235, 239);
+    margin-left:0;
+    animation: light 5s ease-in-out infinite;
+    .animation-split(5);
+    box-shadow: -1px -1px 1px #000;
+  }
+
+  
+}
+
+@keyframes light{
+  0%{
+    background:rgb(2, 252, 206);
+  }
+
+  50%{
+    background:rgb(26, 26, 26);
+  }
+
+
+  100%{
+    background:rgb(17, 255, 239);
+  }
 }

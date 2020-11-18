@@ -12,11 +12,11 @@
              height:9px;
            }
          }
-
-          .ivu-select-dropdown{
+.l-app-bar{
+   .ivu-select-dropdown{
             margin-top:15px;
              background:#23334c;
-    color:#fff;
+              color:#fff;
             li,ul{
                background:#23334c;
                border-color:#23334c;
@@ -35,18 +35,20 @@
 
               margin:0 1px;
             }
+}
+         
    
   }
 </style>
 <template>
   <div class="l-app-bar">
     <div class="l-left">
-       <Dropdown ref='dm' :trigger="my_enterprises.length == 0?'custom':'hover'" placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise' >
+       <Dropdown ref='dm'  :trigger="my_enterprises.length == 0?'custom':'hover'" placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise' >
        <BaseLogo class='d-none d-sm-block' style="margin-right:20px;"></BaseLogo>
         <DropdownMenu slot="list">
            <DropdownItem ref='m1'  :name='null' v-show='current_enterprise != null'><img style='width:30px;height:30px;margin-right:3px;' src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" /> 个人模式</DropdownItem>
           <template v-for='e in my_enterprises'>
-            <DropdownItem ref='m1' :key='e.id' :name='e.id' v-show='e.id != current_enterprise'><img style='width:30px;height:30px;margin-right:3px;' :src="e.avatar" /> {{e.name}}</DropdownItem>
+            <DropdownItem v-if='e' ref='m1' :key='e.id' :name='e.id' v-show='e.id != current_enterprise'><img style='width:30px;height:30px;margin-right:3px;' :src="e.avatar" /> {{e.name}}</DropdownItem>
           </template>
         </DropdownMenu>
       </Dropdown>
@@ -54,7 +56,6 @@
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
-
            <div class='spinner'  v-if='loading'>
             <div class="rect1"></div>
             <div class="rect2"></div>

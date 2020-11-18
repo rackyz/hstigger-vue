@@ -1,22 +1,22 @@
 <template>
   <Layout style='overflow:hidden;'>
-      <Header style="background:#23334c;color:#fff;border-left:5px solid #23334c;font-size:25px;padding-left:10px;position:relative;text-shadow:-2px -2px 2px #000;"> 平台管理 
-            <div style='position:absolute;right:10px;top:8px;font-size:10px;color:#aaa;height:20px;line-height:20px;font-family:arial;text-shadow:-1px -1px 1px #333;'>
-              Ningbo Gaozhuan Enterprise Information Platform ADMIN / 后台管理
-            </div>
-          	<div class="hs-caption" style='position:absolute;bottom:0;left:150px;right:0;height:30px;font-size:14px;display:flex;align-items:center;padding:0 20px;border-top-left-radius:20px;color:#ddd;' v-if="ActiveMenu"><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" size='16' style='margin-right:7px;' /> {{ActiveMenu.name}}</div>
+      <Header style="background:#23334c;color:#fff;font-size:18px;line-height:45px;padding-left:10px;position:relative;text-shadow:0px 0px 2px #000;font-family:Arial Black;color:#dfdfdf;height:45px;"><span style='font-size:30px;color:gold;position:relative;margin-right:10px;'>NEIP<span style='font-size:14px;margin-left:5px;font-weight:bold;'>后台管理</span> </span>
+        <div class='hs-light' style='position:absolute;right:10px;top:4px;height:40px;line-height:15px;display:flex;'>
+          <template v-for="a in Array(16)">
+            <div :key='a' style='margin-right:4px;'></div>
+          </template>
+          
+          </div>
+          	<div class="hs-caption" style='position:absolute;bottom:0;left:200px;right:0;height:30px;font-size:14px;display:flex;align-items:center;padding:0 20px;border-top-left-radius:20px;color:#ddd;border-bottom:2px solid #fff;' v-if="ActiveMenu"><Icon custom='gzicon gzi-parameter' size='18' style='margin-right:8px;' /> 控制台<Icon type='ios-arrow-forward' size='12' style='margin:0 5px;margin-left:10px;' /><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" size='16' style='margin-right:7px;' /> {{ActiveMenu.name}}</div>
 
           
 
       </Header>
       <Layout style='flex-direction:row;'>
-     <hs-menu style='min-width:200px;width:200px;padding-bottom:60px;' :data="menus" @on-select='onClickMenu' :current="ActivePath">
-      
+     <hs-menu style='min-width:200px;width:200px;padding-bottom:60px;padding:0;' :data="menus" @on-select='onClickMenu' :current="ActivePath">
      </hs-menu>
       <Content>
-          <transition name='fade'>
             <router-view></router-view>
-          </transition>
       </Content>
       </Layout>
   </Layout>

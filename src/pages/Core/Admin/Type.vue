@@ -3,21 +3,23 @@
         <Alert style="margin:10px;" show-icon>系统基础的类型数据都在此页进行配置,您可以对非系统类型进行修改并制定标识颜色</Alert>
        <Row :gutter="10" style="margin:5px;">
         <Col :span="4">
-       <Card title="类型列表" icon='md-list'>
-          <hs-tree :data="hs.makeTree(keys)" selection="selectedKey" @on-select='selectedKey=$event' />
+       <Card title="类型列表" icon='md-list' padding="0">
+           <div class='filter' style='border-bottom:1px solid #dfdfdf;padding:5px;'>
+               <Input long />
+           </div>
+          <hs-tree :data="keys" selection="selectedKey" @on-select='selectedKey=$event' />
         </Card>
         </Col>
 
         <Col :span='20'>
       <Card :padding="0">
-            <div slot="title" style='padding:4px 2px;color:#083964;font-size:16px;'><Icon type='ios-pricetag' style='margin-right:5px' /> {{selectedKey.name || "未选择"}} ({{selectedKey.count || 0}})</div>
+            <div slot="title" style='padding:4px 2px;color:#083964;font-size:14px;' v-if='selectedKey.name'><Icon :type='selectedKey.icon || "ios-pricetag"' style='margin-right:5px'  /> {{selectedKey.name || "未选择"}} / {{selectedKey.key || ""}} <span style='font-weight:bold;margin-left:5px;' v-show="selectedKey.coun">({{selectedKey.count}})</span></div>
             <hs-toolbar :data="tools" :enabled="ToolEnabled" @event="onEvent" v-show="selectedKey&&selectedKey.id" />
-
+            <div style='color:#aaa;height:100%;width:100%;display:flex;align-items:center;justify-content:center;padding-top:100px;' v-show="!selectedKey.id">您还未选择任何类型</div>
             <hs-list :data="getTypes(selectedKey.key)" :option="{tmpl:'BaseType'}" selectable='multiple' style='border:none' />
       </Card>
       </Col>
       </Row>
-
       <!-- Modal -->
        <hs-modal-form
         ref="form"

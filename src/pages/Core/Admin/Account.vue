@@ -1,6 +1,5 @@
 <template>
-	<div class="hs-conatiner hs-conatiner-scrollable" >
-	
+	<div class="hs-conatiner hs-conatiner-scrollable">
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff"
@@ -28,18 +27,18 @@
 				>结束批量操作</Button
 			>
 			<Input v-model="searchText" search style="width: 200px" clearable />
-			<ButtonGroup style="margin-left: 5px"
-				><Button
-					:type="hidingLocked ? 'primary' : ''"
-					@click="hidingLocked = !hidingLocked"
-					>隐藏已禁用</Button
-				>
-			</ButtonGroup>
+			
 			<Button
 				:type="showUnsafe ? 'primary' : ''"
 				@click="showUnsafe = !showUnsafe"
 				style="margin-left: 5px"
-				>密码未修改
+				>账号类型
+			</Button>
+			<Button
+				:type="showUnsafe ? 'primary' : ''"
+				@click="showUnsafe = !showUnsafe"
+				style="margin-left: 5px"
+				>账号状态
 			</Button>
 		</div>
     <!-- table -->
@@ -174,9 +173,9 @@
 					style="height: 40px; margin: 10px; width: 90%"
 					@click="importAllAccounts"
 					v-if="importState == 2 && importData && importData.length"
-					:disabled="importableAccounts.length == 0"
+					:disabled="!importableAccounts || importableAccounts.length == 0"
 					:loading="loadingImport"
-					>导入账号({{ importableAccounts.length }})</Button
+					>导入账号({{importableAccounts? importableAccounts.length:0 }})</Button
 				>
 			</div>
 
@@ -219,16 +218,20 @@ export default {
         	
 				{ type: "text", key: "user", width: 150, title: "用户名",
 				render(h,param){
-					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar,frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px",fontWeight:"bold"}},param.row.user)
+					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
+					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px",fontWeight:"bold"}},param.row.user)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
 				}},
 			{
 					type: "type",
 					title: "账户类型",
-					key: "passweak",
+					key: "type",
 					width: 100,
-					option: { getters:"core/AccountType" },
+					option: {
+							getters:"core/getTypes",
+							getters_key:"AccountType",
+							labelKey:"value"
+					},
 				},
 
 				{ type: "text", key: "phone", width: 150, title: "联系电话" },
@@ -252,8 +255,8 @@ export default {
 					option: { states: ["正常",'锁定'],colors:['darkgreen','darkred'] },
 				},
 			
-				
-        { key: "oauth", type: "time", title: "第三方绑定"},
+				 { key: "email", type: "text", title: "邮箱",width:250},
+        { key: "oauth", type: "text", title: "第三方绑定"},
        
         
 			],
@@ -306,6 +309,11 @@ export default {
 					icon: "ios-people",
 				},
 				{
+					key: "import-tmpl",
+					name: "导入模板",
+					icon: "md-download",
+				},
+				{
 					key: "refresh",
 					name: "刷新",
 					icon: "md-refresh",
@@ -323,14 +331,14 @@ export default {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
 			if (this.multiple) {
 				if (this.selected && this.selected.length > 0) {
-					return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1];
+					return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1,1];
 				} else {
-					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1];
+					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1,1];
 				}
 			} else {
         if (this.selected ){
           if(this.selected.includes('sys')){
-            return [1, 1, 0, 0, 0, 0, 0, 1, 1, 1];
+            return [1, 1, 0, 0, 0, 0, 0, 1, 1,1, 1];
           }
 
           let state = this.accounts.find(v=>v.id == this.selected).state
@@ -345,9 +353,10 @@ export default {
 						1,
 						1,
 						1,
+						1
           ];
         }
-				else return [1, 0, 0, 0, 0, 0, 0, 1, 1, 1];
+				else return [1, 0, 0, 0, 0, 0, 0, 1, 1, 1,1];
 			}
 		},
 		user_password_form() {
@@ -402,38 +411,46 @@ export default {
 						},
 					},
 					type:{
-						label:"账户类型",
 						control:"select",
 						option:{
-							getters:"core/AccountType"
+							
+							required:true,
+							idKey:"value",
+							getters:"core/getTypes",
+							key:"AccountType"
 						}
-					},
-					frame:{
-						label:"边框",
-						editable:true,
-						control:'image'
 					},
 					avatar: {
 						label: "头像",
 						editable: true,
 						control: "image",
 					},
+					password:{
+						label:'密码',
+						control:'input',
+						option:{
+							required:true,
+							defaultValue:'123456'
+						}
+					},
 					phone: {
-						label: "电话",
 						control: "input",
 					},
 					email:{
-						label: "邮箱",
 						control: "input",
 					}
 				},
-				layout: `<div style='padding-left:90px;position:relative;'>
-				<div style='position:absolute;left:0px;top:0px;width:80px;height:80px;'>{{avatar}}<div style='height:10px;'></div>{{frame}}</div>
-        <Row :gutter='10'>
-        <Col span='12'>{{type}}</Col><Col span='12'>{{user}}</Col>
-        </Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{phone}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{email}}</Col>
+				layout: `<div><div style='padding-left:120px;position:relative;'>
+				<div style='position:absolute;left:0px;top:0px;width:110px;height:110px;'>{{avatar}}<div style='height:10px;'></div></div>
+				<Row :gutter='10'>
+		
+        <Col span='24'><Col span='24'>{{type}}</Col></Row>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{user}}</Col>
+        </Row></div><div>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >电话</Col><Col span='19'>{{phone}}</Col>
+        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >邮箱</Col><Col span='19'>{{email}}</Col>
+				</Row>
+				<Row :gutter='10' style='margin-top:0px;'><Col span='5' style='line-height:40px;text-align:right;' ><div style='color:red;'>密码类型</div></Col><Col span='19' style='padding:10px'>随机生成发送给手机 or 指定密码</Col>
         </Row></div>`,
 
 				option: {
@@ -576,7 +593,7 @@ export default {
 					: (this.accounts.find((v) => v.id == selected_id)))
       
 			if (e == "add") {
-				this.current = null;
+				this.current = {}
 				this.showModal = true;
 			} else if (e == "edit") {
 				this.current = selected;
@@ -610,9 +627,9 @@ export default {
 					this.multiple
 						? `确定要删除<span style='color:red;margin:0 2px;font-weight:bold'>${selected
 								.slice(0, 3)
-								.map((v) => v.name)
+								.map((v) => v.user)
 								.join(", ")}</span>等${selected.length}个账号`
-						: `确定要删除该用户<span style='color:red;margin:0 2px;font-weight:bold'>${selected.name}</span>?`,
+						: `确定要删除该用户<span style='color:red;margin:0 2px;font-weight:bold'>${selected.user}</span>?`,
 					() => {
 						if (this.multiple) {
 							this.$store
