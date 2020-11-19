@@ -40,7 +40,7 @@ module.exports = {
         GET_ENTERPRISES: "GET /enterprises",
         GET_ENTERPRISE: "GET /enterprrises",
         POST_ENTERPRISE: "POST /enterprises",
-        DEL_ENTERPRISE: "DEL /enterprises",
+        DEL_ENTERPRISE: "DELETE /enterprises",
         PATCH_ENTERPRISE: "PATCH /enterprises",
 
         GET_TYPES: "GET /types",

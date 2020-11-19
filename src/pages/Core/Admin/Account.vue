@@ -417,7 +417,8 @@ export default {
 							required:true,
 							idKey:"value",
 							getters:"core/getTypes",
-							key:"AccountType"
+							key:"AccountType",
+							defaultValue:0
 						}
 					},
 					avatar: {
@@ -440,17 +441,16 @@ export default {
 						control: "input",
 					}
 				},
-				layout: `<div><div style='padding-left:120px;position:relative;'>
-				<div style='position:absolute;left:0px;top:0px;width:110px;height:110px;'>{{avatar}}<div style='height:10px;'></div></div>
+				layout: `<div>
 				<Row :gutter='10'>
 		
-        <Col span='24'><Col span='24'>{{type}}</Col></Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{user}}</Col>
-        </Row></div><div>
+        <Col span='5' style='line-height:40px;text-align:right;' >账号类型</Col><Col span='19'>{{type}}</Col></Row>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >用户名</Col><Col span='19'>{{user}}</Col>
+        </Row>
         <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >电话</Col><Col span='19'>{{phone}}</Col>
         </Row><Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >邮箱</Col><Col span='19'>{{email}}</Col>
 				</Row>
-				<Row :gutter='10' style='margin-top:0px;'><Col span='5' style='line-height:40px;text-align:right;' ><div style='color:red;'>密码类型</div></Col><Col span='19' style='padding:10px'>随机生成发送给手机 or 指定密码</Col>
+				<Row :gutter='10' style='margin-top:0px;'><Col span='5' style='line-height:40px;text-align:right;' ><div style='color:red;'>密码</div></Col><Col span='19' style='padding:10px 5px'>随机生成发送给手机 or 指定密码</Col>
         </Row></div>`,
 
 				option: {

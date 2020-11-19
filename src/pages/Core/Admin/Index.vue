@@ -7,10 +7,7 @@
           </template>
           
           </div>
-          	<div class="hs-caption" style='position:absolute;bottom:0;left:200px;right:0;height:30px;font-size:14px;display:flex;align-items:center;padding:0 20px;border-top-left-radius:20px;color:#ddd;border-bottom:2px solid #fff;' v-if="ActiveMenu"><Icon custom='gzicon gzi-parameter' size='18' style='margin-right:8px;' /> 控制台<Icon type='ios-arrow-forward' size='12' style='margin:0 5px;margin-left:10px;' /><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" size='16' style='margin-right:7px;' /> {{ActiveMenu.name}}</div>
-
-          
-
+          <div class="hs-caption" style='position:absolute;bottom:0;left:200px;right:0;height:30px;font-size:14px;display:flex;align-items:center;padding:0 20px;border-top-left-radius:20px;color:#ddd;border-bottom:2px solid #fff;' v-if="ActiveMenu"><Icon custom='gzicon gzi-parameter' size='18' style='margin-right:8px;' /> 控制台<Icon type='ios-arrow-forward' size='12' style='margin:0 5px;margin-left:10px;' /><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" size='16' style='margin-right:7px;' /> {{ActiveMenu.name}}</div>
       </Header>
       <Layout style='flex-direction:row;'>
      <hs-menu style='min-width:200px;width:200px;padding-bottom:60px;padding:0;' :data="menus" @on-select='onClickMenu' :current="ActivePath">
@@ -25,10 +22,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
-  data(){
-    return {
-       menus:[{
+  metaInfo:{
+    title:'后台管理'
+  },
+  computed:{
+    ...mapGetters("core",['session']),
+    menus(){
+      let session = this.session
+      if(!session)  
+        return []
+
+      return [{
         name:'总览',
         icon:'bar-chart',
         path:'/core/admin/dashboard',
@@ -41,17 +47,20 @@ export default {
         name:'账户管理',
         icon:"user",
         path:'/core/admin/account',
-        count:12
+        count:session.users ? session.users.length : 0,
+        count_color:session.users && session.users.length > 0?"":"#aaa"
       },{
         name:'企业管理',
         icon:"organization",
         path:'/core/admin/enterprise',
-        count:2
+        count:session.enterprises ? session.enterprises.length : 0,
+        count_color:session.enterprises && session.enterprises.length > 0?"":"#aaa"
       },{
         name:'应用管理',
         icon:"apps",
         path:'/core/admin/app',
-        count:2
+        count:session.modules ? session.modules.length || "0":0,
+        count_color:session.modules && session.modules.length > 0?"":"#aaa" 
       }]
         },{
           name:"公用数据",
@@ -97,13 +106,7 @@ export default {
           icon:'config'
         }]
         },]
-    }
-   
-  },
-  metaInfo:{
-    title:'后台管理'
-  },
-  computed:{
+    },
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{

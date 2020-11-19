@@ -14,8 +14,9 @@ const state = {
   projects:[],
   current_enterprise:null,
   my_enterprises:[],
+  modules:[],
   apps:{
-   
+    
     "task":{
       key:'task',
       name:'任务与计划',
@@ -147,10 +148,29 @@ const getters = {
     return state.session
   },
   apps(state){
-    return state.apps
+    let o = {}
+    state.modules.forEach(v=>{
+      o[v.key] = Object.assign({},v)
+      o[v.key].path = o[v.key].url
+    })
+    return o
   },
   app_groups(state){
-    return state.app_groups
+    let types =  getters.getTypes(state)('ModuleType') || []
+    if(types){
+    state.modules.forEach(v=>{
+      let t = types.find(t=>v.type == t.value)
+      if(t){
+        if(t.subs){
+          t.subs.push(v.key)
+        }else{
+          t.subs = [v.key]
+        }
+      }
+
+    })
+  }
+    return types
   },
   acc_list(state){
     return state.acc_list
@@ -272,14 +292,6 @@ const actions = {
       }).catch(reject)
     })
   },
-  GetTypes({commit}){
-    return new Promise((resolve,reject)=>{
-      API.CORE.GET_TYPES().then(res=>{
-        commit('saveTypes',res.data.data)
-        resolve()
-      }).catch(reject)
-    })
-  },
   Patch({commit},item){
     return new Promise((resolve,reject)=>{
         if(item.id){
@@ -374,11 +386,13 @@ const mutations = {
     API.CORE.SetAuthorization(session.token)
     localStorage.setItem('hs-token',session.token)
     state.session = session
+     state.types = session.types //SaveTypes(session.types)
     state.users = session.users
+    state.modules = session.modules
     if (Array.isArray(session.my_enterprises))
       return state.my_enterprises = session.my_enterprises.map(
         v => session.enterprises.find(e => e && e.id == v))
-    state.types = SaveTypes(session.types)
+   
     // state.projects = session.projects
     // state.deps.forEach(v=>v.list = state.users.find(u=>Array.isArray(u.deps)?u.deps.includes(v):null))  
   },
@@ -393,19 +407,6 @@ const mutations = {
   },
   saveUsers(state,users){
     state.users = users
-  },
-  saveTypes(state,data){
-    data.forEach(v=>{
-      v.count = 0
-    })
-    data.forEach(v=>{
-        if(v.parent_id){
-          let t = data.find(x=>x.id == v.parent_id)
-          if(t)
-                t.count++
-        }
-    })
-    state.types = data
   },
   localPatchTypes(state,item){
        

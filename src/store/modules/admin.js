@@ -42,7 +42,7 @@ const actions = {
       API.CORE.POST_ACCOUNTS(users).then(res => {
         let resInfoArray = res.data.data
         users.forEach((v,i)=>{
-          Object.assign(v[i],resInfoArray[i])
+          Object.assign(v,resInfoArray[i])
         })
         commit("saveAccounts", users)
         resolve()
@@ -63,7 +63,7 @@ const actions = {
   },
   DeleteUser({commit},user_id){
     return new Promise((resolve,reject)=>{
-      API.CORE.DEL_ACCOUNT(user_id).then(res=>{
+      API.CORE.DEL_ACCOUNT({param:{id:user_id}}).then(res=>{
         commit('removeAccount', user_id)
         resolve()
       }).catch(reject)

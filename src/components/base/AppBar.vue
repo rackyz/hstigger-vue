@@ -102,26 +102,7 @@
     </div>
 
     <!-- DEBUG MODAL -->
-      <Modal title="调试"  footer-hide draggable v-model="showDebug" v-show='session.id'>
-          <div style="padding:10px;padding-left:120px;">
-          用户: <Select style='display:inline-block;width:200px;' transfer :value="session.id"  @on-change="Debug_ChangeUser"> <Option :key="d.id" :name="d.id" v-for="d in users" :value="d.id">
-                {{d.name}}
-          </Option>
-          </Select><br />
-              部门: <Select ref='debug_deps' style='display:inline-block;width:300px;margin-top:5px;' multiple transfer :value="session.deps"  @on-select="Debug_ChangeDep"> <Option :key="d.id" :name="d.id" v-for="d in deps" :value="d.id">
-                      {{d.name}}
-              </Option>
-          </Select><br />
-              角色: <Select  ref='debug_roles' style='display:inline-block;width:300px;margin-top:5px;' multiple transfer :value="session.roles"  @on-select="Debug_ChangeRole"> <Option :key="d.id" :name="d.id" v-for="d in roles" :value="d.id">
-                      {{d.name}}
-          </Option>
-          </Select>
-          <hs-avatar :userinfo="session" :size="80" style="position:absolute;left:20px;top:45px;" />
-          <br />
-          <pre class="debug-log">SESSION:{{session}}
-              </pre>
-                  </div>
-      </Modal>
+     <BaseDebugPanel v-model='showDebug' />
    
       <div class='l-login-mask' v-show="!isLogin"  >
           <div class="login">
