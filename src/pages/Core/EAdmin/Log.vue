@@ -87,7 +87,8 @@ export default {
             const mapper = {
                 app:"服务器",
                 user:"用户",
-                req:"请求"
+                req:"请求",
+                redis:"缓存"
             }
             return mapper[t]
         },
@@ -104,19 +105,20 @@ export default {
           return h('span',{style:{color:'dark'}},[h('Icon',{props:{custom:"gzicon gzi-rizhi"},style:{marginRight:"3px"}}),node.name]);
         },
         getData(){
+            const LOG_REXP = /(.*)\.log-(.*)\.log/
             this.CORE.GET_LOGS().then(res=>{
               let list = res.data.data
              
                list.sort((a,b)=>a>b?1:-1)
               list.forEach(v=>{
-                  if(['user.log','req.log','application.log'].includes(v.name)){
-                      v.parent_id = 1
-                  }else{
+                  if(LOG_REXP.test(v.name)){
                       v.parent_id = 2
+                  }else{
+                      v.parent_id = 1
                   }
                   v.file = v.name
                   if(v.name){
-                      let matches = v.name.match(/(.*)\.log-(.*)\.log/)
+                      let matches = v.name.match(LOG_REXP)
                       if(matches){
                           let [, type, date] = matches
                           v.name = type + '.' + date

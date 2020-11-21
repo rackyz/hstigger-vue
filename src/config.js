@@ -35,7 +35,13 @@ module.exports = {
         GET_ACCOUNTS: "GET /accounts",
         POST_ACCOUNTS: "POST /accounts",
         PATCH_ACCOUNT: "PATCH /accounts/:id",
-        DEL_ACCOUNT: "DEL /accounts/:id",
+        DEL_ACCOUNT: "DELETE /accounts/:id",
+        DEL_ACCOUNTS: "POST /accounts/delete",
+        RESET_PASSWORD: "POST /accounts/reset-pwd",
+        CHANGE_PASSWORD: "POST /accounts/change-pwd",
+        LOCK_ACCOUNT: "POST /accounts/lock",
+        UNLOCK_ACCOUNT: "POST /accounts/unlock",
+
 
         GET_ENTERPRISES: "GET /enterprises",
         GET_ENTERPRISE: "GET /enterprrises",

@@ -32,7 +32,7 @@ const actions = {
     return new Promise((resolve,reject)=>{
        API.CORE.GET_ACCOUNTS().then(res => {
           let accounts = res.data.data
-          commit('saveAccounts', accounts)
+          commit('initAccounts', accounts)
           resolve()
        }).catch(reject)
     })
@@ -49,21 +49,40 @@ const actions = {
       }).catch(reject)
     })
   },
+  ResetPassword({commit},user_id_list){
+    return new Promise((resolve,reject)=>{
+      API.CORE.RESET_PASSWORD(user_id_list).then(res=>{
+        resolve()
+      }).catch(reject)
+    })
+  },
   PatchUser({commit,dispatch},user){
     return new Promise((resolve,reject)=>{
       if(user.id)
         return API.CORE.PATCH_ACCOUNT(user,{param:{id:user.id}}).then(res=>{
           let resInfo = res.data.data
-          commit("patchAccount", resInfo)
+          Object.assign(user, resInfo)
+          commit("patchAccount", user)
           resolve()
         }).catch(reject)
       else
         dispatch('CreateUsers',[user])
+        resolve()
     })
   },
   DeleteUser({commit},user_id){
     return new Promise((resolve,reject)=>{
       API.CORE.DEL_ACCOUNT({param:{id:user_id}}).then(res=>{
+        commit('removeAccount', user_id)
+        resolve()
+      }).catch(reject)
+    })
+  },
+  DeleteUsers({
+    commit
+  }, userid_list) {
+    return new Promise((resolve, reject) => {
+      API.CORE.DEL_ACCOUNTS(userid_list).then(res => {
         commit('removeAccount', user_id)
         resolve()
       }).catch(reject)
@@ -81,7 +100,7 @@ const actions = {
 }
 
 const mutations = {
-  saveUsers(state, accounts) {
+  initAccounts(state, accounts) {
     state.accounts = accounts
   },
   saveAccounts(state,accounts){
@@ -92,12 +111,17 @@ const mutations = {
   patchAccount(state,account){
     let index = state.accounts.findIndex(v=>v.id === account.id)
     if(index != -1)
-      state.accounts.splice(index,1,state.Object.assign(accounts[index],account))
+      state.accounts.splice(index,1,Object.assign({},state.accounts[index],account))
   },
   removeAccount(state,id){
     let index = state.accounts.findIndex(v=>v.id == id)
     if (index != -1)
       state.accounts.splice(index,1)
+  },
+  removeAccounts(state,id_list = []){
+    id_list.forEach(v=>{
+      mutations.removeAccount(state,v)
+    })
   }
 }
 

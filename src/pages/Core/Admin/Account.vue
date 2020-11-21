@@ -197,8 +197,6 @@ import { mapGetters } from "vuex";
 export default {
 	data() {
 		return {
-			accounts:[],
-
 			loadingImport: false,
 			selected: null,
 			loading: false,
@@ -256,9 +254,37 @@ export default {
 				},
 			
 				 { key: "email", type: "text", title: "邮箱",width:250},
-        { key: "oauth", type: "text", title: "第三方绑定"},
-       
-        
+				{ key: "oauth", title: "第三方绑定",width:150,sortable:false,
+					render:(h,param)=>{
+					const  oauthItems =[{
+							icon:'qq',
+							title:"QQ登录"
+					},{
+							icon:'wechat',
+							title:"微信登录",
+							size:19
+					},{
+							icon:'dingding-o',
+							title:"钉钉登录"
+					},{
+							icon:'shouji',
+							title:'手机扫码',
+							size:16
+					}]
+
+					let icons = oauthItems.map(v=>h('Icon',{props:{
+						custom:`gzicon gzi-${v.icon}`,
+						size:v.size,
+						color:"#aaa"
+					},style:{marginRight:"6px"}}))
+
+					return h('div',{style:{
+						display:'flex',
+						alignItems:'center',
+						justifyContent:"center"
+					}},icons)
+				}},
+         { type: "text", title: " "},
 			],
 
 			current: {},
@@ -327,6 +353,7 @@ export default {
 	},
 	computed: {
 		...mapGetters('core',['getType']),
+		...mapGetters('admin',['accounts']),
 		toolEnabled() {
       // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
 			if (this.multiple) {
@@ -524,9 +551,7 @@ export default {
         return
 
       if (e.type == "select") 
-        this.selected = e.data;
-      else if( e.type == "open" && e.data)
-        this.RouteTo('/core/users/'+e.data.id,true)
+        this.selected = e.data
     },
     /**
      * @method importAllUsers
@@ -573,10 +598,8 @@ export default {
      */
 		getData() {
 			this.loading = true;
-			this.CORE.GET_ACCOUNTS().then(res=>{
-					this.accounts = res.data.data
-			}).finally(()=>{
-					this.loading = false;
+			this.$store.dispatch('admin/ListUsers').finally(e=>{
+				this.loading = false
 			})
     },
     /** @method onToolEvent
@@ -608,15 +631,15 @@ export default {
 				if (this.multiple) {
 					this.Confirm(
 						`确定要重置<span style="color:red">${selected
-							.map(v => v.name)
+							.map(v => v.user)
 							.join(",")}等${selected.length}</span>用户的密码?`,
-						() => this.$store.dispatch("admin/Resetpassword", selected_id)
+						() => this.$store.dispatch("admin/ResetPassword", selected_id)
 					);
 				} else {
 					this.Confirm(
-						`确定要重置用户<span style="color:red">${selected.name}</span>的密码?`,
+						`确定要重置用户<span style="color:red">${selected.user}</span>的密码?`,
 						() =>
-							this.$store.dispatch("admin/Resetpassword", [selected.id])
+							this.$store.dispatch("admin/ResetPassword", [selected.id])
 					);
 				}
 				this.$store.dispatch("admin/ResetPassword", { id: selected.id });
@@ -727,7 +750,6 @@ export default {
 		 *  @description Remote method, for patching user information
 		 */
 		patchUser(item) {
-			console.log("patch:", item);
 			var that = this;
 			if (this.current && this.current.id) {
 				item.id = this.current.id;
