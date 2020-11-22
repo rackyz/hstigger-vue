@@ -2,10 +2,13 @@ const axios = require('axios')
 const config = require('../config')
 
 
+
 let Clients = {}
 config.Servers.forEach((server,i)=>{
   var axiosClient = axios.create({baseURL:server.Connection.baseURL,
     timeout: server.Connection.timeout})
+
+  let client = {name:server.Name, getAPI,axios:axiosClient, apis:server.API}
 
   // 初始化头部配置
   axiosClient.defaults.headers = server.Connection.defaultHeaders || {}
@@ -34,6 +37,7 @@ config.Servers.forEach((server,i)=>{
       } else if (err.response.status == 403) {
         return Promise.reject('403-权限不足,请联系管理员!')
       } else if (err.response.status == 401) {
+        client.Clear()
         return Promise.reject("tokenoutofdate")
       } else {
         return Promise.reject(`${err.response.status}] ${err}`)
@@ -80,7 +84,6 @@ config.Servers.forEach((server,i)=>{
     return apiObject
   }
 
-  let client = {name:server.Name, getAPI,axios:axiosClient, apis:server.API}
 
   client.SetAuthorization = function(token){
     axiosClient.defaults.headers.Authorization = token
@@ -88,6 +91,13 @@ config.Servers.forEach((server,i)=>{
 
   client.SetEnterprise = function(ent_id){
     axiosClient.defaults.headers.Enterprise = ent_id
+  }
+
+  client.Clear = function(){
+    delete axiosClient.defaults.headers.Authorization
+    delete axiosClient.defaults.headers.Enterprise
+    localStorage.removeItem('hs-token')
+
   }
 
   Object.entries(server.API).forEach(([k,v]) => {
