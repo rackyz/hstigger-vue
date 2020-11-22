@@ -632,14 +632,22 @@ export default {
 					this.Confirm(
 						`确定要重置<span style="color:red">${selected
 							.map(v => v.user)
-							.join(",")}等${selected.length}</span>用户的密码?`,
-						() => this.$store.dispatch("admin/ResetPassword", selected_id)
+							.join(",")}</span>等<span style="color:red">${selected.length}</span>名用户的密码?`,
+						() => this.$store.dispatch("admin/ResetPassword", selected_id).then(res=>{
+							this.Success("操作完成")
+						}).catch(e=>{
+							this.Error(e)
+						})
 					);
 				} else {
 					this.Confirm(
 						`确定要重置用户<span style="color:red">${selected.user}</span>的密码?`,
 						() =>
-							this.$store.dispatch("admin/ResetPassword", [selected.id])
+							this.$store.dispatch("admin/ResetPassword", [selected.id]).then(res=>{
+							this.Success("操作完成")
+						}).catch(e=>{
+							this.Error(e)
+						})
 					);
 				}
 				this.$store.dispatch("admin/ResetPassword", { id: selected.id });
