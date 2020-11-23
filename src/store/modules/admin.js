@@ -52,9 +52,49 @@ const actions = {
   ResetPassword({commit},user_id_list){
     return new Promise((resolve,reject)=>{
       API.CORE.RESET_PASSWORD(user_id_list).then(res=>{
+        commit('pathAccounts',user_id_list.map(id=>({id,changed:false})))
+        resolve()
+        
+      }).catch(reject)
+    })
+  },
+  ChangePassword({commit},{id,password}){
+    return new Promise((resolve,reject)=>{
+      API.CORE.CHANGE_PASSWORD({id,password}).then(res=>{
+         commit('patchAccount', {
+           id,changed:1
+         })
         resolve()
       }).catch(reject)
     })
+  },
+  LockAccounts({commit},user_id_list){
+    if(user_id_list && !Array.isArray(user_id_list))
+      user_id_list = [user_id_list]
+    return new Promise((resolve, reject) => {
+      API.CORE.LOCK_ACCOUNTS(user_id_list).then(res => {
+        commit('patchAccounts', user_id_list.map(id => ({
+          id,
+          locked:1
+        })))
+        resolve()
+
+      }).catch(reject)
+    })
+  },
+  UnlockAccounts({commit},user_id_list){
+      if (user_id_list && !Array.isArray(user_id_list))
+        user_id_list = [user_id_list]
+     return new Promise((resolve, reject) => {
+       API.CORE.UNLOCK_ACCOUNTS(user_id_list).then(res => {
+         commit('patchAccounts', user_id_list.map(id => ({
+           id,
+           locked: 0
+         })))
+         resolve()
+
+       }).catch(reject)
+     })
   },
   PatchUser({commit,dispatch},user){
     return new Promise((resolve,reject)=>{
@@ -111,7 +151,12 @@ const mutations = {
   patchAccount(state,account){
     let index = state.accounts.findIndex(v=>v.id === account.id)
     if(index != -1)
-      state.accounts.splice(index,1,Object.assign({},state.accounts[index],account))
+      state.accounts.splice(index,1,Object.assign(state.accounts[index],account))
+  },
+  patchAccounts(state,items){
+    items.forEach(v=>{
+      mutations.patchAccount(state,v)
+    })
   },
   removeAccount(state,id){
     let index = state.accounts.findIndex(v=>v.id == id)

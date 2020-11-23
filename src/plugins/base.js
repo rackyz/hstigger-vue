@@ -10,6 +10,17 @@ import moment from 'moment'
 Vue.use(PuzzleVerification)
 Vue.prototype.moment = moment
 
+Vue.prototype.Download = function(url){
+
+   let a = document.createElement("a")
+   a.href = url
+   a.download = "download"
+
+   document.body.appendChild(a)
+
+   a.click()
+   a.remove()
+}
 
 // Predefined Some Easy Prompt Methods based on iview
 Vue.prototype.Confirm = function (content, cb) {

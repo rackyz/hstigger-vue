@@ -5,27 +5,21 @@
 			style="background: #fff"
 			:data="tools"
 			@event="onToolEvent"
-			:enabled="toolEnabled"
+			:disabled="toolDisabled"
 		/>
-		<a
-			href="https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx"
-			class='tmpl-link'
-		>
-			<Icon type="md-download" /> 下载导入用表格模板</a
-		>
     <!-- filters -->
-		<div class="filter-wrap" style="padding: 5px" @click="selected = null">
-			<ButtonGroup style="margin-right: 5px" v-show="multiple"
+		<div class="filter-wrap" style="padding: 5px">
+			<Button
+				style="margin-right: 5px"
+				:type="multiple?'error':''"
+				@click="multiple=!multiple"
+				>{{multiple?"取消多选":"多选"}}</Button
+			>
+			<ButtonGroup style="margin-right: 5px" v-if="multiple"
 				><Button @click="onSelectAll">全选</Button
 				><Button @click="selected = []">清空</Button></ButtonGroup
 			>
-			<Button
-				style="margin-right: 5px"
-				type="error"
-				v-show="multiple"
-				@click="multiple = false"
-				>结束批量操作</Button
-			>
+			
 			<Input v-model="searchText" search style="width: 200px" clearable />
 			
 			<Button
@@ -40,6 +34,7 @@
 				style="margin-left: 5px"
 				>账号状态
 			</Button>
+			{{selected}}
 		</div>
     <!-- table -->
 		<div
@@ -102,7 +97,7 @@
     <!-- modal for changing user password -->
 		<hs-modal-form
 			ref="formpwd"
-			:title="`修改密码${selected_user ? (':'+selected_user.name) : ''}`"
+			:title="`修改密码${selected_user ? (':'+selected_user.user) : ''}`"
 			v-model="showModalPassword"
 			:width="320"
      
@@ -242,15 +237,15 @@ export default {
 					title: "密码安全",
 					key: "changed",
 					width: 100,
-					option: { states: ["未修改","已修改"],colors:['darkred','darkgreen'] },
+					option: { states: ["未修改","正常"],colors:['darkred','darkgreen'] },
 				},
 
 				{
 					type: "state",
-					title: "账号状态",
+					title: "账号锁定",
 					key: "locked",
 					width: 120,
-					option: { states: ["正常",'锁定'],colors:['darkgreen','darkred'] },
+					option: { states: ["正常",'锁定'],colors:['green','#aaa'] },
 				},
 			
 				 { key: "email", type: "text", title: "邮箱",width:250},
@@ -316,7 +311,7 @@ export default {
 				},
 				{
 					key: "lock",
-					name: "禁用",
+					name: "锁定",
 					icon: "md-lock",
 				},
 				{
@@ -330,13 +325,8 @@ export default {
 					icon: "ios-folder-open",
 				},
 				{
-					key: "multiple",
-					name: "批量操作",
-					icon: "ios-people",
-				},
-				{
 					key: "import-tmpl",
-					name: "导入模板",
+					name: "下载模板",
 					icon: "md-download",
 				},
 				{
@@ -354,37 +344,45 @@ export default {
 	computed: {
 		...mapGetters('core',['getType']),
 		...mapGetters('admin',['accounts']),
-		toolEnabled() {
-      // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
+		toolDisabled() {
+			const baseConfig = {
+				add:true,				// add
+				edit:false,			// edit
+				delete:false,			// del
+				resetpwd:false,			// reset
+				resetpwdto:false,			// changepwd
+				lock:false,			// lock
+				unlock:false,			// unlock
+				import:false,			// import
+				"import-tmpl":false,			// download
+				refresh:true			// refresh
+			}
 			if (this.multiple) {
 				if (this.selected && this.selected.length > 0) {
-					return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1,1];
-				} else {
-					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1,1];
-				}
+					baseConfig.delete = 1
+					baseConfig.resetpwd = 1
+					baseConfig.lock = 1
+					baseConfig.unlock = 1
+				} 
 			} else {
         if (this.selected ){
-          if(this.selected.includes('sys')){
-            return [1, 1, 0, 0, 0, 0, 0, 1, 1,1, 1];
+					 if(this.selected.includes('sys')){
+						baseConfig.edit = 1
           }
+					let selectedItem = this.accounts.find(v=>v.id == this.selected)
+					let locked = selectedItem ? selectedItem.locked : 0
+						baseConfig.edit = 1
+					baseConfig.delete = 1
+					baseConfig.resetpwd = 1
+					baseConfig.lock =  (locked == 0)
+					baseConfig.unlock = (locked == 1)
+				}else {
 
-          let state = this.accounts.find(v=>v.id == this.selected).state
-					return [
-						1,
-						1,
-						1,
-						1,
-						1,
-						state == 0,
-						state == 1,
-						1,
-						1,
-						1,
-						1
-          ];
-        }
-				else return [1, 0, 0, 0, 0, 0, 0, 1, 1, 1,1];
+				}
+
 			}
+
+			return baseConfig
 		},
 		user_password_form() {
 			return {
@@ -549,8 +547,7 @@ export default {
 		onTableEvent(e) {
       if(!e)
         return
-
-      if (e.type == "select") 
+			if (e.type == "select") 
         this.selected = e.data
     },
     /**
@@ -624,9 +621,18 @@ export default {
 			} else if (e == "refresh") {
 				this.getData();
 			} else if (e == "lock") {
-				this.$store.dispatch("admin/LockUser", selected_id);
+				this.$store.dispatch("admin/LockAccounts", selected_id).then(()=>{
+					this.$refs.table.$forceUpdate()
+					this.Success("操作成功")
+				}).catch(e=>{
+					this.Error(e)
+				});
 			} else if (e == "unlock") {
-				this.$store.dispatch("admin/UnlockUser", selected_id);
+				this.$store.dispatch("admin/UnlockAccounts", selected_id).then(()=>{
+					this.Success("操作成功")
+				}).catch(e=>{
+					this.Error(e)
+				});
 			} else if (e == "resetpwd") {
 				if (this.multiple) {
 					this.Confirm(
@@ -686,9 +692,12 @@ export default {
 						}
 					}
 				);
-			} else if (e == "import") {
-				this.$refs.fileLoader.click();
-			} else if (e == "multiple") {
+			//} 
+			// else if (e == "import") {
+			// 	this.$refs.fileLoader.click();
+			// } else if (e == "import-tmpl"){
+			// 	this.Download("https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx")
+			}else if (e == "multiple") {
 				this.multiple = true;
 				this.selected = [];
 			} else if (e == "unmultiple") {
@@ -739,11 +748,11 @@ export default {
 				this.$refs.formpwd.setError("passwordAgain", "两次密码不一致,请检查");
 				return;
 			}
-
 			if (this.selected) {
 				item.id = this.selected
+				delete item.passwordAgain
 				this.$store
-					.dispatch("admin/ResetPassword", item)
+					.dispatch("admin/ChangePassword", item)
 					.then((res) => {
 						that.Success("修改成功");
 						that.showModalPassword = false;

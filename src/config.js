@@ -39,8 +39,8 @@ module.exports = {
         DEL_ACCOUNTS: "POST /accounts/delete",
         RESET_PASSWORD: "POST /accounts/reset-pwd",
         CHANGE_PASSWORD: "POST /accounts/change-pwd",
-        LOCK_ACCOUNT: "POST /accounts/lock",
-        UNLOCK_ACCOUNT: "POST /accounts/unlock",
+        LOCK_ACCOUNTS: "POST /accounts/lock",
+        UNLOCK_ACCOUNTS: "POST /accounts/unlock",
 
 
         GET_ENTERPRISES: "GET /enterprises",

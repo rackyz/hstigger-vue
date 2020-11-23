@@ -71,7 +71,9 @@ export default {
   computed:{
     ...mapGetters('core',['apps']),
     items(){
-      return this.data.subs.map(v=>this.apps[v]).filter(v=>v && (!this.filter || v.name.includes(this.filter)))
+      if(this.data && Array.isArray(this.data.subs))
+        return this.data.subs.map(v=>this.apps[v]).filter(v=>v && (!this.filter || v.name.includes(this.filter)))
+      return []
     },
     checked_count(){
       return Object.keys(this.checked).length
