@@ -21,20 +21,22 @@
 			>
 			
 			<Input v-model="searchText" search style="width: 200px" clearable />
+			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 账号类型 -">
+				<template v-for="t in AccountTypes">
+					<Option :value='t.value' :key='t.value' :label="t.name">
+						<span :style='`color:${t.color}`'>{{t.name}}</span>
+					</Option>
+				</template>
+			</Select>
+			<Select clearable v-model='changed' style='width:120px;margin-left:5px;' placeholder="- 密码安全 -">
+					<Option :value='0' style='color:red' >
+						未修改
+					</Option>
+						<Option :value='1' style='color:green'>
+						正常
+					</Option>
+			</Select>
 			
-			<Button
-				:type="showUnsafe ? 'primary' : ''"
-				@click="showUnsafe = !showUnsafe"
-				style="margin-left: 5px"
-				>账号类型
-			</Button>
-			<Button
-				:type="showUnsafe ? 'primary' : ''"
-				@click="showUnsafe = !showUnsafe"
-				style="margin-left: 5px"
-				>账号状态
-			</Button>
-			{{selected}}
 		</div>
     <!-- table -->
 		<div
@@ -51,6 +53,8 @@
 				:columns="columns"
 				:data="filterdAccounts"
 				:paged="false"
+				:page="page"
+				:pageSize="pageSize"
 				:selectable="multiple ? 'multiple' : 'single'"
 				:selection="selected"
 				full
@@ -73,11 +77,14 @@
 			<Page
 				:total="filterdAccounts.length"
 				size="small"
-				:page-size="100"
+				:current="page"
+				:page-size="pageSize"
 				:page-size-opts="[20, 50, 100]"
 				show-elevator
 				show-sizer
 				show-total
+				@on-change="page=$event"
+				@on-page-size-change="pageSize=$event"
 			/>
 		</div>
     <!-- modal for create/edit user data -->
@@ -107,6 +114,7 @@
 			editable
 			@on-submit="patchUserPassword"
 			@on-event="handleEvent"
+
 		/>
 
 		<!-- modal for importing -->
@@ -192,6 +200,10 @@ import { mapGetters } from "vuex";
 export default {
 	data() {
 		return {
+			page:1,
+			pageSize:100,
+			type:undefined,
+			changed:undefined,
 			loadingImport: false,
 			selected: null,
 			loading: false,
@@ -209,10 +221,10 @@ export default {
 			columns: [
         { type: "index", title: "序号" },
         	
-				{ type: "text", key: "user", width: 150, title: "用户名",
+				{ type: "text", key: "user", width: 250, title: "用户名",
 				render(h,param){
 					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px",fontWeight:"bold"}},param.row.user)
+					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.user)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
 				}},
 			{
@@ -342,8 +354,11 @@ export default {
     this.$refs.table.calcTableHeight()
 	},
 	computed: {
-		...mapGetters('core',['getType']),
+		...mapGetters('core',['getTypes']),
 		...mapGetters('admin',['accounts']),
+		AccountTypes(){
+			return this.getTypes('AccountType')
+		},
 		toolDisabled() {
 			const baseConfig = {
 				add:true,				// add
@@ -495,11 +510,11 @@ export default {
 						(!v.name || !v.name.includes(this.searchText.trim())) &&
 						(!v.user || !v.user.includes(this.searchText.trim()))
 					)
-						return false;
+					return false;
+					console.log(v)
+					if (this.changed != undefined && v.changed != this.changed) return false;
 
-					if (this.showUnsafe && !v.passweak) return false;
-
-					if (this.hidingLocked && v.state != 0) return false;
+					if (this.type != undefined && v.type != this.type) return false;
 
 					return true;
 				}) || []
