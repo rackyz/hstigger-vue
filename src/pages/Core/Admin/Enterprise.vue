@@ -5,15 +5,10 @@
 		<hs-toolbar
 			style="background: #fff"
 			:data="tools"
+      :disabled="{}"
 			@event="onToolEvent"
-			:enabled="toolEnabled"
 		/>
-		<a
-			href="https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx"
-			class='tmpl-link'
-		>
-			<Icon type="md-download" /> 下载导入用表格模板</a
-		>
+	
     <!-- filters -->
 		<div class="filter-wrap" style="padding: 5px" @click="selected = null">
 			<ButtonGroup style="margin-right: 5px" v-show="multiple"
@@ -28,19 +23,7 @@
 				>结束批量操作</Button
 			>
 			<Input v-model="searchText" search style="width: 200px" clearable />
-			<ButtonGroup style="margin-left: 5px"
-				><Button
-					:type="hidingLocked ? 'primary' : ''"
-					@click="hidingLocked = !hidingLocked"
-					>隐藏已禁用</Button
-				>
-			</ButtonGroup>
-			<Button
-				:type="showUnsafe ? 'primary' : ''"
-				@click="showUnsafe = !showUnsafe"
-				style="margin-left: 5px"
-				>密码未修改
-			</Button>
+		
 		</div>
     <!-- table -->
 		<div
@@ -97,98 +80,11 @@
 			:form="user_form"
 			:data="current"
 			editable
-			@on-submit="patchUser"
+			@on-submit="patch"
 			@on-event="handleEvent"
 		/>
-    <!-- modal for changing user password -->
-		<hs-modal-form
-			ref="formpwd"
-			:title="`修改密码${selected_user ? (':'+selected_user.name) : ''}`"
-			v-model="showModalPassword"
-			:width="320"
-     
-			style="margin: 10px"
-			:form="user_password_form"
-			:data="current"
-			editable
-			@on-submit="patchUserPassword"
-			@on-event="handleEvent"
-		/>
-
-		<!-- modal for importing -->
-		<Modal
-			v-model="modalImporting"
-			width="600"
-			transfer
-			:z-index="10"
-			:footer-hide="importState != 3"
-		>
-			<p slot="header" style="color: #f60; text-align: center">
-				<Icon type="ios-information-circle"></Icon>
-				<span>导入数据</span>
-			</p>
-			<div style="text-align: center; font-size: 0.85rem">
-				<p
-					style="
-						color: #333;
-						margin-bottom: 0.25rem;
-						font-size: 14px;
-						text-align: left;
-						padding: 5px 30px;
-						padding-top: 15px;
-					"
-				>
-					{{ importStateStr }}
-				</p>
-				<div
-					style="
-						text-align: left;
-						padding: 10px;
-						font-size: 12px;
-						max-height: 300px;
-						overflow-y: auto;
-						background: #fff;
-						padding: 10px;
-						margin: 10px 30px;
-					"
-				>
-					<p v-for="(u, i) in importData" :key="u.name">
-						[{{ i + 1 }}] {{ u.user }} / {{ u.name }}
-						<template v-if="u.state == undefined">
-							<span
-								style="float: right"
-								:style="`color:${TestImportState(u) ? 'red' : 'green'}`"
-								>{{ TestImportState(u) ? TestImportState(u) : "可导入" }}</span
-							>
-						</template>
-						<template v-else>
-							<span
-								style="float: right"
-								:style="`color:${u.state ? 'red' : 'blue'}`"
-								>{{ u.state ? "创建失败" : "创建成功" }}</span
-							>
-						</template>
-					</p>
-				</div>
-				<Button
-					style="height: 40px; margin: 10px; width: 90%"
-					@click="importAllAccounts"
-					v-if="importState == 2 && importData && importData.length"
-					:disabled="importableAccounts.length == 0"
-					:loading="loadingImport"
-					>导入账号({{ importableAccounts.length }})</Button
-				>
-			</div>
-
-      <!-- file loader hiding stuff -->
-			<input
-				ref="fileLoader"
-				v-show="false"
-				type="file"
-				accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*.csv"
-				@change="parse"
-			/>
-		</Modal>
+  
+		
 	</div>
 </template>
 
@@ -220,44 +116,37 @@ export default {
 				{ type: "text", key: "user", minWidth: 250, title: "企业名称",
 				render(h,param){
 					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar,frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px",fontWeight:"bold"}},param.row.name)
+					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
         }},
         	{ type: "text", key: "shortname", width: 150, title: "企业简称" , sortable:false,option:{
             align:'center',
            
           }},
-			{
-					type: "type",
-					title: "账户类型",
-					key: "passweak",
-					width: 100,
-					option: { getters:"core/AccountType" },
-				},
-
-				{ type: "text", key: "phone", width: 150, title: "联系电话" },
-				 { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
-         { key: "created_at", type: "time",title: "注册时间",width:100,option:{
-           type:'date'
-         } },
-        	{
+          	{
 					type: "state",
-					title: "密码安全",
-					key: "changed",
-					width: 100,
-					option: { states: ["未修改","已修改"],colors:['darkred','darkgreen'] },
-				},
-
-				{
-					type: "state",
-					title: "账号状态",
+					title: "企业状态",
 					key: "locked",
 					width: 120,
 					option: { states: ["正常",'锁定'],colors:['darkgreen','darkred'] },
 				},
+				{ type: "text", key: "user", width: 250, title: "管理账号",
+				render(h,param){
+					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
+					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.user)
+					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
+				}},
+
+				{ type: "text", key: "phone", width: 150, title: "员工人数" },
+         { type: "text", key: "phone", width: 150, title: "数据库" },
+         { type: "text", key: "phone", width: 150, title: "文件存储" },
+         
+        { type: "text", key: "phone", width: 150, title: "开通模块" },
+
+			{ key: "created_at", type: "time",title: "创建时间",width:100,option:{
+           type:'date'
+         } },
 			
-				
-        { key: "oauth", type: "time", title: "第三方绑定"},
        
         
 			],
@@ -279,16 +168,7 @@ export default {
 					name: "删除",
 					icon: "md-trash",
 				},
-				{
-					key: "resetpwd",
-					name: "重置密码",
-					icon: "md-key",
-				},
-				{
-					key: "resetpwdto",
-					name: "修改密码",
-					icon: "ios-key",
-				},
+				
 				{
 					key: "lock",
 					name: "禁用",
@@ -299,16 +179,7 @@ export default {
 					name: "启用",
 					icon: "md-unlock",
 				},
-				{
-					key: "import",
-					name: "导入",
-					icon: "ios-folder-open",
-				},
-				{
-					key: "multiple",
-					name: "批量操作",
-					icon: "ios-people",
-				},
+			
 				{
 					key: "refresh",
 					name: "刷新",
@@ -319,7 +190,10 @@ export default {
 	},
 	mounted() {
     this.getData();
-    this.$refs.table.calcTableHeight()
+    this.$nextTick(()=>{
+      this.$refs.table.calcTableHeight()
+    })
+    
 	},
 	computed: {
 		...mapGetters('core',['getType']),
@@ -467,13 +341,7 @@ export default {
 				}) || []
 			);
     },
-    /**
-     * @computed importableUsers
-     * @description find users which can be imported in user-data from file
-     */
-		importableAccounts() {
-			return this.importData.filter((v) => !this.TestImportState(v));
-    },
+   
     selected_user(){
       if(Array.isArray(this.selected)){
         return this.selected.map(id=>this.accounts.find(v=>v.id == id)).filter(v=>v)
@@ -483,29 +351,11 @@ export default {
     }
 	},
 	methods: {
-    /**
-     * @method TestImportState
-     * @description Test user-data to show state with mistakes
-     */
-		TestImportState(user) {
-      if (this.accounts.find((v) => v.user == user.user)) 
-        return "用户名重复";
-			else if (this.accounts.find((v) => v.phone == user.phone))
-				return "电话号码重复";
-    },
-    /** 
-     * @method onSelectAll
-     * @description binding 'select all' button for select all current users
-     */
+  
 		onSelectAll() {
 			this.selected = this.filterdAccounts.map((v) => v.id);
     },
-    /**
-     * @method onTableEvent
-     * @description handle table event stuff
-     *              - select
-     *              - open
-     */
+   
 		onTableEvent(e) {
       if(!e)
         return
@@ -515,49 +365,9 @@ export default {
       else if( e.type == "open" && e.data)
         this.RouteTo('/core/users/'+e.data.id,true)
     },
-    /**
-     * @method importAllUsers
-     * @description when users has been load from file, you can post them to server api for creating accounts
-     */
-		importAllUsers() {
-			var that = this;
-			this.loadingImport = true;
-			let accounts = this.importData.filter((v) => !this.TestImportState(v));
-			this.$store
-				.dispatch("admin/CreateUsers", accounts)
-				.then((results) => {
-					let succees = results.filter((v) => v == 0);
-					let map = {};
-					that.importStateStr = `导入完毕,成功导入${succees.length}个账户`;
-					that.importStates = results;
-					accounts.forEach((v, i) => {
-						v.state = results[i].id ? 0 : 1;
-					});
-					that.importState = 3;
-				})
-				.catch((e) => {
-					this.Error(e);
-					this.modalImporting = false;
-					this.getData();
-				})
-				.finally((e) => {
-					this.loadingImport = false;
-				});
-		},
-  		GetStateColor(s) {
-			if (s == 0) return "yellowgreen";
-			else if (s == 1) return "darkred";
-			else return "orange";
-		},
-		GetStateText(s) {
-			if (s == 0) return "正常";
-			else if (s == 1) return "禁用";
-			else return "锁定";
+    handleEvent(){
+
     },
-    /** 
-     * @method getData
-     * @description our old friend get data from remote server
-     */
 		getData() {
 			this.loading = true;
 			this.CORE.GET_ENTERPRISES().then(res=>{
@@ -570,150 +380,14 @@ export default {
      *  @description handle toolbar event
      */
 		onToolEvent(e) {
-      var that = this;
-      let selected_id = this.selected
-			let selected =
-				(this.multiple
-					? (selected_id
-							.map((v) => this.accounts.find((item) => item.id == v))
-							.filter((v) => v))
-					: (this.accounts.find((v) => v.id == selected_id)))
-      
-			if (e == "add") {
-				this.current = null;
-				this.showModal = true;
-			} else if (e == "edit") {
-				this.current = selected;
-				this.showModal = true;
-			} else if (e == "refresh") {
-				this.getData();
-			} else if (e == "lock") {
-				this.$store.dispatch("admin/LockUser", selected_id);
-			} else if (e == "unlock") {
-				this.$store.dispatch("admin/UnlockUser", selected_id);
-			} else if (e == "resetpwd") {
-				if (this.multiple) {
-					this.Confirm(
-						`确定要重置<span style="color:red">${selected
-							.map(v => v.name)
-							.join(",")}等${selected.length}</span>用户的密码?`,
-						() => this.$store.dispatch("admin/Resetpassword", selected_id)
-					);
-				} else {
-					this.Confirm(
-						`确定要重置用户<span style="color:red">${selected.name}</span>的密码?`,
-						() =>
-							this.$store.dispatch("admin/Resetpassword", [selected.id])
-					);
-				}
-				this.$store.dispatch("admin/ResetPassword", { id: selected.id });
-			} else if (e == "resetpwdto") {
-				this.showModalPassword = true;
-			} else if (e == "delete") {
-				this.Confirm(
-					this.multiple
-						? `确定要删除<span style='color:red;margin:0 2px;font-weight:bold'>${selected
-								.slice(0, 3)
-								.map((v) => v.name)
-								.join(", ")}</span>等${selected.length}个账号`
-						: `确定要删除该用户<span style='color:red;margin:0 2px;font-weight:bold'>${selected.name}</span>?`,
-					() => {
-						if (this.multiple) {
-							this.$store
-								.dispatch(
-									"admin/DeleteUsers",
-									selected_id
-								)
-								.then((res) => {
-									this.Success("删除成功");
-								})
-								.catch((e) => {
-									this.Error(e);
-								});
-						} else {
-							this.$store
-								.dispatch("admin/DeleteUser", selected_id)
-								.then((res) => {
-									this.Success("删除成功");
-								})
-								.catch((e) => {
-									this.Error(e);
-								});
-						}
-					}
-				);
-			} else if (e == "import") {
-				this.$refs.fileLoader.click();
-			} else if (e == "multiple") {
-				this.multiple = true;
-				this.selected = [];
-			} else if (e == "unmultiple") {
-				this.multiple = false;
-				this.selected = null;
-			}
+     
 		},
 
-		/** parse (file-object from input[type=file])
-		 *  Parse imported XLSX file to userdata
-		 */
-		parse(file) {
-			file = this.$refs.fileLoader.files[0];
-			var that = this;
-			// Open File Parsing Modal
-			this.modalImporting = true;
-			this.importStateStr = "正在分析文件... 请耐心等待";
-
-			// Analysize file with file2Xce(HSUI UTIL METHOD)
-			// Format the given data to valid form
-			this.hs
-				.file2Xce(file)
-				.then((tabJson) => {
-					if (tabJson && tabJson.length > 0) {
-						that.importStateStr = "正在上传数据...";
-						let accounts = tabJson[0].sheet.map((v) => ({
-							name: v["姓名"],
-							phone: v["电话"],
-							password: v["密码"],
-							user: v["电话"],
-						}));
-						that.importStateStr = `已从文件中提取${accounts.length}个账号`;
-						that.importState = 2;
-						that.importData = accounts;
-					}
-				})
-				.finally((e) => {
-					that.$refs.fileLoader.value = "";
-				});
-		},
-
-		/** @method patchUserPassword
-		 *  @description Remote method, for patching user password
-		 */
-		patchUserPassword(item) {
-			var that = this;
-			if (item.password != item.passwordAgain) {
-				this.$refs.formpwd.setError("passwordAgain", "两次密码不一致,请检查");
-				return;
-			}
-
-			if (this.selected) {
-				item.id = this.selected
-				this.$store
-					.dispatch("admin/ResetPassword", item)
-					.then((res) => {
-						that.Success("修改成功");
-						that.showModalPassword = false;
-					})
-					.catch((e) => {
-						that.Error(e);
-					});
-			}
-		},
 
 		/** @method patchUser
 		 *  @description Remote method, for patching user information
 		 */
-		patchUser(item) {
+		patch(item) {
 			console.log("patch:", item);
 			var that = this;
 			if (this.current && this.current.id) {

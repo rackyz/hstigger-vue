@@ -57,8 +57,7 @@
 				:pageSize="pageSize"
 				:selectable="multiple ? 'multiple' : 'single'"
 				:selection="selected"
-				full
-				:onEvent="onTableEvent"
+				@event="onTableEvent"
 			>
 			</hs-table>
      
@@ -350,8 +349,11 @@ export default {
 		};
 	},
 	mounted() {
-    this.getData();
-    this.$refs.table.calcTableHeight()
+		this.getData();
+		this.$nextTick(()=>{
+			this.$refs.table.calcTableHeight()
+		})
+    
 	},
 	computed: {
 		...mapGetters('core',['getTypes']),
@@ -511,7 +513,6 @@ export default {
 						(!v.user || !v.user.includes(this.searchText.trim()))
 					)
 					return false;
-					console.log(v)
 					if (this.changed != undefined && v.changed != this.changed) return false;
 
 					if (this.type != undefined && v.type != this.type) return false;
