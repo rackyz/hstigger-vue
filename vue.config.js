@@ -39,8 +39,9 @@ const Chained = config=>{
   config.module
     .rule('babel')
     .test(/\.js$/)
-    .use('babel-loader')
+    .use('babel-loader',[{presets:["es2015"]}])
     .loader('babel-loader')
+
 
 
   config.module.rules.delete('eslint')

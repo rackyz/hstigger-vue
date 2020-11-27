@@ -5,7 +5,7 @@
 		<hs-toolbar
 			style="background: #fff"
 			:data="tools"
-      :disabled="{}"
+      :disabled="toolDisabled"
 			@event="onToolEvent"
 		/>
 	
@@ -38,7 +38,7 @@
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="columns"
-				:data="filterdAccounts"
+				:data="filterdData"
 				:paged="false"
 				:selectable="multiple ? 'multiple' : 'single'"
 				:selection="selected"
@@ -60,7 +60,7 @@
 			"
 		>
 			<Page
-				:total="filterdAccounts.length"
+				:total="filterdData.length"
 				size="small"
 				:page-size="100"
 				:page-size-opts="[20, 50, 100]"
@@ -72,12 +72,12 @@
     <!-- modal for create/edit user data -->
 		<hs-modal-form
 			ref="form"
-			:title="current && current.id ? '修改信息' : '新增用户'"
+			:title="current && current.id ? '修改信息' : '新增企业'"
 			v-model="showModal"
 			:width="420"
 			style="margin: 10px"
 			footer-hide
-			:form="user_form"
+			:form="form"
 			:data="current"
 			editable
 			@on-submit="patch"
@@ -130,12 +130,10 @@ export default {
 					width: 120,
 					option: { states: ["正常",'锁定'],colors:['darkgreen','darkred'] },
 				},
-				{ type: "text", key: "user", width: 250, title: "管理账号",
-				render(h,param){
-					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.user)
-					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
-				}},
+				{ type: "user", key: "owner_id", width: 250, title: "管理账号",
+			    option:{
+            getters:"core/users"
+          }},
 
 				{ type: "text", key: "phone", width: 150, title: "员工人数" },
          { type: "text", key: "phone", width: 150, title: "数据库" },
@@ -196,122 +194,46 @@ export default {
     
 	},
 	computed: {
-		...mapGetters('core',['getType']),
-		toolEnabled() {
-      // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
-			if (this.multiple) {
-				if (this.selected && this.selected.length > 0) {
-					return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1];
-				} else {
-					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1];
-				}
-			} else {
-        if (this.selected ){
-          if(this.selected.includes('sys')){
-            return [1, 1, 0, 0, 0, 0, 0, 1, 1, 1];
-          }
-
-          let state = this.accounts.find(v=>v.id == this.selected).state
-					return [
-						1,
-						1,
-						1,
-						1,
-						1,
-						state == 0,
-						state == 1,
-						1,
-						1,
-						1,
-          ];
-        }
-				else return [1, 0, 0, 0, 0, 0, 0, 1, 1, 1];
-			}
+    ...mapGetters('core',['getType','users']),
+    ...mapGetters('admin',['enterprises']),
+		toolDisabled() {
+        return {}
 		},
-		user_password_form() {
-			return {
-				layout:
-					"<div><Row><Col :span='24'>{{password}}</Col></Row><Row style='margin-top:10px'><Col :span='24'>{{passwordAgain}}</Col></Row></div>",
-				def: {
-					password: {
-						label: "输入密码",
-						control: "input",
-						option: {
-							type: "password",
-							require: true,
-						},
-					},
-					passwordAgain: {
-						label: "密码确认",
-						control: "input",
-						option: {
-							type: "password",
-							require: true,
-						},
-					},
-				},
-			};
-		},
-		user_form() {
+		form() {
 			return {
 				def: {
-					user: {
-						label: "登录名",
-						editable: true,
-						control: "input",
-						option: {
-							required: true,
-							rules: [
-								{
-									type: "name",
-								},
-								{
-									msg: "该名称已存在,请更换",
-								},
-							],
-						},
-					},
+          avatar:{
+            control:'image'
+          },
 					name: {
-						label: "姓名",
-						editable: true,
+						label: "企业全称",
+            control: "input",
+						option: {
+							required: true,
+						},
+					},
+					shortname: {
+						label: "短名称",
 						control: "input",
 						option: {
 							required: true,
 						},
 					},
-					type:{
-						label:"账户类型",
+					owner_id:{
+						label:"管理账号",
 						control:"select",
 						option:{
-							getters:"core/AccountType"
+							getters:"core/users"
 						}
-					},
-					frame:{
-						label:"边框",
-						editable:true,
-						control:'image'
-					},
-					avatar: {
-						label: "头像",
-						editable: true,
-						control: "image",
-					},
-					phone: {
-						label: "电话",
-						control: "input",
-					},
-					email:{
-						label: "邮箱",
-						control: "input",
 					}
 				},
 				layout: `<div style='padding-left:90px;position:relative;'>
-				<div style='position:absolute;left:0px;top:0px;width:80px;height:80px;'>{{avatar}}<div style='height:10px;'></div>{{frame}}</div>
+				<div style='position:absolute;left:0px;top:0px;width:80px;height:80px;'>{{avatar}}</div>
         <Row :gutter='10'>
-        <Col span='12'>{{type}}</Col><Col span='12'>{{user}}</Col>
+        <Col span='24'>{{name}}</Col>
         </Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{phone}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{email}}</Col>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{shortname}}</Col>
+        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{owner_id}}</Col>
         </Row></div>`,
 
 				option: {
@@ -323,9 +245,9 @@ export default {
      * @computed filteredUsers
      * @description find users after many filters
      */
-		filterdAccounts() {
+		filterdData() {
 			return (
-				this.accounts.filter((v) => {
+				this.enterprises.filter((v) => {
 					if (
 						this.searchText &&
 						(!v.name || !v.name.includes(this.searchText.trim())) &&
@@ -333,9 +255,6 @@ export default {
 					)
 						return false;
 
-					if (this.showUnsafe && !v.passweak) return false;
-
-					if (this.hidingLocked && v.state != 0) return false;
 
 					return true;
 				}) || []
@@ -370,9 +289,7 @@ export default {
     },
 		getData() {
 			this.loading = true;
-			this.CORE.GET_ENTERPRISES().then(res=>{
-					this.accounts = res.data.data
-			}).finally(()=>{
+			this.$store.dispatch('admin/GetEnterprises').finally(()=>{
 					this.loading = false;
 			})
     },
@@ -380,7 +297,9 @@ export default {
      *  @description handle toolbar event
      */
 		onToolEvent(e) {
-     
+      if(e == 'add'){
+        this.showModal = true
+      }
 		},
 
 
@@ -394,9 +313,9 @@ export default {
 				item.id = this.current.id;
 			}
 			this.$store
-				.dispatch("admin/PatchUser", item)
+				.dispatch("admin/PatchEnterprise", item)
 				.then((res) => {
-					that.Success(item.id ? "修改成功" : "新增用户成功");
+					that.Success(item.id ? "修改成功" : "新增成功");
 					that.showModal = false;
 					that.current = {};
 				})

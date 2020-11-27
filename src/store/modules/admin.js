@@ -3,8 +3,10 @@
  */
 
 import API from '@/plugins/axios'
+import UTIL from '../util.js'
 const state = {
   accounts:[],
+  enterprises:[],
   status:{}
 }
 
@@ -14,6 +16,9 @@ const getters = {
   },
   status(state){
     return state.status
+  },
+  enterprises(state){
+    return state.enterprises
   }
 }
 
@@ -106,8 +111,7 @@ const actions = {
           resolve()
         }).catch(reject)
       else
-        dispatch('CreateUsers',[user])
-        resolve()
+        dispatch('CreateUsers',[user]).then(resolve).catch(reject)
     })
   },
   DeleteUser({commit},user_id){
@@ -127,10 +131,39 @@ const actions = {
         resolve()
       }).catch(reject)
     })
-  }
+  },
 
   // ENTERPRISES
+  GetEnterprises({commit}){
+    return new Promise((resolve,reject)=>{
+      API.CORE.GET_ENTERPRISES().then(res=>{
+        commit('saveEnterprises',res.data.data)
+        resolve(res.data.data)
+      }).catch(reject)
+    })
+  },
 
+  PatchEnterprise({commit},item){
+    if(item.id == undefined){
+      return new Promise((resolve,reject)=>{
+        API.CORE.CREATE_ENTERPRISE(item).then(res=>{
+          let updateInfo = res.data.data
+          Object.assign(item,updateInfo)
+          commit('saveEnterprises',[item])
+          resolve()
+        }).catch(reject)
+      }) 
+    }else{
+      return new Promise((resolve,reject=>{
+        API.CORE.PATCH_ENTERPROSE({param:{id}},item).then(res=>{
+           let updateInfo = res.data.data
+           Object.assign(item, updateInfo)
+           commit('saveEnterprises', [item])
+           resolve()
+        }).catch(reject)
+      }))
+    }
+  }
 
 
 
@@ -167,6 +200,12 @@ const mutations = {
     id_list.forEach(v=>{
       mutations.removeAccount(state,v)
     })
+  },
+  saveEnterprises(state,items){
+    UTIL.LocalSaveItems(state,'enterprises',items)
+  },
+  deleteEnterprises(state,id){
+    UTIL.LocalDeleteItem(state,'enterprises',id)
   }
 }
 

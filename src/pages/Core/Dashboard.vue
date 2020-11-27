@@ -174,11 +174,12 @@ export default {
       //examples
       flowInstances:[{
         id:1,
-        name:'项目计划审核',
-        nodeName:'主管部门审核',
-        executor:'超级管理员',
+        name:'年终总结',
+        nodeName:'员工提交',
+        executor:'马骍 (我)',
+         date:'2020/12/31 12:00:00',
         icon:'gongzuobaogao',
-        desc:'奉化中学'
+        desc:'请完成您的年终总结'
 
       },{
         id:2,

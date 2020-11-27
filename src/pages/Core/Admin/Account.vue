@@ -391,6 +391,7 @@ export default {
 						baseConfig.edit = 1
 					baseConfig.delete = 1
 					baseConfig.resetpwd = 1
+					baseConfig.resetpwdto = 1
 					baseConfig.lock =  (locked == 0)
 					baseConfig.unlock = (locked == 1)
 				}else {

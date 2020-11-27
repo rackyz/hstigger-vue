@@ -35,7 +35,7 @@ for (const rawfilePath of files.keys()) {
   }
 
   let route = {
-    name: fileName,
+    name: filePath,
     path: '/' + filePath,
     component: resolve => require(['@pages/' + rawfilePath.slice(2)], resolve)
   }
@@ -43,8 +43,6 @@ for (const rawfilePath of files.keys()) {
   if (fileContent.default && fileContent.default.metaInfo) {
     meta = fileContent.default.metaInfo
     
-    if (meta.title)
-      route.name = meta.title
     if (meta.group)
       route.group  = meta.group
     if (meta.public)

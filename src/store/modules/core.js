@@ -229,7 +229,7 @@ const actions = {
 
       API.CORE.WHO_IS({headers}).then(res => {
         let session = res.data.data
-        console.log('session:',session)
+        console.log('WHOAMI-session:',session)
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
@@ -402,7 +402,6 @@ const mutations = {
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {
-    console.log('save-acc:',acc_list)
     state.acc_list = [...acc_list]
   },
   saveUsers(state,users){
