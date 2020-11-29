@@ -255,7 +255,9 @@ const actions = {
     var md5 = crypto.createHash("md5")
     md5.update(password)
     password = md5.digest('hex')
-
+    localStorage.removeItem('hs-token')
+    localStorage.removeItem('hs-enterprise')
+    API.CORE.Clear()
     return new Promise((resolve, reject) => {
        API.CORE.LOGIN({
              account:user,

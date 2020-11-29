@@ -105,19 +105,16 @@ export default {
 			columns: [
         { type: "index", title: "序号" },
         	
-				{ type: "text", key: "user", minWidth: 250, title: "企业名称",
+				{ type: "text", key: "user",width: 250,  minWidth: 250, title: "应用名称",
 				render(h,param){
-					let avatar = h('hs-avatar',{props:{size:40,name:param.row.user,avatar:param.row.avatar || DEFAULT_ENT_AVATAR,frame:3}})
+					let avatar = h('Icon',{props:{size:40,name:param.row.user,avatar:param.row.avatar || DEFAULT_ENT_AVATAR,frame:3}})
 					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
         }},
-        	{ type: "text", key: "shortname", width: 150, title: "企业简称" , sortable:false,option:{
-            align:'center',
-           
-          }},
+         { type: "text", key: "database", title: "简介",option:{align:"center"} },
           	{
 					type: "type",
-					title: "企业状态",
+					title: "状态",
 					key: "state",
 					width: 120,
 					option: { getters:'core/getTypes',getters_key:"EntStateType",
@@ -135,13 +132,13 @@ export default {
 						
 					}},
 
-				{ type: "text", key: "memberCount", width: 150, title: "员工人数",option:{align:"center"} },
-         { type: "text", key: "database", width: 150, title: "数据库",option:{align:"center"} },
-         { type: "text", key: "storageCount", width: 150, title: "文件存储",option:{align:"center"} },
+				{ type: "text", key: "memberCount", width: 150, title: "收藏数",option:{align:"center"} },
+        
+         { type: "text", key: "storageCount", width: 250, title: "路径地址",option:{align:"center"} },
          
-        { type: "text", key: "moduleCount", width: 150, title: "开通模块",option:{align:"center"} },
+        { type: "text", key: "moduleCount", width: 150, title: "权限",option:{align:"center"} },
 
-			{ key: "created_at", type: "time",title: "创建时间",width:100,option:{
+			{ key: "created_at", type: "time",title: "添加时间",width:100,option:{
            type:'date'
          } },
 			

@@ -122,6 +122,7 @@ const actions = {
       }).catch(reject)
     })
   },
+  
   DeleteUsers({
     commit
   }, userid_list) {
@@ -146,7 +147,7 @@ const actions = {
   PatchEnterprise({commit},item){
     if(item.id == undefined){
       return new Promise((resolve,reject)=>{
-        API.CORE.CREATE_ENTERPRISE(item).then(res=>{
+        API.CORE.POST_ENTERPRISE(item).then(res=>{
           let updateInfo = res.data.data
           Object.assign(item,updateInfo)
           commit('saveEnterprises',[item])
@@ -163,9 +164,54 @@ const actions = {
         }).catch(reject)
       }))
     }
+  },
+
+  DeleteEnterprises({commit},id_list){
+    return new Promise((resolve,reject)=>{
+      API.CORE.DEL_ENTERPRISES(id_list).then(res=>{
+        commit('deleteEnterprises',id_list)
+        resolve()
+      }).catch(reject)
+    })
+     
+  },
+
+  LockEnterprises({commit},id_list){
+    return new Promise((resolve,reject)=>{
+      API.CORE.LOCK_ENTERPRISES(id_list).then(res=>{
+        commit('saveEnterprises',id_list.map(v=>({id:v,state:2})))
+        resolve()
+      }).catch(reject)
+    })
+     
+  },
+  UnlockEnterprises({commit},id_list){
+    return new Promise((resolve,reject)=>{
+      API.CORE.UNLOCK_ENTERPRISES(id_list).then(res=>{
+        commit('saveEnterprises',id_list.map(v=>({id:v,state:1})))
+        resolve()
+      }).catch(reject)
+    })
+     
+  },
+
+  // FILE
+  // [in] local files objects
+  // [out] paired file-name file-path string
+  upload:({commit},files)=>{
+    return new Promise((resolve,reject)=>{
+      let file_db_objects = files.map(v=>({
+        name:v.name,
+        ext:v.ext,
+        size:v.size,
+        url: API.MakeCOSURL(v.name)
+      }))
+      API.CORE.POST_FILES(file_db_objects).then(res=>{
+
+      })
+    })
+    
   }
-
-
 
   // APPLICATIONS
 

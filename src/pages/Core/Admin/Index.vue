@@ -58,7 +58,7 @@ export default {
       },{
         name:'应用管理',
         icon:"apps",
-        path:'/core/admin/app',
+        path:'/core/admin/module',
         count:session.modules ? session.modules.length || "0":0,
         count_color:session.modules && session.modules.length > 0?"":"#aaa" 
       }]

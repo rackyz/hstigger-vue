@@ -20,7 +20,6 @@
       </Card>
       </Col>
       </Row>
-      {{types}}
       <!-- Modal -->
        <hs-modal-form
         ref="form"

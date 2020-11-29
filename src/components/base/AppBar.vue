@@ -105,11 +105,15 @@
      <BaseDebugPanel v-model='showDebug' />
    
       <div class='l-login-mask' v-show="!isLogin"  >
-          <div class="login">
+          <div class="login" v-if="!loading">
           <BaseLoginHeader />
           <p style='color:#aaa'>您的登录状态已过期，请重新登录</p>
           <BaseLogin style="margin-top:20px;" />
+          
       </div>
+      <div v-else style='margin:300px auto!important;width:200px;height:200px;border-radius:50%;overflow:hidden;'>
+        <img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg' style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'  />
+        </div>
     </div>
      
   </div>

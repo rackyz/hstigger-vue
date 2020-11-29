@@ -7,7 +7,7 @@ let Clients = {}
 config.Servers.forEach((server,i)=>{
   var axiosClient = axios.create({baseURL:server.Connection.baseURL,
     timeout: server.Connection.timeout})
-
+  
   let client = {name:server.Name, getAPI,axios:axiosClient, apis:server.API}
 
   // 初始化头部配置
@@ -38,6 +38,9 @@ config.Servers.forEach((server,i)=>{
         return Promise.reject('403-权限不足,请联系管理员!')
       } else if (err.response.status == 401) {
         client.Clear()
+        console.log('win:',window.location.reload)
+        window.location.reload()
+        
         return Promise.reject("tokenoutofdate")
       } else {
         return Promise.reject(`${err.response.status}] ${err}`)

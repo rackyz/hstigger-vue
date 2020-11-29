@@ -48,6 +48,9 @@ module.exports = {
         POST_ENTERPRISE: "POST /enterprises",
         DEL_ENTERPRISE: "DELETE /enterprises",
         PATCH_ENTERPRISE: "PATCH /enterprises",
+        DEL_ENTERPRISES: "POST /enterprise/delete",
+        LOCK_ENTERPRISES: "POST /enterprises/lock",
+        UNLOCK_ENTERPRISES: "POST /enterpsrises/unlock",
 
         GET_TYPES: "GET /types",
         PATCH_TYPES: "PATCH /types/:id",
@@ -78,6 +81,11 @@ module.exports = {
         GET_NEWS: "GET /news",
 
         GET_NOTICES: "GET /notices",
+
+        GET_FILE: "GET /files/:id",
+        GET_FILES: "GET /files",
+        POST_FILES: "POST /files",
+        DEL_FILE: "DELETE /files/:id",
 
         // FLOWS
         GET_FLOWS: "GET /flows",
