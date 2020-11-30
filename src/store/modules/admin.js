@@ -7,6 +7,7 @@ import UTIL from '../util.js'
 const state = {
   accounts:[],
   enterprises:[],
+  modules:[],
   status:{}
 }
 
@@ -19,6 +20,9 @@ const getters = {
   },
   enterprises(state){
     return state.enterprises
+  },
+  modules(state){
+    return state.modules
   }
 }
 
@@ -155,16 +159,21 @@ const actions = {
         }).catch(reject)
       }) 
     }else{
-      return new Promise((resolve,reject=>{
-        API.CORE.PATCH_ENTERPROSE({param:{id}},item).then(res=>{
+      return new Promise((resolve,reject)=>{
+        API.CORE.PATCH_ENTERPRISE(item,{
+            param: {
+              id: item.id
+            }
+          }).then(res => {
            let updateInfo = res.data.data
            Object.assign(item, updateInfo)
            commit('saveEnterprises', [item])
            resolve()
         }).catch(reject)
-      }))
+      })
     }
   },
+  
 
   DeleteEnterprises({commit},id_list){
     return new Promise((resolve,reject)=>{
@@ -194,6 +203,44 @@ const actions = {
     })
      
   },
+
+
+  GetModules({commit}){
+    return new Promise((resolve,reject)=>{
+      API.CORE.GET_MODULES().then(res=>{
+        commit("saveModules",res.data.data)
+        resolve()
+      }).catch(reject)
+    })
+  },
+  PatchModule({commit},item){
+    return new Promise((resolve,reject)=>{
+      if(item.id){
+        API.CORE.PATCH_MODULE(item,{param:{id:item.id}}).then(res=>{
+          commit("saveModules",[item])
+          resolve()
+        }).catch(reject)
+      }else{
+        API.CORE.POST_MODULE(item).then(res=>{
+          let createInfo = res.data.data
+          Object.assign(item,createInfo)
+          commit("saveModules",[item])
+          resolve()
+        }).catch(reject)
+      }
+    })
+  },
+
+  DeleteModules({commit},id_list){
+    return new Promise((resolve, reject) => {
+      API.CORE.DEL_MODLUES(id_list).then(res=>{
+         commit("deleteModules", id_list)
+         resolve()
+      }).catch(reject)
+     
+    })
+  },
+
 
   // FILE
   // [in] local files objects
@@ -252,7 +299,13 @@ const mutations = {
   },
   deleteEnterprises(state,id){
     UTIL.LocalDeleteItem(state,'enterprises',id)
-  }
+  },
+  saveModules(state, items) {
+      UTIL.LocalSaveItems(state, 'modules', items)
+    },
+    deleteModules(state, id) {
+      UTIL.LocalDeleteItem(state, 'modules', id)
+    }
 }
 
 export default {

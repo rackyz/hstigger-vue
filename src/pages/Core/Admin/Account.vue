@@ -458,6 +458,7 @@ export default {
 						option:{
 							
 							required:true,
+							labelKey:"name",
 							idKey:"value",
 							getters:"core/getTypes",
 							key:"AccountType",
@@ -538,16 +539,6 @@ export default {
     }
 	},
 	methods: {
-    /**
-     * @method TestImportState
-     * @description Test user-data to show state with mistakes
-     */
-		TestImportState(user) {
-      if (this.accounts.find((v) => v.user == user.user)) 
-        return "用户名重复";
-			else if (this.accounts.find((v) => v.phone == user.phone))
-				return "电话号码重复";
-    },
     /** 
      * @method onSelectAll
      * @description binding 'select all' button for select all current users

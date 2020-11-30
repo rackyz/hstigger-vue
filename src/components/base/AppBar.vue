@@ -67,12 +67,12 @@
        <div class='text-btn' @click="showDebug = !showDebug" style='margin-right:15px;'>
           <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
         </div>
-      <Badge :count='session.flow_count' type='error' style='margin-right:20px;'>
+      <Badge :count='session.flow_count' type='error' style='margin-right:20px;' v-if="false">
        <div class='text-btn' @click="RouteTo('/core/flow')" >
           <Icon custom='gzicon gzi-lianjieliu' size="18"  />
         </div>
          </Badge>
-<Badge :count='session.task_count' type='warning' style='margin-right:20px;'>
+<Badge :count='session.task_count' type='warning' style='margin-right:20px;' v-if="false">
          <div class='text-btn' @click="RouteTo('/core/task')">
           <Icon custom='gzicon gzi-eventavailable' size="18"  />
         </div>

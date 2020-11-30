@@ -22,6 +22,10 @@ Vue.prototype.Download = function(url){
    a.remove()
 }
 
+Vue.prototype.$Notice.config({
+    top:50,
+    duration:30
+})
 // Predefined Some Easy Prompt Methods based on iview
 Vue.prototype.Confirm = function (content, cb) {
     this.$Modal.confirm({

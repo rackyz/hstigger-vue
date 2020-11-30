@@ -26,17 +26,17 @@ out.LocalSaveItems = (state,key,value,idkey='id')=>{
 }
 
 
-out.LocalDeleteItem = (state,key,id,idkey='id')=>{
+out.LocalDeleteItem = (state,key,value,idkey='id')=>{
   if (!Array.isArray(state[key]))
     THROW(E.INVALID_KEY, key)
   if ((value) == undefined)
     THROW(E.INVALID_VALUE, key, value)
   
-  let index = state[key].findIndex(v => v[idkey] == id)
+  let index = state[key].findIndex(v => v[idkey] == value)
   if(index != -1)
     state[key].splice(index,1)
   else
-    THROW(E.VALUE_NOT_FOUND, key, id)
+    THROW(E.VALUE_NOT_FOUND, key, value)
 }
 
 

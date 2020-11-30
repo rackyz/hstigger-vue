@@ -93,7 +93,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-const DEFAULT_ENT_AVATAR = "https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/spring.png"
+const DEFAULT_ENT_AVATAR = "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/company.png"
 export default {
 	data() {
 		return {
@@ -107,8 +107,8 @@ export default {
         	
 				{ type: "text", key: "user", minWidth: 250, title: "企业名称",
 				render(h,param){
-					let avatar = h('hs-avatar',{props:{size:40,name:param.row.user,avatar:param.row.avatar || DEFAULT_ENT_AVATAR,frame:3}})
-					let name = h('a',{attrs:{href:"/core/users/"+param.row.id},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name)
+					let avatar = h('Avatar',{props:{size:40,name:param.row.user,shape:"square",src:param.row.avatar || DEFAULT_ENT_AVATAR},style:{borderRadius:"7px"}})
+					let name = h('a',{style:{marginLeft:"10px",fontSize:"14px"}},param.row.name)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
         }},
         	{ type: "text", key: "shortname", width: 150, title: "企业简称" , sortable:false,option:{
@@ -128,7 +128,7 @@ export default {
 						let users = this.$store.getters["core/users"]
 						let user = users.find(v=>v.id == param.row.owner_id)
 						if(!user)
-							return h("-")
+							return h("span","-")
 						else{
 							return h("div",{class:"flex-wrap",style:{marginLeft:"20px;"}},[h("hs-avatar",{props:{userinfo:user,size:30}}),h("span",{style:{marginLeft:"10px",fontSize:"16px"}},user.user)])
 						}
@@ -311,9 +311,9 @@ export default {
 			}else if(e == 'refresh'){
 				this.getData()
 			}else if(e == 'lock'){
-				this.lock()
+				this.lock(this.selected)
 			}else if(e == 'unlock'){
-				this.unlock()
+				this.unlock(this.selected)
 			}
 		},
 
@@ -322,21 +322,27 @@ export default {
 			if(!ent)	
 				return
 			this.Confirm(`将要删除企业<img src='${ent.avatar || DEFAULT_ENT_AVATAR}' style="margin-left:5px;margin-right:2px;width:25px;height:25px;border-radius:5px;border:2px solid #666;" /><span style="color:red;font-weight:bold">${ent.name}</span><br />删除该企业会导致<span style="color:red;font-weight:bold">企业所有数据被删除</span>，是否继续?`,()=>{
-				this.$store.dispatch("admin/DeleteEnterprise",id).then((res=>{
+				this.$store.dispatch("admin/DeleteEnterprises",[id]).then((res=>{
 						this.Success("删除成功")
-				})).catch(this.Error)
+				})).catch(e=>{
+          this.Error(e)
+        })
 			})
 			
 		},
 		lock(id){
-			this.$store.dispatch("admin/LockEnterprise",id).then(res=>{
+			this.$store.dispatch("admin/LockEnterprises",[id]).then(res=>{
 				this.Success("锁定成功")
-			}).catch(this.Error)
+			}).catch(e=>{
+        this.Error(e)
+      })
 		},
 		unlock(id){
-			this.$store.dispatch("admin/UnlockEnterprise",id).then(res=>{
+			this.$store.dispatch("admin/UnlockEnterprises",[id]).then(res=>{
 				this.Success("解锁成功")
-			}).catch(this.Error)
+			}).catch(e=>{
+        this.Error(e)
+      })
 		},
 		patch(item) {
 			console.log("patch:", item);

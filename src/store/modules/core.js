@@ -246,7 +246,7 @@ const actions = {
       commit
     }, ent_id) {
     return new Promise((resolve,reject)=>{
-      API.CORE.SetEnterprise(ent_id)
+      API.ENT.SetEnterprise(ent_id)
       commit('SetCurrentEnterprise', ent_id)
       resolve()
     })
