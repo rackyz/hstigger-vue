@@ -26,7 +26,8 @@
 		
 		</div>
     <!-- table -->
-		<div
+	
+    <div
 			style="
 				height: calc(100% - 160px);
 				overflow: hidden;
@@ -77,7 +78,7 @@
 			ref="form"
 			:title="current && current.id ? '修改信息' : '新增模块'"
 			v-model="showModal"
-			:width="620"
+			:width="420"
 			style="margin: 10px"
 			footer-hide
 			:form="form"
@@ -134,10 +135,12 @@ export default {
 			showModal: false,
 				columns: [
         { type: "index", title: "序号" },
-        	 { type: "type", key: "type", width:100,title: "模块类型",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"ModuleType",
+        	 { type: "type", key: "source_type", width:100,title: "源类型",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"RSS_SOURCE_TYPE",
 							labelKey:"value"},},
-				{ type: "text", key: "name",width: 200,  minWidth: 250, title: "应用名称"},
-					{ type: "text", key: "desc",  title: "简介", },
+				{ type: "text", key: "name",minWidth: 200,  minWidth: 250, title: "应用名称"},
+					 { type: "type", key: "subject_type", width:100,title: "类别",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"RSS_SUBJECT_TYPE",
+							labelKey:"value"},}, { type: "type", key: "content_type", width:100,title: "内容类型",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"RSS_CONTENT_TYPE",
+							labelKey:"value"},},
         
 							 { type: "type", key: "state", width:100,title: "状态",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"ModuleState",
 							labelKey:"value"},},
@@ -149,7 +152,13 @@ export default {
 					option: { getters:'core/getTypes',getters_key:"AccountType",
 							labelKey:"value"},
 				},
-				{ key: "owner_id", width: 150, title: "管理账号",
+			
+
+			
+        
+         
+        { type: "state", key: "private", width: 150, title: "定制版",option:{states:['否','是'],colors:['green','orange']} },
+	{ key: "created_by", width: 150, title: "创建人",
 			    render:(h,param)=>{
 						let users = this.$store.getters["core/users"]
 						let user = users.find(v=>v.id == param.row.owner_id)
@@ -160,21 +169,12 @@ export default {
 						}
 						
 					}},
-
-				{ type: "text", key: "private", width: 150, title: "收藏数",option:{align:"center"} },
-        
-         
-        { type: "state", key: "private", width: 150, title: "定制版",option:{states:['否','是'],colors:['green','orange']} },
-
 			{ key: "created_at", type: "time",title: "添加时间",width:100,option:{
            type:'date'
          } },
-			{ key: "admin", type: "time",title: "控制台入口",width:100,render(h,param){
-				return h('a',{domProps:{href:param.row.admin}},'控制台')
-			}},
-      	{ key: "admin", type: "time",title: "应用入口",width:100,render(h,param){
-				return h('a',{domProps:{href:param.row.url}},'应用入口')
-			}},
+			{ key: "admin", type: "time",title: "预览",width:100,render(h,param){
+				return h('a',{domProps:{href:param.row.admin}},'预览')
+			}}
         
 			],
 		};
@@ -188,7 +188,7 @@ export default {
 	},
 	computed: {
     ...mapGetters('core',['getType','users']),
-    ...mapGetters('admin',{items:'modules'}),
+    ...mapGetters('admin',{items:'rss'}),
 		toolDisabled() {
         return {}
 		},
@@ -203,11 +203,11 @@ export default {
 						},
 					},
 					type:{
-						label:"模块类型",
+						label:"源类型",
 						control:"select",
 						option:{
 							getters:"core/getTypes",
-							key:"ModuleType",
+							key:"RSS_SOURCE_TYPE",
 							labelKey:"name",
 							defaultValue:1
 						}
@@ -339,7 +339,7 @@ export default {
     },
 		getData() {
 			this.loading = true;
-			this.$store.dispatch('admin/GetModules').finally(()=>{
+			this.$store.dispatch('admin/GetRss').finally(()=>{
 					this.loading = false;
 			})
     },
@@ -369,7 +369,7 @@ export default {
 			if(!item)	
 				return
 			this.Confirm(`将移除应用<span style="color:red;font-weight:bold">${item.name}</span>，是否继续?`,()=>{
-				this.$store.dispatch("admin/DeleteModules",[id]).then((res=>{
+				this.$store.dispatch("admin/DeleteRss",[id]).then((res=>{
 						this.Success("删除成功")
 				})).catch(e=>{
           this.Error(e)
@@ -385,7 +385,7 @@ export default {
 				item.id = this.current.id;
 			}
 			this.$store
-				.dispatch("admin/PatchModule", item)
+				.dispatch("admin/PatchRss", item)
 				.then((res) => {
 					that.Success(item.id ? "修改成功" : "新增成功");
 					that.showModal = false;

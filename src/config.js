@@ -54,8 +54,16 @@ module.exports = {
 
         GET_MODULES: "GET /modules",
         POST_MODULE: "POST /modules",
-        PATCH_MODULE: "PATCH /modules",
-        DEL_MODULES: "DEL /modules",
+        PATCH_MODULE: "PATCH /modules/:id",
+        DEL_MODULES: "POST /modules/delete",
+
+        // RSS
+        GET_RSS: "GET /rss",
+        GET_RSS_DATA: "GET /rss/:id",
+        POST_RSS: "POST /rss",
+        PATCH_RSS: "PATCH /rss/:id",
+        DEL_RSS: "POST /rss/delete",
+
 
         GET_TYPES: "GET /types",
         PATCH_TYPES: "PATCH /types/:id",

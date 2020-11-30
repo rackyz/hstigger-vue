@@ -8,7 +8,9 @@ const state = {
   accounts:[],
   enterprises:[],
   modules:[],
-  status:{}
+  rss:[],
+  status:{},
+  logs:[]
 }
 
 const getters = {
@@ -23,10 +25,25 @@ const getters = {
   },
   modules(state){
     return state.modules
+  },
+  rss(state){
+    return state.rss
+  },
+  logs(state){
+    return state.logs
   }
 }
 
 const actions = {
+  GetLogs({commit}){
+    return new Promise((resolve,reject)=>{
+      API.CORE.GET_LOGS().then(res=>{
+        commit('saveLogs',res.data.data)
+        resolve()
+      }).catch(reject)
+    })
+    
+  },
   GetStatus({commit}){
     return new Promise((resolve, reject) => {
       API.CORE.GET_ACCOUNTS().then(res => {
@@ -233,13 +250,51 @@ const actions = {
 
   DeleteModules({commit},id_list){
     return new Promise((resolve, reject) => {
-      API.CORE.DEL_MODLUES(id_list).then(res=>{
+      API.CORE.DEL_MODULES(id_list).then(res=>{
          commit("deleteModules", id_list)
          resolve()
       }).catch(reject)
      
     })
   },
+
+  GetRss({commit}){
+    return new Promise((resolve,reject)=>{
+      API.CORE.GET_RSS().then(res=>{
+        commit("saveRss",res.data.data)
+        resolve()
+      }).catch(reject)
+    })
+  },
+
+  PatchRSS({commit},item){
+    if(!item.id)
+      return new Promise((resolve,reject)=>{
+        API.CORE.POST_RSS(item).then(res=>{
+          Object.assign(item,res.data.data)
+          commit("saveRss",[item])
+          resolve()
+        }).catch(reject)
+      })
+    else
+      return new Promise((resolve,reject)=>{
+        API.CORE.PATCH_RSS(item,{param:{id:item.id}}).then(res=>{
+          
+          commit("saveRss",[item])
+          resolve()
+        }).catch(reject)
+      })
+  },
+
+  DeleteRss({commit},id_list){
+    return new Promise((resolve,reject)=>{
+      API.CORE.DEL_RSS(id_list).then(res=>{
+        commit("deleteRss",id_list)
+        resolve()
+      }).catch(reject)
+    })
+  },
+  
 
 
   // FILE
@@ -305,7 +360,17 @@ const mutations = {
     },
     deleteModules(state, id) {
       UTIL.LocalDeleteItem(state, 'modules', id)
+    },
+    saveRss(state,items){
+      UTIL.LocalSaveItems(state,'rss',items)
+    },
+    deleteModules(state,id){
+      UTIL.LocalDeleteItem(state,'rss',id)
+    },
+    saveLogs(state,items){
+      UTIL.LocalSaveItems(state,'logs',items)
     }
+
 }
 
 export default {

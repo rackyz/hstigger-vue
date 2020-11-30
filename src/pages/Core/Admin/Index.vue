@@ -28,11 +28,16 @@ export default {
     title:'后台管理'
   },
   computed:{
-    ...mapGetters("core",['session']),
+    ...mapGetters("core",['session','types']),
+    ...mapGetters("admin",['accounts','enterprises','modules','rss','logs']),
     menus(){
-      let session = this.session
-      if(!session)  
-        return []
+      let accountsCount = this.accounts.length
+      let enterprisesCount = this.enterprises.length
+      let modulesCount = this.modules.length
+      let rssCount = this.rss.length
+      let typesCount = this.types.length
+      let settingsCount = Object.keys(this.session.settings).length
+      let logsCount = this.logs.length
 
       return [{
         name:'总览',
@@ -47,20 +52,20 @@ export default {
         name:'账户管理',
         icon:"user",
         path:'/core/admin/account',
-        count:session.users ? session.users.length : 0,
-        count_color:session.users && session.users.length > 0?"":"#aaa"
+        count:accountsCount,
+        count_color:accountsCount > 0?"":"#aaa"
       },{
         name:'企业管理',
         icon:"organization",
         path:'/core/admin/enterprise',
-        count:session.enterprises ? session.enterprises.length : 0,
-        count_color:session.enterprises && session.enterprises.length > 0?"":"#aaa"
+        count:enterprisesCount,
+        count_color:enterprisesCount > 0?"":"#aaa"
       },{
         name:'应用管理',
         icon:"apps",
         path:'/core/admin/module',
-        count:session.modules ? session.modules.length || "0":0,
-        count_color:session.modules && session.modules.length > 0?"":"#aaa" 
+        count:modulesCount,
+        count_color:modulesCount?"":"#aaa" 
       }]
         },{
           name:"公用数据",
@@ -69,7 +74,9 @@ export default {
             {
           name:'订阅管理',
         icon:"config",
-        path:'/core/admin/subscription'
+        path:'/core/admin/rss',
+          count:rssCount,
+        count_color:rssCount?"":"#aaa" 
       },
           {
         name:'项目模板',
@@ -91,15 +98,21 @@ export default {
         subs:[{
           name:'系统类型',
           path:'/core/admin/type',
-          icon:'tag'
+          icon:'tag',
+           count:typesCount,
+          count_color:typesCount > 0?"":"#aaa"
         },{
           name:'系统配置',
           path:'/core/admin/setting',
-          icon:'switch'
+          icon:'switch',
+          count:settingsCount,
+          count_color:settingsCount>0?"":"#aaa"
         },{
           name:'系统日志',
           path:'/core/admin/log',
-          icon:'rizhi'
+          icon:'rizhi',
+          count:logsCount,
+          count_color:logsCount>0?"":"#aaa"
         },{
           name:'备份和恢复',
           path:'/core/admin/maintain',
@@ -125,6 +138,13 @@ export default {
     ActivePath(){
       return this.$route.path
     }
+  },
+  mounted(){
+    this.$store.dispatch('admin/ListUsers')
+    this.$store.dispatch('admin/GetEnterprises')
+    this.$store.dispatch('admin/GetModules')
+    this.$store.dispatch('admin/GetRss')
+    this.$store.dispatch('admin/GetLogs')
   },
   methods:{
     onClickMenu(e){
