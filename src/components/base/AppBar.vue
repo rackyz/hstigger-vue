@@ -100,21 +100,25 @@
 
    
     </div>
-
     <!-- DEBUG MODAL -->
      <BaseDebugPanel v-model='showDebug' />
    
-      <div class='l-login-mask' v-show="!isLogin"  >
+      <div class='l-login-mask' v-if="!isLogin"  >
           <div class="login" v-if="!loading">
           <BaseLoginHeader />
           <p style='color:#aaa'>您的登录状态已过期，请重新登录</p>
           <BaseLogin style="margin-top:20px;" />
           
       </div>
-      <div v-else style='margin:300px auto!important;width:200px;height:200px;border-radius:50%;overflow:hidden;'>
-        <img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg' style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'  />
-        </div>
+      
     </div>
+    <div v-if='loading'  style='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(33,33,33,0.6)'>
+    <div style='margin:300px auto!important;width:200px;height:200px;border-radius:50%;overflow:hidden;color:#fff;'>
+        <img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg' style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'  />
+        
+        </div>
+        
+        </div>
      
   </div>
 </template>
@@ -151,6 +155,14 @@ export default {
   },
   mounted(){
     if(!this.session.id){
+      this.getSession()
+    }
+
+    
+  },
+  methods:{
+    getSession(){
+      
       this.loading = true
       this.$store.dispatch('core/whoami').then(()=>{
 
@@ -160,13 +172,14 @@ export default {
         }, 2000);
         
       })
-    }
-
-    
-  },
-  methods:{
+    },
     onSelectEnterprise(e){
-      this.$store.dispatch('core/SetCurrentEnterprise',e)
+      this.loading = true
+      this.$store.dispatch('core/SetCurrentEnterprise',e).then(res=>{
+        this.getSession(e)
+      }).finally(e=>{
+        setTimeout(()=>{this.loading=false},
+      1000)})
     },
     onClickUserMenu(e){
       if(e == 'logout'){

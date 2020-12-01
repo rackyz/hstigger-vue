@@ -183,7 +183,65 @@ module.exports = {
         RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
 
       }
-    }
+    },
+    {
+      Name:"ENT_ADMIN",
+       Connection: {
+         baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/entadmin',
+         timeout: 5000,
+         defaultHeaders: {
+           "api-version": "v0"
+         }
+       },
+       API: {
+         // core
+     
+         LOGIN: "POST /sessions",
+         WHO_IS: "GET /sessions/current",
+         GET_ACCLERATES: "GET /users/self/menus",
+         SAVE_ACCELERATES: "POST /users/self/menus",
+         GET_ACTIONS: "GET /users/self/action-menus",
+         SAVE_ACTIONS: "GET /users/self/action-menus",
+         GET_USERS: "GET /users",
+         GET_USER: "GET /users/:id",
+         POST_USER: "POST /users",
+         POST_USERS: "POST /users/create-users",
+         PATCH_USER: "PATCH /users/:id",
+         DEL_USER: "DELETE /users/:id",
+         DEL_USERS: "POST /users/delete",
+         ADD_USER_CONCERNED_PROJECT: "",
+ 
+ 
+ 
+         // PROJECT
+         GET_PROJECTS: "GET /projects",
+         GET_PROJECT: "GET /projects/:id",
+         POST_PROJECT: "POST /projects",
+         PATCH_PROJECT: "PATCH /projects/:id",
+         DEL_PROJECT: "DELETE /projects/:id",
+ 
+         GET_NEWS: "GET /news",
+ 
+         GET_NOTICES: "GET /notices",
+ 
+         GET_FILE: "GET /files/:id",
+         GET_FILES: "GET /files",
+         POST_FILES: "POST /files",
+         DEL_FILE: "DELETE /files/:id",
+ 
+         // FLOWS
+         GET_FLOWS: "GET /flows",
+         CREATE_FLOW: "POST /flows",
+         UPDATE_FLOW: "PATCH /flows/:id",
+         DEL_FLOW: "DELETE /flows/:id",
+ 
+         // 
+         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
+         DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",
+         RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
+ 
+       }
+     }
   ],
   // cos 文件服务器
   cosServer:'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com'

@@ -210,7 +210,7 @@ export default {
                 return
             }
 
-        
+                console.log("LOGIN")
             this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
                 this.Success('登陆成功')

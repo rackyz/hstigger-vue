@@ -25,19 +25,15 @@ export default {
   data(){
     return {
        menus:[{
-        name:'企业系统总览',
+        name:'总览',
         icon:'bar-chart',
-        path:'/core/admin/dashboard'
-      },{
-        name:'平台信息总览',
-        icon:'area-chart',
-        path:'/core/admin/root_dashboard'
+        path:'/core/eadmin/dashboard'
       },{
         name:"账号与权限",
         icon:'apps',
         is_group:true,
         subs:[{
-        name:'用户管理',
+        name:'员工管理',
         icon:"user",
         path:'/core/admin/user'
       },{
@@ -80,20 +76,20 @@ export default {
           is_group:true,
           subs:[
           {
-        name:'项目管理',
+        name:'订阅管理',
         path:'/core/admin/project',
         icon:'xiangmu'
       },{
-        name:'工作流(配置)',
+        name:'流程模板',
         path:'/core/admin/flow',
         icon:'shenjing'
       }]
       },{
-        name:'企业基础数据维护',
+        name:'系统配置',
         icon:'apps',
         is_group:true,
         subs:[{
-          name:'企业配置',
+          name:'企业信息',
           path:'/core/admin/config',
           icon:'controls-5'
         },{
@@ -112,33 +108,7 @@ export default {
           name:'备份和恢复',
           path:'/core/admin/maintain',
           icon:'config'
-        }]
-        },{
-        name:'平台基础数据维护',
-        icon:'apps',
-        is_group:true,
-        subs:[{
-          name:'管理员账户',
-          path:'/core/admin/ruser',
-          icon:'user'
-        },{
-          name:'企业账户',
-          path:'/core/admin/euser',
-          icon:'user'
-        },{
-          name:'功能配置',
-          path:'/core/admin/type',
-          icon:'tag'
-        },{
-          name:'系统日志',
-          path:'/core/admin/log',
-          icon:'rizhi'
-        },{
-          name:'备份和恢复',
-          path:'/core/admin/maintain',
-          icon:'config'
-        }]
-        },]
+        }]}]
     }
    
   },

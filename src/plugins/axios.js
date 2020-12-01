@@ -88,19 +88,24 @@ config.Servers.forEach((server,i)=>{
 
 
   client.SetAuthorization = function(token){
-    console.log('SET_AUTHEN:',client.name,token)
-    client.axios.defaults.headers.Authorization = token
+   if(token)
+      client.axios.defaults.headers.Authorization = token
   }
 
   client.SetEnterprise = function(ent_id){
-    client.axios.defaults.headers.Enterprise = ent_id
+    if(ent_id)
+      client.axios.defaults.headers.Enterprise = ent_id
+  }
+
+  client.ClearEnterprise = function(){
+    delete client.axios.defaults.headers.Enterprise
   }
 
   client.Clear = function(){
     delete client.axios.defaults.headers.Authorization
     delete client.axios.defaults.headers.Enterprise
     localStorage.removeItem('hs-token')
-
+    localStorage.removeItem('current_enterprise')
   }
 
   Object.entries(server.API).forEach(([k,v]) => {

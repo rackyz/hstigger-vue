@@ -115,8 +115,10 @@ const getters = {
 }
 
 const actions = {
-  whoami({commit,dispatch}){
+  whoami({commit}){
     let token = localStorage.getItem('hs-token')
+    let enterprise_id = localStorage.getItem('current_enterprise')
+    commit('SetCurrentEnterprise',enterprise_id)
     return new Promise((resolve,reject)=>{
       if(!token)
         reject()
@@ -126,22 +128,15 @@ const actions = {
       }
       if (process.env.VUE_APP_MOCK)
         data.token = token
-
-      let current_enterprise_id = localStorage.getItem('current_enterprise')
-      
-     
-
       API.CORE.WHO_IS({headers}).then(res => {
         let session = res.data.data
-        console.log('WHOAMI-session:',session)
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
-        if (!current_enterprise_id || session.enterprises.find(v => v.id == current_enterprise_id) == null)
-          if(session.my_enterprises.length > 0)
-            current_enterprise_id = session.my_enterprises[0]
-
-        dispatch('SetCurrentEnterprise', current_enterprise_id)
+       
+        if (!enterprise_id || session.enterprises.find(v => v.id == enterprise_id) == null)
+          commit('ClearEnterprise')
+        
         resolve(session)
       }).catch(reject)
     })
@@ -159,8 +154,10 @@ const actions = {
     md5.update(password)
     password = md5.digest('hex')
     localStorage.removeItem('hs-token')
-    localStorage.removeItem('hs-enterprise')
     API.CORE.Clear()
+    let enterprise_id = localStorage.getItem('current_enterprise')
+    if(enterprise_id)
+      commit('SetCurrentEnterprise',enterprise_id)
     return new Promise((resolve, reject) => {
        API.CORE.LOGIN({
              account:user,
@@ -291,9 +288,27 @@ const mutations = {
       rss.push(key)
   },
   SetCurrentEnterprise(state, ent_id) {
-   API.ENT.SetEnterprise(ent_id)
-    localStorage.setItem('current_enterprise',ent_id)
-    state.current_enterprise = ent_id
+    if(ent_id){
+      console.log("Set Enterprise")
+      API.CORE.SetEnterprise(ent_id)
+      API.ENT.SetEnterprise(ent_id)
+      API.ENT_ADMIN.SetEnterprise(ent_id)
+      localStorage.setItem('current_enterprise',ent_id)
+      
+      state.current_enterprise = ent_id
+    }else{
+      mutations.ClearEnterprise(state)
+    }
+
+   
+  },
+  ClearEnterprise(state){
+    console.log("Clear Enterprise")
+    API.CORE.ClearEnterprise()
+    API.ENT.ClearEnterprise()
+    API.ENT_ADMIN.ClearEnterprise()
+    localStorage.removeItem('current_enterprise')
+    state.current_enterprise = null
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)
@@ -301,6 +316,9 @@ const mutations = {
       API.ENT.SetAuthorization(session.token)
     if (session.type > 2)
       API.ADMIN.SetAuthorization(session.token)
+    
+    if(session.ent_admin)
+      API.ENT_ADMIN.SetAuthorization(session.token)
 
     localStorage.setItem('hs-token',session.token)
     state.session = session
