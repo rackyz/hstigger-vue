@@ -1,7 +1,19 @@
 <template>
-  <div style='wdith:100%;display:flex;align-items:center;flex-direction:column;' >
-    <hs-list :data="items" :option="{tmpl:'BaseNew',offset:1}" selectable='false' style='border:none;padding:5px;' />
+  <div style='position:relative;'>
+    <template v-if='!id || !items || items.length == 0 || error' >
+      {{error || "没有内容"}}
+    </template>
+    <template v-else>
+      <Carousel autoplay v-model="value2" loop style='width:100%;'  autoplay-speed='10000' height='130' >
+        <template v-for='d in items'>
+          <CarouselItem :key='d.title' >
+            <a :href="d.link" target="_blank"><div :style='`background:url("${d.image}");background-size:100% 100%;height:285px;display:flex;align-items:flex-end;justify-content:center;color:#fff;text-shadow:1px 1px 1px #333;padding:20px 5px;`' >{{d.title}}</div></a>
+        </CarouselItem>
+        </template>
+    </Carousel>
+    </template>
   </div>
+
 </template>
 
 <script>

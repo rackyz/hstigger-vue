@@ -1,6 +1,6 @@
 <template>
   <div class="news-item">
-    <a :href="data.url" target='_blank'>{{data.title}}</a>
+    <a :href="data.link" target='_blank'>{{data.title}}</a>
     <div class='date'>{{data.date}}</div>
   </div>
 </template>
@@ -22,7 +22,7 @@ export default {
   overflow: hidden;
   
   .date{
-    min-width:50px;
+    min-width:100px;
     text-align: right;
   }
 

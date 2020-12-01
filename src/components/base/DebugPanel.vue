@@ -34,7 +34,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-const keys = ['session','users','enterprises','types','apps','app_groups']
+const keys = ['session','users','enterprises','types','modules','rss','user_rss']
 export default {
   data(){
     return {

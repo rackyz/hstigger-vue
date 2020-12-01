@@ -5,44 +5,15 @@
   <Row :key='i' :gutter="10" style='margin:10px;'>
     <Col :span='5'>
         <Card class="panel"  style='width:100%;height:100px;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);'>
-        <div style='padding:10px;padding-top:0;'>
-          早上好, <a>{{session.name}}</a>
-          <h3>2020年9月1日</h3>
-       </div>
-      
-    </Card>
-    <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
-      <div class='l-list'>
-        
-        <div class='action-button'>
-          <Icon custom='gzicon gzi-jianbao' color='#45556E' size='32' />
-          发布通知
-        </div>
-
-        <div class='action-button'>
-          <Icon custom='gzicon gzi-xiangmu' color='#45556E' size='32' />
-          布置任务
-        </div>
-
-        <div class='action-button'>
-          <Icon custom='gzicon gzi-Building-' color='#45556E' size='32' />
-          创建项目
-        </div>
-
-        <div class='action-button'>
-          <Icon custom='gzicon gzi-xiangmu2' color='#45556E' size='32' />
-          上传档案
-        </div>
-
-        <div class='action-button' style='border:2px dashed #45566E;border-radius:5px;width:42px;height:42px;margin:8px 14px;'>
-          <Icon type='md-add' color='#45556E' size='30' />
-        </div>
-      </div>
+          <BaseWeather />
+        </Card>
+      <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
+        <BaseUserFlowPanel />
         
          
     </Card>
      <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
-        
+         <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'><Icon custom='gzicon gzi-config' size='15' style='margin-left:5px;'></Icon></a></span></div>
         <BaseProjectList />
         
     </Card>
@@ -62,50 +33,33 @@
     </Card>
   
     </Col>
-    <Col :span='13'>
     
-    <Row :gutter="10">
-       <Col :span='12'>
-      <Card padding='5'>
-       
-         <Carousel autoplay v-model="value2" loop style='width:100%;'  autoplay-speed='10000' height='130'>
-        <CarouselItem >
-            <div style='background:url("http://zjw.ningbo.gov.cn/picture/0/1c6ce00c15b7414892c01e0f6ec60f9d.jpg") 100% 100%;height:283px;display:flex;align-items:flex-end;justify-content:center;color:#fff;text-shadow:1px 1px 1px #333;padding:20px;'>这种通知要注意把要求和措施部分交待清楚，可以分条也可用小标题的形式，这样才能便于下级执行。会议性的。</div>
-        </CarouselItem>
-        <CarouselItem >
-             <div style='background:url("http://zjw.ningbo.gov.cn/picture/0/6b477cefef604d3a9a88ed0b93140ece.jpg") 100% 100%;height:283px;display:flex;align-items:flex-end;justify-content:center;color:#fff;text-shadow:1px 1px 1px #333;padding:20px;'>这种通知要注意把要求和措施部分交待清楚，可以分条也可用小标题的形式，这样才能便于下级执行。会议性的。</div>
-        </CarouselItem>
-       <CarouselItem >
-             <div style='background:url("http://zjw.ningbo.gov.cn/picture/0/ccd73078009e4d5db385e6bdca661251.jpg") 100% 100%;height:283px;display:flex;align-items:flex-end;justify-content:center;color:#fff;text-shadow:1px 1px 1px #333;padding:20px;'>这种通知要注意把要求和措施部分交待清楚，可以分条也可用小标题的形式，这样才能便于下级执行。会议性的。</div>
-        </CarouselItem>
-        <CarouselItem >
-             <div style='background:url("http://zjw.ningbo.gov.cn/picture/0/6855b12e17d24a1fa11bff75c6a7db99.jpg") 100% 100%;height:283px;display:flex;align-items:flex-end;justify-content:center;color:#fff;text-shadow:1px 1px 1px #333;padding:20px;'>这种通知要注意把要求和措施部分交待清楚，可以分条也可用小标题的形式，这样才能便于下级执行。会议性的。</div>
-        </CarouselItem>
-    </Carousel>
-      </Card>
-      </Col>
-      <Col :span='12'>
-      <Card padding='0'>
-        <div class='card-title'><Icon type='md-paper' size='19' /> 行业动态 <span style='float:right'>MORE</span></div>
-        <BaseNewsList style='height:260px' />
-      </Card>
-      </Col>
-      
-    </Row>
-    <Row :gutter='10' style='margin-top:10px'>
-      <Col :span='12'>
-      <Card padding='0'>
-        <div class='card-title'><Icon type='md-paper' size='19' /> 通知公告 <span style='float:right'>MORE</span></div>
-         <BaseNoticeList  style='height:260px' />
-      </Card>
-      </Col>
-      <Col :span='12'>
-      <Card padding='0'>
-        <div class='card-title'><Icon type='md-paper' size='19' /> 通知公告 <span style='float:right'>MORE</span></div>
-         <BaseNoticeList  style='height:260px' />
-      </Card>
-      </Col>
-    </Row>
+    <Col :span='13'>
+       <template v-if='my_rss && my_rss.length != 0'>
+          <Row :gutter="10">
+          <template v-for="r in my_rss">
+            <Col :span='12' :key='r.id'>
+            <Card padding='5' :key='r.id' style='height:300px;margin-bottom:10px;border-radius:0;border:none;'>
+            <div class="flex-wrap flex-between" style='padding:3px 8px;background:#23334c;color:#fff;' v-if="r.media_type != 1">
+              {{r.name}}  
+              <a style='float:right' :href="r.link" target='_blank'>MORE</a>
+            </div>
+            <component :is="MapRssComponent(r.media_type)" :id="r.id" />
+              
+            </Card>
+          </Col>
+
+          </template>
+        </Row>
+       </template>
+       <template v-else>
+         <div class='full-container flex-wrap' style='height:300px;width:100%;'>
+           点击添加<a href='#' @click='modalRSS=true'>信息源</a>
+         </div>
+       </template>
+   
+   
+  
     
 
     </Col></Col>
@@ -162,14 +116,24 @@
     <div class="panel" style="  width:calc(8.3333% * 3 - 8px);height:calc(110px * 6 - 20px);left:calc(8.3333% * 9 + 4px);top:2px;background:#333;color:#fff;padding:20px;">
       待办任务
     </div> -->
+
+    <Modal title="添加RSS信息源" footer-hide v-model='modalRSS' width='400'>
+      <div style='padding:20px'>
+        勾选您所需要的信息源
+        <template v-for="r in rss">
+          <div :key='r.id' style='display:flex;justify-content:space-between;align-items:center;padding:2px 10px;'>{{r.name}} <i-switch :value='user_rss ? user_rss.includes(r.id):false' @on-change='handleToggleRss(r.id,$event)' /></div>
+        </template>
+      </div>
+    </Modal>
     </Layout>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters,mapMutations} from 'vuex'
 export default {
   data(){
     return {
+      modalRSS:false,
       isConfiguring:false,
       //examples
       flowInstances:[{
@@ -225,12 +189,14 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['session'])
+    ...mapGetters('core',['session','my_rss','user_rss','rss']),
+    
   },
   metaInfo:{
     title:'工作台'
   },
   methods:{
+    ...mapMutations('core',['toggleRss']),
     getTimeString(date,deadline){
       let now = moment()
       if(deadline){
@@ -239,40 +205,19 @@ export default {
         return moment(date).fromNow()
       else
         return '-'
+    },
+    MapRssComponent(media_type){
+      const MEDIA_TYPES = ['','BasePictureNews','BaseNewsList','BaseNoticeList','BaseArticles','BaseProjects']
+      return MEDIA_TYPES[media_type]
+    },
+    handleToggleRss(rss_key){
+      this.toggleRss(rss_key)
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.demo-carousel{
-  text-align: center;
-  font-size:16px;
-  margin:5px 0;
-  text-overflow: ellipsis;
-}
-
-.action-button{
-  display:flex;
-  flex-direction: column;
-  width:60px;
-  height:60px;
-  font-size:12px;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-button:hover{
-  filter:brightness(1.5);
-  cursor: pointer;
-}
-
-.action-button:active{
-  position: relative;
-  bottom:-1px;
-  right:-1px;
-}
-
 .l-count-card{
   font-size:15px;
   background:rgb(197, 89, 1);

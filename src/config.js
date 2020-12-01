@@ -30,7 +30,26 @@ module.exports = {
         DEL_USER: "DELETE /users/:id",
         DEL_USERS: "POST /users/delete",
         ADD_USER_CONCERNED_PROJECT: "",
+         GET_RSS_DATA: "GET /rss/:id",
 
+
+        // 
+        ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
+        DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",
+        RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
+
+      }
+    }, {
+      Name: "ADMIN",
+      Connection: {
+        baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/admin',
+        timeout: 5000,
+        defaultHeaders: {
+          "api-version": "v0"
+        }
+      },
+      API: {
+        // core
 
         GET_ACCOUNTS: "GET /accounts",
         POST_ACCOUNTS: "POST /accounts",
@@ -104,18 +123,13 @@ module.exports = {
         GET_FLOWS: "GET /flows",
         CREATE_FLOW: "POST /flows",
         UPDATE_FLOW: "PATCH /flows/:id",
-        DEL_FLOW: "DELETE /flows/:id",
-
-        // 
-        ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
-        DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",
-        RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
+        DEL_FLOWS: "POST /flows/delete",
 
       }
-    },{
+    }, {
      Name:"ENT",
       Connection: {
-        baseURL: process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001',
+        baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/enterprise',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"

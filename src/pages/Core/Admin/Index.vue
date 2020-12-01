@@ -29,7 +29,7 @@ export default {
   },
   computed:{
     ...mapGetters("core",['session','types']),
-    ...mapGetters("admin",['accounts','enterprises','modules','rss','logs']),
+    ...mapGetters("admin",['accounts','enterprises','modules','rss','logs','flows']),
     menus(){
       let accountsCount = this.accounts.length
       let enterprisesCount = this.enterprises.length
@@ -38,6 +38,7 @@ export default {
       let typesCount = this.types.length
       let settingsCount = Object.keys(this.session.settings).length
       let logsCount = this.logs.length
+      let flowsCount = this.flows.length
 
       return [{
         name:'总览',
@@ -66,36 +67,59 @@ export default {
         path:'/core/admin/module',
         count:modulesCount,
         count_color:modulesCount?"":"#aaa" 
-      }]
-        },{
-          name:"公用数据",
-          is_group:true,
-          subs:[
-            {
+      },{
           name:'订阅管理',
         icon:"config",
         path:'/core/admin/rss',
           count:rssCount,
         count_color:rssCount?"":"#aaa" 
+      },]
+        },{
+          name:"共享资源",
+          is_group:true,
+          subs:[
+          
+            {
+        name:'流程模板',
+        path:'/core/admin/flow',
+        icon:'shenjing',
+          count:flowsCount,
+        count_color:flowsCount?"":"#aaa" 
       },
           {
         name:'项目模板',
+        path:'/core/admin/prjtemp',
+        icon:'xiangmu'
+      }, {
+        name:'文档模板',
+        path:'/core/admin/doctemp',
+        icon:'shenjing'
+      }]},{
+          name:"公共平台数据 (不可见)",
+          is_group:true,
+          subs:[
+       {
+        name:'项目实例',
         path:'/core/admin/project',
         icon:'xiangmu'
       },{
-        name:'流程模板',
-        path:'/core/admin/flow',
-        icon:'shenjing'
+        name:'流程实例',
+        path:'/core/admin/project',
+        icon:'xiangmu'
       },{
-        name:'文档模板',
-        path:'/core/admin/flow',
-        icon:'shenjing'
-      }]
+        name:'文件实例',
+        path:'/core/admin/project',
+        icon:'xiangmu'
+      },]
       },{
         name:'系统配置',
         icon:'apps',
         is_group:true,
         subs:[{
+        name:'通知公告',
+        path:'/core/admin/notice',
+        icon:'shenjing'
+      },{
           name:'系统类型',
           path:'/core/admin/type',
           icon:'tag',
@@ -145,6 +169,7 @@ export default {
     this.$store.dispatch('admin/GetModules')
     this.$store.dispatch('admin/GetRss')
     this.$store.dispatch('admin/GetLogs')
+    this.$store.dispatch('admin/GetFlows')
   },
   methods:{
     onClickMenu(e){

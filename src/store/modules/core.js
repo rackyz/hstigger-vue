@@ -9,128 +9,15 @@ const state = {
   types:[],
   users:[],
   deps:[],
+  rss:[],
   isLogin:false,
   roles:[],
   projects:[],
   current_enterprise:null,
   my_enterprises:[],
   modules:[],
-  apps:{
-    
-    "task":{
-      key:'task',
-      name:'任务与计划',
-      path:'/app/task',
-      version:'1.0.0',
-       dev: true
-    },
-    "archive": {
-      key: 'archive',
-      name: '资料库',
-      path: '/app/task',
-      version: '1.0.0',
-       dev: true
-    },
-    "disk":{
-      key:'disk',
-      name:"网络硬盘",
-      path:'/app/disk',
-      version:'1.0.0',
-       dev: true
-    },
-    "projects":{
-      key:'projects',
-      name:'营业综合',
-      path:'/core/bi/panel',
-      version:'2.0.0'
-    },
-    "charts":{
-      key:'projects',
-      name:'图表分析',
-      path:'/core/bi/chart',
-      version:'2.0.0'
-    },
-    "data":{
-      key:'projects',
-      name:'数据分析',
-      path:'/core/bi/dataanalysize',
-      version:'2.0.0'
-    },
-    "admin":{
-      key:"admin",
-      name:"后台管理",
-      path:"/core/admin",
-    },
-    "it-request":{
-      key:'it-request',
-      name:"需求工单",
-      path:'/app/it-request',
-      version:'1.0.0',
-      dev:true
-    },
-    "depEarly": {
-      key: 'depEarly',
-      name: "前期部",
-      path: '/app/dep-early',
-      version: '1.0.0',
-       dev: true
-    },
-    "dep-chief-engineer": {
-      key: 'dep-chief-engineer',
-      name: "总师部",
-      path: '/app/dep-chief-engineer',
-      version: '1.0.0',
-       dev: true
-    },
-    "depFinance": {
-      key: 'depFinance',
-      name: "财务室",
-      path: '/core/fi/dashboard',
-      version: '1.0.0',
-    },
-    "depManagement": {
-      key: 'depManagement',
-      name: "经营部",
-      path: '/app/dep-management',
-      version: '1.0.0',
-       dev: true
-    }
-  },
-  app_groups: [
-    {
-      name:"通用模块",
-      icon:'supervisor',
-      subs: ['notice', 'task', 'meeting','disk', 'archive']
-    },
-    {
-      name:"部门模块",
-      icon:'depart',
-      subs: ['depCEO','depChiefEngineer',
-        'depEarly', 'depFinance', 'depManagement'
-      ]
-    },
-    {
-      name:'业务模块',
-      icon:'xiangmu1',
-      subs: ['projects','charts','data'
-      ]
-    },
-    {
-      name:'行政综合',
-      icon:'jinxingzhong',
-      subs:['meeting-room-reservation']
-    },
-    {
-      name:'财务报销',
-      icon:'money',
-      subs:['project-bill','claim-back','fi-report']
-    },{
-      name:"系统配置",
-      icon:'parameter',
-      subs:['admin','it-request']
-    }
-  ],
-  acc_list: []
+  acc_list: [],
+  user_rss:[]
 }
 
 
@@ -144,39 +31,54 @@ const getters = {
   current_enterprise(state){
     return state.current_enterprise
   },
+   apps(state) {
+       let o = {}
+       state.modules.forEach(v => {
+         o[v.key] = Object.assign({}, v)
+         o[v.key].path = o[v.key].url
+       })
+       return o
+      },
+      app_groups(state) {
+          let types = getters.getTypes(state)('ModuleType') || []
+          if (types) {
+            state.modules.forEach(v => {
+              let t = types.find(t => v.type == t.value)
+              if (t) {
+                if (t.subs) {
+                  t.subs.push(v.key)
+                } else {
+                  t.subs = [v.key]
+                }
+              }
+
+            })
+          }
+          return types
+        },
   session(state){
     return state.session
   },
-  apps(state){
-    let o = {}
-    state.modules.forEach(v=>{
-      o[v.key] = Object.assign({},v)
-      o[v.key].path = o[v.key].url
-    })
-    return o
+  user_rss(state){
+    return state.user_rss
   },
-  app_groups(state){
-    let types =  getters.getTypes(state)('ModuleType') || []
-    if(types){
-    state.modules.forEach(v=>{
-      let t = types.find(t=>v.type == t.value)
-      if(t){
-        if(t.subs){
-          t.subs.push(v.key)
-        }else{
-          t.subs = [v.key]
-        }
-      }
-
-    })
-  }
-    return types
+  my_rss(state){
+    return state.rss.filter(v=>state.user_rss.includes(v.id))
+  },
+  rss(state){
+    return state.rss
   },
   acc_list(state){
     return state.acc_list
   },
   users(state){
     return state.users
+  },
+  flows(state){
+    return state.session.flows
+  },
+  user_flows(state){
+    return state.session.user_flows
   },
   deps(state){
     return state.deps
@@ -188,6 +90,8 @@ const getters = {
     return state.projects
   },
   getTypes:(state)=>key=>{
+    if(!state.types)
+      return []
     let typeRoot = state.types.find(v=>v.key == key)
     if(typeRoot)
         return state.types.filter(v=>v.parent_id == typeRoot.id)
@@ -246,7 +150,6 @@ const actions = {
       commit
     }, ent_id) {
     return new Promise((resolve,reject)=>{
-      API.ENT.SetEnterprise(ent_id)
       commit('SetCurrentEnterprise', ent_id)
       resolve()
     })
@@ -379,18 +282,33 @@ const mutations = {
   login(state){
     state.isLogin = true
   },
+  toggleRss(state,key){
+    let rss = state.user_rss
+    let index = rss.findIndex(v=>v == key)
+    if(index != -1)
+      rss.splice(index,1)
+    else
+      rss.push(key)
+  },
   SetCurrentEnterprise(state, ent_id) {
-   
+   API.ENT.SetEnterprise(ent_id)
     localStorage.setItem('current_enterprise',ent_id)
     state.current_enterprise = ent_id
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)
+    if (session.type > 1)
+      API.ENT.SetAuthorization(session.token)
+    if (session.type > 2)
+      API.ADMIN.SetAuthorization(session.token)
+
     localStorage.setItem('hs-token',session.token)
     state.session = session
      state.types = session.types //SaveTypes(session.types)
     state.users = session.users
     state.modules = session.modules
+    state.rss = session.rss
+    state.user_rss = state.rss.map(v=>v.id)
     if (Array.isArray(session.my_enterprises))
       return state.my_enterprises = session.my_enterprises.map(
         v => session.enterprises.find(e => e && e.id == v))

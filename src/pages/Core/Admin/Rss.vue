@@ -1,10 +1,11 @@
 <template>
 	<div class="hs-conatiner hs-conatiner-scrollable" >
 	
-    <!-- tool bar -->
+    <!-- tool bar 暂不支持自定义 rss -->
 		<hs-toolbar
 			style="background: #fff"
 			:data="tools"
+		
       :disabled="toolDisabled"
 			@event="onToolEvent"
 		/>
@@ -88,6 +89,9 @@
 			@on-event="handleEvent"
 		/>
   
+		<Modal v-model='modalPreview' transfer footer-hide :title="`RSS源:${previewItem?previewItem.name:''}`">
+			<pre style='padding:10px;'>{{previewData}}</pre>
+		</Modal>
 		
 	</div>
 </template>
@@ -101,6 +105,9 @@ export default {
 			selected: null,
 			loading: false,
 			importData: [],
+				modalPreview:false,
+			previewItem:null,
+			previewData:null,
 			searchText: null,
 				tools: [
 				{
@@ -133,7 +140,22 @@ export default {
 				},
 			],
 			showModal: false,
-				columns: [
+			
+		};
+	},
+	mounted() {
+    this.getData();
+    this.$nextTick(()=>{
+      this.$refs.table.calcTableHeight()
+    })
+    
+	},
+	computed: {
+    ...mapGetters('core',['getType','users']),
+		...mapGetters('admin',{items:'rss'}),
+			columns(){
+				var that = this
+				return [
         { type: "index", title: "序号" },
         	 { type: "type", key: "source_type", width:100,title: "源类型",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"RSS_SOURCE_TYPE",
 							labelKey:"value"},},
@@ -172,23 +194,13 @@ export default {
 			{ key: "created_at", type: "time",title: "添加时间",width:100,option:{
            type:'date'
          } },
-			{ key: "admin", type: "time",title: "预览",width:100,render(h,param){
-				return h('a',{domProps:{href:param.row.admin}},'预览')
-			}}
+			{ key: "admin", type: "time",sortable:false,title: "测试",width:100,render(h,param){
+				return h('a',{on:{click(e
+				
+				){ e.stopPropagation();	that.onTableEvent({type:'preview',data:param.row.id})}}},'测试')
+				}}
         
-			],
-		};
-	},
-	mounted() {
-    this.getData();
-    this.$nextTick(()=>{
-      this.$refs.table.calcTableHeight()
-    })
-    
-	},
-	computed: {
-    ...mapGetters('core',['getType','users']),
-    ...mapGetters('admin',{items:'rss'}),
+			]},
 		toolDisabled() {
         return {}
 		},
@@ -331,11 +343,25 @@ export default {
     },
    
 		onTableEvent(e) {
+			console.log(e)
       if(!e)
         return
 
       if (e.type == "select") 
-        this.selected = e.data;
+				this.selected = e.data;
+				else if(e.type =='preview'){
+						this.modalPreview = true
+				
+						this.previewItem = this.items.find(v=>v.id == e.data)
+								console.log(this.previewItem)
+							this.previewData = "读取中..."
+					this.ADMIN.GET_RSS_DATA({param:{id:e.data}}).then(res=>{
+						this.previewData = res.data.data
+					}).catch(e=>{
+						this.previewData = e
+			
+					})
+			}
     },
 		getData() {
 			this.loading = true;

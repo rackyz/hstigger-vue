@@ -38,7 +38,6 @@ config.Servers.forEach((server,i)=>{
         return Promise.reject('403-权限不足,请联系管理员!')
       } else if (err.response.status == 401) {
         client.Clear()
-        console.log('win:',window.location.reload)
         window.location.reload()
         
         return Promise.reject("tokenoutofdate")
@@ -89,16 +88,17 @@ config.Servers.forEach((server,i)=>{
 
 
   client.SetAuthorization = function(token){
-    axiosClient.defaults.headers.Authorization = token
+    console.log('SET_AUTHEN:',client.name,token)
+    client.axios.defaults.headers.Authorization = token
   }
 
   client.SetEnterprise = function(ent_id){
-    axiosClient.defaults.headers.Enterprise = ent_id
+    client.axios.defaults.headers.Enterprise = ent_id
   }
 
   client.Clear = function(){
-    delete axiosClient.defaults.headers.Authorization
-    delete axiosClient.defaults.headers.Enterprise
+    delete client.axios.defaults.headers.Authorization
+    delete client.axios.defaults.headers.Enterprise
     localStorage.removeItem('hs-token')
 
   }

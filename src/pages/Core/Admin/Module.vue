@@ -87,7 +87,6 @@
 			@on-event="handleEvent"
 		/>
   
-		
 	</div>
 </template>
 

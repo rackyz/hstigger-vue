@@ -1,4 +1,4 @@
-/** Store.Core
+/** Store.ADMIN
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
 
@@ -10,7 +10,8 @@ const state = {
   modules:[],
   rss:[],
   status:{},
-  logs:[]
+  logs:[],
+  flows:[]
 }
 
 const getters = {
@@ -31,13 +32,16 @@ const getters = {
   },
   logs(state){
     return state.logs
+  },
+  flows(state){
+    return state.flows
   }
 }
 
 const actions = {
   GetLogs({commit}){
     return new Promise((resolve,reject)=>{
-      API.CORE.GET_LOGS().then(res=>{
+      API.ADMIN.GET_LOGS().then(res=>{
         commit('saveLogs',res.data.data)
         resolve()
       }).catch(reject)
@@ -46,7 +50,7 @@ const actions = {
   },
   GetStatus({commit}){
     return new Promise((resolve, reject) => {
-      API.CORE.GET_ACCOUNTS().then(res => {
+      API.ADMIN.GET_ACCOUNTS().then(res => {
         let accounts = res.data.data
         commit('saveAccounts', accounts)
         resolve()
@@ -56,7 +60,7 @@ const actions = {
   // USERS/ACCOUNTS
   ListUsers({commit}){
     return new Promise((resolve,reject)=>{
-       API.CORE.GET_ACCOUNTS().then(res => {
+       API.ADMIN.GET_ACCOUNTS().then(res => {
           let accounts = res.data.data
           commit('initAccounts', accounts)
           resolve()
@@ -65,7 +69,7 @@ const actions = {
   },
   CreateUsers({commit},users){
     return new Promise((resolve,reject)=>{
-      API.CORE.POST_ACCOUNTS(users).then(res => {
+      API.ADMIN.POST_ACCOUNTS(users).then(res => {
         let resInfoArray = res.data.data
         users.forEach((v,i)=>{
           Object.assign(v,resInfoArray[i])
@@ -77,7 +81,7 @@ const actions = {
   },
   ResetPassword({commit},user_id_list){
     return new Promise((resolve,reject)=>{
-      API.CORE.RESET_PASSWORD(user_id_list).then(res=>{
+      API.ADMIN.RESET_PASSWORD(user_id_list).then(res=>{
         commit('pathAccounts',user_id_list.map(id=>({id,changed:false})))
         resolve()
         
@@ -86,7 +90,7 @@ const actions = {
   },
   ChangePassword({commit},{id,password}){
     return new Promise((resolve,reject)=>{
-      API.CORE.CHANGE_PASSWORD({id,password}).then(res=>{
+      API.ADMIN.CHANGE_PASSWORD({id,password}).then(res=>{
          commit('patchAccount', {
            id,changed:1
          })
@@ -98,7 +102,7 @@ const actions = {
     if(user_id_list && !Array.isArray(user_id_list))
       user_id_list = [user_id_list]
     return new Promise((resolve, reject) => {
-      API.CORE.LOCK_ACCOUNTS(user_id_list).then(res => {
+      API.ADMIN.LOCK_ACCOUNTS(user_id_list).then(res => {
         commit('patchAccounts', user_id_list.map(id => ({
           id,
           locked:1
@@ -112,7 +116,7 @@ const actions = {
       if (user_id_list && !Array.isArray(user_id_list))
         user_id_list = [user_id_list]
      return new Promise((resolve, reject) => {
-       API.CORE.UNLOCK_ACCOUNTS(user_id_list).then(res => {
+       API.ADMIN.UNLOCK_ACCOUNTS(user_id_list).then(res => {
          commit('patchAccounts', user_id_list.map(id => ({
            id,
            locked: 0
@@ -125,7 +129,7 @@ const actions = {
   PatchUser({commit,dispatch},user){
     return new Promise((resolve,reject)=>{
       if(user.id)
-        return API.CORE.PATCH_ACCOUNT(user,{param:{id:user.id}}).then(res=>{
+        return API.ADMIN.PATCH_ACCOUNT(user,{param:{id:user.id}}).then(res=>{
           let resInfo = res.data.data
           Object.assign(user, resInfo)
           commit("patchAccount", user)
@@ -137,7 +141,7 @@ const actions = {
   },
   DeleteUser({commit},user_id){
     return new Promise((resolve,reject)=>{
-      API.CORE.DEL_ACCOUNT({param:{id:user_id}}).then(res=>{
+      API.ADMIN.DEL_ACCOUNT({param:{id:user_id}}).then(res=>{
         commit('removeAccount', user_id)
         resolve()
       }).catch(reject)
@@ -148,7 +152,7 @@ const actions = {
     commit
   }, userid_list) {
     return new Promise((resolve, reject) => {
-      API.CORE.DEL_ACCOUNTS(userid_list).then(res => {
+      API.ADMIN.DEL_ACCOUNTS(userid_list).then(res => {
         commit('removeAccount', user_id)
         resolve()
       }).catch(reject)
@@ -158,7 +162,7 @@ const actions = {
   // ENTERPRISES
   GetEnterprises({commit}){
     return new Promise((resolve,reject)=>{
-      API.CORE.GET_ENTERPRISES().then(res=>{
+      API.ADMIN.GET_ENTERPRISES().then(res=>{
         commit('saveEnterprises',res.data.data)
         resolve(res.data.data)
       }).catch(reject)
@@ -168,7 +172,7 @@ const actions = {
   PatchEnterprise({commit},item){
     if(item.id == undefined){
       return new Promise((resolve,reject)=>{
-        API.CORE.POST_ENTERPRISE(item).then(res=>{
+        API.ADMIN.POST_ENTERPRISE(item).then(res=>{
           let updateInfo = res.data.data
           Object.assign(item,updateInfo)
           commit('saveEnterprises',[item])
@@ -177,7 +181,7 @@ const actions = {
       }) 
     }else{
       return new Promise((resolve,reject)=>{
-        API.CORE.PATCH_ENTERPRISE(item,{
+        API.ADMIN.PATCH_ENTERPRISE(item,{
             param: {
               id: item.id
             }
@@ -194,7 +198,7 @@ const actions = {
 
   DeleteEnterprises({commit},id_list){
     return new Promise((resolve,reject)=>{
-      API.CORE.DEL_ENTERPRISES(id_list).then(res=>{
+      API.ADMIN.DEL_ENTERPRISES(id_list).then(res=>{
         commit('deleteEnterprises',id_list)
         resolve()
       }).catch(reject)
@@ -204,7 +208,7 @@ const actions = {
 
   LockEnterprises({commit},id_list){
     return new Promise((resolve,reject)=>{
-      API.CORE.LOCK_ENTERPRISES(id_list).then(res=>{
+      API.ADMIN.LOCK_ENTERPRISES(id_list).then(res=>{
         commit('saveEnterprises',id_list.map(v=>({id:v,state:2})))
         resolve()
       }).catch(reject)
@@ -213,7 +217,7 @@ const actions = {
   },
   UnlockEnterprises({commit},id_list){
     return new Promise((resolve,reject)=>{
-      API.CORE.UNLOCK_ENTERPRISES(id_list).then(res=>{
+      API.ADMIN.UNLOCK_ENTERPRISES(id_list).then(res=>{
         commit('saveEnterprises',id_list.map(v=>({id:v,state:1})))
         resolve()
       }).catch(reject)
@@ -224,7 +228,7 @@ const actions = {
 
   GetModules({commit}){
     return new Promise((resolve,reject)=>{
-      API.CORE.GET_MODULES().then(res=>{
+      API.ADMIN.GET_MODULES().then(res=>{
         commit("saveModules",res.data.data)
         resolve()
       }).catch(reject)
@@ -233,12 +237,12 @@ const actions = {
   PatchModule({commit},item){
     return new Promise((resolve,reject)=>{
       if(item.id){
-        API.CORE.PATCH_MODULE(item,{param:{id:item.id}}).then(res=>{
+        API.ADMIN.PATCH_MODULE(item,{param:{id:item.id}}).then(res=>{
           commit("saveModules",[item])
           resolve()
         }).catch(reject)
       }else{
-        API.CORE.POST_MODULE(item).then(res=>{
+        API.ADMIN.POST_MODULE(item).then(res=>{
           let createInfo = res.data.data
           Object.assign(item,createInfo)
           commit("saveModules",[item])
@@ -250,7 +254,7 @@ const actions = {
 
   DeleteModules({commit},id_list){
     return new Promise((resolve, reject) => {
-      API.CORE.DEL_MODULES(id_list).then(res=>{
+      API.ADMIN.DEL_MODULES(id_list).then(res=>{
          commit("deleteModules", id_list)
          resolve()
       }).catch(reject)
@@ -260,7 +264,7 @@ const actions = {
 
   GetRss({commit}){
     return new Promise((resolve,reject)=>{
-      API.CORE.GET_RSS().then(res=>{
+      API.ADMIN.GET_RSS().then(res=>{
         commit("saveRss",res.data.data)
         resolve()
       }).catch(reject)
@@ -270,7 +274,7 @@ const actions = {
   PatchRSS({commit},item){
     if(!item.id)
       return new Promise((resolve,reject)=>{
-        API.CORE.POST_RSS(item).then(res=>{
+        API.ADMIN.POST_RSS(item).then(res=>{
           Object.assign(item,res.data.data)
           commit("saveRss",[item])
           resolve()
@@ -278,7 +282,7 @@ const actions = {
       })
     else
       return new Promise((resolve,reject)=>{
-        API.CORE.PATCH_RSS(item,{param:{id:item.id}}).then(res=>{
+        API.ADMIN.PATCH_RSS(item,{param:{id:item.id}}).then(res=>{
           
           commit("saveRss",[item])
           resolve()
@@ -288,14 +292,21 @@ const actions = {
 
   DeleteRss({commit},id_list){
     return new Promise((resolve,reject)=>{
-      API.CORE.DEL_RSS(id_list).then(res=>{
+      API.ADMIN.DEL_RSS(id_list).then(res=>{
         commit("deleteRss",id_list)
         resolve()
       }).catch(reject)
     })
   },
   
-
+  GetFlows({commit}){
+    return new Promise((resolve,reject)=>{
+      API.ADMIN.GET_FLOWS().then(res=>{
+        commit("saveFlows",res.data.data)
+        resolve()
+      }).catch(reject)
+    })
+  },
 
   // FILE
   // [in] local files objects
@@ -308,7 +319,7 @@ const actions = {
         size:v.size,
         url: API.MakeCOSURL(v.name)
       }))
-      API.CORE.POST_FILES(file_db_objects).then(res=>{
+      API.ADMIN.POST_FILES(file_db_objects).then(res=>{
 
       })
     })
@@ -369,7 +380,13 @@ const mutations = {
     },
     saveLogs(state,items){
       UTIL.LocalSaveItems(state,'logs',items)
-    }
+    },
+    saveFlows(state, items) {
+        UTIL.LocalSaveItems(state, 'flows', items)
+      },
+      deletFlows(state, id) {
+        UTIL.LocalDeleteItem(state, 'flows', id)
+      },
 
 }
 
