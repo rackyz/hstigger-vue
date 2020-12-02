@@ -2,6 +2,7 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const path = require('path')
 const config = require('./src/config')
+// const QCloudCosPlugin = require('webpack-cos-plugin');
 const clean = new CleanWebpackPlugin()
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -66,6 +67,26 @@ const Chained = config=>{
      "moment": "moment",
      "axios": "axios"
    })
+
+    //  config.plugin('qcloud-cos')
+    //    .use(QCloudCosPlugin, [{
+    //      auth: {
+    //        region: 'ap-shanghai',
+    //        SecretId: 'AKID673paDhy3FlL4nGhrt3Xt7EAxZLxnvAD',
+    //        SecretKey: '2ta8XqzwoY1MWVgkeMyQhmrqfkfPyMya',
+    //        // Bucket 名称
+    //        fileBucket: 'nbgz-pmis',
+    //      },
+    //      bucket: {
+    //        Bucket: 'cloud-1257839135',
+    //        Region: 'ap-shanghai'
+    //      },
+    //      cosBaseDir: '',
+    //      project: '',
+    //      useVersion: true,
+    //      existCheck: false
+    //    }])
+     
 
 
   config.module.rule('eslint').clear()

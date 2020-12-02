@@ -1,8 +1,10 @@
+const LocalServer = 'http://192.168.14.40:6001'
+const ProductServer = 'https://api.hstigger.com'
 module.exports = {
   Servers:[{
       Name:"CORE",
       Connection: {
-        baseURL: process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001',
+        baseURL: process.env.NODE_ENV == 'production' ? ProductServer : LocalServer,
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"
@@ -10,6 +12,8 @@ module.exports = {
       },
       API: {
         // core
+        DEBUG_CHANGE_USER: "POST /sessions/debug",
+
         GET_LOGIN_SETTING: "GET /settings/login",
         SEND_VERIFY_CODE: "POST /sessions/forget-vcode",
         VERIFY_FORGET_VCODE: "POST /sessions/forget",
@@ -31,6 +35,11 @@ module.exports = {
         DEL_USERS: "POST /users/delete",
         ADD_USER_CONCERNED_PROJECT: "",
          GET_RSS_DATA: "GET /rss/:id",
+         
+           GET_FILE: "GET /files/:id",
+             GET_FILES: "GET /files",
+             POST_FILES: "POST /files",
+             DEL_FILE: "DELETE /files/:id",
 
 
         // 
@@ -42,7 +51,7 @@ module.exports = {
     }, {
       Name: "ADMIN",
       Connection: {
-        baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/admin',
+       baseURL: (process.env.NODE_ENV == 'production' ? ProductServer : LocalServer) + '/admin',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"
@@ -129,7 +138,7 @@ module.exports = {
     }, {
      Name:"ENT",
       Connection: {
-        baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/enterprise',
+       baseURL: (process.env.NODE_ENV == 'production' ? ProductServer : LocalServer) + '/enterprise',
         timeout: 5000,
         defaultHeaders: {
           "api-version": "v0"
@@ -187,7 +196,7 @@ module.exports = {
     {
       Name:"ENT_ADMIN",
        Connection: {
-         baseURL: (process.env.NODE_ENV == 'production' ? "https://api.hstigger.com" : 'http://localhost:6001')+'/entadmin',
+         baseURL: (process.env.NODE_ENV == 'production' ? ProductServer : LocalServer) + '/entadmin',
          timeout: 5000,
          defaultHeaders: {
            "api-version": "v0"
@@ -244,5 +253,5 @@ module.exports = {
      }
   ],
   // cos 文件服务器
-  cosServer:'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com'
+  cosServer: 'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/'
 }

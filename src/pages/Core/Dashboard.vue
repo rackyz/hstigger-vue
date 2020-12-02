@@ -29,8 +29,29 @@
             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
             <p>点击或拖拽文件到此处上传个人临时文件</p>
         </div>
+        <div class="content">
+            <template v-for="f in files.slice(files.length-5,files.length).reverse()">
+            <div :key="f.id" class="notice">
+               <div class="flex-wrap" style="height:100%;">
+                  <div class="date">{{util.moment(f.inputTime).format('YYYY-MM-DD')}} </div>
+                  <div class="ext" style="margin-left:20px;">{{f.ext}}</div>
+                  <div class="title">{{f.name}} <img class='new' src="https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/kt/new.gif" v-if="util.isNew(f.inputTime)" /></div>
+              </div>
+              
+
+               <a :href="f.url" target="blank">下载</a>
+
+            </div>
+          </template>
+         
+        </div>
     </Upload>
     </Card>
+    <Card dis-hover style="margin-top:10px;" padding="0" v-if="uploadingFiles.length != 0">
+        上传中...<br />
+        {{uploadingFiles.map(v=>`${v.name}(${v.percent})`).join(',')}}
+      </Card>
+     
   
     </Col>
     
@@ -129,6 +150,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import {mapGetters,mapMutations} from 'vuex'
 export default {
   data(){
@@ -190,6 +212,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',['session','my_rss','user_rss','rss']),
+    ...mapGetters('file',['files','uploadingFiles'])
     
   },
   metaInfo:{
@@ -212,7 +235,19 @@ export default {
     },
     handleToggleRss(rss_key){
       this.toggleRss(rss_key)
-    }
+    },
+     onUploadFile(e){
+      
+      this.$store.dispatch('file/upload',{files:e}).then(res=>{
+        this.Success({
+          title:'上传成功',
+          desc:"文件已上传完毕"
+        })
+      }).catch(e=>{
+         this.Error(e)
+      })
+      return false
+    },
   }
 }
 </script>

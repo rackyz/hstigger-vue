@@ -86,6 +86,12 @@ const getters = {
   roles(state){
     return state.roles
   },
+  settings(state){
+    return state.session.settings
+  },
+  enterprises(state){
+    return state.session.enterprises
+  },
   projects(){
     return state.projects
   },
@@ -107,7 +113,7 @@ const getters = {
         return state.types
     },
     keys(state){
-        return state.types.filter(v=>v.key)
+        return state.types.map(v=>v.key)
     },
   getRoles: state => type_id => {
     return state.roles.filter(v => v.type_id == type_id)
@@ -115,6 +121,21 @@ const getters = {
 }
 
 const actions = {
+  debug_change_user({commit},id){
+    return new Promise((resolve,reject)=>{
+      API.CORE.DEBUG_CHANGE_USER({id}).then(res=>{
+        let session = res.data.data
+          commit('login')
+         commit('save', session)
+         commit('saveAcc', session.user_menus)
+          let enterprise_id = localStorage.getItem('current_enterprise')
+         if (!enterprise_id || session.enterprises.find(v => v.id == enterprise_id) == null)
+           commit('ClearEnterprise')
+
+         resolve(session)
+      }).catch(reject)
+    })
+  },
   whoami({commit}){
     let token = localStorage.getItem('hs-token')
     let enterprise_id = localStorage.getItem('current_enterprise')
@@ -312,9 +333,9 @@ const mutations = {
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)
-    if (session.type > 1)
+    if (session.type > 0)
       API.ENT.SetAuthorization(session.token)
-    if (session.type > 2)
+    if (session.type  > 1)
       API.ADMIN.SetAuthorization(session.token)
     
     if(session.ent_admin)
@@ -326,7 +347,7 @@ const mutations = {
     state.users = session.users
     state.modules = session.modules
     state.rss = session.rss
-    state.user_rss = state.rss.map(v=>v.id)
+    state.user_rss = Array.isArray(state.rss) ? state.rss.map(v => v.id):[]
     if (Array.isArray(session.my_enterprises))
       return state.my_enterprises = session.my_enterprises.map(
         v => session.enterprises.find(e => e && e.id == v))

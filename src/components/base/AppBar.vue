@@ -64,7 +64,7 @@
             <div class="rect5"></div>
           </div>
 
-       <div class='text-btn' @click="showDebug = !showDebug" style='margin-right:15px;'>
+       <div class='text-btn' @click="RouteTo('/core/debug')" style='margin-right:15px;'>
           <Icon custom="gzicon gzi-bug" size="18" :color="showDebug?'yellowgreen':''" />
         </div>
       <Badge :count='session.flow_count' type='error' style='margin-right:20px;' v-if="false">
@@ -100,8 +100,6 @@
 
    
     </div>
-    <!-- DEBUG MODAL -->
-     <BaseDebugPanel v-model='showDebug' />
    
       <div class='l-login-mask' v-if="!isLogin"  >
           <div class="login" v-if="!loading">
