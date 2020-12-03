@@ -1,18 +1,7 @@
 
-<style lang="less" >
-
-.card-title{
-  margin:0;
-  padding:5px 10px;
-  border-bottom:1px solid #eee;
-  width:inherit !important;
-  text-align: left;
-}
-
-</style>
 <template>
   <Card class="panel" padding='0' style='margin-top:10px;'>
-       <div class='card-title'><Icon type='md-folder-open' size='19' /> 临时文件 / {{loading?'读取中...':''}} <span style='float:right'>MORE</span></div>
+       <div class='card-title'><Icon type='md-folder-open' size='19' /> 临时文件  {{loading?' - 读取中...':''}} <span style='float:right;' class='card-more' @click='RouteTo("/core/self/file")'>MORE</span></div>
         <Upload
         multiple
         style="margin:5px;"
@@ -28,8 +17,8 @@
      <div class="content">
             <template v-for="f in files">
             <div :key="f.id" class="file-item">
-               <div class='flex-wrap'>
-                 <div class="file-icon" :style="`background:${getFileExtColor(f.name)}`">
+               <div class='flex-wrap' @click='PreDownload(f.id)'>
+                 <div class="file-icon" :style="`background:${getFileExtColor(f.ext)}`">
                    
                     <span>{{f.ext}}</span>
                     </div>
@@ -39,8 +28,7 @@
                   </div>
 
                <div class='flex-wrap'>
-               <a @click='PreDownload(f.id)' href='#' style='border:1px solid #dfdfdf;'><Icon type='md-download'  size='20' /></a>
-               <a @click='PreDelete(f.id)' href='#' style='margin-left:5px;border:1px solid #dfdfdf;'><Icon type='md-trash' size='20' color='#aaa'></Icon></a>
+               <a @click='Delete(f)' href='#' style='margin-left:5px;border:1px solid #dfdfdf;'><Icon type='md-trash' size='20' color='#aaa'></Icon></a>
                </div>
             </div>
           </template>
@@ -80,6 +68,7 @@ export default {
      },
      getFileExtColor(ext) {
        ext = ext.toLowerCase()
+       console.log("EXT:",ext)
 			const colors = {
 				doc: "blue",
 				docx: "blue",
@@ -87,7 +76,11 @@ export default {
 				pptx: "orange",
 				ppt: "orange",
 				xls: "green",
-				xlsx: "green",
+        xlsx: "green",
+        jpg:"purple",
+        psd:"darkcyan",
+        png:"#aaa",
+        gif:"green"
 			};
 
 			return colors[ext] || "#333";
@@ -104,19 +97,23 @@ export default {
       })
       return false
     },
+    Delete(f){
+      this.Confirm(`确定删除文件'${f.name}'`,()=>{
+        this.$store.dispatch('DeleteFiles',[f.id])
+      })
+    },
     PreDownload(file_id){
       this.CORE.GET_FILE({param:{id:file_id}}).then(res=>{
         
         let url = res.data.data
-        console.log("URL:",this.makeURL(url))
-        return
+      
         this.Download(this.makeURL(url))
       }).catch(e=>{
         this.Error(e)
       })
     },
     isNew(date){
-      return moment().isBefore(moment(date).subtract(3,'days'))
+      return moment().isAfter(moment(date).subtract(3,'days'))
     }
    }
 }
@@ -124,43 +121,7 @@ export default {
 <style lang="less" scoped>
 .content{
   padding:5px 10px;
-  .file-item{
-    width:100%;
-    background:#eee;
-    display: flex;
-    align-items: center;
-    background:#fff;
-    justify-content: space-between;
-    padding:3px 0;
+  
 
-
-    .file-icon{
-            width:60px;
-            height:30px;
-            border-radius: 2px;
-            display: flex;
-            align-items: center;;
-            justify-content: center;
-            span{
-                border:none;
-                position: relative;
-                bottom:0;
-                color:#fff;
-                z-index: 10;
-                line-height: auto;
-                box-shadow: none;
-            }
-        }
-  }
-
-  .title{
-    padding:0 5px;
-    width:200px;
-    text-overflow: ellipsis;
-    background:linear-gradient(to right,#eee,#eeeeee00);
-    height:30px;
-    line-height:30px;
-    white-space: nowrap;
-  }
 }
 </style>

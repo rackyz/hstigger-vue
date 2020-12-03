@@ -30,7 +30,7 @@
             <Card padding='5' :key='r.id' style='height:300px;margin-bottom:10px;border-radius:0;border:none;'>
             <div class="flex-wrap flex-between" style='padding:3px 8px;background:#23334c;color:#fff;' v-if="r.media_type != 1">
               {{r.name}}  
-              <a style='float:right' :href="r.link" target='_blank'>MORE</a>
+              <span class='card-more' style='float:right' @click="RouteTo(r.link,true)">MORE</span>
             </div>
             <component :is="MapRssComponent(r.media_type)" :id="r.id" />
               

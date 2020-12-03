@@ -239,3 +239,24 @@ html,body{
 }
 
 
+
+.card-title{
+  margin:0;
+  padding:5px 10px;
+  padding-bottom:2px;
+  border-bottom:1px solid #eee;
+  width:inherit !important;
+  text-align: left;
+}
+
+.card-more{
+ color:#aaa;
+  cursor: pointer;
+  font-size:12px;
+}
+
+
+.card-more:hover{
+  color:#10b2ec;
+}
+

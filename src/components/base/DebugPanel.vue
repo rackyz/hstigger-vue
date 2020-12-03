@@ -20,6 +20,7 @@
           <template v-for='k in keys'>
              <Button style='margin-right:5px;margin-bottom:5px;' :key='k' :type="target==k?'info':''" @click='target=k;CalcLine()'>{{k}}</Button>
           </template>
+           <Button style='margin-right:5px;margin-bottom:5px;'  :type="target=='files'?'info':''" @click='target="files";CalcLine()'>files</Button>
           </div>
 
         <hs-avatar :userinfo="session" :size="80" style="position:absolute;left:20px;top:5px;" />
@@ -46,6 +47,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',keys),
+    ...mapGetters('file',["files"])
   },
   mounted(){
     var that = this

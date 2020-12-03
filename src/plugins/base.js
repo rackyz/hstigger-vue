@@ -58,13 +58,23 @@ Object.entries(Clients).forEach(([k,v])=>{
 
 Vue.prototype.RouteTo = function (path, newtab = false) {
     if (newtab) {
-        let routerUrl = this.$router.resolve({
-            path
-        });
-        window.open(routerUrl.href, "_blank");
+        if(!path.includes('http')){
+            let routerUrl = this.$router.resolve({
+                path
+            });
+            window.open(routerUrl.href, "_blank");
+        }else{
+            window.open(path, "_blank");
+        }
+        
     } else {
-        if(this.$route.path != path)
-            this.$router.push(path)
+        if(!path.includes('http')){
+            
+            if(this.$route.path != path)
+                this.$router.push(path)
+        }else{
+            window.location.href = path
+        }
     }
 
 
