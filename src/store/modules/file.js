@@ -22,6 +22,9 @@ import API from '@/plugins/axios'
    },
    uploadingFiles(state) {
      return state.uploadingList
+   },
+   makeURL:(state)=>(path)=>{
+     return API.CORE.config.baseURL + path 
    }
  }
 
@@ -37,6 +40,7 @@ import API from '@/plugins/axios'
      })
 
    },
+   
    upload({
      commit,
      rootState

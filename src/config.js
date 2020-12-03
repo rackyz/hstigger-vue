@@ -11,17 +11,18 @@ module.exports = {
         }
       },
       API: {
-        // core
-        DEBUG_CHANGE_USER: "POST /sessions/debug",
+        // public api
+        DEBUG_CHANGE_USER: "POST public/sessions/debug",
+        GET_LOGIN_SETTING: "GET /public/settings/login",
+        SEND_VERIFY_CODE: "POST /public/sessions/forget-vcode",
+        VERIFY_FORGET_VCODE: "POST /public/sessions/forget",
+        CHANGE_PWD: "POST /public/sessions/changepwd",
+        REGISTER: "POST /public/sessions/register",
+        LOGIN: "POST /public/sessions",
+        WHO_IS: "GET /public/sessions/current",
 
-        GET_LOGIN_SETTING: "GET /settings/login",
-        SEND_VERIFY_CODE: "POST /sessions/forget-vcode",
-        VERIFY_FORGET_VCODE: "POST /sessions/forget",
-        CHANGE_PWD: "POST /sessions/changepwd",
-        REGISTER: "POST /sessions/register",
 
-        LOGIN: "POST /sessions",
-        WHO_IS: "GET /sessions/current",
+        // logined api
         GET_ACCLERATES: "GET /users/self/menus",
         SAVE_ACCELERATES: "POST /users/self/menus",
         GET_ACTIONS: "GET /users/self/action-menus",
@@ -34,12 +35,12 @@ module.exports = {
         DEL_USER: "DELETE /users/:id",
         DEL_USERS: "POST /users/delete",
         ADD_USER_CONCERNED_PROJECT: "",
-         GET_RSS_DATA: "GET /rss/:id",
+        GET_RSS_DATA: "GET /rss/:id",
          
-           GET_FILE: "GET /files/:id",
-             GET_FILES: "GET /files",
-             POST_FILES: "POST /files",
-             DEL_FILE: "DELETE /files/:id",
+        GET_FILE:   "GET /files/:id",
+        GET_FILES: "GET /files",
+        POST_FILES: "POST /files",
+        DEL_FILE: "DELETE /files/:id",
 
 
         // 
@@ -147,8 +148,6 @@ module.exports = {
       API: {
         // core
     
-        LOGIN: "POST /sessions",
-        WHO_IS: "GET /sessions/current",
         GET_ACCLERATES: "GET /users/self/menus",
         SAVE_ACCELERATES: "POST /users/self/menus",
         GET_ACTIONS: "GET /users/self/action-menus",

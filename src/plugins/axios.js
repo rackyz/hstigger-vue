@@ -8,7 +8,7 @@ config.Servers.forEach((server,i)=>{
   var axiosClient = axios.create({baseURL:server.Connection.baseURL,
     timeout: server.Connection.timeout})
   
-  let client = {name:server.Name, getAPI,axios:axiosClient, apis:server.API}
+  let client = {name:server.Name, getAPI,axios:axiosClient, apis:server.API, config:server.Connection}
 
   // 初始化头部配置
   axiosClient.defaults.headers = server.Connection.defaultHeaders || {}
@@ -39,8 +39,7 @@ config.Servers.forEach((server,i)=>{
       } else if (err.response.status == 401) {
         client.Clear()
         window.location.reload()
-        
-        return Promise.reject("tokenoutofdate")
+        return Promise.reject()
       } else {
         return Promise.reject(`${err.response.status}] ${err}`)
       }
@@ -128,6 +127,7 @@ config.Servers.forEach((server,i)=>{
     }
   })
   Clients[server.Name] = client
+  
 })
 
 
