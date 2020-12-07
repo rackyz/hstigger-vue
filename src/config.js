@@ -1,5 +1,5 @@
 var LocalServer = 'http://192.168.14.40:6001'
-LocalServer = 'http://localhost:6001'
+//LocalServer = 'http://localhost:6001'
 const ProductServer = 'https://api.hstigger.com'
 module.exports = {
   Servers:[{

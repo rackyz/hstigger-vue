@@ -51,7 +51,7 @@
         <Modal v-model='modalFlow' footer-hide fullscreen >
         <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(current ? ('/ '+get_flow(current).name):'')}}</div>
           <!-- <BaseFlow :key="current" /> -->
-          <hs-flow />
+          <hs-flow :flow='require("@/flows/"+current)' />
         </Modal>
       </div>
 </template>
