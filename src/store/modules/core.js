@@ -154,7 +154,7 @@ const actions = {
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
-       
+        console.log("SESSION:",session)
         if (!enterprise_id || session.enterprises.find(v => v.id == enterprise_id) == null)
           commit('ClearEnterprise')
         

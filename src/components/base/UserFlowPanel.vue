@@ -1,3 +1,8 @@
+<style lang="less">
+.glass-panel-wrapper{
+  bottom:60px;
+}
+</style>
 <template>
   <div class='l-list'>
         <template v-for='f in flows'>
@@ -51,7 +56,10 @@
         <Modal v-model='modalFlow' footer-hide fullscreen >
         <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(current ? ('/ '+get_flow(current).name):'')}}</div>
           <!-- <BaseFlow :key="current" /> -->
-          <hs-flow :flow='require("@/flows/"+current)' />
+          <template v-if='flowDef && flowDef.nodes'>
+           
+          <hs-flow :flow='flowDef' />
+          </template>
         </Modal>
       </div>
 </template>
@@ -62,6 +70,7 @@ export default {
   data(){
     return {
       modalCustom:false,
+      flowDef:{},
       modalFlow:false,
       current:null
     }
@@ -78,6 +87,7 @@ export default {
       })
       return slots
     },
+    
     flowGroups(){
       let types = this.getTypes('FLOW_TYPE')
       let groups = types.map(v=>({id:v.value,name:v.name,color:v.color,icon:v.icon,flows:[]}))
@@ -91,6 +101,24 @@ export default {
 
   },
   methods:{
+     FormatFlow (f) {
+      let o = {}
+      o.info = {
+        id:f.id,
+        name:f.name,
+        desc:f.desc
+      },
+      o.nodes = Object.keys(f.nodes).map(v=>({key:v,...f.nodes[v]}))
+      o.def = f.def
+      o.actions = Object.keys(f.actions).map(v => ({
+        key: v,
+        ...f.actions[v]
+      }))
+      o.option = f.option
+
+      return o
+    
+    },
     get_flow(e){
       return this.flows.find(v=>v.id == e)
     },
@@ -101,8 +129,16 @@ export default {
 
     },
     OpenFlowCreateModal(id){
+      if(!id)
+        return
       this.current = id
-      this.modalFlow = true
+      try{
+        this.flowDef = this.FormatFlow(require("@/flows/"+id))
+        this.modalFlow = true
+      }catch(e){
+        this.Error(e)
+      }
+     
     },
     
     OpenCustomSettingPanel(){
