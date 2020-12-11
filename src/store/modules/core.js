@@ -25,6 +25,9 @@ const getters = {
   isLogin(state){
     return state.isLogin
   },
+  uid(state){
+    return state.session.user_id
+  },  
   my_enterprises(state){
     return state.my_enterprises
   },
@@ -94,6 +97,28 @@ const getters = {
   },
   projects(){
     return state.projects
+  },
+  _get_flow_dep_manager:state=>dep_id=>{
+    if(dep_id == 0)
+      return ['ed49e690-3b83-11eb-8e1e-c15d5c7db744']
+    else if (dep_id == 1) //房建：章建良 李增义 汤海平
+      return ['ed4a8300-3b83-11eb-8e1e-c15d5c7db744', 'ed4a34b4-3b83-11eb-8e1e-c15d5c7db744','']
+    else if (dep_id == 2) //市政： 王勤轰 玄先涛 庄辉
+      return ['ed4a5be7-3b83-11eb-8e1e-c15d5c7db744', 'ed4a5c0b-3b83-11eb-8e1e-c15d5c7db744', 'ed4a82f9-3b83-11eb-8e1e-c15d5c7db744']
+    else if (dep_id == 3) //管理： 顾震 刘勇 吴献国
+      return ['ed49e6d0-3b83-11eb-8e1e-c15d5c7db744', 'ed4a34be-3b83-11eb-8e1e-c15d5c7db744', 'ed4a5bf7-3b83-11eb-8e1e-c15d5c7db744']
+    else if(dep_id == 4)  // 装修
+      return ['ed4a82fb-3b83-11eb-8e1e-c15d5c7db744']
+    else if(dep_id == 5) // 造价 钱敏
+      return ['ed4a8301-3b83-11eb-8e1e-c15d5c7db744']
+    else if(dep_id == 6) // BIM
+      return ['ed49e690-3b83-11eb-8e1e-c15d5c7db744']
+      
+      
+      //BIM：詹红岩
+      //造价： 钱敏
+      //装修： 竺家君
+      //行政： 詹红岩
   },
   getTypes:(state)=>key=>{
     if(!state.types)

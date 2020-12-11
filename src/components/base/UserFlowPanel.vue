@@ -66,6 +66,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import flow from '../../flows/29fe3900-3504-11eb-a58f-19892a782200.js'
 export default {
   data(){
     return {
@@ -133,7 +134,7 @@ export default {
         return
       this.current = id
       try{
-        this.flowDef = this.FormatFlow(require("@/flows/"+id))
+        this.flowDef = this.FormatFlow(flow)
         this.modalFlow = true
       }catch(e){
         this.Error(e)
