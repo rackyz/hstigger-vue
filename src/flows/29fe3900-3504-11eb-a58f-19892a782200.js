@@ -278,85 +278,88 @@ var flow = {
   desc: '2020年度人员考核定级及评优工作',
   icon: 'gongzuobaogao',
   def: {
-    name: {
-      label: "姓名",
-      control: 'input',
-      option: {
-        required: true,
-        editable: false
-      }
-    },
-    dep: {
-      label: "部门",
-      control: 'select',
-      option: {
-        options: ['行政综合', '房建监理事业部', '市政监理事业部', '建设管理事业部', '装修管理事业部', '造价咨询事业部', 'BIM咨询'],
-        defaultValue: 0,
-
-        required: true,
-      }
-    },
-    position: {
-      label: "职务",
-      control: 'select',
-      option: {
-        options: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级', '助理级/员级'],
-        required: true,
-        defaultValue: 2
-      }
-    },
-    rank: {
-      label: "职称",
-      control: 'select',
-      option: {
-        options: ['正高级', '高级', '中级', '初级', '无'],
-        text: true,
-        defaultValue: '无',
-        required: true,
-      }
-    },
-    project: {
-      label: "所在项目部名称(可简写)",
-      control: "input",
-      option: {
-        maxlen: 40
-      }
-
-    },
-    report: {
-      control: "docx",
-      label: "述职报告",
-      option: {
-        single: true,
-        required: true
-      }
-    },
-    hire_date: {
-      label: "入职时间",
-      control: 'time',
-      option: {
-        required: true,
-        type: 'date'
-      }
-    },
-    cerificate: {
-      label: "岗位证书",
-      control: "select",
-      option: {
-        options: ['国家注册监理', '其他注册类', '监理工程师', '监理员', '其他'],
-        text: true,
-        required: true
-      }
-    },
-    education: {
-      label: "学历",
-      control: "select",
-      option: {
-        options: ['硕士', '本科(全日制)', '本科(非全日制)', '专科', '中专', '其他'],
-        text: true,
-        required: true
-      }
-    },
+      name: {
+        label: "姓名",
+        control: 'input',
+        option:{
+          required: true,
+          editable: false,
+          defaultValue:"session",
+          defaultValueKey:"id"
+        }
+      },
+      dep: {
+        label: "部门",
+        control: 'select',
+        option: {
+          options: ['行政综合','房建监理事业部','市政监理事业部','建设管理事业部','装修管理事业部', '造价咨询事业部', 'BIM咨询'],
+          
+          required: true,
+        }
+      },
+      position: {
+        label: "职务",
+        control: 'select',
+        option: {
+          options: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级','助理级/员级'],
+          required: true,
+          defaultValue: 2
+        }
+      },
+      rank: {
+        label: "职称",
+        control: 'select',
+        option:{
+          options: ['正高级','高级','中级','初级','无'],
+          text:true,
+          defaultValue: '无',
+           required: true,
+        }
+      },
+      project:{
+        label:"所在项目部名称(可简写)",
+        control:"input",
+        option:{
+          maxlen:40
+        }
+      
+      },
+      report: {
+        control: "docx",
+        label: "述职报告",
+        option: {
+          single: true,
+          required:true
+        }
+      },
+        hire_date:{
+          label:"入职时间",
+          control:'time',
+          option:{
+            required:true,
+            type:'date'
+          }
+        },
+      cerificate:{
+        label:"岗位证书",
+        control:"select",
+        option:{
+          options: ['国家注册监理', '其他注册类', '监理工程师', '监理员','其他'],
+          defaultValue:'其他',
+          text:true,
+          required:true
+        }
+      },
+      education:{
+        label:"学历",
+        control:"select",
+        option:{
+          options: ['硕士','本科(全日制)','本科(非全日制)','专科','中专','其他'],
+          defaultValue:'本科(全日制)',
+            text: true,
+              required: true
+        }
+      },
     ...CreateENDef('n1'),
     ...CreateENDef('n2', ['n1']),
     ...CreateENDef('n31', ['n1']),

@@ -1,8 +1,9 @@
 var LocalServer = 'http://192.168.14.40:6001'
-//LocalServer = 'http://localhost:6001'
+LocalServer = 'http://localhost:6001'
 const ProductServer = 'https://api.hstigger.com'
 module.exports = {
-  Servers:[{
+  Servers:[
+    {
       Name:"CORE",
       Connection: {
         baseURL: process.env.NODE_ENV == 'production' ? ProductServer : LocalServer,
@@ -51,7 +52,8 @@ module.exports = {
         RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
 
       }
-    }, {
+    },
+     {
       Name: "ADMIN",
       Connection: {
        baseURL: (process.env.NODE_ENV == 'production' ? ProductServer : LocalServer) + '/admin',
@@ -163,8 +165,6 @@ module.exports = {
         DEL_USERS: "POST /users/delete",
         ADD_USER_CONCERNED_PROJECT: "",
 
-
-
         // PROJECT
         GET_PROJECTS: "GET /projects",
         GET_PROJECT: "GET /projects/:id",
@@ -186,6 +186,12 @@ module.exports = {
         CREATE_FLOW: "POST /flows",
         UPDATE_FLOW: "PATCH /flows/:id",
         DEL_FLOW: "DELETE /flows/:id",
+
+        // WORKFLOWS - instance
+        GET_WORKFLOWS: "GET /workflows",
+        POST_WORKFLOW: "POST /workflows",
+        PATCH_WORKFLOW: "PATCH /workflows/:id",
+        DEL_WORKFLOW: "DELTE /workflows/:id",
 
         // 
         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",

@@ -58,7 +58,7 @@
           <!-- <BaseFlow :key="current" /> -->
           <template v-if='flowDef && flowDef.nodes'>
            
-          <hs-flow :flow='flowDef' />
+          <hs-flow :loading='loading' :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' />
           </template>
         </Modal>
       </div>
@@ -70,9 +70,11 @@ import flow from '../../flows/29fe3900-3504-11eb-a58f-19892a782200.js'
 export default {
   data(){
     return {
+      loading:false,
       modalCustom:false,
       flowDef:{},
       modalFlow:false,
+      history:[],
       current:null
     }
   },
@@ -135,6 +137,7 @@ export default {
       this.current = id
       try{
         this.flowDef = this.FormatFlow(flow)
+        this.Install(id,this.flowDef)
         this.modalFlow = true
       }catch(e){
         this.Error(e)
@@ -147,6 +150,41 @@ export default {
     },
     SaveCustomSetting(){
        this.modalCustom = false
+    },
+    Install(id,def){
+      this.ADMIN.UPDATE_FLOW({define:def},{param:{id}})
+    },
+    Patch(e){
+      this.loading = true
+      
+      if(!e.id){
+        e.flow_id = this.flowDef.id
+        e.desc = e.data.name +'-2020年终考核'
+        this.ENT.POST_WORKFLOW(e).then(res=>{
+        console.log(res)
+        this.Success("提交完成")
+      }).catch(e=>{
+        this.Error(e)  
+      }).finally(e=>{
+        this.loading = false
+      })
+      }else{
+        this.ENT.PATCH_WORKFLOW(e,{param:{id:e.id}}).then(res=>{
+        console.log(res)
+        this.Success("提交完成")
+      }).catch(e=>{
+        this.Error(e)  
+      }).finally(e=>{
+        this.loading = false
+      })
+      }
+      
+    },
+    Recall(e){
+
+    },
+    Save(e){
+
     }
   }
 }
