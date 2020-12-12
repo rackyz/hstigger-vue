@@ -71,7 +71,8 @@
 			/>
 		</div>
 
-	
+		
+		<BaseFlow :id='selected' v-model="showInstance" />
     <!-- modal for create/edit user data -->
 		<hs-modal-form
 			ref="form"
@@ -88,16 +89,21 @@
 		/>
   
 	</div>
+
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 const DEFAULT_ENT_AVATAR = "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/company.png"
+import FLOW_DEF_RAW from '@/flows/29fe3900-3504-11eb-a58f-19892a782200.js'
+let local_local_def = {}
+local_local_def['4f477a00-3c1b-11eb-8b81-b551b8fbb24d'] = FLOW_DEF_RAW
 export default {
 	data() {
 		return {
 			selected: null,
 			loading: false,
+			showInstance:false,
 			importData: [],
 			searchText: null,
 				tools: [
@@ -122,7 +128,16 @@ export default {
 					name: "授权",
 					icon: "md-key",
 				},
-			
+				{
+					key:"install",
+					name:"安装",
+					custom:'upload'
+				},
+				{
+					key:"instantiate",
+					name:"创建实例",
+					custom:'download'
+				},
 			
 				{
 					key: "refresh",
@@ -359,9 +374,44 @@ export default {
 				this.lock(this.selected)
 			}else if(e == 'unlock'){
 				this.unlock(this.selected)
+			}else if(e=='instantiate'){
+				this.showInstance = true
+				
+			}else if(e=='install'){
+				this.install(e)
 			}
 		},
+		instantiate(){
+			this.showInstance = true
+		},
+		FormatFlow (f) {
+      return {
+        info:{
+          id:f.id,
+          name:f.name,
+          desc:f.desc
+        },
+        nodes:Object.keys(f.nodes).map(v=>({key:v,...f.nodes[v]})),
+        def: f.def,
+        actions:Object.keys(f.actions).map(v => ({
+        key: v,
+        ...f.actions[v]
+      })),
+      option:f.option
 
+      }
+    
+    },
+		install(e){
+		
+			let def = local_local_def[this.selected]
+				console.log(def)
+			this.ADMIN.UPDATE_FLOW({define:this.FormatFlow(def)},{param:{id:e}}).then(res=>{
+				this.Success('安装成功')
+			}).catch(e=>{
+				this.Error(e)
+			})
+		},
 		del(id){
 			let item = this.items.find(v=>v.id == id)
 			if(!item)	

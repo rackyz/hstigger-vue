@@ -45,6 +45,7 @@ module.exports = {
         DEL_FILE: "DELETE /files/:id",
         DEL_FILES: "POST /files/delete",
 
+        GET_FLOW: "GET /flows/:id",
 
         // 
         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",

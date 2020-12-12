@@ -74,7 +74,7 @@
      
     </Card>
     
-    <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0'>
+    <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0' v-show='false'>
       <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'><Icon custom='gzicon gzi-config' size='15' style='margin-left:5px;'></Icon></a></span></div>
      <template v-for="(fi,i) in tasks">
        <div class='ti-item' :key='fi.id'>

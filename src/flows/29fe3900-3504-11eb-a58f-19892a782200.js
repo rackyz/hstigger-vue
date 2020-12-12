@@ -1,4 +1,14 @@
 // predefined result
+const STATES = {
+  ACTIVE:0,
+  SUBMIT:1,
+  REJECT:2,
+  RETRY:3,
+  ACCEPT:4,
+  PROCESS:5,
+  PROCESS_OK:6,
+  PROCESS_FAILED:7
+}
 var C1 = {
   key: "CommitLevel",
   label: "推荐等级",
@@ -284,7 +294,7 @@ var flow = {
         option:{
           required: true,
           editable: false,
-          defaultValue:"session",
+          defaultValueGetter:"session",
           defaultValueKey:"id"
         }
       },
@@ -384,9 +394,9 @@ var flow = {
       ${CreateENLayout('n1')}
       ${MAKE_CONDITION_LAYOUTS([QN0,QN1])}
       </div>{{db}}</div>`,
-      defaultValueGetter: "core/uid",
-      getters: "core/users",
-      editable: false
+      executor_default_getter: "core/uid",
+      executor_getters: "core/users",
+      executor_modifiable: false
     },
     n2: {
       name: "第一责任人打分 (项目部/部门)",
@@ -404,8 +414,7 @@ var flow = {
       <div style='margin-top:10px'>{{report}}</div>
       ${CreateENLayout('n1')}
       ${MAKE_CONDITION_LAYOUTS([QN0,QN1])}`,
-      executor: "{PROJECT_MANAGER}",
-      getters: "core/users",
+      executor_getters: "core/users",
     },
     n3: {
       name: "平行责任人打分 (最多3名)",
@@ -439,12 +448,11 @@ var flow = {
      <h2 style='text-align:center;font-family:仿宋;font-size:20px;font-weight:bold;'>员工自评表</h2> 
      ${CreateENLayout('n1')}
       ${MAKE_CONDITION_LAYOUTS([QN0,QN1])}`,
-      executor: "",
-      exe_mul: true,
-      exe_optional: true,
-      getters: "core/users",
-      exe_op: "jointly",
-      exe_max: 3
+      in_type: 1,
+      optional: true,
+      executor_multiple:true,
+      executor_getters: "core/users",
+      executor_max: 3
     },
     n4: {
       name: "事业部打分(第二责任人)",
@@ -482,11 +490,11 @@ var flow = {
       ${CreateENLayout('n1')}
       ${MAKE_CONDITION_LAYOUTS([QN0,QN1])}`,
       exe_mul: true,
-      editable: false,
-      getters: "core/users",
+      executor_modifiable: false,
+      executor_getters: "core/users",
       exe_op: "or",
-      defaultValueGetterKey: 'dep',
-      defaultValueGetter: 'core/_get_flow_dep_manager'
+      executor_default_getter_key: 'dep',
+      executor_default_getter: 'core/_get_flow_dep_manager'
     },
     n5: {
       name: "结果汇总 (行政)",
@@ -523,8 +531,8 @@ var flow = {
       ${MAKE_CONDITION_LAYOUTS([QN0,QN1])}
       `,
       defaultValue: "ed49bf83-3b83-11eb-8e1e-c15d5c7db744",
-      editable: false,
-      getters: "core/users",
+      executor_modifiable: false,
+      executor_getters: "core/users",
     }
   },
   actions: {
@@ -532,56 +540,59 @@ var flow = {
       name: "发送",
       from: "n1",
       to: "n2",
-      type: "submit"
+      type: STATES.SUBMIT
     },
     a2: {
       name: "发送",
       from: "n1",
       to: "n3",
-      type: "submit"
+      type: STATES.SUBMIT,
+       with: "a1"
     },
     a3: {
       name: "退回",
       from: "n2",
       to: "n1",
-      type: "reject"
+      type: STATES.REJECT
     },
     a4: {
       name: "发送",
       from: "n2",
       to: "n4",
-      type: "submit"
+      type: STATES.SUBMIT,
+     
     },
     a5: {
       name: "提交",
       from: "n3",
 
-      type: "submit"
+      type: STATES.SUBMIT
     },
     a6: {
       name: "退回",
       from: "n4",
       to: "n2",
-      type: "reject"
+      type: STATES.REJECT
     },
     a7: {
       name: "发送",
       from: "n4",
       to: "n5",
-      type: "submit"
+      type: STATES.SUBMIT
     },
     a8: {
       name: "接收",
       from: "n5",
       to: "finished",
-      type: "accept"
+      type: STATES.ACCEPT
     },
     a9: {
       name: "退回",
       from: "n5",
       to: "n4",
-      type: "reject"
+      type: STATES.REJECT
     }
+  
   },
 }
 

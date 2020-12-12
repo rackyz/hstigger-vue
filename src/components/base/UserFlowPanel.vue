@@ -53,20 +53,12 @@
            </div>
         </Modal>
 
-        <Modal v-model='modalFlow' footer-hide fullscreen >
-        <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(current ? ('/ '+get_flow(current).name):'')}}</div>
-          <!-- <BaseFlow :key="current" /> -->
-          <template v-if='flowDef && flowDef.nodes'>
-           
-          <hs-flow :loading='loading' :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' />
-          </template>
-        </Modal>
+        <BaseFlow :id='current' v-model="modalFlow" />
       </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import flow from '../../flows/29fe3900-3504-11eb-a58f-19892a782200.js'
 export default {
   data(){
     return {
@@ -104,45 +96,20 @@ export default {
 
   },
   methods:{
-     FormatFlow (f) {
-      let o = {}
-      o.info = {
-        id:f.id,
-        name:f.name,
-        desc:f.desc
-      },
-      o.nodes = Object.keys(f.nodes).map(v=>({key:v,...f.nodes[v]}))
-      o.def = f.def
-      o.actions = Object.keys(f.actions).map(v => ({
-        key: v,
-        ...f.actions[v]
-      }))
-      o.option = f.option
-
-      return o
     
-    },
-    get_flow(e){
-      return this.flows.find(v=>v.id == e)
-    },
+   
     AddFlowToCustom(){
       
     },
     ClearFlow(){
 
     },
+     get_flow(e){
+      return this.flows.find(v=>v.id == e)
+    },
     OpenFlowCreateModal(id){
-      if(!id)
-        return
       this.current = id
-      try{
-        this.flowDef = this.FormatFlow(flow)
-        this.Install(id,this.flowDef)
-        this.modalFlow = true
-      }catch(e){
-        this.Error(e)
-      }
-     
+      this.modalFlow = true
     },
     
     OpenCustomSettingPanel(){
@@ -150,42 +117,8 @@ export default {
     },
     SaveCustomSetting(){
        this.modalCustom = false
-    },
-    Install(id,def){
-      this.ADMIN.UPDATE_FLOW({define:def},{param:{id}})
-    },
-    Patch(e){
-      this.loading = true
-      
-      if(!e.id){
-        e.flow_id = this.flowDef.id
-        e.desc = e.data.name +'-2020年终考核'
-        this.ENT.POST_WORKFLOW(e).then(res=>{
-        console.log(res)
-        this.Success("提交完成")
-      }).catch(e=>{
-        this.Error(e)  
-      }).finally(e=>{
-        this.loading = false
-      })
-      }else{
-        this.ENT.PATCH_WORKFLOW(e,{param:{id:e.id}}).then(res=>{
-        console.log(res)
-        this.Success("提交完成")
-      }).catch(e=>{
-        this.Error(e)  
-      }).finally(e=>{
-        this.loading = false
-      })
-      }
-      
-    },
-    Recall(e){
-
-    },
-    Save(e){
-
     }
+    
   }
 }
 </script>
