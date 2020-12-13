@@ -26,6 +26,8 @@ Vue.prototype.$Notice.config({
     top:50,
     duration:3
 })
+
+Vue.prototype.$bus = new Vue()
 // Predefined Some Easy Prompt Methods based on iview
 Vue.prototype.Confirm = function (content, cb) {
     this.$Modal.confirm({

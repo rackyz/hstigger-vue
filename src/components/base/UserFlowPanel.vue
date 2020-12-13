@@ -5,7 +5,7 @@
 </style>
 <template>
   <div class='l-list'>
-        <template v-for='f in flows'>
+        <template v-for='f in userFlowItems'>
           <div class='action-button' @click='OpenFlowCreateModal(f.id)' :key='f.id'>
             <Icon :custom='`gzicon gzi-${f.icon}`' color='#45556E' size='32' />
             <div class='ab-title'>{{f.name}}</div>
@@ -71,13 +71,13 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['flows','user_flows','getTypes']),
+    ...mapGetters('core',['flows','my_flows','getTypes']),
     userFlowItems(){
-      return this.flows.filter(v=>this.user_flows.includes(v.id))
+      return this.flows.filter(v=>this.my_flows.includes(v.id))
     },
     user_flows_slots(){
       let slots = new Array(14)
-      this.user_flows.forEach((v,i)=>{
+      this.my_flows.forEach((v,i)=>{
         slots[i] = v
       })
       return slots

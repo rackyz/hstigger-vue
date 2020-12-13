@@ -94,7 +94,7 @@ import API from '@/plugins/axios'
              formdata.append('file', files[i])
              fileObjects[i].source = CancelToken.source()
 
-
+            console.log('start cos uploading...')
              return API.COS.post('', formdata, {
                'content-type': 'multipart/form-data',
                headers: {
@@ -123,6 +123,8 @@ import API from '@/plugins/axios'
                    source: undefined
                  }
                })
+               resolve(resFiles[i])
+              
              }).catch(e => {
                if (e && e.message == "取消上传") {
                  commit('cancelUploading', a[i])
@@ -136,7 +138,7 @@ import API from '@/plugins/axios'
            })).then(res => {
            // all file uploaded successfully
            commit('append', fileObjects)
-           resolve('ok')
+           resolve(resFiles)
          })
        }).catch((err) => {
          if (typeof err == 'object') {
@@ -159,7 +161,19 @@ import API from '@/plugins/axios'
        })
      })
 
-   }
+   },
+   DeleteFiles({commit},id_list){
+     return new Promise((resolve,reject)=>{
+      API.CORE.DEL_FILES(id_list).then(res=>{
+        let results = res.data.data || []
+        console.log(results)
+      
+        commit('LocalDeleteFiles',id_list)
+        resolve(id_list)
+      }).catch(reject)
+      
+   })
+  }
  }
 
  const mutations = {
@@ -189,6 +203,11 @@ import API from '@/plugins/axios'
 
    cancelUploading(state, file) {
      state.uploadingList = []
+   },
+   LocalDeleteFiles(state,id_list){
+     let files = state.list
+     files = files.filter(f=>!id_list.includes(f.id))
+     state.list = files
    }
  }
 

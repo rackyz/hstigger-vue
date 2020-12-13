@@ -28,6 +28,9 @@ const getters = {
   uid(state){
     return state.session.user_id
   },  
+  username(state){
+    return state.session.name
+  },
   my_enterprises(state){
     return state.my_enterprises
   },
@@ -80,7 +83,7 @@ const getters = {
   flows(state){
     return state.session.flows
   },
-  user_flows(state){
+  my_flows(state){
     return state.session.user_flows
   },
   deps(state){
@@ -161,9 +164,10 @@ const actions = {
       }).catch(reject)
     })
   },
-  whoami({commit}){
+  whoami({commit,dispatch}){
     let token = localStorage.getItem('hs-token')
     let enterprise_id = localStorage.getItem('current_enterprise')
+  
     commit('SetCurrentEnterprise',enterprise_id)
     return new Promise((resolve,reject)=>{
       if(!token)
@@ -180,9 +184,12 @@ const actions = {
         commit('save', session)
         commit('saveAcc',session.user_menus)
         console.log("SESSION:",session)
-        if (!enterprise_id || session.enterprises.find(v => v.id == enterprise_id) == null)
+        if (enterprise_id && !enterprise_id != self && session.enterprises.find(v => v.id == enterprise_id) == null)
           commit('ClearEnterprise')
-        
+        if(!enterprise_id && session.my_enterprises.length > 0){
+          commit('SetCurrentEnterprise',session.my_enterprises[0])
+          dispatch('whoami')
+        }
         resolve(session)
       }).catch(reject)
     })
@@ -201,9 +208,6 @@ const actions = {
     password = md5.digest('hex')
     localStorage.removeItem('hs-token')
     API.CORE.Clear()
-    let enterprise_id = localStorage.getItem('current_enterprise')
-    if(enterprise_id)
-      commit('SetCurrentEnterprise',enterprise_id)
     return new Promise((resolve, reject) => {
        API.CORE.LOGIN({
              account:user,
@@ -334,7 +338,7 @@ const mutations = {
       rss.push(key)
   },
   SetCurrentEnterprise(state, ent_id) {
-    if(ent_id){
+    if(ent_id && ent_id != 'self'){
       console.log("Set Enterprise")
       API.CORE.SetEnterprise(ent_id)
       API.ENT.SetEnterprise(ent_id)
@@ -349,7 +353,6 @@ const mutations = {
    
   },
   ClearEnterprise(state){
-    console.log("Clear Enterprise")
     API.CORE.ClearEnterprise()
     API.ENT.ClearEnterprise()
     API.ENT_ADMIN.ClearEnterprise()

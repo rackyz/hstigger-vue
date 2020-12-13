@@ -13,7 +13,7 @@
          
     </Card>
      <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
-         <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'><Icon custom='gzicon gzi-config' size='15' style='margin-left:5px;'></Icon></a></span></div>
+         <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'></a></span></div>
         <BaseProjectList />
         
     </Card>
@@ -40,11 +40,11 @@
           </template>
         </Row>
        </template>
-       <template v-else>
-         <div class='full-container flex-wrap' style='height:300px;width:100%;'>
-           点击添加<a href='#' @click='modalRSS=true'>信息源</a>
-         </div>
-       </template>
+       <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
+          <div class='card-title'><Icon custom='gzicon gzi-message' size='15' /> 信息源 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'></a></span></div><BaseEmpty><div class='full-container flex-wrap' style='height:300px;width:100%;justify-content:center;'>
+           点击管理<a href='#' @click='modalRSS=true'>信息源</a>
+         </div></BaseEmpty></Card>
+         
    
    
   
@@ -53,9 +53,37 @@
     </Col></Col>
     <Col :span='6'>
      <Card class="panel" style="width:100%;border:none;" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right'>MORE</span></div>
+     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
+     <template v-if="flowInstances.length == 0">
+       <BaseEmpty :msg="空" />
+     </template>
      <template v-for="(fi,i) in flowInstances">
-       <div class='fi-item' :key='fi.id'>
+       <div class='fi-item' :key='fi.id' @click='OpenWorkflow(fi)'>
+         <Icon :custom='`gzicon gzi-${fi.icon}`' size='25' />
+         <div class='fi-info'>
+           <div class='fi-flowinfo'>
+             [{{fi.name}}]{{fi.node_name}}
+           </div>
+           <div class='fi-desc'>  
+             {{fi.desc}}
+           </div>
+         </div>
+         <div class='fi-date'>
+           <div class='fi-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
+           <div class='fi-executor'>{{fi.executor}}</div>
+         </div>
+       </div>
+     </template>
+     
+    </Card>
+
+     <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0'>
+     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 与我相关 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
+     <template v-if="flowPassed.length == 0">
+       <BaseEmpty :msg="空" />
+     </template>
+     <template v-for="(fi,i) in flowPassed">
+       <div class='fi-item' :key='fi.id' @click='OpenWorkflow(fi)'>
          <Icon :custom='`gzicon gzi-${fi.icon}`' size='25' />
          <div class='fi-info'>
            <div class='fi-flowinfo'>
@@ -97,7 +125,7 @@
     </Col>
   </Row>
    
-   
+    <BaseFlow :id='current_flow.flow_id' :inst_id="current_flow.id" v-model="showFlow" />
     <!-- <div class="panel" style="  width:calc(8.3333% * 7 - 2px);height:calc(110px * 6 - 20px);left:calc(8.3333% * 2 );top:2px;background:rgba(200,200,200,0.7);filter:drop-shadow(1px 1px 2px #333) brightness(1.1);padding:20px;">
       日历
     </div>
@@ -125,56 +153,10 @@ export default {
       modalRSS:false,
       isConfiguring:false,
       //examples
-      flowInstances:[{
-        id:1,
-        name:'年终总结',
-        nodeName:'员工提交',
-        executor:'马骍 (我)',
-         date:'2020/12/31 12:00:00',
-        icon:'gongzuobaogao',
-        desc:'请完成您的年终总结'
-
-      },{
-        id:2,
-        name:'项目计划审核',
-        nodeName:'主管部门审核',
-        executor:'超级管理员',
-        icon:'gongzuobaogao',
-        date:'2020/11/2 12:00:00',
-        desc:'钟公庙中学'
-        
-      },{
-        id:3,
-        name:'项目计划审核',
-        nodeName:'主管部门审核',
-        executor:'超级管理员',
-        deadline:'2020/11/4 12:00:00',
-        icon:'gongzuobaogao',
-        desc:'新星商业1#地块'
-        
-      },],
-      tasks:[{
-        id:12,
-        type:'year',
-        iconText:'年',
-        root:'项目签约计划',
-        desc:'[奉化中学] 桩基阶段',
-        deadline:'2020/11/5'
-      },{
-        id:13,
-        type:'month',
-        iconText:'月',
-        root:'项目收款计划',
-        desc:'[奉化中学] 桩基完成后15日内收款 32.3万(10%)',
-        deadline:'2020/11/5'
-      },{
-        id:16,
-        type:'day',
-        iconText:'日',
-        root:'个人计划',
-        desc:'联系客户解决水管排水的问题',
-        deadline:'2020/11/5'
-      }]
+      flowInstances:[],
+      flowPassed:[],
+      showFlow:false,
+      current_flow:{}
     }
   },
   computed:{
@@ -184,6 +166,19 @@ export default {
   },
   metaInfo:{
     title:'工作台'
+  },
+  created(){
+     this.$bus.$on('switchent',()=>{
+    
+      this.flowInstances =[]
+      this.flowPassed =[]
+      this.getWorkflows()
+    })
+    
+  },
+  mounted(){
+    this.getWorkflows()
+   
   },
   methods:{
     ...mapMutations('core',['toggleRss']),
@@ -203,6 +198,22 @@ export default {
     handleToggleRss(rss_key){
       this.toggleRss(rss_key)
     },
+    getWorkflows(){
+      if(this.session.current_enterprise != 'self'){
+        this.ENT.LIST_WORKFLOW().then(res=>{
+          this.flowInstances = res.data.data
+        })
+
+        this.ENT.LIST_WORKFLOW_PASSED().then(res=>{
+          this.flowPassed = res.data.data
+        })
+      }
+      
+    },
+    OpenWorkflow(fi){
+      this.current_flow = fi
+      this.showFlow = true
+    }
      
   }
 }
@@ -295,6 +306,7 @@ export default {
   filter:brightness(1.2);
   transition:all 0.5s;
   cursor: pointer;
+  background:rgb(233, 236, 185);
 }
 
 .ti-item{

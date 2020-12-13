@@ -175,6 +175,7 @@ export default {
       this.loading = true
       this.$store.dispatch('core/SetCurrentEnterprise',e).then(res=>{
         this.getSession(e)
+        this.$bus.$emit('switch-ent')
       }).finally(e=>{
         setTimeout(()=>{this.loading=false},
       1000)})

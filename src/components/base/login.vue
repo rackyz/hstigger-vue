@@ -7,14 +7,17 @@
         padding:10px;
     }
     
+    .l-form .gz-disabled-item:hover{
+  background:none !important;
+}
 }
 
 
 </style>
 <template>
-    <div class="l-login">
+    <div class="l-login" :style='setting.MAINTAIN?"filter:grayscale(1);":""'>
         <!-- LAYOUT BEGIN -->
-        <hs-login :loading="loading" @submit="prepareSubmitForm" />
+        <hs-login :loading="loading" @submit="prepareSubmitForm" :disabled="setting.MAINTAIN" />
         <div class='flex-wrap flex-between' style='width:100%;font-size:16px;margin-top:5px;overflow:hidden;'>
             <div class="forget-btn" @click='isForgetting=true;'>忘记账号或者密码?</div>
             <div class="forget-btn" @click='isRegistering=true' v-show='setting.ENABLE_REGISTER'>注册账号</div>
@@ -22,17 +25,19 @@
       
         <BaseOAuthLogin v-if='setting.ENABLE_OAUTH_LOGIN' />
         <div class='states-wrap' :style='`background:${server_down?"darkred":"yellowgreen"}`'>
+            
         </div>
+        <span style='color:yellowgreen;position:relative;top:-122px;z-index:2000;' v-show="setting.MAINTAIN">{{setting.MESSAGE || "系统维护中..."}}</span>
         <!-- LAYOUT END -->
 
         <!-- FORGET MODAL FORM -->
-        <hs-modal-form class-name='login-modal' title="密码找回" width='500'  v-model='isForgetting' :form="ForgetForm" :initData="forgetFormData" :env='forgetFormEnv' @on-submit='OnSubmitForget' @cancel='isForgetting=false' @event='onForgetFormEvent' editable></hs-modal-form>
+        <hs-modal-form v-if="!setting.MAINTAIN" class-name='login-modal' title="密码找回" width='500'  v-model='isForgetting' :form="ForgetForm" :initData="forgetFormData" :env='forgetFormEnv' @on-submit='OnSubmitForget' @cancel='isForgetting=false' @event='onForgetFormEvent' editable></hs-modal-form>
           
         <!-- RESET MODAL FORM -->
-        <hs-modal-form ref='change_pwd_form' class-name='login-modal' title="输入新密码" width='500'  v-model='isChangePwd' :form="ResetForm" :data="changePwdFormData"  @on-submit='onSubmitChangingPwd' @cancel='isChangePwd=false'  editable></hs-modal-form>
+        <hs-modal-form v-if="!setting.MAINTAIN" ref='change_pwd_form' class-name='login-modal' title="输入新密码" width='500'  v-model='isChangePwd' :form="ResetForm" :data="changePwdFormData"  @on-submit='onSubmitChangingPwd' @cancel='isChangePwd=false'  editable></hs-modal-form>
 
         <!-- REGISTER MODAL FORM -->
-        <hs-modal-form class-name='login-modal' title="新用户注册" width='420'  v-model='isRegistering' :form="RegForm" :data="registerFormData"  @on-submit='OnSubmitRegister' @cancel='isRegistering=false'  editable></hs-modal-form>
+        <hs-modal-form v-if="!setting.MAINTAIN" class-name='login-modal' title="新用户注册" width='420'  v-model='isRegistering' :form="RegForm" :data="registerFormData"  @on-submit='OnSubmitRegister' @cancel='isRegistering=false'  editable></hs-modal-form>
 
         <!-- SAFEMODE PuzzleVerification MODAL -->
         <PuzzleVerification
@@ -114,6 +119,7 @@ export default {
                 this.server_down = false
                 if(this.InternalChecker)
                     clearInterval(this.InternalChecker)
+                this.$forceUpdate()
             }).catch(e=>{
                 this.Error('服务器连接失败,请检查网络')
                 if(!this.InternalChecker)
@@ -135,7 +141,7 @@ export default {
                 var that = this
                 this.currentAccount = e.data
                 this.CORE.SEND_VERIFY_CODE({account:e.data}).then(res=>{
-                    this.$set(that.forgetFormEnv,'cooldown',15)
+                    this.$set(that.forgetFormEnv,'cooldown',60)
                     if(!that.IntervalCoolDown)
                         that.IntervalCoolDown = setInterval(()=>{
                            this.$set(that.forgetFormEnv,'cooldown',that.forgetFormEnv.cooldown-1)

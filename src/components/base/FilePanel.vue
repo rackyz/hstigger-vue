@@ -32,7 +32,7 @@
                </div>
             </div>
           </template>
-         
+          <BaseEmpty v-if='files.length == 0' />
         </div>
     <Card dis-hover style="margin-top:10px;" padding="0" v-if="uploadingFiles.length != 0">
         上传中...<br />
@@ -99,7 +99,7 @@ export default {
     },
     Delete(f){
       this.Confirm(`确定删除文件'${f.name}'`,()=>{
-        this.$store.dispatch('DeleteFiles',[f.id])
+        this.$store.dispatch('file/DeleteFiles',[f.id])
       })
     },
     PreDownload(file_id){

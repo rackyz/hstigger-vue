@@ -134,6 +134,7 @@ config.Servers.forEach((server,i)=>{
 var COS = axios.create({
   baseURL: config.cosServer
 })
+COS.baseURL = config.cosServer
 
 Clients.COS = COS
 

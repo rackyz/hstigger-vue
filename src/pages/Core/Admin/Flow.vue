@@ -378,7 +378,7 @@ export default {
 				this.showInstance = true
 				
 			}else if(e=='install'){
-				this.install(e)
+				this.install(this.selected)
 			}
 		},
 		instantiate(){

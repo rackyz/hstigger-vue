@@ -2,7 +2,7 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const path = require('path')
 const config = require('./src/config')
-// const QCloudCosPlugin = require('webpack-cos-plugin');
+const QCloudCosPlugin = require('webpack-cos-plugin');
 const clean = new CleanWebpackPlugin()
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -68,24 +68,24 @@ const Chained = config=>{
      "axios": "axios"
    })
 
-    //  config.plugin('qcloud-cos')
-    //    .use(QCloudCosPlugin, [{
-    //      auth: {
-    //        region: 'ap-shanghai',
-    //        SecretId: 'AKID673paDhy3FlL4nGhrt3Xt7EAxZLxnvAD',
-    //        SecretKey: '2ta8XqzwoY1MWVgkeMyQhmrqfkfPyMya',
-    //        // Bucket 名称
-    //        fileBucket: 'nbgz-pmis',
-    //      },
-    //      bucket: {
-    //        Bucket: 'cloud-1257839135',
-    //        Region: 'ap-shanghai'
-    //      },
-    //      cosBaseDir: '',
-    //      project: '',
-    //      useVersion: true,
-    //      existCheck: false
-    //    }])
+     config.plugin('qcloud-cos')
+       .use(QCloudCosPlugin, [{
+         auth: {
+           region: 'ap-shanghai',
+           SecretId: 'AKID673paDhy3FlL4nGhrt3Xt7EAxZLxnvAD',
+           SecretKey: '2ta8XqzwoY1MWVgkeMyQhmrqfkfPyMya',
+           // Bucket 名称
+           fileBucket: 'nbgz-pmis',
+         },
+         bucket: {
+           Bucket: 'cloud-1257839135',
+           Region: 'ap-shanghai'
+         },
+         cosBaseDir: '',
+         project: '',
+         useVersion: true,
+         existCheck: false
+       }])
      
 
 
@@ -109,6 +109,7 @@ const Chained = config=>{
 
 
 module.exports = {
+ publicPath:'https://cloud-1257839135.cos.ap-shanghai.myqcloud.com/hstigger-vue/0.1.0/',
   outputDir:"./dist",
   chainWebpack: Chained
 }
