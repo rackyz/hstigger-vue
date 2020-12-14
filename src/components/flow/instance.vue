@@ -1,15 +1,39 @@
 
+<style lang="less">
+.glass-thread{
+  .gz-tool:first-child{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  .gz-tool:last-child{
+     border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .gz-tool-checked{
+    cursor: inherit;
+  }
+}
+</style>
 <template>
   <div
     class="hs-contaner-full"
     style='padding:0;position:relative;height:100%;padding-right:10px;'
   >
-  {{canEdit}}
-    <div class='view-wrapper' v-if="canView">
+    <template v-if="loading">
+         <div class='view-wrapper' v-if='loading' style='display:flex;justify-content:center;flex-direction:column;font-size:30px;color:#aaa;'>
+       
+      加载中... 请稍后...
+    </div>
+    </template>
+    <template v-else>
+        <div class='view-wrapper' v-if='canView'>
+        <transition name='fade'>
       <div
         class='view'
         ref='view'
-        v-if="currentNodeObject && currentNodeObject.view"
+        v-if="currentNodeObject && currentNodeObject.view && canView"
       >
         <div class='paper-view'>
 
@@ -19,10 +43,12 @@
           />
         </div>
       </div>
+       </transition>
+        <transition name='fade'>
       <div
         class='view'
         ref='view2'
-        v-if='currentNodeObject && currentNodeObject.layout && canEdit'
+        v-if='currentNodeObject && currentNodeObject.layout && canEdit && canView'
       >
         <div class='paper-view'>
 
@@ -36,7 +62,9 @@
           />
         </div>
       </div>
+      </transition>
     </div>
+   
     <div class='view-wrapper' v-else style='display:flex;justify-content:center;flex-direction:column;'>
        <div style='padding:10px;width:800px;height:500px;position:relative;'>
         <hs-dagre
@@ -48,27 +76,30 @@
       </div>
       您无权查看此阶段数据
     </div>
-    <div class='view-wrapper' v-if='!currentNode || !currentNodeObject' style='display:flex;justify-content:center;flex-direction:column;font-size:30px;color:#aaa;'>
+    <div class='view-wrapper' v-if='currentNode == undefined || !currentNodeObject' style='display:flex;justify-content:center;flex-direction:column;font-size:30px;color:#aaa;'>
        
       请选择对应操作节点
     </div>
+    
     <div class='glass-panel-wrapper'>
       
      
-      <div class='glass-panel'>
+      <div class='glass-panel' style='height:70px;'>
         <hs-toolbar
+        style='max-height:70px;'
           :data="tools"
           :disabled="toolDisabled"
           @event="onToolEvent"
         />
       </div>
       <div
-        class='glass-panel'
-        style='margin-left:10px;width:auto;'
+        class='glass-panel glass-thread'
+        style='margin-left:10px;width:auto;height:70px;padding:0 5px;'
         v-if="threads.length > 0 "
       >
         <hs-toolbar
-          :data="threads"
+        
+          :data="threads_tools"
           :checked="checked"
           @event="onChangeThread"
           :option="{getters:option.executor_getters}"
@@ -91,7 +122,7 @@
         :class="canRecall?'':'g-button-disabled'"
         @click="Save()"
       >
-        草稿<span style='color:#aaa;font-size:14px;color:#fff;'>暂存</span>
+        暂存<span style='color:#aaa;font-size:12px;color:#fff;position:relative;top:-3px;'>本地</span>
       </div>
       <template v-for='a in actions'>
         <div
@@ -108,6 +139,8 @@
       </template>
 
     </div>
+    </template>
+        
     
     <Modal
       v-model="showInfo"
@@ -312,6 +345,9 @@ export default {
       type: Object,
       default: () => { }
     },
+    loading:{
+      type:Boolean
+    },
     history: {
       type: Object,
       default: () => []
@@ -325,19 +361,38 @@ export default {
     }
   },
   mounted() {
-   this.Compile()
-   let option = this.option || {}
-   this.flow.def.executors = {
-          control: 'node',
-          label: '流程配置',
-          option: {
-            nodes: this.flow.nodes,
-            getters: option.executor_getters,
-            idKey: option.exe_idKey || 'id',
-            labelKey: option.exe_labelKey || 'name'
-          }
-        }
-  console.log("HISTORY:",this.history)
+     let option = this.option || {}
+            this.flow.def.executors = {
+                    control: 'node',
+                    label: '流程配置',
+                    option: {
+                      nodes: this.flow.nodes,
+                      getters: option.executor_getters,
+                      idKey: option.exe_idKey || 'id',
+                      labelKey: option.exe_labelKey || 'name'
+                    }
+                  }
+
+    if(!this.inst_id){
+      let draft = localStorage.getItem('draft_flow_'+this.flow.id)
+      if(draft){
+        this.Confirm("您有一篇保存本地的草稿，是否继续编辑?",()=>{
+          this.formData = JSON.parse(draft)
+  
+           this.Compile()
+           
+        },()=>{
+          localStorage.removeItem('draft_flow_'+this.flow.id)
+          this.Compile()
+        },{cancelText:"丢弃",okText:"打开"})
+      }else{
+         this.Compile()
+      }
+    }else{
+      this.Compile()
+    }
+
+  
   },
   watch: {
     initdata: {
@@ -370,6 +425,9 @@ export default {
           o[v.key] = true
       })
       return o
+    },
+    threads_tools(){
+      return this.threads.map(v=>({...v,state:v.stateText}))
     },
     currentNodeObject() {
       
@@ -436,22 +494,24 @@ export default {
       }
     },
     canView(){
-      
+     
       if (!this.currentNodeObject)
         return false
+       if(this.currentNodeObject.state == 0)
+        return true
       if(Array.isArray(this.currentNodeObject.executors) && this.currentNodeObject.executors.includes(this.user)) //and executor
         return true
       else{
         let prev = this.history.find(v=>v.id == this.currentNodeObject.from)
         console.log('prev:',prev)
-        if(prev && Array.isArray(prev.executors) && prev.executors.includes(this.user) || prev.op == this.user)
+        if(prev && Array.isArray(prev.executors) && prev.executors.includes(this.user) || (prev && prev.op == this.user))
           return true
       }
     },
     canEdit(){
       if (!this.currentNodeObject)
         return false
-      if(!this.currentNodeObject.executors)
+         if(this.currentNodeObject.state == 0)
         return true
        if (this.currentNodeObject && Array.isArray(this.currentNodeObject.executors) && this.currentNodeObject.executors.includes(this.user) && this.actions.filter(v=>this.ShowAction(v)).length > 0) //and executor
         return true
@@ -504,7 +564,8 @@ export default {
         key: v.id,
         node: v.node,
         type:"checked",
-        state:GetNodeType(v.state).name,
+        stateText:GetNodeType(v.state).name,
+        state:v.state,
         name: this.GetNode(v.node).name,
         color: "yellowgreen",
         uid: v.executors,
@@ -557,6 +618,7 @@ export default {
         let o = {
           id: 0,
           node: this.nodes[0].key,
+          executors:[this.user],
           state: NODE_STATES.initing
         }
         this.history.push(o)
@@ -567,12 +629,11 @@ export default {
       }
     },
     Compile() {
-      console.log("COMPILE..")
       this.$nextTick(() => {
         if(this.history.length == 0){
           this.currentNode = this.Init()
-          return
         }
+
         let node = this.currentNodeObject
         if (!node)
         {
@@ -590,7 +651,7 @@ export default {
         }
 
         seq.reverse()
-        let data = {}
+        let data = this.formData
         seq.forEach(v => {
           if(v.data)
             data = Object.assign(data, v.data)
@@ -608,7 +669,7 @@ export default {
           }
         this.formData = data
 
-       
+       this.currentNode = this.history[0].id
 
         if (this.$refs.view1)
           this.$refs.view1.scrollTop = 0
@@ -629,8 +690,8 @@ export default {
       return this.nodes.find(v => v.key == key)
     },
     Save() {
-      let model = this.$refs.form.formControl.model
-      this.$emit('save', model)
+      localStorage.setItem("draft_flow_"+this.flow.id,JSON.stringify(this.$refs.form.formControl.model))
+      this.Success("本地草稿保存成功")
     },
     Submit(a) {
      
@@ -772,7 +833,7 @@ export default {
   }
 
   .glass-tool-button {
-    height: 60px;
+    height: 70px;
     width: 100px;
     background: #ffffff77;
     border-radius: 5px;
@@ -848,4 +909,6 @@ export default {
   height: 160px;
   background: #000;
 }
+
+
 </style>

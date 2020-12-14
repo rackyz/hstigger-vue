@@ -29,11 +29,13 @@ Vue.prototype.$Notice.config({
 
 Vue.prototype.$bus = new Vue()
 // Predefined Some Easy Prompt Methods based on iview
-Vue.prototype.Confirm = function (content, cb) {
+Vue.prototype.Confirm = function (content, cb, cb2, option={}) {
     this.$Modal.confirm({
         title: '操作确认',
         content,
-        onOk: cb
+        onOk: cb,
+        onCancel: cb2,
+        ...option
     })
 }
 

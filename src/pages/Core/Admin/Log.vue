@@ -106,7 +106,7 @@ export default {
         },
         getData(){
             const LOG_REXP = /(.*)\.log-(.*)\.log/
-            this.CORE.GET_LOGS().then(res=>{
+            this.ADMIN.GET_LOGS().then(res=>{
               let list = res.data.data
              
                list.sort((a,b)=>a>b?1:-1)
@@ -149,7 +149,7 @@ export default {
         getLogData(node){
           this.selected = node
           if(node && node.id){
-              this.CORE.GET_LOG({param:{id:node.id}}).then(res=>{
+              this.ADMIN.GET_LOG({param:{id:node.id}}).then(res=>{
               this.log = {...this.list.find(v=>v.id == node.id),data:res.data.data}
             })
           }

@@ -7,16 +7,10 @@
    <Modal v-model='value' footer-hide fullscreen @on-visible-change='handleClose'>
     <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(id ? ('/ '+get_flow(id).name):'')}} - {{session.id}}</div>
       <!-- <BaseFlow :key="current" /> -->
-      <Spin fix v-if="loading">
-                <div class="loader">
-                    <svg class="circular" viewBox="25 25 50 50">
-                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"></circle>
-                    </svg>
-                </div>
-            </Spin>
+     
       <template v-if='!loading && flowDef && flowDef.nodes'>
         
-      <workflow  :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
+      <workflow v-if='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
       </template>
     </Modal>
 </template>
@@ -98,6 +92,7 @@ export default {
       return this.flows.find(v=>v.id == e)
     },
     handleClose(){
+      this.history = []
       this.$emit('input',this.value)
     },
     getInst(e){
