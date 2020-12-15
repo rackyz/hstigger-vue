@@ -107,6 +107,8 @@ config.Servers.forEach((server,i)=>{
     localStorage.removeItem('current_enterprise')
   }
 
+  client.buffer = {}
+
   Object.entries(server.API).forEach(([k,v]) => {
     client[k] = (data, config) => {
       let apiObject = getAPI(k, config)
@@ -120,9 +122,12 @@ config.Servers.forEach((server,i)=>{
         ...apiObject,
         data
       }
-
+      
       if(config && config.headers)
         requestObject.headers = config.headers
+      // return new Promise((resolve,reject)=>{
+      //   client_buffer[]
+      // })
       return axiosClient.request(requestObject)
     }
   })

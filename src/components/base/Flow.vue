@@ -8,10 +8,7 @@
     <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(id ? ('/ '+get_flow(id).name):'')}} - {{session.id}}</div>
       <!-- <BaseFlow :key="current" /> -->
      
-      <template v-if='!loading && flowDef && flowDef.nodes'>
-        
       <workflow v-if='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
-      </template>
     </Modal>
 </template>
 
@@ -102,7 +99,6 @@ export default {
       this.instId = e
       this.loading = true
       this.ENT.GET_WORKFLOW({param:{id:e}}).then(res=>{
-        console.log("history:",res.data.data)
         let {instance,history,data} = res.data.data
         history.forEach(v=>{
           v.node = v.key
@@ -140,8 +136,8 @@ export default {
       })
     },
     Patch(e){
-    //  this.loading = true
-      console.log('patching:',e)
+      this.loading = true
+      
       if(!this.instId){
         e.flow = {
 
@@ -158,7 +154,7 @@ export default {
           }).catch(e=>{
          //   this.Error(e)  
           }).finally(e=>{
-         //   this.loading = false
+            this.loading = false
           })
       }else{
         this.ENT.PATCH_WORKFLOW(e,{param:{id:this.instId}}).then(res=>{

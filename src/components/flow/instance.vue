@@ -22,10 +22,16 @@
     style='padding:0;position:relative;height:100%;padding-right:10px;'
   >
     <template v-if="loading">
-         <div class='view-wrapper' v-if='loading' style='display:flex;justify-content:center;flex-direction:column;font-size:30px;color:#aaa;'>
-       
-      加载中... 请稍后...
-    </div>
+        <div class='view-wrapper' style='display:flex;justify-content:center;flex-direction:column;font-size:30px;color:#aaa;flex-direciton:column;'>
+           <div style='margin:0px auto!important;margin-bottom:20px;width:200px;height:200px;border-radius:50%;overflow:hidden;color:#fff;'>
+        <img src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg' style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'  />
+        
+        </div>
+        
+          流程加载中... <br />
+          <span style='font-family:consolas'>loading</span>
+
+      </div>
     </template>
     <template v-else>
         <div class='view-wrapper' v-if='canView'>
@@ -39,7 +45,7 @@
 
           <hs-form
             :form='MakeView(flow.def,currentNodeObject)'
-            :data='formData'
+            :data='db'
           />
         </div>
       </div>
@@ -58,6 +64,7 @@
             :editable="canEdit"
             :data='formData'
             :env='option'
+           
             @submit="model=$event"
           />
         </div>
@@ -331,6 +338,9 @@ export default {
       model: {},
       formData: {},
       state: 1,
+      db:{
+
+      },
       initData: {
       },
     }
@@ -405,6 +415,8 @@ export default {
     },
     history: {
       handler(v, oldv) {
+         this.currentNode =null
+
         this.Compile()
       },
       immediate: true,
@@ -426,13 +438,16 @@ export default {
       })
       return o
     },
+    handleChange(e){
+      this.db = Object.assign(this.formData,e)
+    },
     threads_tools(){
       return this.threads.map(v=>({...v,state:v.stateText}))
     },
     currentNodeObject() {
       
       if(this.currentNode == undefined)
-        return null
+        this.currentNode = 0
       let hnode = this.history.find(v=>v.id == this.currentNode)
       if(!hnode)
         return null
@@ -669,7 +684,8 @@ export default {
           }
         this.formData = data
 
-       this.currentNode = this.history[0].id
+      if(!this.currentNode)
+        this.currentNode = this.threads[0].key
 
         if (this.$refs.view1)
           this.$refs.view1.scrollTop = 0
@@ -726,8 +742,7 @@ export default {
       } else {
         this.$emit('patch', { actions, node: this.currentNodeObject.id })
       }
-      this.currentNode =null
-
+     
       
 
 

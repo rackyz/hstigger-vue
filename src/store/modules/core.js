@@ -34,6 +34,9 @@ const getters = {
   my_enterprises(state){
     return state.my_enterprises
   },
+  projects(state){
+    return state.session.my_projects
+  },
   current_enterprise(state){
     return state.current_enterprise
   },
@@ -97,9 +100,6 @@ const getters = {
   },
   enterprises(state){
     return state.session.enterprises
-  },
-  projects(){
-    return state.projects
   },
   _get_flow_dep_manager:state=>dep_id=>{
     if(dep_id == 0)

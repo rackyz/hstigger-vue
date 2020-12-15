@@ -15,11 +15,11 @@ export default {
     }
   },
   mounted(){
-    this.$store.dispatch('project/getList')
+    
   },
   computed:{
-    ...mapGetters('project',{
-      'projects':'list'})
+    ...mapGetters('core',{
+      'projects':'projects'})
   }
 }
 </script>

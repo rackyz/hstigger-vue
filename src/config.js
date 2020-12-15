@@ -154,7 +154,7 @@ module.exports = {
       },
       API: {
         // core
-    
+        
         GET_ACCLERATES: "GET /users/self/menus",
         SAVE_ACCELERATES: "POST /users/self/menus",
         GET_ACTIONS: "GET /users/self/action-menus",
@@ -203,7 +203,9 @@ module.exports = {
         // 
         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
         DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",
-        RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects"
+        RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects",
+
+            LIST_CHECKREPORTS: "GET /a_flows?q='4f477a00-3c1b-11eb-8b81-b551b8fbb24d'",
 
       }
     },
@@ -217,6 +219,10 @@ module.exports = {
          }
        },
        API: {
+        // CHECK
+    
+
+        // ----------
          // core
      
          LOGIN: "POST /sessions",

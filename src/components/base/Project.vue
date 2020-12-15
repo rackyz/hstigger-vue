@@ -1,5 +1,5 @@
 <template>
-  <div class="project-item" @click.stop='onClick' style='background:#444 url(http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png)'>
+  <div class="project-item" @click.stop='onClick' :style='`background:#444 url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
   <div class='pi-code'>{{data.code}} </div>
   <div class='pi-name'>{{data.name}}</div>
   <div style='font-size:10px;'><span class='pi-type'>市政监理</span> <span class='pi-type'>慈城</span> <span class='pi-type'>CBD</span></div>
@@ -37,13 +37,18 @@ export default {
     font-size:10px;
     color:#ff3;
     position:absolute;
-    top:5px;
+    top:10px;
     left:20px;
   }
 
   .pi-name{
     margin-top:5px;
     font-size:20px;
+    text-overflow: ellipsis;
+    max-width:260px;
+    overflow:hidden;
+    height:35px;
+    white-space: nowrap;
   }
 
   .pi-type{
