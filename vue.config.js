@@ -68,6 +68,7 @@ const Chained = config=>{
      "axios": "axios"
    })
 
+   if(process.env.NODE_ENV == 'production'){
      config.plugin('qcloud-cos')
        .use(QCloudCosPlugin, [{
          auth: {
@@ -86,6 +87,7 @@ const Chained = config=>{
          useVersion: true,
          existCheck: false
        }])
+   }
      
 
 
@@ -109,7 +111,7 @@ const Chained = config=>{
 
 
 module.exports = {
- publicPath:'https://cloud-1257839135.cos.ap-shanghai.myqcloud.com/hstigger-vue/0.1.0/',
+  publicPath: process.env.NODE_ENV == 'production'?'https://cloud-1257839135.cos.ap-shanghai.myqcloud.com/hstigger-vue/0.1.0/':'',
   outputDir:"./dist",
   chainWebpack: Chained
 }

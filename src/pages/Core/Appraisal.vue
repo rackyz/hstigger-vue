@@ -111,19 +111,24 @@ export default {
       items:[],
       loading:false,
       	columns: [
-        { type: "index", title: "序号" },
+        { type: "index", title: "序号" ,fixed:"left"},
         
-			 { type: "text", key: "name", width:200,title: "姓名",option:{align:"center"}},
+			 { type: "text", key: "name", width:200,title: "姓名",option:{align:"center"},fixed:"left"},
             { type: "state", key: "dep", width:120,title: "部门",option:{align:"center"},	option: {states: ['行政综合','房建监理事业部','市政监理事业部','建设管理事业部','装修管理事业部', '造价咨询事业部', 'BIM咨询']}},
            { type: "state", key: "position", width:120,title: "职务",option:{align:"center"},	option: { 
              states: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级','助理级/员级']},},
               { type: "text", key: "rank", width:120,title: "职称",option:{align:"center"}},
                { type: "text", key: "project", width:200,title: "所在项目",option:{align:"center"}},
-               {type:'datetime',key:'hire_date',width:120},
+               {type:'time',title:"入职时间",key:'hire_date',width:120,option:{type:"date"}},
                  { type: "text", key: "cerificate", width:200,title: "岗位证书",option:{align:"center"}},
                   { type: "text", key: "education", width:200,title: "学历",option:{align:"center"}},
-                { type: "text", key: "report", width:100,title: "述职报告",option:{}},
-					{ type: "text", key: "desc",minWidth:300,  title: "评语", },
+                { type: "text", key: "report", width:100,title: "述职报告",render(h,param){
+                  if(param.row.report && param.row.report.url)
+                    return h('a',{domProps:{href:param.row.report.url}},'下载')
+                  else
+                    return h('span','-')
+                }},
+					{ type: "text", key: "Comment_n2",minWidth:300,  title: "评语", },
         
 							 { type: "type", key: "state", width:100,title: "状态",option:{align:"center"},	option: { getters:'core/getTypes',getters_key:"FLOW_STATE",
 							labelKey:"value"},},
