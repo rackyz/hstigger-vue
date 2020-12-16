@@ -92,6 +92,30 @@ Vue.directive('transfer',{
     }
 })
 
+Vue.directive('tableDrag', {
+  inserted: function () {
+    let el = document.getElementsByClassName('ivu-table-body')[0];
+    el.style.cursor = 'grab';
+    el.onmousedown = function () {
+      let gapX = event.clientX;
+      let gapY = event.clientY
+      let startX = el.scrollLeft;
+      let startY = el.scrollTop
+      document.onmousemove = function (e) {
+        let x = e.clientX - gapX;
+        let y = e.clientY - gapY
+        el.scrollLeft = startX - x;
+        el.scrollTop = startY - y
+        return false;
+      };
+      document.onmouseup = function (e) {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
+  }
+});
+
 process.env.VUE_APP_MOCK && require('../../mock/index.js')
 
 Vue.config.productionTip = false

@@ -371,17 +371,8 @@ export default {
     }
   },
   mounted() {
-     let option = this.option || {}
-            this.flow.def.executors = {
-                    control: 'node',
-                    label: '流程配置',
-                    option: {
-                      nodes: this.flow.nodes,
-                      getters: option.executor_getters,
-                      idKey: option.exe_idKey || 'id',
-                      labelKey: option.exe_labelKey || 'name'
-                    }
-                  }
+     
+    
 
     if(!this.inst_id){
       let draft = localStorage.getItem('draft_flow_'+this.flow.id)
@@ -395,11 +386,7 @@ export default {
           localStorage.removeItem('draft_flow_'+this.flow.id)
           this.Compile()
         },{cancelText:"丢弃",okText:"打开"})
-      }else{
-         this.Compile()
       }
-    }else{
-      this.Compile()
     }
 
   
@@ -645,6 +632,19 @@ export default {
     },
     Compile() {
       this.$nextTick(() => {
+         if(this.flow){
+       let option = this.option || {}
+      this.flow.def.executors = {
+              control: 'node',
+              label: '流程配置',
+              option: {
+                nodes: this.flow.nodes,
+                getters: option.executor_getters,
+                idKey: option.exe_idKey || 'id',
+                labelKey: option.exe_labelKey || 'name'
+              }
+            }
+      }
         if(this.history.length == 0){
           this.currentNode = this.Init()
         }

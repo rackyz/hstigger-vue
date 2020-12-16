@@ -1,6 +1,6 @@
 var LocalServer = 'http://192.168.14.40:6001'
 // LocalServer = 'http://localhost:6001'
- LocalServer = 'http://192.168.0.108:6001'
+// LocalServer = 'http://192.168.0.108:6001'
 const ProductServer = 'https://api.hstigger.com'
 module.exports = {
   version:1000,
@@ -197,7 +197,7 @@ module.exports = {
         GET_WORKFLOW: "GET /workflows/:id",
         POST_WORKFLOW: "POST /workflows",
         PATCH_WORKFLOW: "PATCH /workflows/:id",
-        DEL_WORKFLOW: "DELTE /workflows/:id",
+        DEL_WORKFLOW: "DELETE /workflows/:id",
         RECALL_WORKFLOW:"PATCH /workflows/:id?q=recall",
 
         // 
@@ -205,7 +205,8 @@ module.exports = {
         DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",
         RESET_CONCERN_PROJECTS: "PATCH settings/reset-concern-projects",
 
-            LIST_CHECKREPORTS: "GET /a_flows?q='4f477a00-3c1b-11eb-8b81-b551b8fbb24d'",
+            LIST_CHECKREPORTS: "GET /a_flows?q=4f477a00-3c1b-11eb-8b81-b551b8fbb24d",
+            GET_REPORT: "GET /a_flows/:id?q=4f477a00-3c1b-11eb-8b81-b551b8fbb24d"
 
       }
     },

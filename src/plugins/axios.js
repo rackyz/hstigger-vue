@@ -123,8 +123,14 @@ config.Servers.forEach((server,i)=>{
         data
       }
       
-      if(config && config.headers)
-        requestObject.headers = config.headers
+      if(config ){
+        if ( config.headers)
+          requestObject.headers = config.headers
+        if (config.timeout) {
+          requestObject.timeout = config.timeout
+        }
+      }
+        
       // return new Promise((resolve,reject)=>{
       //   client_buffer[]
       // })

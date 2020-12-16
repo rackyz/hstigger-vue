@@ -41,6 +41,7 @@
 
         <!-- SAFEMODE PuzzleVerification MODAL -->
         <PuzzleVerification
+        v-if="isVerificationShow"
             v-model='isVerificationShow'
             style='top:-250px;z-index:1000;'
             deviation="20"

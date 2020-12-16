@@ -8,7 +8,7 @@
     <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(id ? ('/ '+get_flow(id).name):'')}} - {{session.id}}</div>
       <!-- <BaseFlow :key="current" /> -->
      
-      <workflow v-if='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
+      <workflow ref='flow' v-if='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
     </Modal>
 </template>
 
@@ -125,6 +125,7 @@ export default {
       this.loading = true
       this.CORE.GET_FLOW({param:{id:this.id}}).then(res=>{
         this.flowDef = res.data.data
+        this.$refs.flow.Compile()
         if(this.flowDef.inst_id){
           this.getInst(this.flowDef.inst_id)
         }

@@ -111,7 +111,7 @@ const Chained = config=>{
 
 
 module.exports = {
-  publicPath: process.env.NODE_ENV == 'production'?'https://cloud-1257839135.cos.ap-shanghai.myqcloud.com/hstigger-vue/0.1.0/':'',
+  publicPath: process.env.NODE_ENV == 'production'?'https://cloud-1257839135.cos.ap-shanghai.myqcloud.com/hstigger-vue/0.1.0/':'/',
   outputDir:"./dist",
   chainWebpack: Chained
 }
