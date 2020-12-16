@@ -632,7 +632,7 @@ export default {
     },
     Compile() {
       this.$nextTick(() => {
-         if(this.flow){
+         if(this.flow && this.flow.def){
        let option = this.option || {}
       this.flow.def.executors = {
               control: 'node',

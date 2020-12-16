@@ -231,7 +231,10 @@ export default {
                       score[n] = score[n] || null
                     return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                       if(vi == 0){
-                        return ['合格','不合格'][v?v:0]
+                        if( v!==undefined)
+                          return ['合格','不合格'][v]
+                        else
+                          return '无'
                       }else{
                         return (v===null || v===undefined?'无':options[v])
                       }
