@@ -105,7 +105,7 @@ const getters = {
     if(dep_id == 0)
       return ['ed49e690-3b83-11eb-8e1e-c15d5c7db744']
     else if (dep_id == 1) //房建：章建良 李增义 汤海平
-      return ['ed4a8300-3b83-11eb-8e1e-c15d5c7db744', 'ed4a34b4-3b83-11eb-8e1e-c15d5c7db744','']
+      return ['ed4a8300-3b83-11eb-8e1e-c15d5c7db744', 'ed4a34b4-3b83-11eb-8e1e-c15d5c7db744', 'b8cabcb0-4014-11eb-813c-c1c9b9ee54e7']
     else if (dep_id == 2) //市政： 王勤轰 玄先涛 庄辉
       return ['ed4a5be7-3b83-11eb-8e1e-c15d5c7db744', 'ed4a5c0b-3b83-11eb-8e1e-c15d5c7db744', 'ed4a82f9-3b83-11eb-8e1e-c15d5c7db744']
     else if (dep_id == 3) //管理： 顾震 刘勇 吴献国

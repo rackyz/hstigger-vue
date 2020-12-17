@@ -83,6 +83,28 @@
 				@click="showFlowInfo = !showFlowInfo"
 				>流程信息</Button
 			>
+
+      <Button
+				style="margin-left: 5px"
+				:type="showSelf?'info':''"
+				@click="showSelf = !showSelf;$refs.table.render()"
+				>自评分</Button
+			>
+
+      <Button
+				style="margin-left: 5px"
+				:type="showFirst?'info':''"
+				@click="showFirst = !showFirst"
+				>第一责任人</Button
+			>
+
+      <Button
+				style="margin-left: 5px"
+				:type="showFirstExtra?'info':''"
+				@click="showFirstExtra = !showFirstExtra"
+				>平行责任人</Button
+			>
+
 		</div>
     <!-- table -->
 		<div
@@ -145,8 +167,12 @@
         <a v-if="reportURL"  :href="reportURL" ><Icon type='md-download' style='margin-right:5px;' />下载文件</a>
         <span v-else>未上传文件</span></div>
         <template v-if="!loadingReport && reportURL">
-         
-          <div v-html="report || '该文件无法预览'" style='padding:0px 10px;font-family:"仿宋";font-size:16px;' />
+         <template v-if="report">
+          <div v-html="report" style='padding:0px 10px;font-family:"仿宋";font-size:16px;' />
+          </template>
+          <template v-else>
+            <BasePreview :url="reportURL" />
+          </template>
         </template>
       </Drawer>
   </div>
@@ -154,6 +180,75 @@
 
 <script>
 import { mapGetters } from "vuex";
+
+var 
+  Q1 = {
+    title: "工作饱满度",
+    desc: "描述",
+    options: ['非常饱满', '很饱满', '饱满', '有点饱满', '正常', '偏少', '很少']
+  },
+  Q2 = {
+    title: "业主关系",
+    desc: "发展潜力",
+    options: ['非常认可', '很认可', '认可', '比较认可', '正常', '一般般', '不大认可']
+  },
+  Q3 = {
+    title: "目标达成",
+    desc: "描述",
+    options: ['完全实现', '大多数实现', '重点实现', '基本实现', '有点差距', '差距很大']
+  },
+  Q4 = {
+    title: "团队建设",
+    desc: "描述",
+    options: ['非常好', '很好', '好', '比较好', '正常', '一般般', '不大好']
+  },
+  Q5= {
+    title: "能力提升",
+    desc: "描述",
+    options: ['非常大', '很大', '大', '比较大', '正常', '不大', '几乎没有']
+  },
+  Q6= {
+    title: "成长性、发展潜力",
+    desc: "发展潜力",
+    options: ['潜力非常大', '潜力很大', '潜力大', '潜力较大', '潜力一般', '潜力不大', '没啥潜力']
+  },
+  Q7= {
+    title: "岗位等级",
+    desc: "描述",
+    options: ['见习', '初级助理', '助理', '成熟助理', '优秀助理',
+      '初级/偏弱工程师', '工程师', '成熟工程师', '优秀工程师'
+    ]
+  },
+  Q8={
+    title:"环境适应度",
+    options:['非常舒适','很舒适','舒适','还算舒适','适应','还算适应','不大适应']
+  },
+  Q9={
+    title:"工作态度",
+    options:['非常努力','很努力','努力','还算努力','正常','不太努力','不努力']
+  },
+  Q10={
+    title:"薪酬评估",
+    options:['明显高于岗位','高于岗位','偏高与岗位','匹配','基本匹配','稍低于岗位','明显低于岗位']
+  },
+  Q11={
+    title:"薪酬调整或岗位晋升建议",
+    options:['明显提升','适当提升','略有提升','保持不变','可适当降低']
+  }
+
+var QN0 = {
+  key:'mem_self',
+  condition:`v-if="db.model.position!=0"`,
+  label: '员工->自评',
+  questions:[Q1,Q5,Q8]
+}
+var QN1 = {key:'mgr_self',label:'项目/部门经理->自评',condition:`v-else`,questions:[Q1, Q4, Q2, Q3]}
+var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q7]}
+var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6, Q7, Q10, Q11]}
+var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3, Q7, Q10, Q11]}
+
+
+
 export default {
   computed:{
     ...mapGetters('core',['users']),
@@ -216,6 +311,12 @@ export default {
               executors.n33 = executors.n3[2]
               }
               let lineDoms = nodes.map((node,j)=>{
+                if(!this.showSelf && node == 'n1'){
+                  return null
+                }else  if(!this.showFirst && node == 'n2')
+                  return null
+                else if(!this.showFirstExtra && node.includes('n3'))
+                  return null
                  if(!executors[node])
                   return null
                   let op = that.users.find(v=>v.id == param.row.ops[node])
@@ -231,10 +332,7 @@ export default {
                       score[n] = score[n] || null
                     return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                       if(vi == 0){
-                        if( v!==undefined)
-                          return ['合格','不合格'][v]
-                        else
-                          return '无'
+                          return ['合格','不合格'][v?v:0]
                       }else{
                         return (v===null || v===undefined?'无':options[v])
                       }
@@ -267,11 +365,80 @@ export default {
             }
           },
           {
+            title:"调查评估",
+            sortable:false,
+            width:500,
+            render(h,param){
+              let nodes=['n1','n2','n31','n32','n33','n4']
+               let nodesName = ['自评','第一','平行','平行','平行','第二']
+              let sheets = ['E0','E1','E2','E3','E4','E5']
+              let options =  ['10分','9.5分','9分','8.5分','8分','7.5分','7分','6.5分','6分','5.5分','5分及以下']
+              let executors =param.row.executors
+              let ops = param.row.ops
+                if(!(executors))
+                return h('span','配置失效')
+             if(Array.isArray(executors.n3)){
+              executors.n31 = executors.n3[0]
+              executors.n32 = executors.n3[1]
+              executors.n33 = executors.n3[2]
+              }
+              let lineDoms = nodes.map((node,j)=>{
+                if(!this.showSelf && node == 'n1'){
+                  return null
+                }else  if(!this.showFirst && node == 'n2')
+                  return null
+                else if(!this.showFirstExtra && node.includes('n3'))
+                  return null
+                 if(!executors[node])
+                  return null
+                  let op = that.users.find(v=>v.id == param.row.ops[node])
+                 let score = []
+                  let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#fff;background:${op?'#333':'#ddd'};text-overflow:eclipse;`},op?op.name:nodesName[j])
+                for(let i=0;i<sheets.length;i++){
+                 
+                  let sheet = sheets[i]
+
+                  if(Array.isArray(param.row[`${sheet}${node}`])){
+                    let rawscore = param.row[`${sheet}${node}`]
+                    score = new Array(5)
+                    for(let n=0;n<5;n++)
+                      score[n] = rawscore[n] || null
+                    return h('div',{class:'cell-row'},[score.map((v,vi)=>{
+                     
+                        return (v===null || v===undefined?'无':options[v])
+                      
+
+                    }).map((s,si)=>{
+                  return h('div',{
+                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*30:0}deg);`
+                    },s)
+                    })
+                    ])
+                  }
+                  
+                }
+                for(let n=0;n<5;n++)
+                    score[n] = score[n] || null
+                return h('div',{class:'cell-row'},[score.map((v,vi)=>{
+                
+                    return (v===null || v===undefined?'无':options[v])
+                  
+
+                }).map((s,si)=>{
+                  return h('div',{
+                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`
+                    },s)
+                })])
+              }).filter(s=>s)
+              return h('div',{class:'cell-row-wrapper'},[lineDoms])
+            }
+          },
+          {
             key:"commit",
             type:'text',
             title:"考核评优/推荐",
             sortable:false,
-            width:550,
+            width:350,
             
             render(h,param){
               let nodes=['n2','n31','n32','n33','n4']
@@ -287,6 +454,12 @@ export default {
               let fields = ['CommitLevel','CommitPride','Commit']
               let fieldsName = ['评优等级','评优奖项','评语']
               let lineDoms = nodes.map((node,j)=>{
+
+                if(!this.showFirst && node == 'n2')
+                  return null
+                else if(!this.showFirstExtra && node.includes('n3'))
+                  return null
+
                 let scores = []
                 if(!executors[node])
                   return null
@@ -308,32 +481,28 @@ export default {
                           if(si < 2){
                             return h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`},s)
                           }else{
-                            return h('Tooltip',{props:{maxWidth:200,content:s,transfer:true}},[h('div',{style:`width:300px;text-overflow:ecllipse;text-align:left;padding:0 5px;`},s)])
+                            return h('Tooltip',{props:{maxWidth:200,content:s,transfer:true}},[h('div',{style:`max-width:200px;text-overflow:ellipsis;overflow:hidden;height:20px;ecllipse;text-align:left;padding:0 5px;white-space:nowrap;line-height:25px;`},s)])
                           }
                         
                       })])
               }).filter(s=>s)
-              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[h('div',{class:'cell-row'},''),lineDoms])
+
+              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},this.showSelf?[h('div',{class:'cell-row'},''),lineDoms]:[lineDoms])
             
             }
           },
-           {
-            title:"调查评估",
-            sortable:false,
-            width:300,
-            children:[{
-              title:"考核人"
-            },{
-              title:"考核人"
-            }],
-          },
+           
           {
              key:"commit",
-            type:'text',
             title:"综合评分",
-            width:100,
+            width:120,
             render(h,params){
-              return h("span","-")
+              let s = '100'
+              let l = '优秀'
+              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`},s)
+              let level =   h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${l=='无'?'#ddd':'darkgreen'};`},l)
+              let row = h('div',{class:'cell-row'},[score,level])
+              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[row])
             }
           },
            
@@ -361,7 +530,12 @@ export default {
                }},{
                 type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'}
               },
-          
+          {
+            title:"创建时间",
+           type:'time',
+            width:100,
+           key:"created_at"
+          },
         
 			]
     },
@@ -385,6 +559,9 @@ export default {
   data(){
     return {
       current_page:0,
+      showSelf:false,
+      showFirst:false,
+      showFirstExtra:false,
       current_page_size:25,
       searchText:"",
       items:[],
@@ -449,7 +626,21 @@ export default {
                }else{ 
                  v.ops[n.key] = n.op
                }
-              
+
+
+               if(n.mem_self || n.mgr_self){
+                  v.QN2 = n.mem_self || n.mgr_self || []
+                  v.TN2 = v.position != 0 ? QN1 : QN2
+                  v.QN31 = n.mgr2mem31
+                  v.QN32 = n.mgr2mem32
+                  v.QN33 = n.mgr2mem33
+                  v.TN31 = v.TN32 = v.TN33 = QN3
+
+                  v.QN4 = n.dep2mgr || n.dep2mem
+                  v.TN4 = v.position != 0 ? QN4 : QN5
+               }
+               if(n.mem_self)
+                this.table = QN1
           })
           }
          

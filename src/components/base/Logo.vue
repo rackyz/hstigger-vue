@@ -41,9 +41,7 @@
   padding-top:2px;
   text-shadow:1px 1px 1px #333;
   border:1px solid #ffffff00;
-  border-radius: 5px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-radius: 2px;
   img{
     width:23px;
     height:23px;

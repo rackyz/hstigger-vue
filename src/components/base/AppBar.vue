@@ -43,7 +43,7 @@
 <template>
   <div class="l-app-bar">
     <div class="l-left">
-       <Dropdown ref='dm'  :trigger="my_enterprises.length == 0?'custom':'hover'" placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise' >
+       <Dropdown ref='dm' transfer :trigger="my_enterprises.length == 0?'custom':'click'" placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise' >
        <BaseLogo class='d-none d-sm-block' style="margin-right:20px;"></BaseLogo>
         <DropdownMenu slot="list">
            <DropdownItem ref='m1'  :name='null' v-show='current_enterprise != null'><img style='width:30px;height:30px;margin-right:3px;' src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" /> 个人模式</DropdownItem>

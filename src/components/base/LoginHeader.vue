@@ -23,7 +23,7 @@ export default {
   display:flex;
   flex-direction:column;
   .caption{
-     font-size:40px;
+     font-size:2.6rem;
     text-shadow:1px 1px 1px #000;
   }
 
@@ -37,6 +37,7 @@ export default {
   line-height:20px;
   padding:0;
   padding-right:5px;
+  text-align: center;
   color:#aaa;
   i{
     position:relative;
