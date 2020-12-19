@@ -71,6 +71,7 @@
 				@click="getData()"
 				>刷新</Button>
 			<Input v-model="searchText" search style="width: 200px" clearable />
+      <span class='filter-label'>信息筛选</span>
       <Button
 				style="margin-left: 5px"
 				:type="showPersonalInfo?'info':''"
@@ -83,11 +84,17 @@
 				@click="showFlowInfo = !showFlowInfo"
 				>流程信息</Button
 			>
-
+      <span class='filter-label'>评分筛选</span>
+       <Button
+				style="margin-left: 5px"
+        v-if="showSelf || showFirstExtra || showFirst"
+				@click="showSelf=showFirst=showFirstExtra=false"
+				>取消</Button
+			>
       <Button
 				style="margin-left: 5px"
 				:type="showSelf?'info':''"
-				@click="showSelf = !showSelf;$refs.table.render()"
+				@click="showSelf = !showSelf;"
 				>自评分</Button
 			>
 
@@ -98,7 +105,7 @@
 				>第一责任人</Button
 			>
 
-      <Button
+     <Button
 				style="margin-left: 5px"
 				:type="showFirstExtra?'info':''"
 				@click="showFirstExtra = !showFirstExtra"
@@ -106,10 +113,42 @@
 			>
 
 		</div>
+    <div class="filter-wrap" style="padding: 5px;background:#aaa;color:#fff;" @click="selected = null">
+        
+      <span class='filter-label'>部门</span>
+      <Button style="margin-left: 5px" size='small'
+        v-if="fdep.length > 0"
+				:type="fdep && fdep.length == 0?'warning':''"
+				@click="fdep=[]">取消</Button>
+      <template v-for='(d,i) in deps'>
+       <Button :key='i'
+				style="margin-left: 5px" size='small'
+				:type="fdep.includes(i)?'warning':''"
+				@click="fdep.includes(i)?fdep.splice(fdep.findIndex(v=>v==i),1):fdep.push(i)"
+				>{{d}}</Button
+			>
+
+      </template>
+
+      <span class='filter-label'>岗位</span>
+      <Button style="margin-left: 5px"
+        v-if="fpos.length > 0" size='small'
+				:type="fpos && fpos.length == 0?'warning':''"
+				@click="fpos=[]">取消</Button>
+      <template v-for='(d,i) in positions'>
+       <Button :key='i'
+				style="margin-left: 5px" size='small'
+				:type="fpos.includes(i)?'warning':''"
+				@click="fpos.includes(i)?fpos.splice(fpos.findIndex(v=>v==i),1):fpos.push(i)"
+				>{{d}}</Button
+			>
+
+      </template>
+      </div>
     <!-- table -->
 		<div
 			style="
-				height: calc(100% - 90px);
+				height: calc(100% - 135px);
 				overflow: hidden;
 				background: #ddd;
 				position: relative;
@@ -247,15 +286,44 @@ var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, 
 var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6, Q7, Q10, Q11]}
 var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3, Q7, Q10, Q11]}
 
-
+const getEVSheets = (user,nodes)=>{
+  return nodes.map(v=>{
+    if(v == 'n1'){
+      if(user.position == 0)
+        return QN1
+      else
+        return QN0
+    }else if(v == 'n4'){
+       if(user.position == 0)
+        return QN4
+      else
+        return QN3
+    }else{
+      return QN2
+    }
+  })
+}
 
 export default {
   computed:{
     ...mapGetters('core',['users']),
+    deps(){
+      return ['行政','房建','市政','建设','装修', '造价', 'BIM']
+    }, 
+    positions(){
+      return  ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级']
+    } ,
     filterdData(){
+      this.current_page = 1
       return this.items.filter(v=>{
         if(this.searchText && (!v.name || !v.name.includes(this.searchText)))
           return false
+        if(this.fdep && this.fdep.length > 0 && !this.fdep.includes(v.dep)){
+          return false
+        }
+         if(this.fpos && this.fpos.length > 0 && !this.fpos.includes(v.position)){
+          return false
+        }
         return true
       })
     },
@@ -266,7 +334,7 @@ export default {
       var that=this
       return [
         { type: "index", title: "序号" ,fixed:"left",sortable:false,render(h,param){
-          return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1)       }},
+          return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1+that.current_page*that.current_page_size)       }},
         
 			 { type: "text", key: "name", width:80,title: "姓名",option:{align:"left"},fixed:"left",render(h,param){
          return h('span',{style:{fontSize:"16px"}},[param.row.name])
@@ -296,7 +364,16 @@ export default {
             title:"考核评分",
             sortable:false,
             width:580,
+            renderHeader(h,param){
+              
+              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#fff;text-overflow:eclipse;`},'负责人')
+              let  colDoms = new Array(10).map((v,i)=>h('div',{
+                    style:`width:40px;min-width:40px;height:20px;color:#fff;`
+                    },i))
+              return  h('div',{class:'cell-row'},[nodeDom,...colDoms])
+            },
             render(h,param){
+             
               let nodes=['n1','n2','n31','n32','n33','n4']
                let nodesName = ['自评','第一','平行','平行','平行','第二']
               let sheets = ['E0','E1','E2','E3','E4','E5']
@@ -311,11 +388,11 @@ export default {
               executors.n33 = executors.n3[2]
               }
               let lineDoms = nodes.map((node,j)=>{
-                if(!this.showSelf && node == 'n1'){
+                if(!that.showSelf && node == 'n1'){
                   return null
-                }else  if(!this.showFirst && node == 'n2')
+                }else  if(!that.showFirst && node == 'n2')
                   return null
-                else if(!this.showFirstExtra && node.includes('n3'))
+                else if(!that.showFirstExtra && node.includes('n3'))
                   return null
                  if(!executors[node])
                   return null
@@ -367,12 +444,12 @@ export default {
           {
             title:"调查评估",
             sortable:false,
-            width:500,
+            width:650,
             render(h,param){
               let nodes=['n1','n2','n31','n32','n33','n4']
                let nodesName = ['自评','第一','平行','平行','平行','第二']
-              let sheets = ['E0','E1','E2','E3','E4','E5']
-              let options =  ['10分','9.5分','9分','8.5分','8分','7.5分','7分','6.5分','6分','5.5分','5分及以下']
+              let sheets = getEVSheets(param.row,nodes)
+            
               let executors =param.row.executors
               let ops = param.row.ops
                 if(!(executors))
@@ -383,38 +460,41 @@ export default {
               executors.n33 = executors.n3[2]
               }
               let lineDoms = nodes.map((node,j)=>{
-                if(!this.showSelf && node == 'n1'){
+                if(!that.showSelf && node == 'n1'){
                   return null
-                }else  if(!this.showFirst && node == 'n2')
+                }else  if(!that.showFirst && node == 'n2')
                   return null
-                else if(!this.showFirstExtra && node.includes('n3'))
+                else if(!that.showFirstExtra && node.includes('n3'))
                   return null
                  if(!executors[node])
                   return null
                   let op = that.users.find(v=>v.id == param.row.ops[node])
                  let score = []
-                  let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#fff;background:${op?'#333':'#ddd'};text-overflow:eclipse;`},op?op.name:nodesName[j])
-                for(let i=0;i<sheets.length;i++){
-                 
-                  let sheet = sheets[i]
+                  let nodeDom = h('div',{style:`width:80px;min-width:80px;height:20px;color:#fff;background:${op?'#333':'#ddd'};text-overflow:eclipse;`},op?op.name:nodesName[j])
+               
+                  let sheet = sheets[j]
+                  var sheetKey = (j>1 && j<5)?(sheet.key+(j-1)):sheet.key
+                    
+                  if(Array.isArray(param.row[sheetKey])){
+                    let rawscore = param.row[sheetKey]
 
-                  if(Array.isArray(param.row[`${sheet}${node}`])){
-                    let rawscore = param.row[`${sheet}${node}`]
-                    score = new Array(5)
-                    for(let n=0;n<5;n++)
+                    
+                    score = new Array(sheet.questions.length)
+                    for(let n=0;n<score.length;n++)
                       score[n] = rawscore[n] || null
+                      
                     return h('div',{class:'cell-row'},[score.map((v,vi)=>{
                      
-                        return (v===null || v===undefined?'无':options[v])
+                        return (v===null || v===undefined?'无':sheet.questions[vi].options[v])
                       
 
                     }).map((s,si)=>{
                   return h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*30:0}deg);`
+                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*(300/sheet.questions[si].options.length):0}deg);`
                     },s)
                     })
                     ])
-                  }
+                  
                   
                 }
                 for(let n=0;n<5;n++)
@@ -426,7 +506,7 @@ export default {
 
                 }).map((s,si)=>{
                   return h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`
+                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`
                     },s)
                 })])
               }).filter(s=>s)
@@ -455,9 +535,9 @@ export default {
               let fieldsName = ['评优等级','评优奖项','评语']
               let lineDoms = nodes.map((node,j)=>{
 
-                if(!this.showFirst && node == 'n2')
+                if(!that.showFirst && node == 'n2')
                   return null
-                else if(!this.showFirstExtra && node.includes('n3'))
+                else if(!that.showFirstExtra && node.includes('n3'))
                   return null
 
                 let scores = []
@@ -479,7 +559,7 @@ export default {
                   return h('div',{class:'cell-row'},[
                         scores.map(v=>v===null?'无':v).map((s,si)=>{
                           if(si < 2){
-                            return h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`},s)
+                            return h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':that.mapColor(s[0])}`},s)
                           }else{
                             return h('Tooltip',{props:{maxWidth:200,content:s,transfer:true}},[h('div',{style:`max-width:200px;text-overflow:ellipsis;overflow:hidden;height:20px;ecllipse;text-align:left;padding:0 5px;white-space:nowrap;line-height:25px;`},s)])
                           }
@@ -487,7 +567,7 @@ export default {
                       })])
               }).filter(s=>s)
 
-              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},this.showSelf?[h('div',{class:'cell-row'},''),lineDoms]:[lineDoms])
+              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},that.showSelf?[h('div',{class:'cell-row'},''),lineDoms]:[lineDoms])
             
             }
           },
@@ -540,13 +620,18 @@ export default {
 			]
     },
     filteredColumns(){
-     
+      
        return this.columns.filter(v=>{
          
          if(!this.showPersonalInfo && v.cat == 'person')
           return false
            if(!this.showFlowInfo && v.cat == 'flow')
           return false
+
+          if(this.fdep.length == 1 && v.key == 'dep')
+            return false
+          if(this.fpos.length == 1 && v.key == 'position')
+            return false
 
           return true
          
@@ -559,10 +644,11 @@ export default {
   data(){
     return {
       current_page:0,
-      showSelf:false,
-      showFirst:false,
-      showFirstExtra:false,
+      showSelf:true,
+      showFirst:true,
+      showFirstExtra:true,
       current_page_size:25,
+      fpos:[],
       searchText:"",
       items:[],
       loading:false,
@@ -574,9 +660,13 @@ export default {
       showPreview:false,
       loadingReport:false,
       showFlowInfo:false,
+      fdep:[],
     }
   },
   methods:{
+    mapColor(ch){
+      return this.hs.mapColor(ch)
+    },
     getReport(){
       if(!this.current || !this.current.id)
         return
@@ -707,5 +797,10 @@ export default {
   right:0;
   bottom:0;
   top:0;
+}
+
+.filter-label{
+  margin:0 5px;
+  margin-left:13px;
 }
 </style>

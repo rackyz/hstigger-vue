@@ -220,10 +220,11 @@ export default {
 			columns: [
         { type: "index", title: "序号" },
         	
-				{ type: "text", key: "user", width: 250, title: "用户名",
+			
+					{ type: "text", key: "user", width: 250, title: "用户",
 				render(h,param){
 					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.user)
+					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name ?`${param.row.name} (${param.row.user})`:param.row.user)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
 				}},
 			{
@@ -263,6 +264,9 @@ export default {
 				{ key: "oauth", title: "第三方绑定",width:150,sortable:false,
 					render:(h,param)=>{
 					const  oauthItems =[{
+							icon:'nbgz',
+							title:"高专平台"
+					},{
 							icon:'qq',
 							title:"QQ登录"
 					},{
@@ -277,11 +281,11 @@ export default {
 							title:'手机扫码',
 							size:16
 					}]
-
-					let icons = oauthItems.map(v=>h('Icon',{props:{
+					const keys=['zzl_id','qq','wechat_id','ding_id','phone']
+					let icons = oauthItems.map((v,i)=>h('Icon',{props:{
 						custom:`gzicon gzi-${v.icon}`,
 						size:v.size,
-						color:"#aaa"
+						color:param.row[keys[i]]?"#409EFF":"#dfdfdf"
 					},style:{marginRight:"6px"}}))
 
 					return h('div',{style:{
