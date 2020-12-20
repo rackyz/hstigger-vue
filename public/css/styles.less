@@ -20,76 +20,11 @@ body {
 .page {
   background: linear-gradient(to bottom, rgba(5, 59, 68, 0.15) 0%, #094155 100%), radial-gradient(at top center, rgba(194, 214, 234, 0.4) 0%, rgba(90, 148, 207, 0.4) 120%) #394865;
   background-blend-mode: multiply, multiply;
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-// iPhoneX - portrait
-@media only screen and (orientation:portrait) and (max-width:400px) {
-  .login {
-    width: 80%
-  }
-
-  .page-debug:before {
-    content: "现在是竖屏手机";
-  }
-
-}
-
-// iPhoneX - landscape
-@media only screen and (orientation:landscape) and (max-height:400px) {
-  .login {
-    height: auto;
-  }
-
-  .page-debug:before {
-    content: "现在是横屏手机";
-  }
-}
-
-// ipad - landscape
-@media only screen and (orientation:portrait) and (min-width:400px) and (max-width:863px) {
-  .login {
-    height: auto;
-  }
-
-  .page-debug:before {
-    content: "竖屏ipad";
-  }
-}
-
-// ipad - portraint
-@media only screen and (orientation:landscape) and (min-height:400px) and (max-height:863px) {
-  .login {
-    height: auto;
-  }
-
-  .page-debug:before {
-    content: "横屏ipad";
-  }
-}
-
-// ipad - portraint
-@media only screen and (orientation:landscape) and (min-width:863px) and (max-width:1600px) {
-  .login {
-    height: auto;
-  }
-
-  .page-debug:before {
-    content: "窄版pc";
-  }
-}
-
-// ipad - portraint
-@media only screen and (orientation:landscape) and (min-width:1600px) {
-  .login {
-    height: auto;
-  }
-
-  .page-debug:before {
-    content: "宽版pc";
-  }
+  position: absolute;
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
 }
 
 
@@ -199,8 +134,10 @@ body {
   font-size:12px;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   >div{
     margin-right:5px;
+    
   }
 }
 
@@ -378,3 +315,94 @@ body {
   
   }
   }
+
+  .page-debug{
+    color:#aaa;
+  }
+
+
+
+
+
+
+  
+// iPhoneX - portrait
+@media only screen and (orientation:portrait) and (max-width:400px) {
+  html,body,.page{
+    width:100%;
+    min-width: 375px;
+    height:100%;position: relative;
+  }
+  .login {
+    width: 80%;
+    margin-top:30px;
+  }
+
+  .page-debug:before {
+    content: "现在是竖屏手机";
+  }
+
+}
+
+// iPhoneX - landscape
+@media only screen and (orientation:landscape) and (max-height:400px) {
+  html,body,.page{
+    width:100%;
+    height:100%;
+    overflow: hidden;
+  }
+  .login {
+    width:300px;
+    height: 200px;
+    margin-top:10px;
+    display: flex;
+    flex-direction: column;
+    zoom:0.95;
+    .system-name{
+      position: relative;
+      top:-100px;
+      .caption{
+        font-size: 25px !important;
+        text-align: center;
+      }
+    }
+  }
+
+
+  .page-debug:before {
+    content: "现在是横屏手机";
+  }
+}
+
+// ipad - landscape
+@media only screen and (orientation:portrait) and (min-width:400px) and (max-width:863px) {
+  .login {
+    height: auto;
+  }
+
+  .page-debug:before {
+    content: "竖屏ipad";
+  }
+}
+
+// ipad - portraint
+@media only screen and (orientation:landscape) and (min-height:400px) and (max-height:863px) {
+  .login {
+    height: auto;
+  }
+
+  .page-debug:before {
+    content: "横屏ipad";
+  }
+}
+
+// ipad - portraint
+@media only screen and (orientation:landscape) and (min-width:863px) and (max-width:1600px) {
+  .login {
+    height: auto;
+  }
+
+  .page-debug:before {
+    content: "窄版pc";
+  }
+}

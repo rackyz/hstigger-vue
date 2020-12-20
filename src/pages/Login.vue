@@ -8,7 +8,7 @@
       </div>
       <div class='footer'>
        
-        <div>Copyright © 2019-2021 宁波高专建设监理有限公司 | </div>
+        <div>Copyright © 2019-2021 宁波高专建设监理有限公司</div>
         <div><a href="https://beian.miit.gov.cn/" style='color:#ddd;'>浙ICP备18011212号-3</a></div>
       </div>
    </div>

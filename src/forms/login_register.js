@@ -2,7 +2,7 @@ export default {
                 layout:`<div>
                
                   <div class='flex-wrap' style='width:100%;justify-content:center;'>
-                 <div style='width:250px;border-radius:10px;overflow:hidden;'>
+                 <div style='width:60%;border-radius:10px;overflow:hidden;'>
                 {{phone}}
                 </div>
                 <Button class='login-btn' style='height:58px;border-radius:10px !important;margin-left:10px;background: linear-gradient(to bottom right, #1c80c7, #07d3c5);font-size:20px;color:#fff;border:none;overflow:hidden;' @click='submit'>一键注册</Button>
