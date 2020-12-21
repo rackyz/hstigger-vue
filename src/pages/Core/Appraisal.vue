@@ -84,6 +84,15 @@
 				@click="showFlowInfo = !showFlowInfo"
 				>流程信息</Button
 			>
+
+       <Button
+				style="margin-left: 5px"
+				:type="showDetail?'info':''"
+				@click="showDetail = !showDetail"
+				>详细评分</Button
+			>
+
+      
       <span class='filter-label'>评分筛选</span>
        <Button
 				style="margin-left: 5px"
@@ -112,6 +121,13 @@
 				>平行责任人</Button
 			>
 
+      <Button
+				style="margin-left: 5px"
+				:type="showSecond?'info':''"
+				@click="showSecond = !showSecond"
+				>第二责任人</Button
+			>
+
 		</div>
     <div class="filter-wrap" style="padding: 5px;background:#aaa;color:#fff;" @click="selected = null">
         
@@ -124,8 +140,9 @@
        <Button :key='i'
 				style="margin-left: 5px" size='small'
 				:type="fdep.includes(i)?'warning':''"
+        :disabled="deps_count[i] == 0"
 				@click="fdep.includes(i)?fdep.splice(fdep.findIndex(v=>v==i),1):fdep.push(i)"
-				>{{d}}</Button
+				>{{d}} {{deps_count[i]}}</Button
 			>
 
       </template>
@@ -138,9 +155,10 @@
       <template v-for='(d,i) in positions'>
        <Button :key='i'
 				style="margin-left: 5px" size='small'
+        :disabled="pos_count[i] == 0"
 				:type="fpos.includes(i)?'warning':''"
 				@click="fpos.includes(i)?fpos.splice(fpos.findIndex(v=>v==i),1):fpos.push(i)"
-				>{{d}}</Button
+				>{{d}} {{pos_count[i]}}</Button
 			>
 
       </template>
@@ -148,7 +166,8 @@
     <!-- table -->
 		<div
 			style="
-				height: calc(100% - 135px);
+				height: calc(100% - 75px);
+        padding-bottom:10px;
 				overflow: hidden;
 				background: #ddd;
 				position: relative;
@@ -156,16 +175,16 @@
 		>
      <!--  -->
 			<hs-table
-       v-tableDrag
+        v-tableDrag
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="filteredColumns"
-				:data="pagedData"
-				:paged="false"
-        	:loading="loading"
+				:data="filterdData"
+        :loading="loading"
+        :count="filterdData.length"
 				selectable="none"
-
-       
+        :pageSize='100'
+        sortable
 				full
 				@event="onTableEvent"
 			>
@@ -174,7 +193,7 @@
 		</div>
 		
     <!-- paging -->
-		<div
+		<!-- <div
 			style="
 				height: 50px;
 				background: #fff;
@@ -195,7 +214,7 @@
         @on-change="current_page=($event-1)"
         @on-opage-size-change="current_page_size=$event"
 			/>
-		</div>
+		</div> -->
 
 	
       </div>
@@ -308,13 +327,18 @@ export default {
   computed:{
     ...mapGetters('core',['users']),
     deps(){
-      return ['行政','房建','市政','建设','装修', '造价', 'BIM']
+      return ['行政','房建','市政','管理','装修', '造价', 'BIM']
     }, 
+    deps_count(){
+      return [0,1,2,3,4,5,6,7].map(d=>this.items.filter(v=>v.dep == d).length)
+    },
     positions(){
       return  ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级']
     } ,
+    pos_count(){
+      return [0,1,2,3].map(d=>this.filterdData.filter(v=>v.position == d).length)
+    },
     filterdData(){
-      this.current_page = 1
       return this.items.filter(v=>{
         if(this.searchText && (!v.name || !v.name.includes(this.searchText)))
           return false
@@ -333,9 +357,9 @@ export default {
     columns(){
       var that=this
       return [
-        { type: "index", title: "序号" ,fixed:"left",sortable:false,render(h,param){
-          return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1+that.current_page*that.current_page_size)       }},
-        
+        // { type: "index", title: "序号" ,fixed:"left",sortable:false,render(h,param){
+        //   return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1+that.current_page*that.current_page_size)       }},
+        {type:"index",title:"序号",fixed:'left'},
 			 { type: "text", key: "name", width:80,title: "姓名",option:{align:"left"},fixed:"left",render(h,param){
          return h('span',{style:{fontSize:"16px"}},[param.row.name])
        }},
@@ -350,25 +374,89 @@ export default {
                  { type: "text",cat:'person', key: "cerificate", width:200,title: "岗位证书",option:{align:"center"}},
                   { type: "text",cat:'person', key: "education", width:200,title: "学历",option:{align:"center"}},
                 { type: "text", key: "report", sortable:false,width:100,title: "述职报告",render(h,param){
-                  return h('a',{domProps:{href:'#'},style:{marginLeft:"10px"},on:{click(){that.showPreview=true;
+                  if(param.row.report && !param.row.report.html)
+                    return h('a',{on:{click(){that.Download(param.row.report.url)}}},'下载')
+                  return h('a',{domProps:{href:'#'},style:{marginLeft:"10px"},on:{click(){
+                    that.showPreview=true;
                   that.current=param.row;that.getReport()}}},'预览')
                  }},
 
                  	{ type: "text",cat:'flow', key: "desc",minWidth:300,  title: "流程",option:{event:"openflow",
               
                    }},
+                     {
+             key:"commit",
+            title:"综合评分",
+            width:120,
+            render(h,param){
+              let sheets = ['E0','E1','E2','E3','E4','E5']
+              let options =  [10,9.5,9,8.5,8,7,5,7,6.5,6,5.5,5]
+              let s = 0
+              for(let i=0;i<sheets.length;i++){
+                let sh = sheets[i]
+                if(param.row[sh+'n4']){
+                  let scores = param.row[sh+'n4']
+                  scores.forEach(sc=>{
+                    s+=options[sc || 0]
+                  })
+                  break
+                }
+              }
+              if(s == 0){
+                return h('div','事业部未评')
+              }
+              let levels = ['优秀','优良','良','合格','不合格']
+              let l = (s > 90 ? 0 : (s > 80 ? 1:(s > 70 ? 2 : (s > 60 ?3:4))))
+              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},s)
+              let level =   h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},levels[l])
+              let row = h('div',{class:'cell-row'},[score,level])
+              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[row])
+            }
+          },
+           
+        
+							 { type: "text", cat:"flow",key: "state", width:200,title: "当前节点",option:{align:"center"},render(h,params){
+                 let activeNodes = params.row.activeNodes
+                 let domActiveNodes = activeNodes.filter(v=>v.executors).map(v=>{
+                   let executors = v.executors.filter(v=>v).map(e=>{
+                     let user = that.users.find(u=>u.id == e)
+                     if(user)
+                      return user
+                   }).filter(s=>s).map(user=>{
+                     return h('hs-avatar',{props:{userinfo:user}})
+                   })
+                   let node = that.nodes.find(n=>n.key == v.key)
+                   let nodeDom = h('div',{class:'cell-node'},'节点')
+                   if(node)
+                      nodeDom = h('div',{class:'cell-node'},node.name)
+                   if(executors.length < 0)
+                    return h('div',{class:'cell-row'},nodeDom)
+                   else
+                    return h('div',{class:'cell-row'},[nodeDom,...executors])
+                 })
+                 return h('div',{class:'cell-row-wrapper'},domActiveNodes)
+               }},{
+                type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'}
+              },
+          {
+            title:"创建时间",
+           type:'time',
+            width:100,
+           key:"created_at"
+          },
 				
           {
             key:"commit",
             type:'text',
             title:"考核评分",
             sortable:false,
-            width:580,
+            cat:"detail",
+            width:510,
             renderHeader(h,param){
               
-              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#fff;text-overflow:eclipse;`},'负责人')
+              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#333;text-overflow:eclipse;`},'负责人')
               let  colDoms = new Array(10).map((v,i)=>h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#fff;`
+                    style:`width:40px;min-width:40px;height:20px;color:#333;`
                     },i))
               return  h('div',{class:'cell-row'},[nodeDom,...colDoms])
             },
@@ -394,6 +482,8 @@ export default {
                   return null
                 else if(!that.showFirstExtra && node.includes('n3'))
                   return null
+                 else if(!that.showSecond && node == 'n4')
+                  return null
                  if(!executors[node])
                   return null
                   let op = that.users.find(v=>v.id == param.row.ops[node])
@@ -405,13 +495,13 @@ export default {
 
                   if(Array.isArray(param.row[`${sheet}${node}`])){
                     score = param.row[`${sheet}${node}`]
-                    for(let n=0;n<10;n++)
+                    for(let n=0;n<9;n++)
                       score[n] = score[n] || null
                     return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                       if(vi == 0){
                           return ['合格','不合格'][v?v:0]
                       }else{
-                        return (v===null || v===undefined?'无':options[v])
+                        return (v===undefined?'无':options[v || 0])
                       }
 
                     }).map((s,si)=>{
@@ -423,7 +513,7 @@ export default {
                   }
                   
                 }
-                for(let n=0;n<10;n++)
+                for(let n=0;n<9;n++)
                     score[n] = score[n] || null
                 return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                   if(vi == 0){
@@ -444,6 +534,7 @@ export default {
           {
             title:"调查评估",
             sortable:false,
+            cat:"detail",
             width:650,
             render(h,param){
               let nodes=['n1','n2','n31','n32','n33','n4']
@@ -466,6 +557,8 @@ export default {
                   return null
                 else if(!that.showFirstExtra && node.includes('n3'))
                   return null
+                 else if(!that.showSecond && node == 'n4')
+                  return null
                  if(!executors[node])
                   return null
                   let op = that.users.find(v=>v.id == param.row.ops[node])
@@ -485,7 +578,7 @@ export default {
                       
                     return h('div',{class:'cell-row'},[score.map((v,vi)=>{
                      
-                        return (v===null || v===undefined?'无':sheet.questions[vi].options[v])
+                        return ( v===undefined?'无':sheet.questions[vi].options[v || 0])
                       
 
                     }).map((s,si)=>{
@@ -539,6 +632,8 @@ export default {
                   return null
                 else if(!that.showFirstExtra && node.includes('n3'))
                   return null
+                else if(!that.showSecond && node == 'n4')
+                  return null
 
                 let scores = []
                 if(!executors[node])
@@ -572,50 +667,7 @@ export default {
             }
           },
            
-          {
-             key:"commit",
-            title:"综合评分",
-            width:120,
-            render(h,params){
-              let s = '100'
-              let l = '优秀'
-              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};`},s)
-              let level =   h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${l=='无'?'#ddd':'darkgreen'};`},l)
-              let row = h('div',{class:'cell-row'},[score,level])
-              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[row])
-            }
-          },
-           
         
-							 { type: "text", cat:"flow",key: "state", width:200,title: "当前节点",option:{align:"center"},render(h,params){
-                 let activeNodes = params.row.activeNodes
-                 let domActiveNodes = activeNodes.filter(v=>v.executors).map(v=>{
-                   let executors = v.executors.filter(v=>v).map(e=>{
-                     let user = that.users.find(u=>u.id == e)
-                     if(user)
-                      return user
-                   }).filter(s=>s).map(user=>{
-                     return h('hs-avatar',{props:{userinfo:user}})
-                   })
-                   let node = that.nodes.find(n=>n.key == v.key)
-                   let nodeDom = h('div',{class:'cell-node'},'节点')
-                   if(node)
-                      nodeDom = h('div',{class:'cell-node'},node.name)
-                   if(executors.length < 0)
-                    return h('div',{class:'cell-row'},nodeDom)
-                   else
-                    return h('div',{class:'cell-row'},[nodeDom,...executors])
-                 })
-                 return h('div',{class:'cell-row-wrapper'},domActiveNodes)
-               }},{
-                type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'}
-              },
-          {
-            title:"创建时间",
-           type:'time',
-            width:100,
-           key:"created_at"
-          },
         
 			]
     },
@@ -627,6 +679,8 @@ export default {
           return false
            if(!this.showFlowInfo && v.cat == 'flow')
           return false
+          if(!this.showDetail && v.cat == 'detail')
+            return false
 
           if(this.fdep.length == 1 && v.key == 'dep')
             return false
@@ -646,7 +700,9 @@ export default {
       current_page:0,
       showSelf:true,
       showFirst:true,
+      showDetail:true,
       showFirstExtra:true,
+      showSecond:true,
       current_page_size:25,
       fpos:[],
       searchText:"",
@@ -735,6 +791,7 @@ export default {
           }
          
         })
+        items = items.sort((a,b)=>{moment(a.created_at).isBefore(moment(b.created_at)?1:-1)})
         this.items = items
         
       }).catch(e=>{
