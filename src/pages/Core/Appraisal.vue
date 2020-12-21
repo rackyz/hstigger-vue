@@ -453,11 +453,22 @@ export default {
             cat:"detail",
             width:510,
             renderHeader(h,param){
-              
+              let titles = ['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
+              if(that.fpos.length == 1 && that.fpos == 0){
+                titles[0] = '道德'
+                titles[1] = '专业'
+                titles[2] = '沟通'
+                titles[3] = '统筹'
+                titles[4] = '勤奋'
+                titles[5] = '目标'
+                titles[6] = '实际'
+                titles[7] = '团队'
+                titles[8] = '配合'
+              }
               let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#333;text-overflow:eclipse;`},'负责人')
-              let  colDoms = new Array(10).map((v,i)=>h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#333;`
-                    },i))
+              let  colDoms = [0,1,2,3,4,5,6,7,8].map((v,i)=>h('div',{
+                    style:`width:40px;min-width:40px;height:20px;color:#666;`
+                    },[titles[i]]))
               return  h('div',{class:'cell-row'},[nodeDom,...colDoms])
             },
             render(h,param){
@@ -465,7 +476,7 @@ export default {
               let nodes=['n1','n2','n31','n32','n33','n4']
                let nodesName = ['自评','第一','平行','平行','平行','第二']
               let sheets = ['E0','E1','E2','E3','E4','E5']
-              let options =  ['10分','9.5分','9分','8.5分','8分','7.5分','7分','6.5分','6分','5.5分','5分及以下']
+              let options =  ['10','9.5','9','8.5','8','7.5','7','6.5','6','5.5','5↓']
               let executors =param.row.executors
               let ops = param.row.ops
                 if(!(executors))
@@ -495,11 +506,9 @@ export default {
 
                   if(Array.isArray(param.row[`${sheet}${node}`])){
                     score = param.row[`${sheet}${node}`]
-                    for(let n=0;n<9;n++)
-                      score[n] = score[n] || null
                     return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                       if(vi == 0){
-                          return ['合格','不合格'][v?v:0]
+                          return v===undefined?'无':(['合格','不合格'][v?v:0])
                       }else{
                         return (v===undefined?'无':options[v || 0])
                       }
@@ -517,7 +526,7 @@ export default {
                     score[n] = score[n] || null
                 return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                   if(vi == 0){
-                    return ['合格','不合格'][v?v:0]
+                    return '无'
                   }else{
                     return (v===null || v===undefined?'无':options[v])
                   }
@@ -536,6 +545,22 @@ export default {
             sortable:false,
             cat:"detail",
             width:650,
+             renderHeader(h,param){
+              let titles=['饱满度','Q2','Q3','Q4','Q5','Q6','Q7']
+              if(that.fpos.length == 1 && that.fpos[0] == 0 && that.showSecond){
+                titles[1] = '团队建设'
+                titles[2] = '业主关系'
+                titles[3] = '目标达成'
+                titles[4] = '岗位等级'
+                titles[5] = '薪酬评估'
+                titles[6] = '薪酬调整'
+              }
+              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#666;text-overflow:eclipse;`},'负责人')
+              let  colDoms = [0,1,2,3,4,5,6,7].map((v,i)=>h('div',{
+                    style:`width:80px;min-width:80px;height:20px;color:#333;`
+                    },[titles[i]]))
+              return  h('div',{class:'cell-row'},[...colDoms])
+            },
             render(h,param){
               let nodes=['n1','n2','n31','n32','n33','n4']
                let nodesName = ['自评','第一','平行','平行','平行','第二']
@@ -612,7 +637,15 @@ export default {
             title:"考核评优/推荐",
             sortable:false,
             width:350,
-            
+             renderHeader(h,param){
+              
+              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#666;text-overflow:eclipse;`},'负责人')
+              let titles = ['评级','推荐','评语']
+              let  colDoms = [0,1,2].map((v,i)=>h('div',{
+                    style:`width:40px;min-width:40px;height:20px;color:#333;`
+                    },[titles[i]]))
+              return  h('div',{class:'cell-row'},[...colDoms])
+            },
             render(h,param){
               let nodes=['n2','n31','n32','n33','n4']
               let executors =param.row.executors
