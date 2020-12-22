@@ -96,8 +96,10 @@
 import { mapGetters } from "vuex";
 const DEFAULT_ENT_AVATAR = "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/company.png"
 import FLOW_DEF_RAW from '@/flows/29fe3900-3504-11eb-a58f-19892a782200.js'
+import FLOW_TEST from '@/flows/TEST'
 let local_local_def = {}
 local_local_def['4f477a00-3c1b-11eb-8b81-b551b8fbb24d'] = FLOW_DEF_RAW
+local_local_def['TEST'] = FLOW_TEST
 export default {
 	data() {
 		return {

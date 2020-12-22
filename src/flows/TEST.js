@@ -213,9 +213,7 @@ var
   Q7= {
     title: "岗位等级",
     desc: "描述",
-    options: ['见习', '初级助理', '助理', '成熟助理', '优秀助理',
-      '初级/偏弱工程师', '工程师', '成熟工程师', '优秀工程师'
-    ]
+    options: ['见习', '初级', '合格', '成熟', '优秀']
   },
   Q8={
     title:"环境适应度",
@@ -232,6 +230,10 @@ var
   Q11={
     title:"薪酬调整或岗位晋升建议",
     options:['明显提升','适当提升','略有提升','保持不变','可适当降低']
+  },
+  Q12={
+    title:"建议岗位",
+    options: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级', '助理级/员级']
   }
 
 var QN0 = {
@@ -241,9 +243,9 @@ var QN0 = {
   questions:[Q1,Q5,Q8]
 }
 var QN1 = {key:'mgr_self',label:'项目/部门经理->自评',condition:`v-else`,questions:[Q1, Q4, Q2, Q3]}
-var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q7]}
-var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6, Q7, Q10, Q11]}
-var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3, Q7, Q10, Q11]}
+var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q12, Q7]}
+var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6,Q12, Q7, Q10, Q11]}
+var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3,Q12,Q7, Q10, Q11]}
 
 
 var MAKE_QN = (q)=>{
@@ -272,7 +274,6 @@ var CreateQNDef = ()=>{
 
 
 var flow = {
-  id:1,
   name: '年终考核',
   desc:'2020年度人员考核定级及评优工作',
   icon:'gongzuobaogao',
@@ -510,12 +511,6 @@ var flow = {
       type: ACTION_TYPES.submit,
       with:'a1'
     },
-    a3: {
-      name: "退回",
-      from: "n2",
-      to: "n1",
-      type: ACTION_TYPES.reject
-    },
     a4: {
       name: "发送",
       from: "n2",
@@ -526,12 +521,6 @@ var flow = {
       name: "提交",
       from: "n3",
     
-      type: ACTION_TYPES.submit
-    },
-    a6: {
-      name: "退回",
-      from: "n4",
-      to: "n2",
       type: ACTION_TYPES.submit
     },
     a7: {
@@ -545,12 +534,6 @@ var flow = {
       from: "n5",
       type: ACTION_TYPES.accept
     },
-    a9: {
-      name: "退回",
-      from: "n5",
-      to: "n4",
-      type: ACTION_TYPES.reject
-    }
   },
 }
 

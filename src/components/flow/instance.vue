@@ -45,7 +45,7 @@
 
           <hs-form
             :form='MakeView(flow.def,currentNodeObject)'
-            :data='db'
+            :data='formData'
           />
         </div>
       </div>
