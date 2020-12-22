@@ -64,9 +64,14 @@
         <!-- filters -->
 		<div class="filter-wrap" style="padding: 5px" @click="selected = null">
 		
-      <Button
+     <Button
 				style="margin-right: 5px"
 				type="error"
+				@click="showScore = true"
+				>编辑评分</Button>
+      <Button
+				style="margin-right: 5px"
+				type="info"
 				:loading="loading"
 				@click="getData()"
 				>刷新</Button>
@@ -218,6 +223,10 @@
 
 	
       </div>
+
+      <Modal title="事业部评分" footer-hide v-model="showScore" width='1200'>
+        <hs-table 
+      </Modal>
 
       <Drawer :title="`述职报告 ${current?' - '+current.name:''}`" v-model="showPreview" width="800">
         <Spin fix v-show='loadingReport' />
@@ -726,6 +735,7 @@ export default {
     return {
       current_page:0,
       showSelf:true,
+      showScore:false,
       showFirst:true,
       showDetail:true,
       showFirstExtra:true,
