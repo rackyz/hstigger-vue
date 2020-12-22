@@ -152,6 +152,7 @@ export default {
             let {instance} = res.data.data
             
             this.getInst(instance.id)
+            this.$emit('update')
           }).catch(e=>{
          //   this.Error(e)  
           }).finally(e=>{
@@ -162,6 +163,7 @@ export default {
           console.log(res)
           this.Success("提交完成")
            this.getInst(this.instId)
+           this.$emit('update')
         }).catch(e=>{
           this.Error(e)  
         }).finally(e=>{
@@ -176,6 +178,7 @@ export default {
           console.log(res)
           this.Success("提交完成")
            this.getInst(this.instId)
+           this.$emit('update')
         }).catch(e=>{
           this.Error(e)  
         }).finally(e=>{

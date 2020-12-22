@@ -125,7 +125,7 @@
     </Col>
   </Row>
    
-    <BaseFlow :id='current_flow.flow_id' :inst_id="current_flow.id" v-model="showFlow" />
+    <BaseFlow :id='current_flow.flow_id' :inst_id="current_flow.id" v-model="showFlow" @update='getWorkflows' />
     <!-- <div class="panel" style="  width:calc(8.3333% * 7 - 2px);height:calc(110px * 6 - 20px);left:calc(8.3333% * 2 );top:2px;background:rgba(200,200,200,0.7);filter:drop-shadow(1px 1px 2px #333) brightness(1.1);padding:20px;">
       日历
     </div>

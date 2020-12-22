@@ -273,9 +273,7 @@ var
   Q7= {
     title: "岗位等级",
     desc: "描述",
-    options: ['见习', '初级助理', '助理', '成熟助理', '优秀助理',
-      '初级/偏弱工程师', '工程师', '成熟工程师', '优秀工程师'
-    ]
+    options: ['见习', '初级', '合格', '成熟', '优秀']
   },
   Q8={
     title:"环境适应度",
@@ -292,6 +290,10 @@ var
   Q11={
     title:"薪酬调整或岗位晋升建议",
     options:['明显提升','适当提升','略有提升','保持不变','可适当降低']
+  },
+  Q12={
+    title:"建议岗位",
+    options: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级', '助理级/员级']
   }
 
 var QN0 = {
@@ -301,9 +303,9 @@ var QN0 = {
   questions:[Q1,Q5,Q8]
 }
 var QN1 = {key:'mgr_self',label:'项目/部门经理->自评',condition:`v-else`,questions:[Q1, Q4, Q2, Q3]}
-var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q7]}
-var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6, Q7, Q10, Q11]}
-var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3, Q7, Q10, Q11]}
+var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q12, Q7]}
+var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6,Q12, Q7, Q10, Q11]}
+var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3,Q12,Q7, Q10, Q11]}
 
 const getEVSheets = (user,nodes)=>{
   return nodes.map(v=>{
@@ -336,15 +338,20 @@ export default {
       return  ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级']
     } ,
     pos_count(){
-      return [0,1,2,3].map(d=>this.filterdData.filter(v=>v.position == d).length)
+      return [0,1,2,3].map(d=>this.filterdDataByDep.filter(v=>v.position == d).length)
     },
-    filterdData(){
-      return this.items.filter(v=>{
+    filterdDataByDep(){
+       return this.items.filter(v=>{
         if(this.searchText && (!v.name || !v.name.includes(this.searchText)))
           return false
         if(this.fdep && this.fdep.length > 0 && !this.fdep.includes(v.dep)){
           return false
         }
+        return true
+       })
+    },
+    filterdData(){
+      return this.filterdDataByDep.filter(v=>{
          if(this.fpos && this.fpos.length > 0 && !this.fpos.includes(v.position)){
           return false
         }
@@ -381,7 +388,7 @@ export default {
                   that.current=param.row;that.getReport()}}},'预览')
                  }},
 
-                 	{ type: "text",cat:'flow', key: "desc",minWidth:300,  title: "流程",option:{event:"openflow",
+                 	{ type: "text",cat:'flow', key: "desc",minWidth:300, linkEvent:true, title: "流程",option:{
               
                    }},
                      {
@@ -389,25 +396,12 @@ export default {
             title:"综合评分",
             width:120,
             render(h,param){
-              let sheets = ['E0','E1','E2','E3','E4','E5']
-              let options =  [10,9.5,9,8.5,8,7,5,7,6.5,6,5.5,5]
-              let s = 0
-              for(let i=0;i<sheets.length;i++){
-                let sh = sheets[i]
-                if(param.row[sh+'n4']){
-                  let scores = param.row[sh+'n4']
-                  scores.forEach(sc=>{
-                    s+=options[sc || 0]
-                  })
-                  break
-                }
-              }
-              if(s == 0){
-                return h('div','事业部未评')
-              }
-              let levels = ['优秀','优良','良','合格','不合格']
-              let l = (s > 90 ? 0 : (s > 80 ? 1:(s > 70 ? 2 : (s > 60 ?3:4))))
-              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},s)
+              let s = param.row.score
+              if(param.row.score == undefined)
+                return h('span','事业部未评')
+              let levels = ['优秀','优良','合格','不合格']
+              let l = (s > 90 ? 0 : (s > 80 ? 1:(s > 60 ?2:3)))
+              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},s || 0)
               let level =   h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},levels[l])
               let row = h('div',{class:'cell-row'},[score,level])
               return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[row])
@@ -544,9 +538,9 @@ export default {
             title:"调查评估",
             sortable:false,
             cat:"detail",
-            width:650,
+            width:730,
              renderHeader(h,param){
-              let titles=['饱满度','Q2','Q3','Q4','Q5','Q6','Q7']
+              let titles=['饱满度','Q2','Q3','Q4','Q5','Q6','Q7','Q8']
               if(that.fpos.length == 1 && that.fpos[0] == 0 && that.showSecond){
                 titles[1] = '团队建设'
                 titles[2] = '业主关系'
@@ -805,6 +799,10 @@ export default {
                }else{ 
                  v.ops[n.key] = n.op
                }
+
+                if(n.key == 'n4'){
+
+                }
 
 
                if(n.mem_self || n.mgr_self){
