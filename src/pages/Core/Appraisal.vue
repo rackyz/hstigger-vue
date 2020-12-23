@@ -67,7 +67,7 @@
      <Button
 				style="margin-right: 5px"
 				type="error"
-				@click="showScore = true"
+				@click="showScore = true;renderEdit()"
 				>编辑评分</Button>
       <Button
 				style="margin-right: 5px"
@@ -224,10 +224,140 @@
 	
       </div>
 
-      <Modal title="事业部评分" footer-hide v-model="showScore" width='1200'>
-        <hs-table 
-      </Modal>
+      <Modal title="事业部评分" footer-hide v-model="showScore" width='1300'>
+        <div style='background:#aaa;'>
+        <div class='flex-wrap' style='padding:10px 0'>
+          <div >
+  <span class='filter-label'>部门</span>
+      <template v-for='(d,i) in editDeps'>
+       <Button :key='i'
+				style="margin-left: 5px" size='small'
+				:type="fdep.includes(d)?'warning':''"
+        :disabled="deps_count[d] == 0"
+				@click="fdep=[d];renderEdit()"
+				>{{deps[d]}} {{deps_count[d]}}</Button
+			>
 
+      </template>
+
+     
+          </div>
+          <div class='POSITIONS'>
+ <span class='filter-label'>岗位</span>
+      <template v-for='(d,i) in positions'>
+       <Button :key='i'
+				style="margin-left: 5px" size='small'
+        :disabled="pos_count[i] == 0"
+				:type="fpos.includes(i)?'warning':''"
+				@click="fpos=[i];renderEdit()"
+				>{{d}} {{pos_count[i]}}</Button
+			>
+
+      </template>
+          </div>
+    
+</div>
+{{model}}
+  <div class='content' style='height:600px;overflow-y:auto;'>
+     <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#fff;margin-bottom:5px;display:flex;align-items:center;width:100%;font-size:12px;'>
+          <div style='width:50px'>姓名</div>
+          <template v-if='eQNSheet && eQNSheet.shorts'>
+          <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
+            <div style='width:30px' :key='qi'>{{q}}</div>
+          </template>
+          </template>
+           <div style='width:30px'>总分</div>
+          <template v-if='eQASheet && eQASheet.questions'>
+          <template v-for="(q,qi) in eQASheet.questions">
+            <div style='width:65px;' :key='qi'>{{q.title}}</div>
+          </template>
+          </template>
+          <div style='width:60px;'>评优等级</div>
+          <div style='width:60px;'>推荐奖项</div>
+          <div style='width:100px;text-align:center;'>评语</div>
+        </div>
+        <template v-for="u in filterdData">
+        <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#eee;margin-bottom:5px;display:flex;align-items:center;width:100%;font-size:12px;' :key='u.id' :style='`background:${editingUser != u.id?"":"yellow"}`'>
+          <div style='width:50px;cursor:pointer;'  @click='editingUser=u.id'>{{u.name}}</div>
+          <template v-if='eQNSheet &&eQNSheet.shorts'>
+          <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
+            <template v-if="editingUser != u.id">
+               <div style='width:30px;text-align:center;background:#fff;' :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+            </template>
+            <template v-else>
+            <Dropdown :key='qi' @on-click="EditQN(u,eQNSheet.key+'n4',qi,$event)">
+              <div style='width:30px;text-align:center;background:#fff;cursor:pointer;' :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+              <DropdownMenu slot='list'>
+                <template v-for='(o,oi) in eQNSheet.options[qi]'>
+                  <DropdownItem style='font-size:12px;' :key='oi' :name='oi'>{{o}}</DropdownItem>
+                </template>
+                
+              </DropdownMenu>
+            </Dropdown>
+            </template>
+          </template>
+          </template>
+           <div style='width:30px;text-align:center;background:#fff;'>{{CalcScore(eQNSheet,Object.assign({},model[eQNSheet.key+'n4'] || {},u[eQNSheet.key+'n4'] || {})) || "-"}}</div>
+          <template v-if='eQASheet && eQASheet.questions'>
+          <template v-for="(q,qi) in eQASheet.questions">
+            <template v-if="editingUser != u.id">
+               <div style='width:65px;text-align:center;background:#fff;' :key='qi'>{{(model[eQASheet.key]?q.options[model[eQASheet.key][qi]]:(u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:"-"))||'-'}}</div>
+            </template>
+            <template v-else>
+            <Dropdown :key='qi' @on-click="EditQA(u,eQASheet.key,qi,$event)">
+              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;' :key='qi'>{{((model[eQASheet.key]? q.options[model[eQASheet.key][qi]]:"") || (u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:'-')) || '-'}}</div>
+              <DropdownMenu slot='list'>
+                <template v-for='(o,oi) in q.options'>
+                  <DropdownItem style='font-size:12px;' :key='oi' :name='oi'>{{o}}</DropdownItem>
+                </template>
+                
+              </DropdownMenu>
+            </Dropdown>
+            </template>
+          </template>
+          </template>
+          <div>   <template v-if="editingUser != u.id">
+               <div style='width:60px;text-align:center;background:#fff;' :key='qi'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :(u.CommitLevel_n4 || "-")}}</div>
+            </template><template v-else>
+              <Dropdown :key='qi' @on-click="u.CommitLevel_n4 = $event">
+              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4}}</div>
+              <DropdownMenu slot='list'>
+                <template v-for="(o,oi) in ['优秀','称职','基本称职','不称职']">
+                  <DropdownItem style='font-size:12px;' :key='o' :name='o'>{{o}}</DropdownItem>
+                </template>
+                
+              </DropdownMenu>
+            </Dropdown>
+              </template></div>
+          <div>   <template v-if="editingUser != u.id">
+               <div style='width:60px;text-align:center;background:#fff;' :key='qi'>{{model.CommitPride_n4 ? model.CommitPride_n4 : (u.CommitPride_n4 || "-")}}</div>
+            </template><template v-else>
+              <Dropdown :key='qi' @on-click="u.CommitPride_n4 = $event">
+              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;'>{{model.CommitPride_n4 ? model.CommitPride_n4 : u.CommitPride_n4}}</div>
+              <DropdownMenu slot='list'>
+                <template v-for="(o,oi) in ['进步奖', '敬业奖', '贡献奖']">
+                  <DropdownItem style='font-size:12px;' :key='o' :name='o'>{{o}}</DropdownItem>
+                </template>
+                
+              </DropdownMenu>
+            </Dropdown>
+              </template></div>
+          <div style='width:100px;background:#fff;padding:0 10px;text-align:center;' @click='editingUser == u.id?createEditCommit(u):""'>
+            {{model.Commit_n4?model.Commit_n4:(u ? (u.Commit_n4 || '-') : '-')}}
+          </div>
+        </div>
+        <div v-if="editingUser == u.id" :key='u.id'>
+          
+
+        </div>
+        
+        </template>
+      </div>
+        </div>
+      </Modal>
+      <Modal title='编辑评语' v-model='showCommitEditor'>
+        <Input type='textarea' :rows='15'  v-model='editingUserItem.Commit_n4' />
+      </Modal>
       <Drawer :title="`述职报告 ${current?' - '+current.name:''}`" v-model="showPreview" width="800">
         <Spin fix v-show='loadingReport' />
         <div slot='close' style='font-size:16px;line-height:33px;margin-right:10px;'>
@@ -275,7 +405,7 @@ var
     options: ['非常大', '很大', '大', '比较大', '正常', '不大', '几乎没有']
   },
   Q6= {
-    title: "成长性、发展潜力",
+    title: "发展潜力",
     desc: "发展潜力",
     options: ['潜力非常大', '潜力很大', '潜力大', '潜力较大', '潜力一般', '潜力不大', '没啥潜力']
   },
@@ -297,13 +427,14 @@ var
     options:['明显高于岗位','高于岗位','偏高与岗位','匹配','基本匹配','稍低于岗位','明显低于岗位']
   },
   Q11={
-    title:"薪酬调整或岗位晋升建议",
+    title:"薪酬建议",
     options:['明显提升','适当提升','略有提升','保持不变','可适当降低']
   },
   Q12={
     title:"建议岗位",
     options: ['项目经理/部门经理/总监(含副职)', '项目/部门经理助理/总代', '工程师级', '助理级/员级']
   }
+
 
 var QN0 = {
   key:'mem_self',
@@ -315,31 +446,145 @@ var QN1 = {key:'mgr_self',label:'项目/部门经理->自评',condition:`v-else`
 var QN2 = {key:'mgr2mem',label:'项目/部门经理->员工',questions:[Q1, Q5, Q9, Q6, Q12, Q7]}
 var QN3 = {key:'dep2mem',label:'事业部->员工',condition:`v-if="db.model.position!=0"`,questions:[Q1, Q5, Q9, Q6,Q12, Q7, Q10, Q11]}
 var QN4 = {key:'dep2mgr',label:'事业部->项目/部门经理',condition:`v-else`,questions:[Q1, Q4, Q2, Q3,Q12,Q7, Q10, Q11]}
-
-const getEVSheets = (user,nodes)=>{
-  return nodes.map(v=>{
-    if(v == 'n1'){
-      if(user.position == 0)
+const getEVSheet = (position,node)=>{
+  if(node == 'n1'){
+      if(position == 0)
         return QN1
       else
         return QN0
-    }else if(v == 'n4'){
-       if(user.position == 0)
+    }else if(node == 'n4'){
+       if(position == 0)
         return QN4
       else
         return QN3
     }else{
       return QN2
     }
-  })
+}
+
+let options =  ['10','9.5','9','8.5','8','7.5','7','6.5','6','5.5','5↓']
+// 项目经理总监
+var E0 ={
+  key:'E0',
+  label:"部门经理/项目经理/总监",
+  condition:'v-if="db.model.position==0"',
+  desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+2、“统筹管理能力”指面对突发、复杂、系统性问题的分析和解决能力。
+3、“实际服务效果”指项目客观服务结果及业主单位评价。
+4、“团队建设”含员工培养、内部管理、内部氛围等。`,
+options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+ cats:['专业技术能力', '沟通协调能力', '统筹管理能力', '勤奋敬业精神', '目标实现能力', '实际服务效果', '团队建设情况', '配合公司情况'
+],
+shorts:['专业','沟通','统筹','勤奋','目标','实际','团建','配合'],
+  heavy:[15,10,10,10,15,15,15,10]
+}
+// 岗位工程师
+var E1={
+  key:"E1",
+  label:'岗位工程师',
+  options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+  condition:'v-else-if="(db.model.dep >= 3) && (db.model.position==1 || db.model.position==2)"',
+  desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+2、“岗位通用能力”是指软件、文字、语言表达、汇报等通用型能力。
+3、“优秀”等级合计得分不宜低于85分，分项得分不宜低于80%，推荐比例一般不应超过25%。
+4、“勤奋敬业精神”（包含工作纪律）分项得分60%以下者，按“不称职”推荐等级。`,
+cats: ['岗位专业能力', '岗位通用能力', '其他岗位通识', '精细严谨程度', '勤奋敬业精神', '沟通协调能力', '工作成果质量', '团队配合情况'],
+shorts:['专业','通用','通识','严谨','敬业','沟通','质量','配合'],
+heavy:[15,15,10,10,10,10,15,15]
+}
+// 工程师助理/员
+var E2={
+  key:"E2",
+  label:"工程师助理/员级",
+  options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+  condition:'v-else-if="(db.model.dep >= 3) && (db.model.position==3)"',
+  desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+2、“知识与技能”各分项需按成熟工程师助理要求，权衡评分。
+3、“优秀”等级合计得分不宜低于85分，分项得分不宜低于80%，推荐比例一般不应超过25%。
+4、	“勤奋敬业精神”（包含工作纪律）分项得分60%以下者，按“不称职”推荐等级。`,
+cats: ['专业基础知识', '流程制度掌握', '基础软件操作', '文字语言表达', '勤奋敬业精神', '精细严谨程度', '沟通协作态度', '学习发展潜力'],
+shorts:['专业','流程','软件','表达','勤奋','严谨','沟通','学习'],
+heavy:[10,10,10,10,20,15,15,10]
+}
+
+// 监理工程师
+var E3 = {
+  key:"E3",
+  label:'监理工程师',
+  options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+  condition:'v-else-if="(db.model.dep==1 || db.model.dep==2) && (db.model.position==1 || db.model.position==2)"',
+ desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+2、“优秀”等级合计得分不宜低于85分，分项得分不宜低于80%，推荐比例一般不应超过25%。
+3、“勤奋敬业精神”（包含工作纪律）分项得分60%以下者，按“不称职”推荐等级。`,
+cats: ['内业能力', '外业能力', '学习与创新', '精细严谨程度', '勤奋敬业精神', '沟通协调能力', '工作指导能力', '团队建设情况'],
+shorts:['内业','外业','创新','严谨','勤奋','沟通','指导','团队'],
+heavy:[15,15,10,10,20,10,10,10]
+}
+
+// 监理员
+var E4 ={
+  key:"E4",
+  label:"监理员",
+  options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+  condition:'v-else-if="(db.model.dep==1 || db.model.dep==2) && (db.model.position==3)"',
+  desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+ 2、“知识与技能”各分项需按成熟监理员要求，权衡评分。
+ 3、“优秀”等级合计得分不宜低于85分，分项得分不宜低于80%，推荐比例一般不应超过25%。
+ 4、	“勤奋敬业精神”（包含工作纪律）分项得分60%以下者，按“不称职”推荐等级。`,
+cats: ['专业基础知识', '施工工艺经验', '仪器操作技能', '资料整理能力', '勤奋敬业精神', '精细严谨程度', '沟通协作态度', '学习发展潜力'],
+shorts:['专业','施工','仪器','资料','勤奋','严谨','沟通','学习'],
+heavy:[10,10,10,10,20,15,15,10]
+}
+
+// 行政
+var E5={
+  key:"E5",
+  label:'行政',
+  options:[['合格','不合格'],options,options,options,options,options,options,options,options,options],
+  condition:'v-else-if="db.model.dep==0"',
+desc: `1、凡遇有职业道德违规事项，必须随时逐级上报，个案处理。
+ 2、 “优秀”等级合计得分不宜低于85分，分项得分不宜低于80%，推荐比例一般不应超过25%。
+ 3、“勤奋敬业精神”（包含工作纪律）分项得分60%以下者，按“不称职”推荐等级。`,
+cats: ['服务意识', '协作意识', '严谨程度', '工作质量', '工作效率', '勤奋敬业精神', '支持项目情况', '支持部门情况'],
+shorts:['服务','协作','严谨','质量','效率','敬业','项目','部门'],
+heavy:[15,15,10,10,10,10,15,15]
+
+}
+const getQASheet = (dep,position)=>{
+  if(position === 0){
+    return E0
+  }else if(dep === 0){
+    return E5
+  }else if(dep === 1 || dep === 2){
+    if(position === 1 || position === 2)
+      return E3
+    else
+      return E4
+  }else if(dep > 2){
+    if(position === 1 || position === 2)
+      return E1
+    else
+      return E2
+  }
+}
+const getEVSheets = (user,nodes)=>{
+  return nodes.map(v=> getEVSheet(user.position,v)
+  )
 }
 
 export default {
   computed:{
-    ...mapGetters('core',['users']),
+    ...mapGetters('core',['users','session']),
     deps(){
       return ['行政','房建','市政','管理','装修', '造价', 'BIM']
     }, 
+    editDeps(){
+      let id = this.session.user_id
+      if(this.session.type > 1){
+        return [0,6]
+      }
+      return []
+    },
     deps_count(){
       return [0,1,2,3,4,5,6,7].map(d=>this.items.filter(v=>v.dep == d).length)
     },
@@ -456,18 +701,17 @@ export default {
             cat:"detail",
             width:510,
             renderHeader(h,param){
-              let titles = ['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
-              if(that.fpos.length == 1 && that.fpos == 0){
-                titles[0] = '道德'
-                titles[1] = '专业'
-                titles[2] = '沟通'
-                titles[3] = '统筹'
-                titles[4] = '勤奋'
-                titles[5] = '目标'
-                titles[6] = '实际'
-                titles[7] = '团队'
-                titles[8] = '配合'
-              }
+              let titles = ['道德','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
+               let dep = that.fdep.length == 1?that.fdep[0]:undefined
+               let pos = that.fpos.length == 1?that.fpos[0]:undefined
+               
+                let sheet = getQASheet(dep,pos)
+                console.log('SHEET:',sheet)
+                if(sheet)
+                  sheet.shorts.forEach((v,i)=>{
+                    titles[i+1] = sheet.shorts[i]
+                  })
+                
               let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#333;text-overflow:eclipse;`},'负责人')
               let  colDoms = [0,1,2,3,4,5,6,7,8].map((v,i)=>h('div',{
                     style:`width:40px;min-width:40px;height:20px;color:#666;`
@@ -547,19 +791,20 @@ export default {
             title:"调查评估",
             sortable:false,
             cat:"detail",
-            width:730,
+            width:720,
              renderHeader(h,param){
               let titles=['饱满度','Q2','Q3','Q4','Q5','Q6','Q7','Q8']
-              if(that.fpos.length == 1 && that.fpos[0] == 0 && that.showSecond){
-                titles[1] = '团队建设'
-                titles[2] = '业主关系'
-                titles[3] = '目标达成'
-                titles[4] = '岗位等级'
-                titles[5] = '薪酬评估'
-                titles[6] = '薪酬调整'
+              let pos = that.fpos.length == 1 ?that.fpos[0]:undefined
+              let node = that.showSelf?'n1':(that.showFirst?'n2':'n4')
+              let sheet = getEVSheet(pos,node)
+              if(sheet){
+                sheet.questions.forEach((v,i)=>{
+                  titles[i] = sheet.questions[i].title
+                })
+                
               }
               let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#666;text-overflow:eclipse;`},'负责人')
-              let  colDoms = [0,1,2,3,4,5,6,7].map((v,i)=>h('div',{
+              let  colDoms = titles.map((v,i)=>h('div',{
                     style:`width:80px;min-width:80px;height:20px;color:#333;`
                     },[titles[i]]))
               return  h('div',{class:'cell-row'},[...colDoms])
@@ -591,7 +836,7 @@ export default {
                   return null
                   let op = that.users.find(v=>v.id == param.row.ops[node])
                  let score = []
-                  let nodeDom = h('div',{style:`width:80px;min-width:80px;height:20px;color:#fff;background:${op?'#333':'#ddd'};text-overflow:eclipse;`},op?op.name:nodesName[j])
+                  let nodeDom = h('div',{style:`width:80px;min-width:80px;height:20px;color:#fff;background:${op?'#333':'#dfdfdf'};text-overflow:eclipse;`},op?op.name:nodesName[j])
                
                   let sheet = sheets[j]
                   var sheetKey = (j>1 && j<5)?(sheet.key+(j-1)):sheet.key
@@ -611,14 +856,14 @@ export default {
 
                     }).map((s,si)=>{
                   return h('div',{
-                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*(300/sheet.questions[si].options.length):0}deg);`
+                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#dfdfdf':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*(300/sheet.questions[si].options.length):0}deg);`
                     },s)
                     })
                     ])
                   
                   
                 }
-                for(let n=0;n<5;n++)
+                for(let n=0;n<8;n++)
                     score[n] = score[n] || null
                 return h('div',{class:'cell-row'},[score.map((v,vi)=>{
                 
@@ -734,6 +979,7 @@ export default {
   data(){
     return {
       current_page:0,
+      showCommitEditor:false,
       showSelf:true,
       showScore:false,
       showFirst:true,
@@ -752,11 +998,63 @@ export default {
       reportURL:"",
       showPreview:false,
       loadingReport:false,
+      editingUserItem:{},
       showFlowInfo:false,
       fdep:[],
+      eQVSheet:{},
+      eQNSheet:{},
+      editingUser:null,
+      model:{}
     }
   },
   methods:{
+    CalcScore(sheet,value = []){
+      const values = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
+      if(sheet && sheet.heavy){
+      let s = 0
+      
+      if(value[0] == 1)
+        s = -50
+      sheet.heavy.forEach((v,i)=>{
+        s += (values[value[i+1]] || 0) * v / 10
+        console.log('s=',s)
+      })
+      return s
+      }
+    },
+    EditQA(u,key,index,value){
+      console.log(key,index,value)
+       if(!this.model[key])
+        this.model[key] = []
+      this.model[key][index] = value
+      this.$set(this,'model',Object.assign({},this.model))
+ 
+       
+    },
+    EditQN(u,key,index,value){
+      
+      if(!this.model[key])
+        this.model[key] = []
+       this.model[key][index] = value
+      this.$set(this,'model',Object.assign({},this.model))
+    },
+    createEditCommit(u){
+      this.showCommitEditor = true
+      this.editingUserItem = u
+    },
+    renderEdit(){
+     
+      if(this.editDeps && this.editDeps.length > 0)
+      {
+        if(this.fpos.length != 1)
+          this.fpos = [0]
+        if(this.fdep.length != 1)
+          this.fdep = [this.editDeps[0]]
+        this.eQASheet = getEVSheet(this.fpos[0],'n4')
+        this.eQNSheet = getQASheet(this.fdep[0],this.fpos[0])
+        this.model = {}
+      }
+    },
     mapColor(ch){
       return this.hs.mapColor(ch)
     },
@@ -900,5 +1198,11 @@ export default {
 .filter-label{
   margin:0 5px;
   margin-left:13px;
+}
+
+.score-item{
+  >*{
+    margin-right:5px;
+  }
 }
 </style>

@@ -167,7 +167,7 @@ export default {
       }).finally(e=>{
         setTimeout(() => {
           this.loading = false
-        }, 2000);
+        }, 500);
         
       })
     },
@@ -178,7 +178,7 @@ export default {
         this.$bus.$emit('switch-ent')
       }).finally(e=>{
         setTimeout(()=>{this.loading=false},
-      1000)})
+      500)})
     },
     onClickUserMenu(e){
       if(e == 'logout'){

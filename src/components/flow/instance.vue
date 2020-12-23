@@ -529,6 +529,7 @@ export default {
     toolDisabled() {
       return {
         contact: true,
+        history:true,
         graph:true,
         document:true,
         db:true
