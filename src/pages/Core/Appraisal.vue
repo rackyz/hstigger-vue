@@ -40,7 +40,7 @@
 
 </style>
 <template>
-  <div class='hs-container-full' style='height:100%;'>
+  <div class='hs-container-full hs-tigger' style='height:100%;'>
    
       <!-- <div class="hs-left">
          <div class='caption'>2020年年终考核情况汇总统计</div>
@@ -66,12 +66,13 @@
 		
      <Button
 				style="margin-right: 5px"
-				type="error"
+        type="success"
+        icon='md-arrow-forward'
 				@click="showScore = true;renderEdit()"
-				>编辑评分</Button>
+				>事业部打分入口</Button>
       <Button
 				style="margin-right: 5px"
-				type="info"
+				icon='md-refresh'
 				:loading="loading"
 				@click="getData()"
 				>刷新</Button>
@@ -86,14 +87,14 @@
       <Button
 				style="margin-left: 5px"
 				:type="showFlowInfo?'info':''"
-				@click="showFlowInfo = !showFlowInfo"
+				@click="showFlowInfo = !showFlowInfo;"
 				>流程信息</Button
 			>
 
        <Button
 				style="margin-left: 5px"
 				:type="showDetail?'info':''"
-				@click="showDetail = !showDetail"
+				@click="showDetail = !showDetail;"
 				>详细评分</Button
 			>
 
@@ -102,7 +103,7 @@
        <Button
 				style="margin-left: 5px"
         v-if="showSelf || showFirstExtra || showFirst"
-				@click="showSelf=showFirst=showFirstExtra=false"
+				@click="showSelf=showFirst=showFirstExtra=false;"
 				>取消</Button
 			>
       <Button
@@ -115,26 +116,26 @@
       <Button
 				style="margin-left: 5px"
 				:type="showFirst?'info':''"
-				@click="showFirst = !showFirst"
+				@click="showFirst = !showFirst;"
 				>第一责任人</Button
 			>
 
      <Button
 				style="margin-left: 5px"
 				:type="showFirstExtra?'info':''"
-				@click="showFirstExtra = !showFirstExtra"
+				@click="showFirstExtra = !showFirstExtra;"
 				>平行责任人</Button
 			>
 
       <Button
 				style="margin-left: 5px"
 				:type="showSecond?'info':''"
-				@click="showSecond = !showSecond"
+				@click="showSecond = !showSecond;"
 				>第二责任人</Button
 			>
 
 		</div>
-    <div class="filter-wrap" style="padding: 5px;background:#aaa;color:#fff;" @click="selected = null">
+    <div class="filter-wrap" style="padding: 5px;background:#33435c;color:#fff;border-bottom:1px solid #fff;" @click="selected = null">
         
       <span class='filter-label'>部门</span>
       <Button style="margin-left: 5px" size='small'
@@ -179,47 +180,25 @@
 			"
 		>
      <!--  -->
+     <transition name='fade'>
 			<hs-table
         v-tableDrag
+        v-show="show"
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="filteredColumns"
 				:data="filterdData"
         :loading="loading"
-        :count="filterdData.length"
 				selectable="none"
-        :pageSize='100'
+        :pageSize='50'
         sortable
+        :rowClassName='getRowClassName'
 				full
 				@event="onTableEvent"
 			>
 			</hs-table>
-    
+    </transition>
 		</div>
-		
-    <!-- paging -->
-		<!-- <div
-			style="
-				height: 50px;
-				background: #fff;
-				display: flex;
-				justify-content: center;
-				border-top: 1px solid #dfdfdf;
-				align-items: center;
-			"
-		>
-			<Page
-				:total="filterdData.length"
-				size="small"
-				:page-size="current_page_size"
-				:page-size-opts="[25, 50, 100]"
-				show-elevator
-				show-sizer
-				show-total
-        @on-change="current_page=($event-1)"
-        @on-opage-size-change="current_page_size=$event"
-			/>
-		</div> -->
 
 	
       </div>
@@ -365,7 +344,7 @@
         <span v-else>未上传文件</span></div>
         <template v-if="!loadingReport && reportURL">
          <template v-if="report">
-          <div v-html="report" style='padding:0px 10px;font-family:"仿宋";font-size:16px;' />
+          <div class='hs-article' v-html="report" style='padding:0px 10px;font-family:"仿宋";font-size:16px;' />
           </template>
           <template v-else>
             <BasePreview :url="reportURL" />
@@ -621,6 +600,12 @@ export default {
         // { type: "index", title: "序号" ,fixed:"left",sortable:false,render(h,param){
         //   return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1+that.current_page*that.current_page_size)       }},
         {type:"index",title:"序号",fixed:'left'},
+         { type: "text", key: "name", width:50,title: "标记",sortable:false,option:{align:"left"},fixed:"left",render(h,param){
+         return h('Button',{props:{size:'small',type:param.row.readed?'success':''},on:{click:()=>{
+           that.$set(param.row,'readed',!param.row.readed);
+           that.saveReadState(param.row.id,param.row.readed)
+         }}},param.row.readed?'已阅':'待阅')
+       }},
 			 { type: "text", key: "name", width:80,title: "姓名",option:{align:"left"},fixed:"left",render(h,param){
          return h('span',{style:{fontSize:"16px"}},[param.row.name])
        }},
@@ -637,7 +622,7 @@ export default {
                 { type: "text", key: "report", sortable:false,width:100,title: "述职报告",render(h,param){
                   if(param.row.report && !param.row.report.html)
                     return h('a',{on:{click(){that.Download(param.row.report.url)}}},'下载')
-                  return h('a',{domProps:{href:'#'},style:{marginLeft:"10px"},on:{click(){
+                  return h('Button',{domProps:{href:'#'},style:{marginLeft:"10px"},on:{click(){
                     that.showPreview=true;
                   that.current=param.row;that.getReport()}}},'预览')
                  }},
@@ -645,22 +630,7 @@ export default {
                  	{ type: "text",cat:'flow', key: "desc",minWidth:300, linkEvent:true, title: "流程",option:{
               
                    }},
-                     {
-             key:"commit",
-            title:"综合评分",
-            width:120,
-            render(h,param){
-              let s = param.row.score
-              if(param.row.score == undefined)
-                return h('span','事业部未评')
-              let levels = ['优秀','优良','合格','不合格']
-              let l = (s > 90 ? 0 : (s > 80 ? 1:(s > 60 ?2:3)))
-              let score =  h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},s || 0)
-              let level =   h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:darkgreen;filter:hue-rotate(${l*30}deg)`},levels[l])
-              let row = h('div',{class:'cell-row'},[score,level])
-              return h('div',{class:'cell-row-wrapper',style:{alignItems:"flex-start"}},[row])
-            }
-          },
+                   
            
         
 							 { type: "text", cat:"flow",key: "state", width:200,title: "当前节点",option:{align:"center"},render(h,params){
@@ -699,9 +669,9 @@ export default {
             title:"考核评分",
             sortable:false,
             cat:"detail",
-            width:510,
+            width:560,
             renderHeader(h,param){
-              let titles = ['道德','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
+              let titles = ['道德','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9','总分']
                let dep = that.fdep.length == 1?that.fdep[0]:undefined
                let pos = that.fpos.length == 1?that.fpos[0]:undefined
                
@@ -713,7 +683,7 @@ export default {
                   })
                 
               let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#333;text-overflow:eclipse;`},'负责人')
-              let  colDoms = [0,1,2,3,4,5,6,7,8].map((v,i)=>h('div',{
+              let  colDoms = [0,1,2,3,4,5,6,7,8,9].map((v,i)=>h('div',{
                     style:`width:40px;min-width:40px;height:20px;color:#666;`
                     },[titles[i]]))
               return  h('div',{class:'cell-row'},[nodeDom,...colDoms])
@@ -724,7 +694,9 @@ export default {
                let nodesName = ['自评','第一','平行','平行','平行','第二']
               let sheets = ['E0','E1','E2','E3','E4','E5']
               let options =  ['10','9.5','9','8.5','8','7.5','7','6.5','6','5.5','5↓']
+              let values = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
               let executors =param.row.executors
+              let sheetObj = getQASheet(param.row.dep,param.row.position)
               let ops = param.row.ops
                 if(!(executors))
                 return h('span','配置失效')
@@ -750,26 +722,40 @@ export default {
                 for(let i=0;i<sheets.length;i++){
                  
                   let sheet = sheets[i]
-
+                 
                   if(Array.isArray(param.row[`${sheet}${node}`])){
                     score = param.row[`${sheet}${node}`]
+                    let sum = 0
+                    score.forEach((v,i)=>{
+                      if(i==0){
+                        if(v)
+                          sum = -50
+                        else
+                          sum = 0
+                      }else{
+                        sum += (values[v] || 0) * ((sheetObj.heavy[i-1] || 0) / 10)
+                      }
+                    })
+                    score[10] = parseInt(sum)
                     return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                       if(vi == 0){
                           return v===undefined?'无':(['合格','不合格'][v?v:0])
+                      }else if(vi==10){
+                        return v===undefined?'无':v
                       }else{
                         return (v===undefined?'无':options[v || 0])
                       }
 
                     }).map((s,si)=>{
                   return h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*30:0}deg);`
+                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'#5a6'};filter:hue-rotate(${score[si]?score[si]*30:0}deg);`
                     },s)
                     })
                     ])
                   }
                   
                 }
-                for(let n=0;n<9;n++)
+                for(let n=0;n<10;n++)
                     score[n] = score[n] || null
                 return h('div',{class:'cell-row'},[nodeDom,score.map((v,vi)=>{
                   if(vi == 0){
@@ -887,10 +873,9 @@ export default {
             width:350,
              renderHeader(h,param){
               
-              let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#666;text-overflow:eclipse;`},'负责人')
               let titles = ['评级','推荐','评语']
               let  colDoms = [0,1,2].map((v,i)=>h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#333;`
+                    style:`width:60px;min-width:60px;height:20px;color:#333;`
                     },[titles[i]]))
               return  h('div',{class:'cell-row'},[...colDoms])
             },
@@ -919,7 +904,7 @@ export default {
                 let scores = []
                 if(!executors[node])
                   return null
-                  let nodeDom = h('div',{style:'width:30px;min-width:40px;height:20px;color:#fff;background:#888;'},nodesName[j])
+                  let nodeDom = h('div',{style:'width:60px;min-width:60px;height:20px;color:#fff;background:#888;'},nodesName[j])
                 for(let i=0;i<fields.length;i++){
                   let f = fields[i]
       
@@ -935,7 +920,7 @@ export default {
                   return h('div',{class:'cell-row'},[
                         scores.map(v=>v===null?'无':v).map((s,si)=>{
                           if(si < 2){
-                            return h('div',{style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':that.mapColor(s[0])}`},s)
+                            return h('div',{style:`width:60px;min-width:60px;height:20px;color:#fff;background:${s=='无'?'#ddd':that.mapColor(s[0])}`},s)
                           }else{
                             return h('Tooltip',{props:{maxWidth:200,content:s,transfer:true}},[h('div',{style:`max-width:200px;text-overflow:ellipsis;overflow:hidden;height:20px;ecllipse;text-align:left;padding:0 5px;white-space:nowrap;line-height:25px;`},s)])
                           }
@@ -1004,10 +989,23 @@ export default {
       eQVSheet:{},
       eQNSheet:{},
       editingUser:null,
-      model:{}
+      model:{},
+      show:true,
+      readed:{}
     }
   },
   methods:{
+    getRowClassName(row,index){
+      if(row.readed)
+        return 'hs-row-readed'
+      else
+        return 'hs-row'
+    },
+    saveReadState(id,state){
+      this.readed[id] = state
+      this.items.find(v=>v.id == id).readed = state
+     localStorage.setItem('appraisal_state',JSON.stringify(this.readed))
+    },
     CalcScore(sheet,value = []){
       const values = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
       if(sheet && sheet.heavy){
@@ -1076,6 +1074,14 @@ export default {
         this.loadingReport = false
       })
     },
+    Switch(func){
+      this.show = false
+      setTimeout(()=>{
+        this.show = true
+      },1000)
+      if(typeof func == 'function')
+        this.func()
+    },
     onTableEvent(e){
       
      if(e.type == 'delete'){
@@ -1093,6 +1099,13 @@ export default {
     },
     getData(){
       this.loading = true
+      let readed = localStorage.getItem('appraisal_state')
+      try{
+      readed = JSON.parse(readed) || {}
+      }catch(e){
+        readed = {}
+      }
+      this.readed = readed
       this.ENT.LIST_CHECKREPORTS({timeout:10000}).then(res=>{
         let items = res.data.data
         items.forEach(v=>{
@@ -1111,7 +1124,7 @@ export default {
                 if(n.key == 'n4'){
 
                 }
-
+              v.readed = readed[v.id]
 
                if(n.mem_self || n.mgr_self){
                   v.QN2 = n.mem_self || n.mgr_self || []
