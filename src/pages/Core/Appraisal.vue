@@ -36,38 +36,26 @@
    border:1px solid #aaa;
   bottom:-2px;
 }
-
+.l-drawer{
+  .ivu-drawer-mask {
+    z-index: 2000 !important;
+  }
+  .ivu-drawer-wrap {
+    z-index: 2000 !important;
+  }
+}
 
 </style>
 <template>
   <div class='hs-container-full hs-tigger' style='height:100%;'>
-   
-      <!-- <div class="hs-left">
-         <div class='caption'>2020年年终考核情况汇总统计</div>
-         <div class='dep'>
-            所有员工 <span class='count'>123/321</span>
-          </div>
-          <div class='dep'>
-            建设管理事业部 <span class='count'>123/321</span>
-          </div>
-           <div class='dep'>
-            市政监理事业部 <span class='count'>123/1234</span>
-          </div>
-           <div class='dep'>
-            房建监理事业部 <span class='count'>123/123</span>
-          </div>
-           <div class='dep'>
-            装修事业部 <span class='count'>123/231</span>
-          </div>
-      </div> -->
-      <div class='hs-content'>
+      <div class='hs-content' >
         <!-- filters -->
 		<div class="filter-wrap" style="padding: 5px" @click="selected = null">
-		
      <Button
 				style="margin-right: 5px"
         type="success"
         icon='md-arrow-forward'
+        v-if="editDeps && editDeps.length > 0"
 				@click="showScore = true;renderEdit()"
 				>事业部打分入口</Button>
       <Button
@@ -147,7 +135,7 @@
 				style="margin-left: 5px" size='small'
 				:type="fdep.includes(i)?'warning':''"
         :disabled="deps_count[i] == 0"
-				@click="fdep.includes(i)?fdep.splice(fdep.findIndex(v=>v==i),1):fdep.push(i)"
+				@click="fdep=[i]"
 				>{{d}} {{deps_count[i]}}</Button
 			>
 
@@ -163,7 +151,7 @@
 				style="margin-left: 5px" size='small'
         :disabled="pos_count[i] == 0"
 				:type="fpos.includes(i)?'warning':''"
-				@click="fpos.includes(i)?fpos.splice(fpos.findIndex(v=>v==i),1):fpos.push(i)"
+				@click="fpos=[i]"
 				>{{d}} {{pos_count[i]}}</Button
 			>
 
@@ -203,14 +191,18 @@
 	
       </div>
 
-      <Modal title="事业部评分" footer-hide v-model="showScore" width='1300'>
-        <div style='background:#aaa;'>
-        <div class='flex-wrap' style='padding:10px 0'>
+      <Modal title="事业部评分" footer-hide v-model="showScore" width='1300' fullscreen class='hs-tigger'    v-if="editDeps && editDeps.length > 0">
+        <div style='background:rgb(51, 67, 92);position:relative;height:100%;'>
+          <!-- tool -->
+        <div class='flex-wrap' style='padding:10px 0;color:#fff;'>
+          <span class='filter-label' style=''>搜索</span>
+          	<Input v-model="searchText" search clearable size='small' style='margin-left:10px;border-radius:0;width:200px;' />
           <div >
-  <span class='filter-label'>部门</span>
+  <span class='filter-label' style=''>部门</span>
+  <ButtonGroup style='margin-left:5px;'>
       <template v-for='(d,i) in editDeps'>
        <Button :key='i'
-				style="margin-left: 5px" size='small'
+				size='small'
 				:type="fdep.includes(d)?'warning':''"
         :disabled="deps_count[d] == 0"
 				@click="fdep=[d];renderEdit()"
@@ -218,127 +210,146 @@
 			>
 
       </template>
-
+</ButtonGroup>
      
           </div>
           <div class='POSITIONS'>
  <span class='filter-label'>岗位</span>
+ <ButtonGroup style='margin-left:5px;'>
       <template v-for='(d,i) in positions'>
        <Button :key='i'
-				style="margin-left: 5px" size='small'
+				 size='small'
         :disabled="pos_count[i] == 0"
 				:type="fpos.includes(i)?'warning':''"
 				@click="fpos=[i];renderEdit()"
 				>{{d}} {{pos_count[i]}}</Button
 			>
 
-      </template>
+      </template></ButtonGroup>
           </div>
     
 </div>
-{{model}}
-  <div class='content' style='height:600px;overflow-y:auto;'>
-     <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#fff;margin-bottom:5px;display:flex;align-items:center;width:100%;font-size:12px;'>
-          <div style='width:50px'>姓名</div>
+<!-- table -->
+  <div style='position:relative;height:calc(100% - 80px);'>
+    <!-- header -->
+     <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#fff;display:flex;align-items:center;width:100%;font-size:12px;'>
+       <div style='width:30px;text-align:center;'>置顶</div>
+          <div style='width:50px;text-align:center;'>姓名</div>
           <template v-if='eQNSheet && eQNSheet.shorts'>
           <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
-            <div style='width:30px' :key='qi'>{{q}}</div>
+            <Tooltip :content="['职业道德',...eQNSheet.cats][qi]" :key='qi'>
+            <div style='width:40px;text-align:center;' :key='qi'>{{q}}</div>
+            </Tooltip>
           </template>
           </template>
-           <div style='width:30px'>总分</div>
+           <div style='width:60px;text-align:center;color:darkred;'>总分</div>
           <template v-if='eQASheet && eQASheet.questions'>
           <template v-for="(q,qi) in eQASheet.questions">
-            <div style='width:65px;' :key='qi'>{{q.title}}</div>
+            <div style='width:70px;text-align:center;' :key='qi'>{{q.title}}</div>
           </template>
           </template>
-          <div style='width:60px;'>评优等级</div>
-          <div style='width:60px;'>推荐奖项</div>
-          <div style='width:100px;text-align:center;'>评语</div>
+          <div style='width:70px;color:darkred;text-align:center;'>评优等级</div>
+          <div style='width:70px;text-align:center;'>推荐奖项</div>
+          <div style='width:200px;text-align:center;'>评语</div>
         </div>
-        <template v-for="u in filterdData">
-        <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#eee;margin-bottom:5px;display:flex;align-items:center;width:100%;font-size:12px;' :key='u.id' :style='`background:${editingUser != u.id?"":"yellow"}`'>
-          <div style='width:50px;cursor:pointer;'  @click='editingUser=u.id'>{{u.name}}</div>
-          <template v-if='eQNSheet &&eQNSheet.shorts'>
-          <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
-            <template v-if="editingUser != u.id">
-               <div style='width:30px;text-align:center;background:#fff;' :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
-            </template>
-            <template v-else>
-            <Dropdown :key='qi' @on-click="EditQN(u,eQNSheet.key+'n4',qi,$event)">
-              <div style='width:30px;text-align:center;background:#fff;cursor:pointer;' :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
-              <DropdownMenu slot='list'>
-                <template v-for='(o,oi) in eQNSheet.options[qi]'>
-                  <DropdownItem style='font-size:12px;' :key='oi' :name='oi'>{{o}}</DropdownItem>
+        <!-- rows -->
+        <div style="height:calc(100% - 40px);position:relative;overflow-y:auto;">
+        <template v-for="u in [...filteredLocked,...filteredUnlocked]">
+            <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#eee;border-bottom:1px solid #ccd;display:flex;align-items:center;width:100%;font-size:14px;' :key='u.id' :class='editingUser == u.id?"score-item-editing":""' >
+              <div style='width:30px;text-align:center;'><Button icon='md-lock' @click.stop="lock(u)" :type="u.locked?'warning':''" size='small' /></div>
+              <div style='width:50px;text-align:center;'   >{{u.name}}</div>
+              <!-- QN sheet -->
+              <template v-if='eQNSheet &&eQNSheet.shorts'>
+                <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
+                  <template v-if="editingUser != u.id">
+                    <div style='width:40px;'  class='l-field' :key='qi'>{{ (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+                  </template>
+                  <template v-else>
+                  <Dropdown :key='qi' @on-click="EditQN(u,eQNSheet.key+'n4',qi,$event)">
+                    <div style='width:40px;'  class='l-field l-field-select'  :class="CompareChange(u,eQNSheet.key+'n4',qi)?'l-field-changed':''"  :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+                    <DropdownMenu slot='list'>
+                      <template v-for='(o,oi) in eQNSheet.options[qi]'>
+                        <DropdownItem style='font-size:12px;' :selected="oi===(model[eQNSheet.key+'n4']?model[eQNSheet.key+'n4'][qi]:(u[eQNSheet.key+'n4']?u[eQNSheet.key+'n4'][qi]:undefined))"  :key='oi' :name='oi'>{{o}}</DropdownItem>
+                      </template>
+                      
+                    </DropdownMenu>
+                  </Dropdown>
+                  </template>
                 </template>
-                
-              </DropdownMenu>
-            </Dropdown>
-            </template>
-          </template>
-          </template>
-           <div style='width:30px;text-align:center;background:#fff;'>{{CalcScore(eQNSheet,Object.assign({},model[eQNSheet.key+'n4'] || {},u[eQNSheet.key+'n4'] || {})) || "-"}}</div>
-          <template v-if='eQASheet && eQASheet.questions'>
-          <template v-for="(q,qi) in eQASheet.questions">
-            <template v-if="editingUser != u.id">
-               <div style='width:65px;text-align:center;background:#fff;' :key='qi'>{{(model[eQASheet.key]?q.options[model[eQASheet.key][qi]]:(u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:"-"))||'-'}}</div>
-            </template>
-            <template v-else>
-            <Dropdown :key='qi' @on-click="EditQA(u,eQASheet.key,qi,$event)">
-              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;' :key='qi'>{{((model[eQASheet.key]? q.options[model[eQASheet.key][qi]]:"") || (u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:'-')) || '-'}}</div>
-              <DropdownMenu slot='list'>
-                <template v-for='(o,oi) in q.options'>
-                  <DropdownItem style='font-size:12px;' :key='oi' :name='oi'>{{o}}</DropdownItem>
+              </template>
+              <!-- Total -->
+              <div style='width:60px;color:darkred;'  class='l-field'>{{CalcScore(eQNSheet,Object.assign({},u[eQNSheet.key+'n4'] || {})) || "-"}}</div>
+              <!-- QA sheet -->
+              <template v-if='eQASheet && eQASheet.questions'>
+                <template v-for="(q,qi) in eQASheet.questions">
+                  <template v-if="editingUser != u.id">
+                    <div style='width:70px;' class='l-field' :key='qi'>{{(u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:"-")||'-'}}</div>
+                  </template>
+                  <template v-else>
+                  <Dropdown :key='qi' @on-click="EditQA(u,eQASheet.key,qi,$event)">
+                    <div style='width:70px;'  class='l-field l-field-select' :class='model[eQASheet.key] && (!u[eQASheet.key] || model[eQASheet.key][qi] !== u[eQASheet.key][qi])?"l-field-changed":""' :key='qi'>{{((model[eQASheet.key]? q.options[model[eQASheet.key][qi]]:"") || (u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:'-')) || '-'}}</div>
+                    <DropdownMenu slot='list'>
+                      <template v-for='(o,oi) in q.options'>
+                        <DropdownItem style='font-size:12px;' :selected='oi===(model[eQASheet.key]?model[eQASheet.key][qi]:(u[eQASheet.key]?u[eQASheet.key][qi]:undefined))' :key='oi' :name='oi'>{{o}}</DropdownItem>
+                      </template>
+                      
+                    </DropdownMenu>
+                  </Dropdown>
+                  </template>
                 </template>
-                
-              </DropdownMenu>
-            </Dropdown>
-            </template>
-          </template>
-          </template>
-          <div>   <template v-if="editingUser != u.id">
-               <div style='width:60px;text-align:center;background:#fff;' :key='qi'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :(u.CommitLevel_n4 || "-")}}</div>
-            </template><template v-else>
-              <Dropdown :key='qi' @on-click="u.CommitLevel_n4 = $event">
-              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4}}</div>
-              <DropdownMenu slot='list'>
-                <template v-for="(o,oi) in ['优秀','称职','基本称职','不称职']">
-                  <DropdownItem style='font-size:12px;' :key='o' :name='o'>{{o}}</DropdownItem>
-                </template>
-                
-              </DropdownMenu>
-            </Dropdown>
-              </template></div>
-          <div>   <template v-if="editingUser != u.id">
-               <div style='width:60px;text-align:center;background:#fff;' :key='qi'>{{model.CommitPride_n4 ? model.CommitPride_n4 : (u.CommitPride_n4 || "-")}}</div>
-            </template><template v-else>
-              <Dropdown :key='qi' @on-click="u.CommitPride_n4 = $event">
-              <div style='width:65px;text-align:center;background:#fff;cursor:pointer;'>{{model.CommitPride_n4 ? model.CommitPride_n4 : u.CommitPride_n4}}</div>
-              <DropdownMenu slot='list'>
-                <template v-for="(o,oi) in ['进步奖', '敬业奖', '贡献奖']">
-                  <DropdownItem style='font-size:12px;' :key='o' :name='o'>{{o}}</DropdownItem>
-                </template>
-                
-              </DropdownMenu>
-            </Dropdown>
-              </template></div>
-          <div style='width:100px;background:#fff;padding:0 10px;text-align:center;' @click='editingUser == u.id?createEditCommit(u):""'>
-            {{model.Commit_n4?model.Commit_n4:(u ? (u.Commit_n4 || '-') : '-')}}
-          </div>
-        </div>
-        <div v-if="editingUser == u.id" :key='u.id'>
-          
-
-        </div>
-        
-        </template>
-      </div>
-        </div>
+              </template>
+              <!-- CommitLevel_n4 -->
+              <template v-if="editingUser != u.id">
+                  <div style='width:70px;'  class='l-field' :key='qi'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :(u.CommitLevel_n4 || "-")}}</div>
+                </template><template v-else>
+                  <Dropdown :key='qi' @on-click="$set(model,'CommitLevel_n4',$event)">
+                  <div style='width:70px;'  class='l-field l-field-select'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4}}</div>
+                  <DropdownMenu slot='list'>
+                    <template v-for="(o) in ['优秀','称职','基本称职','不称职']">
+                      <DropdownItem style='font-size:12px;' :key='o' :name='o' :selected='model && o===model.CommitLevel_n4' >{{o}}</DropdownItem>
+                    </template>
+                    
+                  </DropdownMenu>
+                </Dropdown>
+                  </template>
+                  <!-- CommitPride_n4 -->
+              <template v-if="editingUser != u.id">
+                  <div style='width:70px'  class='l-field' :key='qi'>{{(u.CommitPride_n4 || "-")}}</div>
+                </template><template v-else>
+                  <Dropdown :key='qi' @on-click="$set(model,'CommitPride_n4',$event)">
+                  <div style='width:70px;'  class='l-field l-field-select'>{{model.CommitPride_n4 ? model.CommitPride_n4 : u.CommitPride_n4}}</div>
+                  <DropdownMenu slot='list'>
+                    <template v-for="(o) in ['进步奖', '敬业奖', '贡献奖']">
+                      <DropdownItem style='font-size:12px;' :selected='o===model.CommitPride_n4' :key='o' :name='o'>{{o}}</DropdownItem>
+                    </template>
+                      <DropdownItem style='font-size:12px;' :selected='undefined===model.CommitPride_n4' key='无' name='无'>无</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+                  </template>
+                    <!-- Commit_n4 -->
+                  <Tooltip maxWidth='300' :content="model.Commit_n4?model.Commit_n4:(u ? (u.Commit_n4 || '-') : '-')" style='height:24px;'>
+              <div style='width:200px;background:#fff;padding:0 10px;text-align:left;' :style="`${editingUser == u.id?'border:1px solid #aaa;background:#ffd;box-shadow:1px 1px 1px 0px #aaa;cursor:pointer;':''}`" class='l-field' @click='editingUser == u.id?createEditCommit(u):""'>
+                {{(editingUser === u.id?(model.Commit_n4 || u.Commit_n4):(u.Commit_n4)) || '-'}}
+                <Icon type='md-create' v-show="editingUser === u.id" size='13' style='margin-right:5px;float:right;line-height:24px;color:#aaa;' />
+              </div>
+              </Tooltip>
+              <!-- Buttons -->
+              <Button size='small' style='margin:0 20px' @click='showReport(u)'>述职报告</Button>
+              <Button size='small' type='info' v-if='editingUser==undefined' :loading='loadingSaveScore' @click="editingUser=u.id">编辑</Button>
+              <Button size='small' type='success' v-if='editingUser==u.id' :loading='loadingSaveScore' @click="saveScore(u)">保存</Button>
+              <Button size='small' v-if='editingUser==u.id' @click.stop='cancelScore'>取消</Button>
+            </div>
+            
+            </template> <!-- rows-->
+            </div>
+          </div><!-- table-->
+        </div><!-- wrap -->
       </Modal>
-      <Modal title='编辑评语' v-model='showCommitEditor'>
-        <Input type='textarea' :rows='15'  v-model='editingUserItem.Commit_n4' />
+      <Modal title='编辑评语' v-model='showCommitEditor' footer-hide>
+        <Input type='textarea' ref='comment' autofocus :rows='15' :value='model.Commit_n4'  @on-change='$set(model,"Commit_n4",$event.target.value)' />
       </Modal>
-      <Drawer :title="`述职报告 ${current?' - '+current.name:''}`" v-model="showPreview" width="800">
-        <Spin fix v-show='loadingReport' />
+      <Drawer class='l-drawer' :title="`述职报告 ${current?' - '+current.name:''}`" transfer v-model="showPreview" width="800">
+        <Spin fix v-show='loadingReport'  />
         <div slot='close' style='font-size:16px;line-height:33px;margin-right:10px;'>
         <a v-if="reportURL"  :href="reportURL" ><Icon type='md-download' style='margin-right:5px;' />下载文件</a>
         <span v-else>未上传文件</span></div>
@@ -554,15 +565,30 @@ const getEVSheets = (user,nodes)=>{
 export default {
   computed:{
     ...mapGetters('core',['users','session']),
+    editingUserItem(){
+      return this.items.find(v=>v.id == this.editingUser)
+    },
     deps(){
       return ['行政','房建','市政','管理','装修', '造价', 'BIM']
     }, 
     editDeps(){
       let id = this.session.user_id
-      if(this.session.type > 1){
+      console.log('id:',this.session.user_id)
+      if(id == 'ed49e690-3b83-11eb-8e1e-c15d5c7db744'){
         return [0,6]
+      }else if(id == 'ed4a8300-3b83-11eb-8e1e-c15d5c7db744' || id == 'ed4a34b4-3b83-11eb-8e1e-c15d5c7db744' || id == 'b8cabcb0-4014-11eb-813c-c1c9b9ee54e7'){
+        return [1]
+      }else if(id == 'ed4a5be7-3b83-11eb-8e1e-c15d5c7db744' || id == 'ed4a5c0b-3b83-11eb-8e1e-c15d5c7db744' || id ==  'ed4a82f9-3b83-11eb-8e1e-c15d5c7db744'){
+        return [2]
+      }else if(id == 'ed49e6d0-3b83-11eb-8e1e-c15d5c7db744' || id == 'ed4a34be-3b83-11eb-8e1e-c15d5c7db744' || id == 'ed4a5bf7-3b83-11eb-8e1e-c15d5c7db744'){
+        return [3]
+      }else if(id == 'ed4a82fb-3b83-11eb-8e1e-c15d5c7db744'){
+        return [4]
+      }else if(id == 'ed4a8301-3b83-11eb-8e1e-c15d5c7db744'){
+        return [5]
       }
-      return []
+
+      return null
     },
     deps_count(){
       return [0,1,2,3,4,5,6,7].map(d=>this.items.filter(v=>v.dep == d).length)
@@ -597,8 +623,6 @@ export default {
     columns(){
       var that=this
       return [
-        // { type: "index", title: "序号" ,fixed:"left",sortable:false,render(h,param){
-        //   return h('div',{style:{background:'#333',color:'#fff',width:'25px',height:'25px',display:"flex",alignItems:'center',justifyContent:'center',borderRadius:'5px',margin:"0 auto"}},param.index+1+that.current_page*that.current_page_size)       }},
         {type:"index",title:"序号",fixed:'left'},
          { type: "text", key: "name", width:50,title: "标记",sortable:false,option:{align:"left"},fixed:"left",render(h,param){
          return h('Button',{props:{size:'small',type:param.row.readed?'success':''},on:{click:()=>{
@@ -633,7 +657,7 @@ export default {
                    
            
         
-							 { type: "text", cat:"flow",key: "state", width:200,title: "当前节点",option:{align:"center"},render(h,params){
+							 { type: "text", cat:"flow",key: "state", width:280,title: "当前节点",option:{align:"center"},render(h,params){
                  let activeNodes = params.row.activeNodes
                  let domActiveNodes = activeNodes.filter(v=>v.executors).map(v=>{
                    let executors = v.executors.filter(v=>v).map(e=>{
@@ -641,12 +665,12 @@ export default {
                      if(user)
                       return user
                    }).filter(s=>s).map(user=>{
-                     return h('hs-avatar',{props:{userinfo:user}})
-                   })
+                     return h('div',{class:'flex-wrap'},[h('hs-avatar',{style:{marginRight:'3px'},props:{userinfo:user}}),user.name])
+                    })
                    let node = that.nodes.find(n=>n.key == v.key)
                    let nodeDom = h('div',{class:'cell-node'},'节点')
                    if(node)
-                      nodeDom = h('div',{class:'cell-node'},node.name)
+                      nodeDom = h('div',{class:'cell-node'},node.name.slice(0,2))
                    if(executors.length < 0)
                     return h('div',{class:'cell-row'},nodeDom)
                    else
@@ -682,6 +706,8 @@ export default {
                     titles[i+1] = sheet.shorts[i]
                   })
                 
+              titles = titles.map((v,i)=>i<9?(h('Tooltip',{props:{transfer:true,content:i==0?'职业道德':(sheet?sheet.cats[i-1]:v)}},v)):v)
+
               let nodeDom = h('div',{style:`width:50px;min-width:50px;height:20px;color:#333;text-overflow:eclipse;`},'负责人')
               let  colDoms = [0,1,2,3,4,5,6,7,8,9].map((v,i)=>h('div',{
                     style:`width:40px;min-width:40px;height:20px;color:#666;`
@@ -697,6 +723,9 @@ export default {
               let values = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
               let executors =param.row.executors
               let sheetObj = getQASheet(param.row.dep,param.row.position)
+              function mapColor(option,index){
+
+              }
               let ops = param.row.ops
                 if(!(executors))
                 return h('span','配置失效')
@@ -748,7 +777,7 @@ export default {
 
                     }).map((s,si)=>{
                   return h('div',{
-                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'#5a6'};filter:hue-rotate(${score[si]?score[si]*30:0}deg);`
+                    style:`width:40px;min-width:40px;height:20px;color:#fff;background:${s=='无'?'#ddd':'#5a6'};filter:hue-rotate(${si<9?(score[si]?score[si]*30:0):((100-score[si])*8)}deg);`
                     },s)
                     })
                     ])
@@ -842,7 +871,7 @@ export default {
 
                     }).map((s,si)=>{
                   return h('div',{
-                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#dfdfdf':'darkgreen'};filter:hue-rotate(${score[si]?score[si]*(300/sheet.questions[si].options.length):0}deg);`
+                    style:`width:80px;min-width:80px;height:20px;color:#fff;background:${s=='无'?'#dfdfdf':'#5a6'};filter:hue-rotate(${score[si]?score[si]*(300/sheet.questions[si].options.length):0}deg);`
                     },s)
                     })
                     ])
@@ -956,6 +985,15 @@ export default {
           return true
          
          })
+    },
+    filteredLocked(){
+      return this.filterdData.filter(v=>v.locked)
+    },
+    filteredUnlocked(){
+      return this.filterdData.filter(v=>!v.locked)
+    },
+    canSubmitScore(){
+      return Object.keys(this.model).length
     }
   },
   mounted(){
@@ -983,7 +1021,7 @@ export default {
       reportURL:"",
       showPreview:false,
       loadingReport:false,
-      editingUserItem:{},
+      
       showFlowInfo:false,
       fdep:[],
       eQVSheet:{},
@@ -991,10 +1029,55 @@ export default {
       editingUser:null,
       model:{},
       show:true,
-      readed:{}
+      readed:{},
+      loadingSaveScore:false
     }
   },
   methods:{
+    showReport(u){
+      this.showPreview=true;
+      this.current=u
+      this.getReport()
+    },
+    ConfirmChange(u){
+      if(this.editingUser || this.loadingSaveScore|| u.locked)
+        return
+     
+     this.$set(this,'model',{})
+          this.editingUser = u.id
+     
+      this.$forceUpdate()
+    },
+    lock(u){
+       if(this.canSubmitScore){
+        this.Confirm('您的评分还未保存,是否继续?',()=>{
+          this.model = {}
+          this.editingUser = undefined
+        })
+      }else{
+         this.model = {}
+          this.editingUser = undefined
+      }
+
+      this.$set(u,'locked',!u.locked)
+    },
+    saveScore(u){
+      let index = this.items.findIndex(v=>v.id == u.id)
+    
+      this.loadingSaveScore = true
+      setTimeout(() => {
+           this.Success("保存成功")
+             this.items.splice(index,1,Object.assign(this.items[index],this.model))
+             //patch e4 store submit
+             //patch e4 store rewrite
+      this.cancelScore()
+      this.loadingSaveScore = false
+      }, (1000));
+    },
+    cancelScore(){
+      this.editingUser=undefined
+      this.$set(this,'model',{})
+    },
     getRowClassName(row,index){
       if(row.readed)
         return 'hs-row-readed'
@@ -1023,35 +1106,54 @@ export default {
     EditQA(u,key,index,value){
       console.log(key,index,value)
        if(!this.model[key])
-        this.model[key] = []
+        this.model[key] = [...u[key]] || []
       this.model[key][index] = value
       this.$set(this,'model',Object.assign({},this.model))
- 
-       
     },
     EditQN(u,key,index,value){
-      
       if(!this.model[key])
-        this.model[key] = []
+        this.model[key] = [...u[key]] || []
        this.model[key][index] = value
       this.$set(this,'model',Object.assign({},this.model))
     },
     createEditCommit(u){
       this.showCommitEditor = true
-      this.editingUserItem = u
+      this.model.Commit_n4 = u.Commit_n4 || ""
+      this.$nextTick(e=>{
+        this.$refs.comment.focus()
+      })
+      
+    },
+    CompareChange(u = {},key,index){
+      if(this.model)
+        return this.model[key] && (!u[key] || this.model[key][index] !== u[key][index])
     },
     renderEdit(){
-     
-      if(this.editDeps && this.editDeps.length > 0)
-      {
-        if(this.fpos.length != 1)
-          this.fpos = [0]
-        if(this.fdep.length != 1)
-          this.fdep = [this.editDeps[0]]
-        this.eQASheet = getEVSheet(this.fpos[0],'n4')
-        this.eQNSheet = getQASheet(this.fdep[0],this.fpos[0])
-        this.model = {}
-      }
+      this.$nextTick(e=>{
+        if(this.editDeps && this.editDeps.length > 0)
+        {
+      
+          if(this.fdep.length != 1)
+            this.fdep = [this.editDeps[0]] || []
+          
+          if(this.fpos.length != 1){
+            for(let i=0;i<this.positions.length;i++){
+              if(!this.pos_count[i]){
+                continue
+              }
+
+              this.fpos= [i] || []
+              break  
+            }
+            
+          }
+          
+          this.eQASheet = getEVSheet(this.fpos[0],'n4')
+          this.eQNSheet = getQASheet(this.fdep[0],this.fpos[0])
+          this.model = {}
+        }
+      })
+      
     },
     mapColor(ch){
       return this.hs.mapColor(ch)
@@ -1218,4 +1320,32 @@ export default {
     margin-right:5px;
   }
 }
+
+.l-field{
+  text-align:center;background:#fff;line-height:24px;
+  border:1px solid #ccc;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height:24px;
+  white-space: nowrap;
+}
+
+.l-field-select{
+  border:1px solid #aaa;
+  padding:0 5px;
+}
+
+.score-item-editing{
+  .l-field-select{
+    background:#ffd;
+    box-shadow:1px 1px 1px 0px #aaa;
+    cursor:pointer;
+  }
+
+  .l-field-changed{
+    background:#fdd;
+  }
+}
+
+
 </style>
