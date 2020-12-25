@@ -62,7 +62,7 @@
          <Icon :custom='`gzicon gzi-${fi.icon}`' size='25' />
          <div class='fi-info'>
            <div class='fi-flowinfo'>
-             [{{fi.name}}]{{fi.node_name}}
+             [{{fi.name}}]<span style='color:#333;margin-left:2px;font-weight:bold;'>{{fi.node_name}}</span>
            </div>
            <div class='fi-desc'>  
              {{fi.desc}}
@@ -87,7 +87,7 @@
          <Icon :custom='`gzicon gzi-${fi.icon}`' size='25' />
          <div class='fi-info'>
            <div class='fi-flowinfo'>
-             [{{fi.name}}]{{fi.nodeName}}
+             [{{fi.name}}]
            </div>
            <div class='fi-desc'>  
              {{fi.desc}}
