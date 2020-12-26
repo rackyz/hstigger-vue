@@ -121,7 +121,12 @@
 				@click="showSecond = !showSecond;"
 				>第二责任人</Button
 			>
-
+  <Button
+				style="float:right"
+			
+				@click="ExportCSV"
+				>导出EXCEL</Button
+			>
 		</div>
     <div class="filter-wrap" style="padding: 5px;background:#33435c;color:#fff;border-bottom:1px solid #fff;" @click="selected = null">
         
@@ -156,6 +161,9 @@
 			>
 
       </template>
+
+
+     
       </div>
     <!-- table -->
 		<div
@@ -1286,6 +1294,49 @@ export default {
        })
      }
     },
+    ExportCSV(){
+      let users = this.users.map(v=>({...v}))
+      users.forEach(v=>{
+        let record = this.items.find(r=>r.name == v.name)
+        if(record){
+          Object.assign(v,record)
+        }
+      })
+
+      this.$refs.table.exportCsv({
+        filename:'2020年终考核汇总',
+        original:false,
+        columns:[{
+          key:'name',
+          title:"姓名"
+        },{
+          key:'depName',
+          title:"部门"
+        },{
+          key:"posName",
+          title:"职务"
+        },{
+          key:'opn1',
+          title:'自评'
+        },{
+          key:'opn2',
+          title:"第一"
+        },{
+          key:"opn31",
+          title:"平行"
+        },{
+          key:"opn32",
+          title:"平行"
+        },{
+          key:"opn33",
+          title:"平行"
+        },{
+          key:"opn4",
+          title:"第二"
+        }],
+        data:users
+      })
+    },
     getData(){
       this.loading = true
       let readed = localStorage.getItem('appraisal_state')
@@ -1302,20 +1353,25 @@ export default {
           v.opusers = {}
           console.log(v.desc)
           console.log(v.executors)
+          v.depName = ['行政综合','房建监理','市政监理','建设管理','装修管理', '造价咨询', 'BIM咨询'][v.dep]
+          v.posName = ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级'][v.position]
+          if(v.name == '马骍')
+            console.log("马骍 HISTORY:",v.historyNodes)
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
-               console.log('history:',n.key,n.op)
+               
                if(n.key == 'n3' && Array.isArray(v.executors.n3)){
                  let index = v.executors.n3.findIndex(v=>v.op == n.op)
-                console.log(n.op)
+                
                  if(index != -1){
+                   
                   if(!n.op)
                     n.op = v.executors.n3[index]
                   v.ops[n.key+(index+1)] = n.op
                   let exec = this.users.find(u=>u.id == n.op)
                   if(exec){
                     v.opusers[n.key+(index+1)] =exec
-                  console.log('index:',v.desc,index,exec.name)
+                    v['op'+n.key+(index+1)] =  exec.name
                   }else{
                     console.log('notfound:',n.op)
                   }
@@ -1323,7 +1379,11 @@ export default {
                }else{ 
                  v.ops[n.key] = n.op
                  v.opusers[n.key] = this.users.find(u=>u.id == n.op)
+                 if(v.opusers[n.key])
+                    v['op'+n.key] =  v.opusers[n.key] .name
+                
                }
+
 
 
 
@@ -1347,7 +1407,7 @@ export default {
                 this.table = QN1
           })
           }
-         
+          v.opn1 = "已录"
         })
         items = items.sort((a,b)=>{moment(a.created_at).isBefore(moment(b.created_at)?1:-1)})
         this.items = items
