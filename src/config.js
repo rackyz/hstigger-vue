@@ -200,6 +200,9 @@ module.exports = {
         DEL_WORKFLOW: "DELETE /workflows/:id",
         RECALL_WORKFLOW:"PATCH /workflows/:id?q=recall",
 
+
+        SAVE_SCORE:"PATCH /workflows/:id?q=savescore",
+
         // 
         ADD_CONCERN_PROJECTS: "PATCH settings/add-concern-projects",
         DEL_CONCERN_PROJECTS: "PATCH settings/del-concern-projects",

@@ -232,7 +232,7 @@
 <!-- table -->
   <div style='position:relative;height:calc(100% - 80px);'>
     <!-- header -->
-     <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#fff;display:flex;align-items:center;width:100%;font-size:12px;'>
+     <div class='flex-wrap score-item score-item-focus' style='padding:10px;width:80px;background:#fff;display:flex;align-items:center;width:100%;font-size:12px;'>
        <div style='width:30px;text-align:center;'>置顶</div>
           <div style='width:50px;text-align:center;'>姓名</div>
           <template v-if='eQNSheet && eQNSheet.shorts'>
@@ -255,18 +255,18 @@
         <!-- rows -->
         <div style="height:calc(100% - 40px);position:relative;overflow-y:auto;">
         <template v-for="u in [...filteredLocked,...filteredUnlocked]">
-            <div class='flex-wrap score-item' style='padding:10px;width:80px;background:#eee;border-bottom:1px solid #ccd;display:flex;align-items:center;width:100%;font-size:14px;' :key='u.id' :class='editingUser == u.id?"score-item-editing":""' >
+            <div class='flex-wrap score-item score-item-user' style='padding:10px;width:80px;background:#eee;border-bottom:1px solid #ccd;display:flex;align-items:center;width:100%;font-size:14px;' :key='u.id' :class='editingUser == u.id?"score-item-editing":""' @click="ConfirmChange(u)">
               <div style='width:30px;text-align:center;'><Button icon='md-lock' @click.stop="lock(u)" :type="u.locked?'warning':''" size='small' /></div>
               <div style='width:50px;text-align:center;'   >{{u.name}}</div>
               <!-- QN sheet -->
               <template v-if='eQNSheet &&eQNSheet.shorts'>
                 <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
                   <template v-if="editingUser != u.id">
-                    <div style='width:40px;'  class='l-field' :key='qi'>{{ (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+                    <div style='width:40px;'  class='l-field' :class="CompareChange(cached[u.id],u,eQNSheet.key+'n4',qi)?'l-field-changed':''" :key='qi'>{{(cached[u.id] && cached[u.id][eQNSheet.key+'n4']? eQNSheet.options[qi][cached[u.id][eQNSheet.key+'n4'][qi]] : (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"")) || "-"}}</div>
                   </template>
                   <template v-else>
-                  <Dropdown :key='qi' @on-click="EditQN(u,eQNSheet.key+'n4',qi,$event)">
-                    <div style='width:40px;'  class='l-field l-field-select'  :class="CompareChange(u,eQNSheet.key+'n4',qi)?'l-field-changed':''"  :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
+                  <Dropdown :key='qi' @on-click="EditQN(u,eQNSheet.key+'n4',qi,$event)" transfer>
+                    <div style='width:40px;'  class='l-field l-field-select'  :class="CompareChange(model,u,eQNSheet.key+'n4',qi)?'l-field-changed':''"  :key='qi'>{{(model[eQNSheet.key+'n4']?eQNSheet.options[qi][model[eQNSheet.key+'n4'][qi]]:"") || (u[eQNSheet.key+'n4'] ? eQNSheet.options[qi][u[eQNSheet.key+'n4'][qi]]:"") || "-"}}</div>
                     <DropdownMenu slot='list'>
                       <template v-for='(o,oi) in eQNSheet.options[qi]'>
                         <DropdownItem style='font-size:12px;' :selected="oi===(model[eQNSheet.key+'n4']?model[eQNSheet.key+'n4'][qi]:(u[eQNSheet.key+'n4']?u[eQNSheet.key+'n4'][qi]:undefined))"  :key='oi' :name='oi'>{{o}}</DropdownItem>
@@ -278,15 +278,15 @@
                 </template>
               </template>
               <!-- Total -->
-              <div style='width:60px;color:darkred;'  class='l-field'>{{CalcScore(eQNSheet,Object.assign({},u[eQNSheet.key+'n4'] || {})) || "-"}}</div>
+              <div style='width:60px;color:darkred;'  class='l-field'>{{(u.id == editingUser ? CalcScore(eQNSheet,Object.assign({},(model[eQNSheet.key+'n4']?model[eQNSheet.key+'n4']:u[eQNSheet.key+'n4']) || {})): CalcScore(eQNSheet,Object.assign({},(cached[u.id] && cached[u.id][eQNSheet.key+'n4']?cached[u.id][eQNSheet.key+'n4']:u[eQNSheet.key+'n4']) || {})))  || "-"}}</div>
               <!-- QA sheet -->
               <template v-if='eQASheet && eQASheet.questions'>
                 <template v-for="(q,qi) in eQASheet.questions">
                   <template v-if="editingUser != u.id">
-                    <div style='width:70px;' class='l-field' :key='qi'>{{(u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:"-")||'-'}}</div>
+                    <div style='width:70px;' class='l-field' :key='qi' :class='cached[u.id] && cached[u.id][eQASheet.key] && (!u[eQASheet.key] || cached[u.id][eQASheet.key][qi] !== u[eQASheet.key][qi])?"l-field-changed":""' >{{(cached[u.id] && cached[u.id][eQASheet.key]?q.options[cached[u.id][eQASheet.key][qi]] : (u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:"-")) ||'-'}}</div>
                   </template>
                   <template v-else>
-                  <Dropdown :key='qi' @on-click="EditQA(u,eQASheet.key,qi,$event)">
+                  <Dropdown :key='qi' @on-click="EditQA(u,eQASheet.key,qi,$event)" transfer>
                     <div style='width:70px;'  class='l-field l-field-select' :class='model[eQASheet.key] && (!u[eQASheet.key] || model[eQASheet.key][qi] !== u[eQASheet.key][qi])?"l-field-changed":""' :key='qi'>{{((model[eQASheet.key]? q.options[model[eQASheet.key][qi]]:"") || (u[eQASheet.key] ? q.options[u[eQASheet.key][qi]]:'-')) || '-'}}</div>
                     <DropdownMenu slot='list'>
                       <template v-for='(o,oi) in q.options'>
@@ -300,10 +300,10 @@
               </template>
               <!-- CommitLevel_n4 -->
               <template v-if="editingUser != u.id">
-                  <div style='width:70px;'  class='l-field' :key='qi'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :(u.CommitLevel_n4 || "-")}}</div>
+                  <div style='width:70px;'  class='l-field'  :class='cached[u.id] && cached[u.id].CommitLevel_n4 !=undefined && cached[u.id].CommitLevel_n4 !== u.CommitLevel_n4?"l-field-changed":""' :key='qi'>{{(cached[u.id] && cached[u.id].CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4) || "-"}}</div>
                 </template><template v-else>
-                  <Dropdown :key='qi' @on-click="$set(model,'CommitLevel_n4',$event)">
-                  <div style='width:70px;'  class='l-field l-field-select'>{{model.CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4}}</div>
+                  <Dropdown :key='qi' @on-click="$set(model,'CommitLevel_n4',$event)" transfer>
+                  <div style='width:70px;'  class='l-field l-field-select' :class='model.CommitLevel_n4 !=undefined && model.CommitLevel_n4 !== u.CommitLevel_n4?"l-field-changed":""' >{{model.CommitLevel_n4 ? model.CommitLevel_n4 :u.CommitLevel_n4}}</div>
                   <DropdownMenu slot='list'>
                     <template v-for="(o) in ['优秀','称职','基本称职','不称职']">
                       <DropdownItem style='font-size:12px;' :key='o' :name='o' :selected='model && o===model.CommitLevel_n4' >{{o}}</DropdownItem>
@@ -314,10 +314,10 @@
                   </template>
                   <!-- CommitPride_n4 -->
               <template v-if="editingUser != u.id">
-                  <div style='width:70px'  class='l-field' :key='qi'>{{(u.CommitPride_n4 || "-")}}</div>
+                  <div style='width:70px'  class='l-field' :key='qi' :class='cached[u.id] && cached[u.id].CommitPride_n4 !=undefined && cached[u.id].CommitPride_n4 !== u.CommitPride_n4?"l-field-changed":""'>{{(cached[u.id] && cached[u.id].CommitPride_n4? cached[u.id].CommitPride_n4 : u.CommitPride_n4 )|| "-"}}</div>
                 </template><template v-else>
-                  <Dropdown :key='qi' @on-click="$set(model,'CommitPride_n4',$event)">
-                  <div style='width:70px;'  class='l-field l-field-select'>{{model.CommitPride_n4 ? model.CommitPride_n4 : u.CommitPride_n4}}</div>
+                  <Dropdown :key='qi' @on-click="$set(model,'CommitPride_n4',$event)" transfer>
+                  <div style='width:70px;'  class='l-field l-field-select' :class='model.CommitPride_n4 !=undefined && model.CommitPride_n4 !== u.CommitPride_n4?"l-field-changed":""'>{{model.CommitPride_n4 ? model.CommitPride_n4 : u.CommitPride_n4}}</div>
                   <DropdownMenu slot='list'>
                     <template v-for="(o) in ['进步奖', '敬业奖', '贡献奖']">
                       <DropdownItem style='font-size:12px;' :selected='o===model.CommitPride_n4' :key='o' :name='o'>{{o}}</DropdownItem>
@@ -327,22 +327,70 @@
                 </Dropdown>
                   </template>
                     <!-- Commit_n4 -->
-                  <Tooltip maxWidth='300' :content="model.Commit_n4?model.Commit_n4:(u ? (u.Commit_n4 || '-') : '-')" style='height:24px;'>
-              <div style='width:200px;background:#fff;padding:0 10px;text-align:left;' :style="`${editingUser == u.id?'border:1px solid #aaa;background:#ffd;box-shadow:1px 1px 1px 0px #aaa;cursor:pointer;':''}`" class='l-field' @click='editingUser == u.id?createEditCommit(u):""'>
+                  <Tooltip transfer maxWidth='300' :content="model.Commit_n4?model.Commit_n4:(u ? (u.Commit_n4 || '-') : '-')" style='height:24px;'>
+              <div style='width:200px;padding:0 10px;text-align:left;' :style="`${editingUser == u.id?'border:1px solid #aaa;background:#ffd;box-shadow:1px 1px 1px 0px #aaa;cursor:pointer;':''}`" class='l-field' @click='editingUser == u.id?createEditCommit(u):""' :class='(editingUser==u.id?( model.Commit_n4 != undefined && model.Commit_n4 != u.Commit_n4) : (cached[u.id] && cached[u.id].Commit_n4 !=undefined && cached[u.id].Commit_n4 !== u.Commit_n4))?"l-field-changed":""'>
                 {{(editingUser === u.id?(model.Commit_n4 || u.Commit_n4):(u.Commit_n4)) || '-'}}
                 <Icon type='md-create' v-show="editingUser === u.id" size='13' style='margin-right:5px;float:right;line-height:24px;color:#aaa;' />
               </div>
               </Tooltip>
               <!-- Buttons -->
               <Button size='small' style='margin:0 20px' @click='showReport(u)'>述职报告</Button>
-              <Button size='small' type='info' v-if='editingUser==undefined' :loading='loadingSaveScore' @click="editingUser=u.id">编辑</Button>
-              <Button size='small' type='success' v-if='editingUser==u.id' :loading='loadingSaveScore' @click="saveScore(u)">保存</Button>
-              <Button size='small' v-if='editingUser==u.id' @click.stop='cancelScore'>取消</Button>
+             
+              <Button size='small' type='success' v-if='editingUser==u.id' :loading='loadingSaveScore' @click="saveScore(u)">保存并上传</Button>
+              <Button size='small' v-if='editingUser==u.id' @click.stop='cancelScore(u)'>重置</Button>
             </div>
+            <template v-if='editingUser == u.id'>
+             
+            <template v-for='node in ["n1","n2","n31","n32","n33"]'>
+              
+             <div :key='node+u.id' class='flex-wrap score-item score-item-focus' style='padding:5px;width:80px;background:#ddd;border-bottom:1px solid #ccd;display:flex;align-items:center;width:100%;font-size:12px;' v-if="u.opusers[node]">
+                 <div style='width:20px;color:#fff;padding:1px;font-size:12px;background:#333;border-radius:2px;text-align:center;'>{{nodeNames[node]}}</div>
+              <div style='width:65px;text-align:center;display:flex;align-items:center;'   ><hs-avatar :userinfo='u.opusers[node]' style='margin-right:5px;' />{{u.opusers[node].name}}</div>
+              <!-- QN sheet -->
+              <template v-if='eQNSheet &&eQNSheet.shorts'>
+                <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
+                
+                    <div style='width:40px;'  class='l-field' :key='qi'>{{ (u[eQNSheet.key+node] ? eQNSheet.options[qi][u[eQNSheet.key+node][qi]]:"") || "-"}}</div>
+                
+                </template>
+              </template>
+              <!-- Total -->
+              <div style='width:60px;color:darkred;'  class='l-field'>{{CalcScore(eQNSheet,Object.assign({},u[eQNSheet.key+node] || {})) || "-"}}</div>
+              <!-- QA sheet -->
+              <template v-if=' eQADownSheets[node] && eQADownSheets[node].questions'>
+                <template v-for="(q,qi) in  eQADownSheets[node].questions">
+                
+                    <div style='width:70px;' class='l-field' :key='qi'>{{(u[ eQADownSheets[node].key] ? q.options[u[ eQADownSheets[node].key][qi]]:"-")||'-'}}</div>
+                 
+                </template>
+              </template>
+              <!-- CommitLevel_n4 -->
+            
+                  <div style='width:70px;' v-if='node != "n1"'  class='l-field' :key='qi'>{{(u[`CommitLevel_${node}`] || "-")}}</div>
+               
+                  <!-- CommitPride_n4 -->
+          
+                  <div style='width:70px' v-if='node != "n1"'  class='l-field' :key='qi'>{{(u[`CommitPride_${node}`] || "-")}}</div>
+              
+                    <!-- Commit_n4 -->
+                  <Tooltip transfer maxWidth='300' v-if='node != "n1"'  :content="(u[`Commit_${node}`] || '-')" style='height:24px;'>
+              <div style='width:200px;background:#fff;padding:0 10px;text-align:left;' class='l-field'>
+                {{ u[`Commit_${node}`] || '-'}}
+              </div>
+              </Tooltip>
+              <!-- Buttons -->
+           
+            </div>
+          
+            </template>
             
             </template> <!-- rows-->
+            </template>
+             {{model}}
             </div>
+            
           </div><!-- table-->
+         
         </div><!-- wrap -->
       </Modal>
       <Modal title='编辑评语' v-model='showCommitEditor' footer-hide>
@@ -651,7 +699,7 @@ export default {
                   that.current=param.row;that.getReport()}}},'预览')
                  }},
 
-                 	{ type: "text",cat:'flow', key: "desc",minWidth:300, linkEvent:true, title: "流程",option:{
+                 	{ type: "text",cat:'flow', key: "desc",minWidth:220, linkEvent:true, title: "流程",option:{
               
                    }},
                    
@@ -680,13 +728,7 @@ export default {
                }},{
                 type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'}
               },
-          {
-            title:"创建时间",
-           type:'time',
-            width:100,
-           key:"created_at"
-          },
-				
+        
           {
             key:"commit",
             type:'text',
@@ -726,7 +768,7 @@ export default {
               function mapColor(option,index){
 
               }
-              let ops = param.row.ops
+             
                 if(!(executors))
                 return h('span','配置失效')
              if(Array.isArray(executors.n3)){
@@ -962,7 +1004,14 @@ export default {
             }
           },
            
-        
+          {
+            title:"创建时间",
+           type:'time',
+           cat:'flow',
+            width:100,
+           key:"created_at"
+          },
+				
         
 			]
     },
@@ -1030,7 +1079,12 @@ export default {
       model:{},
       show:true,
       readed:{},
-      loadingSaveScore:false
+      loadingSaveScore:false,
+      eQADownSheets:{},
+      nodeNames:{
+        n1:"自",n2:"一",n31:"平",n32:"平",n33:"平"
+      },
+      cached:{}
     }
   },
   methods:{
@@ -1040,11 +1094,15 @@ export default {
       this.getReport()
     },
     ConfirmChange(u){
-      if(this.editingUser || this.loadingSaveScore|| u.locked)
+    if(!u || !u.id || this.loadingSaveScore)
         return
-     
-     this.$set(this,'model',{})
-          this.editingUser = u.id
+    if( u.id == this.editingUser)
+     return
+
+    if(this.editingUser)
+      this.$set(this,'cached',Object.assign({},this.cached,{[this.editingUser]:{...this.model}}))
+     this.$set(this,'model',this.cached[u.id] || {})
+     this.editingUser = u.id
      
       this.$forceUpdate()
     },
@@ -1062,20 +1120,34 @@ export default {
       this.$set(u,'locked',!u.locked)
     },
     saveScore(u){
+      if(!u || !u.id)
+        return
       let index = this.items.findIndex(v=>v.id == u.id)
     
-      this.loadingSaveScore = true
-      setTimeout(() => {
-           this.Success("保存成功")
-             this.items.splice(index,1,Object.assign(this.items[index],this.model))
+     
+      
+      //validation
+      if(!this.model || Object.keys(this.model).length == 0){
+        this.Error("请修改后再提交上传")
+        return
+      }
+
+       this.loadingSaveScore = true
+      this.ENT.SAVE_SCORE(this.model,{param:{id:u.id}}).then(res=>{
+        this.Success("保存成功")
+        this.items.splice(index,1,Object.assign(this.items[index],this.model))
              //patch e4 store submit
              //patch e4 store rewrite
-      this.cancelScore()
-      this.loadingSaveScore = false
-      }, (1000));
+           
+        this.cancelScore()
+       
+      }).finally(e=>{
+         this.loadingSaveScore = false
+      })
     },
-    cancelScore(){
+    cancelScore(u){
       this.editingUser=undefined
+      delete this.cached[u]
       this.$set(this,'model',{})
     },
     getRowClassName(row,index){
@@ -1104,15 +1176,24 @@ export default {
       }
     },
     EditQA(u,key,index,value){
-      console.log(key,index,value)
        if(!this.model[key])
-        this.model[key] = [...u[key]] || []
+       {
+         if(u[key])
+            this.model[key] = [...u[key]]
+         else
+          this.model[key] = []
+       }
       this.model[key][index] = value
       this.$set(this,'model',Object.assign({},this.model))
     },
     EditQN(u,key,index,value){
-      if(!this.model[key])
-        this.model[key] = [...u[key]] || []
+    if(!this.model[key])
+       {
+         if(u[key])
+            this.model[key] = [...u[key]]
+         else
+          this.model[key] = []
+       }
        this.model[key][index] = value
       this.$set(this,'model',Object.assign({},this.model))
     },
@@ -1124,9 +1205,9 @@ export default {
       })
       
     },
-    CompareChange(u = {},key,index){
-      if(this.model)
-        return this.model[key] && (!u[key] || this.model[key][index] !== u[key][index])
+    CompareChange(model,u = {},key,index){
+      if(model)
+        return model[key] && (!u[key] || model[key][index] !== u[key][index])
     },
     renderEdit(){
       this.$nextTick(e=>{
@@ -1147,7 +1228,13 @@ export default {
             }
             
           }
-          
+          this.eQADownSheets = {
+             n1:getEVSheet(this.fpos[0],'n1'),
+             n2:getEVSheet(this.fpos[0],'n2'),
+             n31:getEVSheet(this.fpos[0],'n3'),
+             n32:getEVSheet(this.fpos[0],'n3'),
+             n33:getEVSheet(this.fpos[0],'n3')
+          }
           this.eQASheet = getEVSheet(this.fpos[0],'n4')
           this.eQNSheet = getQASheet(this.fdep[0],this.fpos[0])
           this.model = {}
@@ -1212,16 +1299,33 @@ export default {
         let items = res.data.data
         items.forEach(v=>{
           v.ops = {}
-          
+          v.opusers = {}
+          console.log(v.desc)
+          console.log(v.executors)
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
-               if(n.key == 'n3' && Array.isArray(v.executors[2])){
-                 let index = v.executors[2].findIndex(v=>v.op == n.op)
-                 if(index != -1)
+               console.log('history:',n.key,n.op)
+               if(n.key == 'n3' && Array.isArray(v.executors.n3)){
+                 let index = v.executors.n3.findIndex(v=>v.op == n.op)
+                console.log(n.op)
+                 if(index != -1){
+                  if(!n.op)
+                    n.op = v.executors.n3[index]
                   v.ops[n.key+(index+1)] = n.op
+                  let exec = this.users.find(u=>u.id == n.op)
+                  if(exec){
+                    v.opusers[n.key+(index+1)] =exec
+                  console.log('index:',v.desc,index,exec.name)
+                  }else{
+                    console.log('notfound:',n.op)
+                  }
+                 }
                }else{ 
                  v.ops[n.key] = n.op
+                 v.opusers[n.key] = this.users.find(u=>u.id == n.op)
                }
+
+
 
                 if(n.key == 'n4'){
 
@@ -1319,6 +1423,12 @@ export default {
   >*{
     margin-right:5px;
   }
+  
+  cursor: pointer;
+}
+
+.score-item-user:hover{
+  filter:brightness(1.1);
 }
 
 .l-field{
@@ -1335,17 +1445,28 @@ export default {
   padding:0 5px;
 }
 
+.score-item-focus{
+  filter:brightness(1);
+}
+
+
 .score-item-editing{
+ 
+  filter:brightness(1);
   .l-field-select{
     background:#ffd;
     box-shadow:1px 1px 1px 0px #aaa;
     cursor:pointer;
   }
-
   .l-field-changed{
     background:#fdd;
   }
+ 
 }
+
+.l-field-changed{
+    background:#fdd;
+  }
 
 
 </style>
