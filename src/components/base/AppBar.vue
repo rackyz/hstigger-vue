@@ -45,8 +45,9 @@
     <div class="l-left">
        <Dropdown ref='dm' transfer :trigger="my_enterprises.length == 0?'custom':'click'" placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onSelectEnterprise' >
        <BaseLogo class='d-none d-sm-block' style="margin-right:20px;"></BaseLogo>
+      
         <DropdownMenu slot="list">
-           <DropdownItem ref='m1'  :name='null' v-show='current_enterprise != null'><img style='width:30px;height:30px;margin-right:3px;' src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" /> 个人模式</DropdownItem>
+           <DropdownItem ref='m1'  name='self' v-show='current_enterprise != "self"'><img style='width:30px;height:30px;margin-right:3px;' src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" /> 个人模式</DropdownItem>
           <template v-for='e in my_enterprises'>
             <DropdownItem v-if='e' ref='m1' :key='e.id' :name='e.id' v-show='e.id != current_enterprise'><img style='width:30px;height:30px;margin-right:3px;' :src="e.avatar" /> {{e.name}}</DropdownItem>
           </template>
@@ -159,10 +160,10 @@ export default {
     
   },
   methods:{
-    getSession(){
+    getSession(e){
       
       this.loading = true
-      this.$store.dispatch('core/whoami').then(()=>{
+      this.$store.dispatch('core/whoami',e).then(()=>{
 
       }).finally(e=>{
         setTimeout(() => {

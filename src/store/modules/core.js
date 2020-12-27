@@ -17,11 +17,15 @@ const state = {
   my_enterprises:[],
   modules:[],
   acc_list: [],
-  user_rss:[]
+  user_rss:[],
+  loading:false
 }
 
 
 const getters = {
+  loading(state){
+    return state.loading
+  },
   isLogin(state){
     return state.isLogin
   },
@@ -39,6 +43,9 @@ const getters = {
   },
   current_enterprise(state){
     return state.current_enterprise
+  },
+  current_ent(state){
+    return state.session.enterprises.find(v=>v.id == state.current_enterprise)
   },
    apps(state) {
        let o = {}
@@ -164,9 +171,9 @@ const actions = {
       }).catch(reject)
     })
   },
-  whoami({commit,dispatch}){
+  whoami({commit,dispatch},e){
     let token = localStorage.getItem('hs-token')
-    let enterprise_id = localStorage.getItem('current_enterprise')
+    let enterprise_id = e || localStorage.getItem('current_enterprise')
   
     commit('SetCurrentEnterprise',enterprise_id)
     return new Promise((resolve,reject)=>{
@@ -183,10 +190,10 @@ const actions = {
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
-        console.log("SESSION:",session)
-        if (enterprise_id && !enterprise_id != self && session.enterprises.find(v => v.id == enterprise_id) == null)
+        console.log("WHOAMI:",enterprise_id)
+        if (enterprise_id && enterprise_id != "self" && session.enterprises.find(v => v.id == enterprise_id) == null)
           commit('ClearEnterprise')
-        if(!enterprise_id && session.my_enterprises.length > 0){
+        else if(!enterprise_id && session.my_enterprises.length > 0){
           commit('SetCurrentEnterprise',session.my_enterprises[0])
           dispatch('whoami')
         }
@@ -348,6 +355,7 @@ const mutations = {
       state.current_enterprise = ent_id
     }else{
       mutations.ClearEnterprise(state)
+      state.current_enterprise = 'self'
     }
 
    
@@ -440,6 +448,9 @@ localDeleteTypes(state,ids){
   ResetConcernProject: (state, ids = []) => {
       state.session.concerned = ids
   },
+  saveUserinfo:(state,userinfo)=>{
+   Object.assign(state.session,userinfo) 
+  }
 }
 
 export default {

@@ -1,9 +1,13 @@
 <template>
   <Layout style='flex-direction:row;overflow:hidden;'>
     
-     <hs-menu style='min-width:250px;width:250px;padding-bottom:60px;' :data="menus" title="后台管理" @on-select='onClickMenu' :current="ActivePath" />
-     
-     
+     <hs-menu style='min-width:250px;width:250px;padding-bottom:60px;padding:0;'  :data="menus"  @on-select='onClickMenu' :current="ActivePath" >
+     <div class='hs-menu-title' slot='title'>
+       <h2>企业后台</h2>
+       <span>{{current_ent.name}}</span>
+       <Avatar shape='square' :src='current_ent.avatar' size='40' class='hs-menu-title-avatar' />
+      </div>
+     </hs-menu>
     <transition name='fadeIn'>
       <Content>
         	<div class="hs-caption" v-if="ActiveMenu"><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" /> {{ActiveMenu.name}}</div>
@@ -21,6 +25,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
@@ -35,16 +40,16 @@ export default {
         subs:[{
         name:'员工管理',
         icon:"user",
-        path:'/core/admin/user'
+        path:'/core/eadmin/user'
       },{
         name:'部门管理',
         icon:"organization",
-        path:'/core/admin/dep'
+        path:'/core/eadmin/dep'
       }
       ,{
         name:'角色权限',
         icon:"quanxianliebiao",
-        path:'/core/admin/role'
+        path:'/core/eadmin/role'
       }]
         },{
           name:"数据管理",
@@ -56,19 +61,19 @@ export default {
         icon:'xiangmu'
       },{
         name:'档案资料',
-        path:'/core/admin/archive',
+        path:'/core/eadmin/archive',
         icon:'xiangmu2'
       },{
         name:'文件管理',
-        path:'/core/admin/file',
+        path:'/core/eadmin/file',
         icon:'file'
       },{
         name:'计划任务',
-        path:'/core/admin/task',
+        path:'/core/eadmin/task',
         icon:'renwujincheng'
       },{
           name:'数据记录',
-        path:'/core/admin/record',
+        path:'/core/eadmin/record',
         icon:'jiludanzilishijilu'
       }]
       },{
@@ -77,11 +82,11 @@ export default {
           subs:[
           {
         name:'订阅管理',
-        path:'/core/admin/project',
+        path:'/core/eadmin/project',
         icon:'xiangmu'
       },{
         name:'流程模板',
-        path:'/core/admin/flow',
+        path:'/core/eadmin/flow',
         icon:'shenjing'
       }]
       },{
@@ -90,7 +95,7 @@ export default {
         is_group:true,
         subs:[{
           name:'企业信息',
-          path:'/core/admin/config',
+          path:'/core/eadmin/config',
           icon:'controls-5'
         },{
           name:'平台对接',
@@ -98,24 +103,25 @@ export default {
           icon:'codelibrary-fill'
         },{
           name:'类型管理',
-          path:'/core/admin/type',
+          path:'/core/eadmin/type',
           icon:'tag'
         },{
           name:'系统日志',
-          path:'/core/admin/log',
+          path:'/core/eadmin/log',
           icon:'rizhi'
         },{
           name:'备份和恢复',
-          path:'/core/admin/maintain',
+          path:'/core/eadmin/maintain',
           icon:'config'
         }]}]
     }
    
   },
   metaInfo:{
-    title:'后台管理'
+    title:'企业后台'
   },
   computed:{
+    ...mapGetters('core',['current_ent']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -143,6 +149,26 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less">
+.hs-menu-title{
+  background:#192438;
+  
+  color:rgb(226, 225, 219);
+  padding:10px;
+  padding-left:60px;
+  .hs-menu-title-avatar{
+    position: absolute;
+    left:10px;
+    top:10px;
+    border:1px solid rgb(54, 161, 238);
+  }
+  h2{
+    font-size:16px;
+    font-weight:bold;
+    text-shadow:1px 1px 1px rgb(0, 0, 0);
+  }
+  span{
+    font-size:12px;
+  }
+}
 </style>

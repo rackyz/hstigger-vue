@@ -3,7 +3,7 @@
     <BaseAppBar style='width:100%;'></BaseAppBar>
    
     <div style='margin-top:44px;height:100%;width:100%;position:relative;' v-if='session.token'>
-       <BaseLoadingBar />
+       <BaseLoadingBar v-show='loading' />
       <router-view></router-view>
     </div>
     
@@ -18,7 +18,7 @@ export default {
     title:"首页"
   },
   computed:{
-    ...mapGetters('core',['session'])
+    ...mapGetters('core',['session','loading'])
   },
   mounted(){
     this.$store.dispatch('core/whoami')

@@ -1,51 +1,47 @@
 <template>
 	<div class="hs-conatiner hs-conatiner-scrollable">
-	
     <!-- tool bar -->
 		<hs-toolbar
-			style="background: #fff;"
+			style="background: #fff"
 			:data="tools"
 			@event="onToolEvent"
-			:enabled="toolEnabled"
+			:disabled="toolDisabled"
 		/>
-		<a
-			href="https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx"
-			class='tmpl-link'
-		>
-			<Icon type="md-download" /> 下载导入用表格模板</a
-		>
     <!-- filters -->
-		<div class="filter-wrap" style="padding: 5px" @click="selected = null">
-			<ButtonGroup style="margin-right: 5px" v-show="multiple"
+		<div class="filter-wrap" style="padding: 5px">
+			<Button
+				style="margin-right: 5px"
+				:type="multiple?'error':''"
+				@click="multiple=!multiple"
+				>{{multiple?"取消多选":"多选"}}</Button
+			>
+			<ButtonGroup style="margin-right: 5px" v-if="multiple"
 				><Button @click="onSelectAll">全选</Button
 				><Button @click="selected = []">清空</Button></ButtonGroup
 			>
-			<Button
-				style="margin-right: 5px"
-				type="error"
-				v-show="multiple"
-				@click="multiple = false"
-				>结束批量操作</Button
-			>
+			
 			<Input v-model="searchText" search style="width: 200px" clearable />
-			<ButtonGroup style="margin-left: 5px"
-				><Button
-					:type="hidingLocked ? 'primary' : ''"
-					@click="hidingLocked = !hidingLocked"
-					>隐藏已禁用</Button
-				>
-			</ButtonGroup>
-			<Button
-				:type="showUnsafe ? 'primary' : ''"
-				@click="showUnsafe = !showUnsafe"
-				style="margin-left: 5px"
-				>密码未修改
-			</Button>
+			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 账号类型 -">
+				<template v-for="t in AccountTypes">
+					<Option :value='t.value' :key='t.value' :label="t.name">
+						<span :style='`color:${t.color}`'>{{t.name}}</span>
+					</Option>
+				</template>
+			</Select>
+			<Select clearable v-model='changed' style='width:120px;margin-left:5px;' placeholder="- 密码安全 -">
+					<Option :value='0' style='color:red' >
+						未修改
+					</Option>
+						<Option :value='1' style='color:green'>
+						正常
+					</Option>
+			</Select>
+			
 		</div>
     <!-- table -->
 		<div
 			style="
-				height: calc(100% - 215px);
+				height: calc(100% - 160px);
 				overflow: hidden;
 				background: #ddd;
 				position: relative;
@@ -55,12 +51,13 @@
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="columns"
-				:data="filterdUsers"
+				:data="filterdAccounts"
 				:paged="false"
+				:page="page"
+				:pageSize="pageSize"
 				:selectable="multiple ? 'multiple' : 'single'"
 				:selection="selected"
-				full
-				:onEvent="onTableEvent"
+				@event="onTableEvent"
 			>
 			</hs-table>
      
@@ -77,13 +74,16 @@
 			"
 		>
 			<Page
-				:total="filterdUsers.length"
+				:total="filterdAccounts.length"
 				size="small"
-				:page-size="100"
+				:current="page"
+				:page-size="pageSize"
 				:page-size-opts="[20, 50, 100]"
 				show-elevator
 				show-sizer
 				show-total
+				@on-change="page=$event"
+				@on-page-size-change="pageSize=$event"
 			/>
 		</div>
     <!-- modal for create/edit user data -->
@@ -93,6 +93,7 @@
 			v-model="showModal"
 			:width="420"
 			style="margin: 10px"
+			footer-hide
 			:form="user_form"
 			:data="current"
 			editable
@@ -102,7 +103,7 @@
     <!-- modal for changing user password -->
 		<hs-modal-form
 			ref="formpwd"
-			:title="`修改密码${selected_user ? (':'+selected_user.name) : ''}`"
+			:title="`修改密码${selected_user ? (':'+selected_user.user) : ''}`"
 			v-model="showModalPassword"
 			:width="320"
      
@@ -112,6 +113,7 @@
 			editable
 			@on-submit="patchUserPassword"
 			@on-event="handleEvent"
+
 		/>
 
 		<!-- modal for importing -->
@@ -171,11 +173,11 @@
 				</div>
 				<Button
 					style="height: 40px; margin: 10px; width: 90%"
-					@click="importAllUsers"
+					@click="importAllAccounts"
 					v-if="importState == 2 && importData && importData.length"
-					:disabled="importableUsers.length == 0"
+					:disabled="!importableAccounts || importableAccounts.length == 0"
 					:loading="loadingImport"
-					>导入账号({{ importableUsers.length }})</Button
+					>导入账号({{importableAccounts? importableAccounts.length:0 }})</Button
 				>
 			</div>
 
@@ -197,6 +199,10 @@ import { mapGetters } from "vuex";
 export default {
 	data() {
 		return {
+			page:1,
+			pageSize:100,
+			type:undefined,
+			changed:undefined,
 			loadingImport: false,
 			selected: null,
 			loading: false,
@@ -213,56 +219,82 @@ export default {
 			importStates: [],
 			columns: [
         { type: "index", title: "序号" },
-        	{
-					type: "user",
-					key: "id",
-					width: 110,
-					title: "姓名",
-					linkEvent: true,
-					option: { align: "center",getters:"admin/users" },
-				},
-				{ type: "text", key: "user", width: 150, title: "用户名" },
+        	
 			
+					{ type: "text", key: "user", width: 250, title: "用户",
+				render(h,param){
+					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
+					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name ?`${param.row.name} (${param.row.user})`:param.row.user)
+					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
+				}},
+			{
+					type: "type",
+					title: "账户类型",
+					key: "type",
+					width: 100,
+					option: {
+							getters:"core/getTypes",
+							getters_key:"AccountType",
+							labelKey:"value"
+					},
+				},
+
 				{ type: "text", key: "phone", width: 150, title: "联系电话" },
-			
-			
-				{
-					type: "list",
-					title: "角色权限",
-					key: "roles",
-					width: 200,
-					option: { getters:'core/roles' },
-				},
-				{
-					type: "list",
-					title: "所属部门",
-					key: "deps",
-					width: 200,
-						option: { getters:'core/deps' },
-        },
-        { key: "wechat", type: "time", title: "微信绑定",width:80 },
-         { key: "dingding", type: "time", title: "钉钉绑定",width:80  },
-          { key: "qq", type: "time", title: "QQ绑定",width:80  },
-        { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
-         { key: "created_at", type: "time",title: "注册时间",option:{
+				 { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
+         { key: "created_at", type: "time",title: "注册时间",width:100,option:{
            type:'date'
          } },
         	{
 					type: "state",
 					title: "密码安全",
-					key: "passweak",
+					key: "changed",
 					width: 100,
-					option: { states: ["安全","默认密码"],colors:['darkgreen','darkred'] },
+					option: { states: ["未修改","正常"],colors:['darkred','darkgreen'] },
 				},
 
 				{
 					type: "state",
-					title: "账号状态",
-					key: "state",
+					title: "账号锁定",
+					key: "locked",
 					width: 120,
-					option: { states: ["正常",'锁定','异常'],colors:['darkgreen','darkred','orange'] },
+					option: { states: ["正常",'锁定'],colors:['green','#aaa'] },
 				},
-        
+			
+				 { key: "email", type: "text", title: "邮箱",width:250},
+				{ key: "oauth", title: "第三方绑定",width:150,sortable:false,
+					render:(h,param)=>{
+					const  oauthItems =[{
+							icon:'nbgz',
+							title:"高专平台"
+					},{
+							icon:'qq',
+							title:"QQ登录"
+					},{
+							icon:'wechat',
+							title:"微信登录",
+							size:19
+					},{
+							icon:'dingding-o',
+							title:"钉钉登录"
+					},{
+							icon:'shouji',
+							title:'手机扫码',
+							size:16
+					}]
+					const keys=['zzl_id','qq','wechat_id','ding_id','phone']
+					let icons = oauthItems.map((v,i)=>h('Icon',{props:{
+						custom:`gzicon gzi-${v.icon}`,
+						size:v.size,
+						color:param.row[keys[i]]?"#409EFF":"#dfdfdf"
+					},style:{marginRight:"6px"}}))
+
+					return h('div',{style:{
+						display:'flex',
+						alignItems:'center',
+						justifyContent:"center"
+					}},icons)
+				}},
+         { type: "text", title: " "},
 			],
 
 			current: {},
@@ -294,7 +326,7 @@ export default {
 				},
 				{
 					key: "lock",
-					name: "禁用",
+					name: "锁定",
 					icon: "md-lock",
 				},
 				{
@@ -308,9 +340,9 @@ export default {
 					icon: "ios-folder-open",
 				},
 				{
-					key: "multiple",
-					name: "批量操作",
-					icon: "ios-people",
+					key: "import-tmpl",
+					name: "下载模板",
+					icon: "md-download",
 				},
 				{
 					key: "refresh",
@@ -321,42 +353,57 @@ export default {
 		};
 	},
 	mounted() {
-    this.getData();
-    this.$refs.table.calcTableHeight()
+		this.getData();
+		this.$nextTick(()=>{
+			this.$refs.table.calcTableHeight()
+		})
+    
 	},
 	computed: {
-		...mapGetters("core", ["deps", "roles"]),
-		...mapGetters("admin", ["users"]),
-		toolEnabled() {
-      // ADD,EDIT,DEL, RESET-PWD,CHANGE-PWD, LOCK,UNLOCK, IMPORT,BATCH, REFRESH
+		...mapGetters('core',['getTypes']),
+		...mapGetters('entadmin',['users']),
+		AccountTypes(){
+			return this.getTypes('AccountType')
+		},
+		toolDisabled() {
+			const baseConfig = {
+				add:true,				// add
+				edit:false,			// edit
+				delete:false,			// del
+				resetpwd:false,			// reset
+				resetpwdto:false,			// changepwd
+				lock:false,			// lock
+				unlock:false,			// unlock
+				import:false,			// import
+				"import-tmpl":false,			// download
+			}
 			if (this.multiple) {
 				if (this.selected && this.selected.length > 0) {
-					return [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1];
-				} else {
-					return [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1];
-				}
+					baseConfig.delete = 1
+					baseConfig.resetpwd = 1
+					baseConfig.lock = 1
+					baseConfig.unlock = 1
+				} 
 			} else {
         if (this.selected ){
-          if(this.selected.includes('sys')){
-            return [1, 1, 0, 0, 0, 0, 0, 1, 1, 1];
+					 if(this.selected.includes('sys')){
+						baseConfig.edit = 1
           }
+					let selectedItem = this.users.find(v=>v.id == this.selected)
+					let locked = selectedItem ? selectedItem.locked : 0
+						baseConfig.edit = 1
+					baseConfig.delete = 1
+					baseConfig.resetpwd = 1
+					baseConfig.resetpwdto = 1
+					baseConfig.lock =  (locked == 0)
+					baseConfig.unlock = (locked == 1)
+				}else {
 
-          let state = this.users.find(v=>v.id == this.selected).state
-					return [
-						1,
-						1,
-						1,
-						1,
-						1,
-						state == 0,
-						state == 1,
-						1,
-						1,
-						1,
-          ];
-        }
-				else return [1, 0, 0, 0, 0, 0, 0, 1, 1, 1];
+				}
+
 			}
+
+			return baseConfig
 		},
 		user_password_form() {
 			return {
@@ -409,49 +456,60 @@ export default {
 							required: true,
 						},
 					},
-					roles: {
-						label: "角色",
-						control: "select",
-						option: {
-							getters: "core/roles",
-							multiple: true,
-						},
+					type:{
+						control:"select",
+						option:{
+							
+							required:true,
+							labelKey:"name",
+							idKey:"value",
+							getters:"core/getTypes",
+							key:"AccountType",
+							defaultValue:0
+						}
 					},
 					avatar: {
 						label: "头像",
 						editable: true,
 						control: "image",
 					},
-					deps: {
-						label: "部门",
-						control: "select",
-						option: {
-							getters: "core/deps",
-							multiple: true,
-						},
+					password:{
+						label:'密码',
+						control:'input',
+						option:{
+							required:true,
+							defaultValue:'123456'
+						}
 					},
 					phone: {
-						label: "电话",
 						control: "input",
 					},
+					email:{
+						control: "input",
+					}
 				},
 				layout: `<div>
-        <Row :gutter='10'>
-        <Col span='10'>{{user}}</Col><Col span='10'>{{name}}</Col><Col span='4'>{{avatar}}</Col>
+				<Row :gutter='10'>
+		
+        <Col span='5' style='line-height:40px;text-align:right;' >账号类型</Col><Col span='19'>{{type}}</Col></Row>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >用户名</Col><Col span='19'>{{user}}</Col>
         </Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='12'>{{phone}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{deps}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='24'>{{roles}}</Col>
+        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >电话</Col><Col span='19'>{{phone}}</Col>
+        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >邮箱</Col><Col span='19'>{{email}}</Col>
+				</Row>
+				<Row :gutter='10' style='margin-top:0px;'><Col span='5' style='line-height:40px;text-align:right;' ><div style='color:red;'>密码</div></Col><Col span='19' style='padding:10px 5px'>随机生成发送给手机 or 指定密码</Col>
         </Row></div>`,
 
-				option: {},
+				option: {
+					hideReset:true
+				},
 			};
     },
     /**
      * @computed filteredUsers
      * @description find users after many filters
      */
-		filterdUsers() {
+		filterdAccounts() {
 			return (
 				this.users.filter((v) => {
 					if (
@@ -459,11 +517,10 @@ export default {
 						(!v.name || !v.name.includes(this.searchText.trim())) &&
 						(!v.user || !v.user.includes(this.searchText.trim()))
 					)
-						return false;
+					return false;
+					if (this.changed != undefined && v.changed != this.changed) return false;
 
-					if (this.showUnsafe && !v.passweak) return false;
-
-					if (this.hidingLocked && v.state != 0) return false;
+					if (this.type != undefined && v.type != this.type) return false;
 
 					return true;
 				}) || []
@@ -473,7 +530,7 @@ export default {
      * @computed importableUsers
      * @description find users which can be imported in user-data from file
      */
-		importableUsers() {
+		importableAccounts() {
 			return this.importData.filter((v) => !this.TestImportState(v));
     },
     selected_user(){
@@ -485,22 +542,12 @@ export default {
     }
 	},
 	methods: {
-    /**
-     * @method TestImportState
-     * @description Test user-data to show state with mistakes
-     */
-		TestImportState(user) {
-      if (this.users.find((v) => v.user == user.user)) 
-        return "用户名重复";
-			else if (this.users.find((v) => v.phone == user.phone))
-				return "电话号码重复";
-    },
     /** 
      * @method onSelectAll
      * @description binding 'select all' button for select all current users
      */
 		onSelectAll() {
-			this.selected = this.filterdUsers.map((v) => v.id);
+			this.selected = this.filterdAccounts.map((v) => v.id);
     },
     /**
      * @method onTableEvent
@@ -511,11 +558,8 @@ export default {
 		onTableEvent(e) {
       if(!e)
         return
-
-      if (e.type == "select") 
-        this.selected = e.data;
-      else if( e.type == "open" && e.data)
-        this.RouteTo('/core/users/'+e.data.id,true)
+			if (e.type == "select") 
+        this.selected = e.data
     },
     /**
      * @method importAllUsers
@@ -524,15 +568,15 @@ export default {
 		importAllUsers() {
 			var that = this;
 			this.loadingImport = true;
-			let users = this.importData.filter((v) => !this.TestImportState(v));
+			let accounts = this.importData.filter((v) => !this.TestImportState(v));
 			this.$store
-				.dispatch("admin/CreateUsers", users)
+				.dispatch("admin/CreateUsers", accounts)
 				.then((results) => {
 					let succees = results.filter((v) => v == 0);
 					let map = {};
 					that.importStateStr = `导入完毕,成功导入${succees.length}个账户`;
 					that.importStates = results;
-					users.forEach((v, i) => {
+					accounts.forEach((v, i) => {
 						v.state = results[i].id ? 0 : 1;
 					});
 					that.importState = 3;
@@ -562,12 +606,9 @@ export default {
      */
 		getData() {
 			this.loading = true;
-			this.$store
-				.dispatch("admin/ListUsers")
-				.then((res) => {})
-				.finally((e) => {
-					this.loading = false;
-				});
+			this.$store.dispatch('entadmin/GetUsers').finally(e=>{
+				this.loading = false
+			})
     },
     /** @method onToolEvent
      *  @description handle toolbar event
@@ -583,7 +624,7 @@ export default {
 					: (this.users.find((v) => v.id == selected_id)))
       
 			if (e == "add") {
-				this.current = null;
+				this.current = {}
 				this.showModal = true;
 			} else if (e == "edit") {
 				this.current = selected;
@@ -591,22 +632,39 @@ export default {
 			} else if (e == "refresh") {
 				this.getData();
 			} else if (e == "lock") {
-				this.$store.dispatch("admin/LockUser", selected_id);
+				this.$store.dispatch("admin/LockAccounts", selected_id).then(()=>{
+					this.$refs.table.$forceUpdate()
+					this.Success("操作成功")
+				}).catch(e=>{
+					this.Error(e)
+				});
 			} else if (e == "unlock") {
-				this.$store.dispatch("admin/UnlockUser", selected_id);
+				this.$store.dispatch("admin/UnlockAccounts", selected_id).then(()=>{
+					this.Success("操作成功")
+				}).catch(e=>{
+					this.Error(e)
+				});
 			} else if (e == "resetpwd") {
 				if (this.multiple) {
 					this.Confirm(
 						`确定要重置<span style="color:red">${selected
-							.map(v => v.name)
-							.join(",")}等${selected.length}</span>用户的密码?`,
-						() => this.$store.dispatch("admin/Resetpassword", selected_id)
+							.map(v => v.user)
+							.join(",")}</span>等<span style="color:red">${selected.length}</span>名用户的密码?`,
+						() => this.$store.dispatch("admin/ResetPassword", selected_id).then(res=>{
+							this.Success("操作完成")
+						}).catch(e=>{
+							this.Error(e)
+						})
 					);
 				} else {
 					this.Confirm(
-						`确定要重置用户<span style="color:red">${selected.name}</span>的密码?`,
+						`确定要重置用户<span style="color:red">${selected.user}</span>的密码?`,
 						() =>
-							this.$store.dispatch("admin/Resetpassword", [selected.id])
+							this.$store.dispatch("admin/ResetPassword", [selected.id]).then(res=>{
+							this.Success("操作完成")
+						}).catch(e=>{
+							this.Error(e)
+						})
 					);
 				}
 				this.$store.dispatch("admin/ResetPassword", { id: selected.id });
@@ -617,9 +675,9 @@ export default {
 					this.multiple
 						? `确定要删除<span style='color:red;margin:0 2px;font-weight:bold'>${selected
 								.slice(0, 3)
-								.map((v) => v.name)
+								.map((v) => v.user)
 								.join(", ")}</span>等${selected.length}个账号`
-						: `确定要删除该用户<span style='color:red;margin:0 2px;font-weight:bold'>${selected.name}</span>?`,
+						: `确定要删除该用户<span style='color:red;margin:0 2px;font-weight:bold'>${selected.user}</span>?`,
 					() => {
 						if (this.multiple) {
 							this.$store
@@ -645,9 +703,12 @@ export default {
 						}
 					}
 				);
-			} else if (e == "import") {
-				this.$refs.fileLoader.click();
-			} else if (e == "multiple") {
+			//} 
+			// else if (e == "import") {
+			// 	this.$refs.fileLoader.click();
+			// } else if (e == "import-tmpl"){
+			// 	this.Download("https://cdn-1301671707.cos.ap-nanjing.myqcloud.com/download/hs_user_template.xlsx")
+			}else if (e == "multiple") {
 				this.multiple = true;
 				this.selected = [];
 			} else if (e == "unmultiple") {
@@ -673,15 +734,15 @@ export default {
 				.then((tabJson) => {
 					if (tabJson && tabJson.length > 0) {
 						that.importStateStr = "正在上传数据...";
-						let users = tabJson[0].sheet.map((v) => ({
+						let accounts = tabJson[0].sheet.map((v) => ({
 							name: v["姓名"],
 							phone: v["电话"],
 							password: v["密码"],
 							user: v["电话"],
 						}));
-						that.importStateStr = `已从文件中提取${users.length}个账号`;
+						that.importStateStr = `已从文件中提取${accounts.length}个账号`;
 						that.importState = 2;
-						that.importData = users;
+						that.importData = accounts;
 					}
 				})
 				.finally((e) => {
@@ -698,11 +759,11 @@ export default {
 				this.$refs.formpwd.setError("passwordAgain", "两次密码不一致,请检查");
 				return;
 			}
-
 			if (this.selected) {
 				item.id = this.selected
+				delete item.passwordAgain
 				this.$store
-					.dispatch("admin/ResetPassword", item)
+					.dispatch("admin/ChangePassword", item)
 					.then((res) => {
 						that.Success("修改成功");
 						that.showModalPassword = false;
@@ -717,7 +778,6 @@ export default {
 		 *  @description Remote method, for patching user information
 		 */
 		patchUser(item) {
-			console.log("patch:", item);
 			var that = this;
 			if (this.current && this.current.id) {
 				item.id = this.current.id;

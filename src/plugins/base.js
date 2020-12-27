@@ -39,22 +39,22 @@ Vue.prototype.Confirm = function (content, cb, cb2, option={}) {
     })
 }
 
-Vue.prototype.Success = function (content) {
-        this.$Notice.success({
-            title: '操作成功',
-            desc: content
-        })
-    },
+// Vue.prototype.Success = function (content) {
+//         this.$Notice.success({
+//             title: '操作成功',
+//             desc: content
+//         })
+//     },
 
-Vue.prototype.Error = function (content) {
-    var that = this
-    setTimeout(() => {
-        that.$Modal.error({
-            title: "错误",
-            content
-        })
-    }, 1000)
-}
+// Vue.prototype.Error = function (content) {
+//     var that = this
+//     setTimeout(() => {
+//         that.$Modal.error({
+//             title: "错误",
+//             content
+//         })
+//     }, 1000)
+// }
 // API transfer
 Object.entries(Clients).forEach(([k,v])=>{
     Vue.prototype[k] = v
