@@ -55,7 +55,7 @@
      <Card class="panel" style="width:100%;border:none;" padding='0'>
      <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">
-       <BaseEmpty :msg="空" />
+       <BaseEmpty :msg="空" :loading="isLoadingActived" />
      </template>
      <template v-for="(fi,i) in flowInstances">
        <div class='fi-item' :key='fi.id' @click='OpenWorkflow(fi)'>
@@ -80,7 +80,7 @@
      <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0'>
      <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 与我相关 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
      <template v-if="flowPassed.length == 0">
-       <BaseEmpty :msg="空" />
+       <BaseEmpty :msg="空" :loading="isLoadingPassed" />
      </template>
      <template v-for="(fi,i) in flowPassed">
        <div class='fi-item' :key='fi.id' @click='OpenWorkflow(fi)'>
@@ -156,7 +156,9 @@ export default {
       flowInstances:[],
       flowPassed:[],
       showFlow:false,
-      current_flow:{}
+      current_flow:{},
+      isLoadingActived:false,
+      isLoadingPassed:false
     }
   },
   computed:{
@@ -168,7 +170,7 @@ export default {
     title:'工作台'
   },
   created(){
-     this.$bus.$on('switchent',()=>{
+     this.$bus.$on('switch-ent',()=>{
     
       this.flowInstances =[]
       this.flowPassed =[]
@@ -200,12 +202,18 @@ export default {
     },
     getWorkflows(){
       if(this.session.current_enterprise != 'self'){
-        this.ENT.LIST_WORKFLOW().then(res=>{
+        this.isLoadingActived = true
+        this.isLoadingPassed = true
+        this.ENT.LIST_WORKFLOW({timeout:20000}).then(res=>{
           this.flowInstances = res.data.data
+        }).finally(e=>{
+          this.isLoadingActived = false
         })
 
-        this.ENT.LIST_WORKFLOW_PASSED().then(res=>{
+        this.ENT.LIST_WORKFLOW_PASSED({timeout:20000}).then(res=>{
           this.flowPassed = res.data.data
+        }).finally(e=>{
+          this.isLoadingPassed = false
         })
       }
       

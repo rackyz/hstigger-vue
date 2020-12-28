@@ -74,11 +74,11 @@
    
     <div class='view-wrapper' v-else style='display:flex;justify-content:center;flex-direction:column;'>
        <div style='padding:10px;width:800px;height:500px;position:relative;'>
-        <hs-dagre
+        <!-- <hs-dagre
           ref='dagre'
           :nodes='flow.nodes'
           :actions='flow.actions'
-        />
+        /> -->
         
       </div>
       您无权查看此阶段数据
@@ -176,7 +176,7 @@
         />
       </div>
     </Modal>
-    <Modal
+    <!-- <Modal
       v-model="showHistory"
       footer-hide
       title="历史记录"
@@ -202,7 +202,7 @@
       <div style='height:600px;overflow-y:auto;padding:20px;position:relative;'>
 
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 
@@ -665,6 +665,7 @@ export default {
           if (node)
             seq.push(node)
         }
+        console.log("INSTANCE:",seq,this.history)
 
         seq.reverse()
         let data = this.formData

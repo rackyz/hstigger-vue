@@ -5,10 +5,10 @@
 </style>
 <template>
    <Modal v-model='value' footer-hide fullscreen @on-visible-change='handleClose'>
-    <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(id ? ('/ '+get_flow(id).name):'')}} - {{session.id}}</div>
+    <div slot='header'><Icon custom='gzicon gzi-lianjieliu' style='margin-right:5px;'></Icon> {{'创建流程实例 '+(id ? ('/ '+get_flow(id).name):'')}} - {{session.id}} - {{inst_id}}</div>
       <!-- <BaseFlow :key="current" /> -->
-     
-      <workflow ref='flow' v-if='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
+      <workflow ref='flow' v-show='value' :loading="loading" :flow='flowDef' :history='history' @patch='Patch' @recall='Recall' @save='Save' :option='option' :user="session.id" @refresh='getData()'/>
+
     </Modal>
 </template>
 
@@ -27,10 +27,6 @@ export default {
   },
   components:{
     workflow
-  },
-  mounted(){
-    this.getData()
-    this.getInst()
   },
   computed:{
     ...mapGetters('core',['flows','session']),
@@ -51,11 +47,11 @@ export default {
     inst_id:{
       handler(v){
         this.getInst(v)
-      }
+      },
+      immediate:true
     }
   },
   methods:{
-    
     upload(e,u){
       let t = null
       let that = this
@@ -88,36 +84,47 @@ export default {
     get_flow(e){
       return this.flows.find(v=>v.id == e)
     },
-    handleClose(){
-      this.history = []
+    handleClose(e){
+     
       this.$emit('input',this.value)
+     
     },
     getInst(e){
-      if(!e){
+      
+      if(!e || this.isGettingInst){
         return
       }
+
+      this.isGettingInst = true
       this.instId = e
       this.loading = true
       this.ENT.GET_WORKFLOW({param:{id:e}}).then(res=>{
         let {instance,history,data} = res.data.data
+        console.log("GET_INST:",res.data.data)
         history.forEach(v=>{
           v.node = v.key
-          v.executors = JSON.parse(v.executors)
+          v.executors = JSON.parse(v.executors || "")
           v.data = {}
         })
+        try{
         data.forEach(v=>{
           let node = history.find(n=>n.id == v.history_node_id)
+          console.log("JSON:",v.value)
           node.data[v.def_key] = JSON.parse(v.value)
-        })
+        })}catch(e){
+          console.error(e)
+        }
         this.history = history
         this.value = true
+
+        console.log("INSTANCE:history",history)
       }).finally(e=>{
         this.loading = false
-    
+        this.isGettingInst = false
       })
     },
     getData(){
-      if(!this.id){
+      if(!this.value || !this.id){
         this.value = false
         return
       }
@@ -129,7 +136,6 @@ export default {
         if(this.flowDef.inst_id){
           this.getInst(this.flowDef.inst_id)
         }
-        console.log('GETDATA:',this.flowDef)
         this.value = true
       }).finally(e=>{
         this.loading = false

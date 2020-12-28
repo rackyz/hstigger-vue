@@ -1,13 +1,14 @@
 <template>
   <div class='l-empty-holder'>
     <span v-if="!useSlot">{{msg || '空空如也, totally empty' }}</span>
+    <spin fix v-if="loading"></spin>
     <slot></slot>
   </div>
 </template>
 
 <script>
 export default {
-  props:['msg'],
+  props:['msg','loading'],
   computed:{
     useSlot(){
       return this.$slots.default

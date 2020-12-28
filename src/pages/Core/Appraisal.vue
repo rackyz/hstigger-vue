@@ -1353,16 +1353,17 @@ export default {
           v.opusers = {}
           console.log(v.desc)
           console.log(v.executors)
+          console.log( v.historyNodes)
           v.depName = ['行政综合','房建监理','市政监理','建设管理','装修管理', '造价咨询', 'BIM咨询'][v.dep]
           v.posName = ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级'][v.position]
           if(v.name == '马骍')
             console.log("马骍 HISTORY:",v.historyNodes)
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
-               
+               console.log(n.key,v.executors.n3)
                if(n.key == 'n3' && Array.isArray(v.executors.n3)){
                  let index = v.executors.n3.findIndex(v=>v.op == n.op)
-                
+                 console.log("n3:",index)
                  if(index != -1){
                    
                   if(!n.op)
@@ -1407,6 +1408,7 @@ export default {
                 this.table = QN1
           })
           }
+          console.log(v.opusers)
           v.opn1 = "已录"
         })
         items = items.sort((a,b)=>{moment(a.created_at).isBefore(moment(b.created_at)?1:-1)})

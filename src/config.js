@@ -9,7 +9,7 @@ module.exports = {
       Name:"CORE",
       Connection: {
         baseURL: process.env.NODE_ENV == 'production' ? ProductServer : LocalServer,
-        timeout: 5000,
+        timeout: 10000,
         defaultHeaders: {
           "api-version": "v0"
         }
@@ -147,7 +147,7 @@ module.exports = {
      Name:"ENT",
       Connection: {
        baseURL: (process.env.NODE_ENV == 'production' ? ProductServer : LocalServer) + '/enterprise',
-        timeout: 5000,
+        timeout: 10000,
         defaultHeaders: {
           "api-version": "v0"
         }
