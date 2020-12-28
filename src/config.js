@@ -1,6 +1,6 @@
 var LocalServer = 'http://192.168.14.40:6001'
 // LocalServer = 'http://localhost:6001'
-//LocalServer = 'http://192.168.0.110:6001'
+LocalServer = 'http://192.168.0.110:6001'
 const ProductServer = 'https://api.hstigger.com'
 module.exports = {
   version:1000,
@@ -46,6 +46,8 @@ module.exports = {
         POST_FILES: "POST /files",
         DEL_FILE: "DELETE /files/:id",
         DEL_FILES: "POST /files/delete",
+        SELF_CHANGE_PASSWORD: "POST /users/changepwd",
+        SELF_CHANGE_INFO: "POST /users/changeinfo",
 
         GET_FLOW: "GET /flows/:id",
  

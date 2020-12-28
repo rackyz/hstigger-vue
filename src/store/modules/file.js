@@ -40,7 +40,14 @@ import API from '@/plugins/axios'
      })
 
    },
-   
+   uploadAvatar(ctx,file){
+    return new Promise((resolve,reject)=>{
+      ctx.dispatch('upload',{files:[file],vdisk:"avatars"}).then(res=>{
+       
+        resolve(API.COS.baseURL +'files/'+ res.url)
+      }).catch(reject)
+    })
+   },
    upload({
      commit,
      rootState
@@ -58,6 +65,8 @@ import API from '@/plugins/axios'
 
        if (!files.length)
          files = [files]
+
+       console.log('files:',files)
 
        let fileObjects = Object.values(files).map(f => ({
          name: f.name,

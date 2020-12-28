@@ -16,7 +16,7 @@
      
     <transition name='fadeIn'>
       <Content>
-        {{dataChangeInfo}}
+      
         <router-view></router-view>
       </Content>
       
@@ -198,7 +198,19 @@ export default {
       })
     },
     handleChangeAvatar(e){
-
+      this.loading = true
+      if(!e.avatar)
+        return
+       this.CORE.SELF_CHANGE_INFO(e).then(res=>{
+        this.Success('修改成功')
+        this.$store.commit('core/saveUserinfo',e)
+        this.dataChangeInfo = e
+        this.modalChangeAvatar =false
+      }).catch(e=>{
+        this.Error(e)
+      }).finally(e=>{
+        this.loading = false
+      })
     }
   }
 }

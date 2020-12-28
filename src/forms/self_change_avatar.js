@@ -5,7 +5,7 @@ export default {
       editable: true,
       control: "avatar",
       option:{
-        uploader:"core/upload"
+        uploader:"file/uploadAvatar"
       }
     },
   },
