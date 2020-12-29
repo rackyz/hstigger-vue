@@ -180,6 +180,7 @@
 			<hs-table
         v-tableDrag
         v-show="show"
+        :option="{stripe:true}"
         ref='table'
 				style="height:100%;width:100%;"
 				:columns="filteredColumns"
@@ -1349,6 +1350,8 @@ export default {
       this.ENT.LIST_CHECKREPORTS({timeout:10000}).then(res=>{
         let items = res.data.data
         items.forEach(v=>{
+           if(v.name == '宋健')
+            console.log("==========================")
           v.ops = {}
           v.opusers = {}
           console.log(v.desc)
@@ -1356,18 +1359,17 @@ export default {
           console.log( v.historyNodes)
           v.depName = ['行政综合','房建监理','市政监理','建设管理','装修管理', '造价咨询', 'BIM咨询'][v.dep]
           v.posName = ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级'][v.position]
-          if(v.name == '马骍')
-            console.log("马骍 HISTORY:",v.historyNodes)
+         
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
                console.log(n.key,v.executors.n3)
                if(n.key == 'n3' && Array.isArray(v.executors.n3)){
-                 let index = v.executors.n3.findIndex(v=>v.op == n.op)
+                 let index = v.executors.n3.findIndex(v=>v == n.op)
                  console.log("n3:",index)
                  if(index != -1){
                    
                   if(!n.op)
-                    n.op = v.executors.n3[index]
+                    return
                   v.ops[n.key+(index+1)] = n.op
                   let exec = this.users.find(u=>u.id == n.op)
                   if(exec){
@@ -1410,6 +1412,8 @@ export default {
           }
           console.log(v.opusers)
           v.opn1 = "已录"
+
+         
         })
         items = items.sort((a,b)=>{moment(a.created_at).isBefore(moment(b.created_at)?1:-1)})
         this.items = items

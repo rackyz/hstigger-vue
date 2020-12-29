@@ -435,19 +435,22 @@ var flow = {
       <div>
       <template v-if='db.model.executors'><h2 style='text-align:center;font-family:仿宋;font-size:20px;font-weight:bold;'>项目部打分评价表(平行责任人)</h2>
       <template v-if='db.env.executor == db.model.executors[0]'>
+      n31
       ${CreateENLayout('n31')}
       ${CommitLayout('n31')}
         ${MAKE_CONDITION_LAYOUTS([QN2],"1")}
         </template><template v-else='db.env.executor == db.model.executors[1]'>
+        n32
       ${CreateENLayout('n32')}
       ${CommitLayout('n32')}
         ${MAKE_CONDITION_LAYOUTS([QN2],"2")}
-        < /template><template v-else='db.env.executor == db.model.executors[2]'>
+        </template><template v-else='db.env.executor == db.model.executors[2]'>
+        n33
       ${CreateENLayout('n33')}
       ${CommitLayout('n33')}
         ${MAKE_CONDITION_LAYOUTS([QN2],"3")}
-        < /template>
-     < /template>
+        </template>
+     </template>
       </div>`,
       view: `<div><h2 style='text-align:center;font-family:仿宋;font-size:20px;font-weight:bold;'>员工自评表</h2>
       <Row :gutter='12' style='margin-top:30px'><Col :span='5'>{{name}}</Col><Col :span='9'>{{dep}}</Col><Col :span='10'>{{position}}</Col></Row>
