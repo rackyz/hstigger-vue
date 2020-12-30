@@ -907,7 +907,7 @@ export default {
                   let sheet = sheets[j]
                   var sheetKey = (j>1 && j<5)?(sheet.key+(j-1)):sheet.key
                     
-                  if(Array.isArray(param.row[sheetKey])){
+                  if(Array.isArray(param.row[sheetKey]) && op){
                     let rawscore = param.row[sheetKey]
 
                     
@@ -950,7 +950,7 @@ export default {
             type:'text',
             title:"考核评优/推荐",
             sortable:false,
-            width:350,
+            width:450,
              renderHeader(h,param){
               
               let titles = ['评级','推荐','评语']
@@ -1002,7 +1002,7 @@ export default {
                           if(si < 2){
                             return h('div',{style:`width:60px;min-width:60px;height:20px;color:#fff;background:${s=='无'?'#ddd':that.mapColor(s[0])}`},s)
                           }else{
-                            return h('Tooltip',{props:{maxWidth:200,content:s,transfer:true}},[h('div',{style:`max-width:200px;text-overflow:ellipsis;overflow:hidden;height:20px;ecllipse;text-align:left;padding:0 5px;white-space:nowrap;line-height:25px;`},s)])
+                            return h('Tooltip',{props:{maxWidth:400,content:s,transfer:true}},[h('div',{style:`max-width:200px;text-overflow:ellipsis;overflow:hidden;height:20px;ecllipse;text-align:left;padding:0 5px;white-space:nowrap;line-height:25px;`},s)])
                           }
                         
                       })])
@@ -1355,7 +1355,7 @@ export default {
           v.ops = {}
           v.opusers = {}
           console.log(v.desc)
-          console.log(v.executors)
+          console.log('EXECUTORS:',v.executors)
           console.log( v.historyNodes)
           v.depName = ['行政综合','房建监理','市政监理','建设管理','装修管理', '造价咨询', 'BIM咨询'][v.dep]
           v.posName = ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级'][v.position]
@@ -1363,7 +1363,7 @@ export default {
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
                console.log(n.key,v.executors.n3)
-               if(n.key == 'n3' && Array.isArray(v.executors.n3)){
+               if(n.key == 'n3' && v.executors && Array.isArray(v.executors.n3)){
                  let index = v.executors.n3.findIndex(v=>v == n.op)
                  console.log("n3:",index)
                  if(index != -1){

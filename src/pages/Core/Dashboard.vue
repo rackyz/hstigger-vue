@@ -3,10 +3,12 @@
 
 
   <Row :key='i' :gutter="10" style='margin:10px;'>
+    
     <Col :span='5'>
         <Card class="panel"  style='width:100%;height:100px;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);'>
           <BaseWeather />
         </Card>
+        </div>
       <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
         <BaseUserFlowPanel />
         
@@ -51,7 +53,7 @@
     
 
     </Col></Col>
-    <Col :span='6'>
+    <Col :span='6' >
      <Card class="panel" style="width:100%;border:none;" padding='0'>
      <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">

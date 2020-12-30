@@ -29,6 +29,9 @@ const getters = {
   isLogin(state){
     return state.isLogin
   },
+  getUser:(state)=>(id)=>{
+    return state.users.find(v=>v.id == id)
+  },
   uid(state){
     return state.session.user_id
   },  
