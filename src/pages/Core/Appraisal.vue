@@ -246,7 +246,7 @@
           <div style='width:50px;text-align:center;'>姓名</div>
           <template v-if='eQNSheet && eQNSheet.shorts'>
           <template v-for="(q,qi) in ['道德',...eQNSheet.shorts]">
-            <Tooltip :content="['职业道德',...eQNSheet.cats][qi]" :key='qi'>
+            <Tooltip transfer :content="['职业道德',...eQNSheet.cats][qi]" :key='qi'>
             <div style='width:40px;text-align:center;' :key='qi'>{{q}}</div>
             </Tooltip>
           </template>

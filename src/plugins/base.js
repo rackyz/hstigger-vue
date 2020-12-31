@@ -6,10 +6,11 @@ const Vue = require('vue')
 const PuzzleVerification = require('vue-puzzle-verification')
 import Clients from './axios'
 import moment from 'moment'
+import SplitPane from 'vue-splitpane'
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
 Vue.prototype.moment = moment
-
+Vue.component('split-pane', SplitPane)
 Vue.prototype.Download = function(url){
 
    let a = document.createElement("a")
