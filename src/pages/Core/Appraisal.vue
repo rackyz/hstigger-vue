@@ -124,7 +124,7 @@
   <Button
 				style="float:right"
 			
-				@click="ExportCSV"
+				@click="ExportXLSX"
 				>导出EXCEL</Button
 			>
 		</div>
@@ -424,7 +424,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-
+const XLSX = require('xlsx')
 var 
   Q1 = {
     title: "工作饱满度",
@@ -917,7 +917,7 @@ export default {
                       
                     return h('div',{class:'cell-row'},[score.map((v,vi)=>{
                      
-                        return ( v===undefined?'无':sheet.questions[vi].options[v || 0])
+                        return (typeof v != 'number'?'无':sheet.questions[vi].options[v || 0])
                       
 
                     }).map((s,si)=>{
@@ -1295,6 +1295,102 @@ export default {
        })
      }
     },
+    ExportXLSX(){
+      const filename = '2020年终考核分类汇总表.xlsx';
+      
+      const workbook = XLSX.utils.book_new()
+      this.deps_count.forEach((v,i)=>{
+        let dep_name = this.deps[i]
+        if(v > 0){
+          let depusers = this.items.filter(v=>v.dep == i)
+          let title = ['序号','姓名','职务','所在项目','职称','岗位证书','学历','入职时间']
+          this.positions.forEach((p,pi)=>{
+            let pos_name = this.positions[pi]
+            let users = depusers.filter(v=>v.position == pi)
+            if(users.length <= 0)
+              return
+            let scoreTitle = ['职业道德',...getQASheet(i,p).cats,"总分"]
+            let qaTitle = getEVSheet(p,'n4').questions.map(v=>v.title)
+            let cmtTitle = ['评级','推荐','评语']
+            let SheetTitle = [...title,...scoreTitle,...qaTitle,...cmtTitle]
+            let data = users.map((v,i)=>[i+1,v.name,this.positions[v.position],v.project,v.rank,v.cerificate,v.education,moment(v.hire_date).format('YYYY-MM'),...v.scoresDesc,v.totalScore,...v.evDesc,v.CommitLevel_n4,v.CommitPride_n4,v.Commit_n4])
+            console.log(dep_name,pos_name,data)
+            let Caption = [`2020年终考核汇总表(${dep_name+'-'+pos_name})`]
+            let worksheet = XLSX.utils.aoa_to_sheet([Caption,SheetTitle,...data])
+            pos_name = pos_name.replace('/','-')
+            console.log(worksheet)
+            worksheet["!merges"]=[{s:{
+              c:0,r:0
+            },e:{
+              c:28,r:0
+            }}]
+            worksheet["A1"].s = {
+              font:{sz:24,bold:true},
+              alignment:{horizontal:"center",vertical:"center",wrap_text:true}
+
+            }
+             let borderStyle = {
+                top: {
+                    style: "thin",
+                    color: { rgb: "000000" }
+                },
+                bottom: {
+                    style: "thin",
+                    color: { rgb: "000000" }
+                },
+                left: {
+                    style: "thin",
+                    color: { rgb: "000000" }
+                },
+                right: {
+                    style: "thin",
+                    color: { rgb: "000000" }
+                }
+            };
+            const cols = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC']
+            for(let i=0;i<28;i++){
+              worksheet[cols[i]+2].s = {
+                fill: {
+                                fgColor: {
+                                    rgb: "eeeeee"
+                                }
+                            },
+                font: {
+                  name: '宋体',
+                  sz: 14,
+                  color: {rgb: "#FFFF0000"},
+                  bold: true,
+                  italic: false,
+                  underline: false
+                },
+                alignment: {
+                  horizontal: "center" ,
+                  vertical: "center"
+                },
+                 border: borderStyle
+              }
+            }
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, dep_name+'-'+pos_name);
+          })
+         
+        }
+      })
+     
+
+     const wbout = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+      const blob = new Blob([wbout], {type: 'application/octet-stream'});
+      // save file
+      let link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      setTimeout(function() {
+          // 延时释放掉obj
+          URL.revokeObjectURL(link.href);
+          link.remove();
+      }, 500);
+    },
     ExportCSV(){
       let users = this.users.map(v=>({...v}))
       users.forEach(v=>{
@@ -1350,13 +1446,8 @@ export default {
       this.ENT.LIST_CHECKREPORTS({timeout:10000}).then(res=>{
         let items = res.data.data
         items.forEach(v=>{
-           if(v.name == '宋健')
-            console.log("==========================")
           v.ops = {}
           v.opusers = {}
-          console.log(v.desc)
-          console.log('EXECUTORS:',v.executors)
-          console.log( v.historyNodes)
           v.depName = ['行政综合','房建监理','市政监理','建设管理','装修管理', '造价咨询', 'BIM咨询'][v.dep]
           v.posName = ['经理/总监(含副)', '经理助理/总代', '工程师级','助理级/员级'][v.position]
          
@@ -1394,18 +1485,29 @@ export default {
 
                 }
               v.readed = readed[v.id]
+              let qasheet = getQASheet(v.dep,v.position)
+              v.scores = v[qasheet.key+'n4'] || new Array(9)
+              v.totalScore = this.CalcScore(qasheet,v.scores) || '-'
+              const scores = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
+              v.scoresDesc = v.scores.map(v=>typeof v=='number'?scores[v]:'-')
+              
+               if(v.mem_self || v.mgr_self){
+                  v.QN2 = v.mem_self || v.mgr_self || []
+                  v.TN2 = v.position != 0 ? QN0 : QN1
+                  v.QN31 = v.mgr2mem31
+                  v.QN32 = v.mgr2mem32
+                  v.QN33 = v.mgr2mem33
+                  v.TN31 = v.TN32 = v.TN33 = QN2
 
-               if(n.mem_self || n.mgr_self){
-                  v.QN2 = n.mem_self || n.mgr_self || []
-                  v.TN2 = v.position != 0 ? QN1 : QN2
-                  v.QN31 = n.mgr2mem31
-                  v.QN32 = n.mgr2mem32
-                  v.QN33 = n.mgr2mem33
-                  v.TN31 = v.TN32 = v.TN33 = QN3
-
-                  v.QN4 = n.dep2mgr || n.dep2mem
-                  v.TN4 = v.position != 0 ? QN4 : QN5
+               
+                  v.TN4 = v.position != 0 ? QN3: QN4
                }
+               v.QN4 = new Array(8)
+               if(v.dep2mgr || v.dep2mem)
+                Object.assign(v.QN4,v.dep2mgr || v.dep2mem) 
+               let evsheet = getEVSheet(v,'n4')
+               v.evDesc = v.QN4.map((q,i)=>typeof q=='number'?evsheet.questions[i].options[q]:'-')
+              
                if(n.mem_self)
                 this.table = QN1
           })
