@@ -5,11 +5,19 @@
   <Row :key='i' :gutter="10" style='margin:10px;'>
     
     <Col :span='5'>
-        <Card class="panel"  style='width:100%;height:100px;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);'>
+        <Card class="panel"  style='width:100%;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);' padding='5'>
           <BaseWeather />
+         
         </Card>
         </div>
       <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
+         <BaseMyStatus />
+       
+        
+         
+    </Card>
+    <Card class="panel"  style='width:100%;border:none;border-radius:0;margin-top:10px;' padding="5">
+   
         <BaseUserFlowPanel />
         
          
@@ -20,8 +28,8 @@
         
     </Card>
     <BaseFilePanel />
-    
-  
+    <BaseLinkPanel />
+    <BaseDownloadPanel />
     </Col>
     
     <Col :span='13'>
@@ -54,6 +62,32 @@
 
     </Col></Col>
     <Col :span='6' >
+    <Card style='width:100%;border:none;border-radius:0' padding="0">
+        <div class='card-title'><Icon custom='gzicon gzi-date' size='19' /> 日历 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a></span></div>
+      <BaseCalender />
+    </Card>
+  
+    <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0' >
+      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a></span></div>
+     <template v-for="(fi,i) in tasks">
+       <div class='ti-item' :key='fi.id'>
+         <div class='ti-icon'>{{fi.iconText}}</div>
+         <div class='ti-info'>
+           <div class='ti-flowinfo'>
+             {{fi.root}}
+           </div>
+           <div class='ti-desc'>  
+             {{fi.desc}}
+           </div>
+         </div>
+         <div class='ti-date'>
+           <div class='ti-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
+           <div class='ti-executor'>{{fi.state}}</div>
+         </div>
+       </div>
+     </template>
+    </Card>
+
      <Card class="panel" style="width:100%;border:none;" padding='0'>
      <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">
@@ -103,37 +137,12 @@
      </template>
      
     </Card>
-    
-    <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0' v-show='false'>
-      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'><Icon custom='gzicon gzi-config' size='15' style='margin-left:5px;'></Icon></a></span></div>
-     <template v-for="(fi,i) in tasks">
-       <div class='ti-item' :key='fi.id'>
-         <div class='ti-icon'>{{fi.iconText}}</div>
-         <div class='ti-info'>
-           <div class='ti-flowinfo'>
-             {{fi.root}}
-           </div>
-           <div class='ti-desc'>  
-             {{fi.desc}}
-           </div>
-         </div>
-         <div class='ti-date'>
-           <div class='ti-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
-           <div class='ti-executor'>{{fi.state}}</div>
-         </div>
-       </div>
-     </template>
-    </Card>
+   
     </Col>
   </Row>
    
     <BaseFlow :id='current_flow.flow_id' :inst_id="current_flow.id" v-model="showFlow" @update='getWorkflows' />
-    <!-- <div class="panel" style="  width:calc(8.3333% * 7 - 2px);height:calc(110px * 6 - 20px);left:calc(8.3333% * 2 );top:2px;background:rgba(200,200,200,0.7);filter:drop-shadow(1px 1px 2px #333) brightness(1.1);padding:20px;">
-      日历
-    </div>
-    <div class="panel" style="  width:calc(8.3333% * 3 - 8px);height:calc(110px * 6 - 20px);left:calc(8.3333% * 9 + 4px);top:2px;background:#333;color:#fff;padding:20px;">
-      待办任务
-    </div> -->
+   
 
     <Modal title="添加RSS信息源" footer-hide v-model='modalRSS' width='400'>
       <div style='padding:20px'>

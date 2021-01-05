@@ -1,7 +1,8 @@
 <template>
   <div class="system-name">
     
-    <div class="caption">企业信息平台</div> 
+    <!-- <div class="caption">企业信息平台</div>  -->
+    <div class="caption">建设项目管理系统</div>
     <div class="version">
      NINGBO GAOZHUAN EIP PLATFORM <span style='color:gold'>v1.0</span>
     </div>
@@ -23,8 +24,9 @@ export default {
   display:flex;
   flex-direction:column;
   .caption{
-     font-size:2.6rem;
+     font-size:2rem;
     text-shadow:1px 1px 1px #000;
+    text-align: center;
   }
 
   

@@ -1309,7 +1309,7 @@ export default {
             let users = depusers.filter(v=>v.position == pi)
             if(users.length <= 0)
               return
-            let scoreTitle = ['职业道德',...getQASheet(i,p).cats,"总分"]
+            let scoreTitle = ['职业道德',...getQASheet(i,pi).cats,"总分"]
             let qaTitle = getEVSheet(p,'n4').questions.map(v=>v.title)
             let cmtTitle = ['评级','推荐','评语']
             let SheetTitle = [...title,...scoreTitle,...qaTitle,...cmtTitle]
@@ -1490,7 +1490,7 @@ export default {
               v.totalScore = this.CalcScore(qasheet,v.scores) || '-'
               const scores = [10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5]
               v.scoresDesc = v.scores.map(v=>typeof v=='number'?scores[v]:'-')
-              
+              v.scoresDesc[0] = v.scoresDesc == 9.5?'不合格':'合格'
                if(v.mem_self || v.mgr_self){
                   v.QN2 = v.mem_self || v.mgr_self || []
                   v.TN2 = v.position != 0 ? QN0 : QN1

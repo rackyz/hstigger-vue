@@ -87,17 +87,11 @@
       </Badge>
       
       <!-- User -->
-      <Dropdown ref='dm' trigger='hover' placement="bottom-start" @on-visible-change='showUserMenu=$event' @on-click='onClickUserMenu'>
-        <a href="javascript:void(0)" class="text-btn text-btn-dropdown" :class="{'text-btn-dropdown-active':showUserMenu}">
+        <div @click="RouteTo('/core/self')" class="text-btn" style='margin-right:5px;'>
           <BaseAvatar :size="25" style='margin-right:8px;' :userinfo="session"></BaseAvatar>
           <span class='d-none d-sm-block'>{{session.user}}</span>
           
-        </a>
-         <DropdownMenu slot="list">
-            <DropdownItem ref='m1' name='self'>个人中心</DropdownItem>
-            <DropdownItem ref='m2' name='logout' divided>退出</DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+        </div>
 
    
     </div>

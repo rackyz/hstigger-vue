@@ -9,8 +9,9 @@
     name: 'App',
     metaInfo: {
       title: '首页',
-      titleTemplate: '%s | 企业信息平台',
-      htmlAttrs: { lang: 'en' },
+    //  titleTemplate: '%s | 企业信息平台',
+       titleTemplate: '%s | 宁波高专建设项目管理系统',
+     htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
