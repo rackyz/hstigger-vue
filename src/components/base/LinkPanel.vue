@@ -15,7 +15,7 @@
                   <div class="title">{{l.title}}</div>
                   
                   </div>
-            <div class='flex-wrap' style='color:#359;' @click='RouteTo(l.url,true)'>进入<Icon type="ios-arrow-forward" style='margin-left:2px;'></Icon></div>
+            <div class='flex-wrap l-enter' style='color:#359;' @click='RouteTo(l.url,true)'>进入<Icon type="ios-arrow-forward" style='margin-left:2px;'></Icon></div>
             </div>
           </template>
           <BaseEmpty v-if='links.length == 0' />
@@ -82,21 +82,23 @@ export default {
 
   .icon-wrap{
      background:rgb(33, 50, 77);
+     border-radius: 5px;
+     overflow: hidden;
     border-right:2px solid #fff;
     height:25px;
     width:25px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right:10px;
+    margin-right:5px;
   }
 
 
 }
 
-.link-item:hover{
+.l-enter:hover{
   cursor: pointer;
   transition: all 0.5s;
-  filter:brightness(1.2);
+  color:rgb(12, 86, 247);
 }
 </style>

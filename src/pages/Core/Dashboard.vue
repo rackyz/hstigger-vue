@@ -17,12 +17,7 @@
         
          
     </Card>
-    <Card class="panel"  style='width:100%;border:none;border-radius:0;margin-top:10px;' padding="5">
    
-        <BaseUserFlowPanel />
-        
-         
-    </Card>
      <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
          <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a><a href='#'></a></span></div>
         <BaseProjectList />
@@ -68,12 +63,14 @@
         <div class='card-title'><Icon custom='gzicon gzi-date' size='19' /> 活动/计划  <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a></span></div>
       <BaseCalender />
     </Card>
-  
     <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0' >
+     
       <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a></span></div>
-      <div style='width:100%;position:relative;padding:5px;'>
-        
-          2020年3月21日   星期几 农历几月几日 节日    </div>
+      <div class="flex-wrap flex-between">
+        <BaseNow />
+        <Icon class='l-add' type="md-add" size="30" style='margin-right:10px;' />
+      </div>
+      
       
            <template v-for="(fi,i) in tasks">
        <div class='ti-item' :key='fi.id'>
@@ -98,9 +95,12 @@
         </div>
     
     </Card>
-
-     <Card class="panel" style="width:100%;border:none;" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;'>MORE</span></div>
+ <Card class="panel"  style='width:100%;border:none;border-radius:0;margin-top:10px;' padding="0">
+    <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 工作流 <span style='float:right;font-size:12px;'>MORE</span></div>
+        <BaseUserFlowPanel />
+        
+         
+     <div class='card-title'><Icon custom='gzicon gzi-event' size='19' /> 待处理 <span style='float:right;font-size:12px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">
        <BaseEmpty :msg="空" :loading="isLoadingActived" />
      </template>
@@ -121,11 +121,7 @@
          </div>
        </div>
      </template>
-     
-    </Card>
-
-     <Card class="panel" style="width:100%;border:none" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 已处理 <span style='float:right;font-size:12px;'>MORE</span></div>
+     <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 已处理 <span style='float:right;font-size:12px;'>MORE</span></div>
      <template v-if="flowPassed.length == 0">
        <BaseEmpty :msg="空" :loading="isLoadingPassed" />
      </template>
@@ -409,5 +405,21 @@ export default {
   filter:brightness(1.2);
   transition:all 0.5s;
   cursor: pointer;
+}
+
+.l-add{
+  cursor: pointer;
+  padding:5px;
+}
+
+.l-add:hover{
+  border:2px dashed #dfdfdf;
+  border-radius: 5px;
+}
+
+.l-add:active{
+  position: relative;
+  bottom:-1px;
+  right:-1px;
 }
 </style>

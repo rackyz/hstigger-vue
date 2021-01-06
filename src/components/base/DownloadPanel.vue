@@ -3,24 +3,25 @@
   <Card class="panel" padding='0' style='margin-top:10px;'>
        <div class='card-title'><Icon type='md-folder-open' size='19' /> 常用软件  {{loading?' - 读取中...':''}} <span style='float:right;' class='card-more' @click='RouteTo("/core/self/file")'>MORE</span></div>
       
-     <div class="content">
+   
+      <div class="content">
             <template v-for="l in links">
-            <div :key="l.id" class="link-item"  @click='RouteTo(l.url,true)'>
+            <div :key="l.id" class="link-item">
                <div class='flex-wrap'>
-                 <div class='icon-wrap'>
+                 <div class='icon-wrap' style=' background:#fff;'>
                    <img v-if='l.avatar' :src='l.avatar' style='width:90%;height:90%;' />
                  <Icon :custom='`gzicon gzi-${l.icon}`' :color="l.color || '#fff'" size="35" v-if="!l.avatar" />
                  </div>
                  
                  
                   <div class="title">{{l.title}}</div>
+                  
                   </div>
-
+            <div class='flex-wrap l-enter' style='color:#359;' @click='RouteTo(l.url,true)'>下载<Icon type="ios-arrow-forward" style='margin-left:2px;'></Icon></div>
             </div>
           </template>
           <BaseEmpty v-if='links.length == 0' />
         </div>
-     
     </Card>
 </template>
 
@@ -59,37 +60,31 @@ export default {
 }
 
 .link-item{
-  height:60px;
+  height:25px;
   padding:0px;
   margin:2px 0;
-  background:rgb(38, 61, 96);
-  color:#fff;
+  color:#333;
   display: flex;
   align-items: center;
-  text-shadow: 1px 1px 1px rgb(5, 79, 120);
-  font-size:16px;
+  font-size:14px;
+  justify-content: space-between;
+  width: 100%;
 
   .icon-wrap{
-    background:rgb(51, 72, 109);
-    border-right:2px solid #fff;
-    height:60px;
-    width:60px;
+     background:rgb(33, 50, 77);
+    height:25px;
+    width:25px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right:10px;
+    margin-right:5px;
+   
   }
 
-  .desc{
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size:13px;
-    color:#aaa;
-    text-shadow: none;
-  }
 
 }
 
-.link-item:hover{
+.l-enter:hover{
   cursor: pointer;
   transition: all 0.5s;
   filter:brightness(1.2);
