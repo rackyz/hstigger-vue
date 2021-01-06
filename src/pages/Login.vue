@@ -1,33 +1,29 @@
 
 <template>
-   <div class="page page-debug">
-      <div class='board' style='padding:10px;color:#dfdfdf;width:400px;'>
-         
-      </div>
-     
-     
-      <div class="login" style='width:100%;'>
-         
-         <div class='flex-wrap'>
-            
-              <Carousel v-model="value1" autoplay loop style='width:600px;height:400px;margin-right:200px;border:2px solid #fff;border-radius:15px;overflow:hidden;'> 
-        <CarouselItem v-for="p in projects" :key='p.name'>
-            <a href="http://www.gzqgczx.com/">
-            <div :style='`background:no-repeat url(${p.image}) !important;background-size:600px 400px;height:400px;display:flex;align-items:flex-end;padding:20px;font-size:20px;color:#fff;text-shadow:1px 1px 1px #aaa;`'>{{p.name}}</div>
-            </a>
+   <div class="page page-debug" style='height:100%;position:relative;width:100%;'>
+    
+       <Carousel v-model="value1" autoplay :autoplay-speed="8000" radius-dot loop style='position:absolute;left:0;top:0;bottom:0;right:0;overflow:hidden;'> 
+        <CarouselItem v-for="p in projects" :key='p.name' style='background:#333;'>
+            <div :style='`background:no-repeat url(${p.image}) !important;background-size:100% 100%;width:100%;height:1000px;display:flex;align-items:flex-start;padding:20px;font-size:20px;color:#fff;text-shadow:1px 1px 1px #aaa;`'></div>
         </CarouselItem>
     </Carousel>
+     
+      <div class="login" style='width:100%;padding:0;margin:0;'>
+         
+         <div class='flex-wrap login-wrap'>
+            
+            
     
     <div>  <BaseLoginHeader />
-          <BaseLogin style="margin-top:20px;width:400px;" :routeTo="'/core'" />  </div>
+          <BaseLogin style="margin-top:20px;width:380px;" :routeTo="'/core'" />  </div>
          </div>
         
        
       </div>
-      <div class='footer' style='flex-direction:column;'>
+      <div class='footer' style='flex-direction:column;margin-bottom:20px;width:1000px;'>
          <div>
       
-         <div style='color:#aaa;width:1000px;margin:0 auto;'><span style='color:#fff'>宁波高专建设监理有限公司</span>创建于1993年，原属宁波高等专科学校（现宁波工程学院）,系宁波市首批监理企业之一。经过二十余年的发展，宁波高专现具有建设监理、招标代理、造价咨询、工程咨询等多项工程咨询类甲级资质。公司一直奉行“方法科学、作风严谨、顾客至上、持续改进”的质量方针，把“顾客满意率、服务优良率”作为质量目标，坚持以专业化的服务为工程建设提供高附加值的咨询成果为发展方向，现已发展成为以提供全过程工程咨询服务为核心业务的综合性工程咨询企业。</div>
+         <div style='color:#aaa;margin:0 auto;'><div style='color:#dfdfdf;font-size:14px;font-weight:bold;'>宁波高专建设监理有限公司</div>创建于1993年，原属宁波高等专科学校（现宁波工程学院）,系宁波市首批监理企业之一。经过二十余年的发展，宁波高专现具有建设监理、招标代理、造价咨询、工程咨询等多项工程咨询类甲级资质。公司一直奉行“方法科学、作风严谨、顾客至上、持续改进”的质量方针，把“顾客满意率、服务优良率”作为质量目标，坚持以专业化的服务为工程建设提供高附加值的咨询成果为发展方向，现已发展成为以提供全过程工程咨询服务为核心业务的综合性工程咨询企业。</div>
         <div>Copyright © 2019-2021  <Icon custom='gzicon gzi-nbgz' /> 宁波高专建设监理有限公司</div></div>
         <div><a href="https://beian.miit.gov.cn/" style='color:#ddd;'>浙ICP备18011212号-3</a></div>
       </div>
@@ -68,3 +64,16 @@ export default {
    }
 }
 </script>
+<style lang="less" scoped>
+.login{
+   backdrop-filter:blur(15px) brightness(0.4);
+   width:100%;
+   height:calc(100%);
+   
+   margin:0 !important;
+   max-width: 100% !important;
+   padding:0 !important;
+   padding-bottom:150px;
+   
+}
+</style>

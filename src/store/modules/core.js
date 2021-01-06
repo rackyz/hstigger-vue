@@ -82,7 +82,8 @@ const getters = {
     return state.user_rss
   },
   my_rss(state){
-    return state.rss.filter(v=>state.user_rss.includes(v.id))
+    ///return state.rss.filter(v=>state.user_rss.includes(v.id))
+    return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v)
   },
   rss(state){
     return state.rss
@@ -212,6 +213,7 @@ const actions = {
       resolve()
     })
   },
+  
   login({commit},{user,password}){
     var md5 = crypto.createHash("md5")
     md5.update(password)
@@ -336,6 +338,10 @@ const SaveTypes = data=>{
 }
 
 const mutations = {
+  SetLocalRss(state,list){
+    state.user_rss = list
+    
+  },
   login(state){
     state.isLogin = true
   },

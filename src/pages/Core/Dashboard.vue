@@ -4,13 +4,14 @@
 
   <Row :key='i' :gutter="10" style='margin:10px;'>
     
-    <Col :span='5'>
+    <Col :span='5' :xs="24" :md='12' :lg="5">
         <Card class="panel"  style='width:100%;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);' padding='5'>
           <BaseWeather />
          
         </Card>
         </div>
       <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
+        <div class='card-title'><Icon custom='gzicon gzi-supervisor' size='19' /> 状态 <a style='float:right;font-size:12px;' href="#" @click.stop="RouteTo('/core/self')">个人中心 <Icon type="ios-arrow-forward" /></a></div>
          <BaseMyStatus />
        
         
@@ -23,7 +24,7 @@
          
     </Card>
      <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
-         <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'></a></span></div>
+         <div class='card-title'><Icon custom='gzicon gzi-pm2' size='19' /> 我的项目 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a><a href='#'></a></span></div>
         <BaseProjectList />
         
     </Card>
@@ -32,11 +33,12 @@
     <BaseDownloadPanel />
     </Col>
     
-    <Col :span='13'>
+    <Col :span='13' :xs="24" :md='12' :lg="13">
        <template v-if='my_rss && my_rss.length != 0'>
           <Row :gutter="10">
+          
           <template v-for="r in my_rss">
-            <Col :span='12' :key='r.id'>
+            <Col :span='12' :key='r.id' :xs="24" :md='24' :lg="12">
             <Card padding='5' :key='r.id' style='height:300px;margin-bottom:10px;border-radius:0;border:none;'>
             <div class="flex-wrap flex-between" style='padding:3px 8px;background:#23334c;color:#fff;' v-if="r.media_type != 1">
               {{r.name}}  
@@ -51,7 +53,7 @@
         </Row>
        </template>
        <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
-          <div class='card-title'><Icon custom='gzicon gzi-message' size='15' /> 信息源 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a><a href='#'></a></span></div><BaseEmpty><div class='full-container flex-wrap' style='height:300px;width:100%;justify-content:center;'>
+          <div class='card-title'><Icon custom='gzicon gzi-message' size='15' /> 信息源 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a><a href='#'></a></span></div><BaseEmpty><div class='full-container flex-wrap' style='height:300px;width:100%;justify-content:center;'>
            点击管理<a href='#' @click='modalRSS=true'>信息源</a>
          </div></BaseEmpty></Card>
          
@@ -61,15 +63,19 @@
     
 
     </Col></Col>
-    <Col :span='6' >
+    <Col :span='6' :xs="24" :md='24' :lg="6">
     <Card style='width:100%;border:none;border-radius:0' padding="0">
-        <div class='card-title'><Icon custom='gzicon gzi-date' size='19' /> 日历 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a></span></div>
+        <div class='card-title'><Icon custom='gzicon gzi-date' size='19' /> 活动/计划  <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a></span></div>
       <BaseCalender />
     </Card>
   
     <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0' >
-      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;line-height:25px;'>MORE</a></span></div>
-     <template v-for="(fi,i) in tasks">
+      <div class='card-title'><Icon custom='gzicon gzi-eventavailable' size='19' /> 今日计划 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a></span></div>
+      <div style='width:100%;position:relative;padding:5px;'>
+        
+          2020年3月21日   星期几 农历几月几日 节日    </div>
+      
+           <template v-for="(fi,i) in tasks">
        <div class='ti-item' :key='fi.id'>
          <div class='ti-icon'>{{fi.iconText}}</div>
          <div class='ti-info'>
@@ -86,10 +92,15 @@
          </div>
        </div>
      </template>
+     <template v-if="!task || tasks.length == 0">
+       <BaseEmpty :msg="空" :loading="isLoadingPassed" />
+     </template>
+        </div>
+    
     </Card>
 
      <Card class="panel" style="width:100%;border:none;" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
+     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 待处理 <span style='float:right;font-size:12px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">
        <BaseEmpty :msg="空" :loading="isLoadingActived" />
      </template>
@@ -113,8 +124,8 @@
      
     </Card>
 
-     <Card class="panel" style="width:100%;border:none;margin-top:10px;" padding='0'>
-     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 与我相关 <span style='float:right;font-size:12px;line-height:25px;'>MORE</span></div>
+     <Card class="panel" style="width:100%;border:none" padding='0'>
+     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 已处理 <span style='float:right;font-size:12px;'>MORE</span></div>
      <template v-if="flowPassed.length == 0">
        <BaseEmpty :msg="空" :loading="isLoadingPassed" />
      </template>
@@ -147,9 +158,11 @@
     <Modal title="添加RSS信息源" footer-hide v-model='modalRSS' width='400'>
       <div style='padding:20px'>
         勾选您所需要的信息源
+          <draggable v-model="draggableRss" animation='500' >
         <template v-for="r in rss">
           <div :key='r.id' style='display:flex;justify-content:space-between;align-items:center;padding:2px 10px;'>{{r.name}} <i-switch :value='user_rss ? user_rss.includes(r.id):false' @on-change='handleToggleRss(r.id,$event)' /></div>
         </template>
+          </draggable>
       </div>
     </Modal>
     </Layout>
@@ -174,7 +187,18 @@ export default {
   },
   computed:{
     ...mapGetters('core',['session','my_rss','user_rss','rss']),
-   
+    draggableRss:{
+      set(e){
+        console.log("DRAG:",e)
+        if(e){
+           this.$store.commit('core/SetLocalRss',e.map(e=>e.id))
+        }
+       
+      },
+      get(){
+        return this.my_rss
+      }
+    }
     
   },
   metaInfo:{

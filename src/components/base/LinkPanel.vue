@@ -5,16 +5,17 @@
       
      <div class="content">
             <template v-for="l in links">
-            <div :key="l.id" class="link-item"  @click='RouteTo(l.url,true)'>
+            <div :key="l.id" class="link-item">
                <div class='flex-wrap'>
                  <div class='icon-wrap'>
-                 <Icon :custom='`gzicon gzi-${l.icon}`' :color="l.color || '#fff'" size="35"  />
+                 <Icon :custom='`gzicon gzi-${l.icon}`' :color="l.color || '#fff'" size="15"  />
                  </div>
                  
                  
-                  <div class="title">{{l.title}} <br /><span class='desc'>{{l.url}}</span></div>
+                  <div class="title">{{l.title}}</div>
+                  
                   </div>
-
+            <div class='flex-wrap' style='color:#359;' @click='RouteTo(l.url,true)'>进入<Icon type="ios-arrow-forward" style='margin-left:2px;'></Icon></div>
             </div>
           </template>
           <BaseEmpty v-if='links.length == 0' />
@@ -69,33 +70,27 @@ export default {
 }
 
 .link-item{
-  height:60px;
+  height:25px;
   padding:0px;
   margin:2px 0;
-  background:rgb(38, 61, 96);
-  color:#fff;
+  color:#333;
   display: flex;
   align-items: center;
-  text-shadow: 1px 1px 1px rgb(75, 101, 114);
-  font-size:16px;
+  font-size:14px;
+  justify-content: space-between;
+  width: 100%;
 
   .icon-wrap{
      background:rgb(33, 50, 77);
     border-right:2px solid #fff;
-    height:60px;
-    width:60px;
+    height:25px;
+    width:25px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right:10px;
   }
 
-  .desc{
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size:13px;
-    color:#aaa;
-    text-shadow: none;
-  }
 
 }
 

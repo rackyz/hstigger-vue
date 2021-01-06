@@ -17,7 +17,7 @@
   </div>
 <div class='status'>
            
-            {{session.statusDesc || '目前主要在做高专企业信息平台的任务模块以及合约管理系统的迁移工作'}} <span class='icon-button'><Icon type="md-create" @click="showEditDesc=true" /></span>
+            {{session.statusDesc || '目前主要在做高专企业信息平台的任务模块以及合约管理系统的迁移工作'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
             
           </div>
 
@@ -97,7 +97,7 @@ export default {
 .name{
   font-size:14px;
   margin-bottom:2px;
-  background:linear-gradient(to right,#dfdfdf,#fff);
+  background:linear-gradient(to right,#e9fcff,#fff);
   height:30px;
   line-height:30px;
   padding-left:5px;
