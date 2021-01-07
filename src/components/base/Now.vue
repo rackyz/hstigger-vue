@@ -28,7 +28,7 @@ export default{
         const momentNow=moment();
         this.date=momentNow.format('YYYY-MM-DD');
         const dayNameMapping=[
-            '星期日','星期一','星期二','星期三','星期四','星期五','星期六'
+           '星期一','星期二','星期三','星期四','星期五','星期六', '星期日'
         ];
         console.log("dsadas",momentNow.format('e'));
         this.day=dayNameMapping[momentNow.format('e')];

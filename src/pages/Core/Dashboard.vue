@@ -34,9 +34,9 @@
           
           <template v-for="r in my_rss">
             <Col :span='12' :key='r.id' :xs="24" :md='24' :lg="12">
-            <Card padding='5' :key='r.id' style='height:300px;margin-bottom:10px;border-radius:0;border:none;'>
-            <div class="flex-wrap flex-between" style='padding:3px 8px;background:#23334c;color:#fff;' v-if="r.media_type != 1">
-              {{r.name}}  
+            <Card padding='5' :key='r.id' style='height:300px;margin-bottom:10px;border-radius:0;border:none;overflow:hidden;'>
+            <div class="flex-wrap flex-between" style='padding:3px 8px;background:#23334c;color:#fff;' v-if="r.media_type != 1"><span>
+              <Icon type="logo-rss" /> {{r.name}}  </span>
               <span class='card-more' style='float:right' @click="RouteTo(r.link,true)">MORE</span>
             </div>
             <component :is="MapRssComponent(r.media_type)" :id="r.id" />
