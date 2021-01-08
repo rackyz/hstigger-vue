@@ -38,7 +38,7 @@ export default{
         updateTime(){
             const _this=this;
             this.timeInterval=setInterval(function(){
-                _this.time=moment().format('HH:mm');
+                _this.time=moment().format('HH:mm:ss');
             },1000);
         }
     }

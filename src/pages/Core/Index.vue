@@ -3,7 +3,7 @@
     <BaseAppBar style='width:100%;'></BaseAppBar>
     <transition name='fade'>
       <div class='screen-saver' v-show="idle">
-        <div class="flex-wrap" style='width:520px;position:relative;bottom:-30px;' > 高专企业云</div>
+        <div class="flex-wrap" style='width:650px;position:relative;bottom:-20px;' > 高专企业云</div>
         <BaseNow /></div>
     </transition>
     <div style='margin-top:44px;height:100%;width:100%;position:relative;' v-if='session.token'>
@@ -39,7 +39,7 @@ export default {
       }
       timer = setTimeout(()=>{
         this.idle = true
-      },10000)
+      },120000)
     }
   }
 }
@@ -61,15 +61,16 @@ export default {
   font-size:25px;
   color:#aaa;
   .date-info{
-    
+    margin-bottom:50px;
     .date-info__left{
       i{
          font-size:90px !important;
         color:#aaa !important;
-        margin-right:5px;
+        margin-right:10px;
       }
-      font-size:100px !important;
+      font-size:88px !important;
       color:#aaa;
+      margin-right:25px;
     }
     .date-info__right{
       font-size:30px !important;
