@@ -30,7 +30,6 @@ export default{
         const dayNameMapping=[
            '星期一','星期二','星期三','星期四','星期五','星期六', '星期日'
         ];
-        console.log("dsadas",momentNow.format('e'));
         this.day=dayNameMapping[momentNow.format('e')];
         this.updateTime();
     },

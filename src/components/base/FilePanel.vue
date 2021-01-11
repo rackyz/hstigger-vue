@@ -60,7 +60,7 @@ export default {
    methods:{
      getData(){
        this.loading = true
-       this.$store.dispatch('file/query?vdisk=tmp').then(res=>{
+       this.$store.dispatch('file/query',{vdisk:"tmp"}).then(res=>{
 
        }).finally(e=>{
          this.loading = false
@@ -87,10 +87,10 @@ export default {
 		},
      onUploadFile(e){
       
-      this.$store.dispatch('file/upload',{files:e,vdisk:'self'}).then(res=>{
+      this.$store.dispatch('file/upload',{files:e,vdisk:'tmp'}).then(res=>{
         this.Success({
           title:'上传成功',
-          desc:"文件已上传完毕"
+          content:"文件已上传完毕"
         })
       }).catch(e=>{
          this.Error(e)

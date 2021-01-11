@@ -1,15 +1,20 @@
 <template>
-        <div style="padding:10px;padding-left:120px;">
-        账号: <Select style='display:inline-block;width:200px;' transfer :value="session.user_id"  @on-select='Debug_changeUser'  > <Option :key="d.id" :name="d.id" v-for="d in session.users" :value="d.id">
+        <div class="hs-page">
+          <Card style="position:absolute;left:10px;top:10px;width:480px;" padding='5'>
+            <div class="flex-wrap" style="position:relative;height:90px;padding:0 5px;">
+              <hs-avatar :userinfo="session" :size="80" />
+              <div class='info' style='height:calc(100% - 10px);padding:0 10px;'>
+                <div style='font-size:20px;'>{{session.name}}({{session.user}})</div>
+                <div>上次登录 {{moment(session.lastlogin_at).fromNow()}}</div>
+                <div>绑定手机 {{session.phone}}</div>
+              </div>
+            </div>
+          </Card>
+          <Card style="position:absolute;left:10px;top:120px;width:480px;" padding='10'>
+            账号: <Select style='display:inline-block;width:200px;' transfer :value="session.user_id"  @on-select='Debug_changeUser'  > <Option :key="d.id" :name="d.id" v-for="d in session.users" :value="d.id">
               {{d.user}}
         </Option>
         </Select><br />
-        级别: <Select ref='debug_deps' style='display:inline-block;width:300px;margin-top:5px;' transfer :value="session.type"  @on-select="Debug_ChangeLevel"> <Option :key="d.id" :name="d.id" v-for="d in getTypes('AccountType')" :value="d.value" :style='`color:${d.color}`'>
-                    {{d.name}}
-            </Option> </Select><br />
-            企业: <Select ref='debug_deps' style='display:inline-block;width:300px;margin-top:5px;' transfer :value="session.current_enterprise"  @on-clear="Debug_ClearEnt"  @on-select="Debug_ChangeEnterprise" clearable><Option :key="d.id" :name="d.id" v-for="d in my_enterprises" :value="d.id">
-                    {{d.name}}
-            </Option> </Select><br />
             <template v-if="current_enterprise">
             部门: <Select ref='debug_deps' style='display:inline-block;width:300px;margin-top:5px;' multiple transfer :value="session.deps"  @on-select="Debug_ChangeDep"> <Option :key="d.id" :name="d.id" v-for="d in deps" :value="d.id">
                     {{d.name}}
@@ -29,13 +34,28 @@
           <div>
              <Button style='margin-right:5px;margin-bottom:5px;' :key='k' :type="target=='appCount'?'info':''" @click="target='appCount';CalcLine()">APPCount</Button>
           </div>
-
-        <hs-avatar :userinfo="session" :size="80" style="position:absolute;left:20px;top:5px;" />
-        <br />
+          </Card>
         
-        <pre ref='pre' style='position:absolute;left:500px;top:10px;bottom:10px;right:10px;background:#000 !important;color:#dfdfdf !important;border:1px solid #aaa;padding:10px;padding-left:45px;'><pre ref='order' style='position:absolute;left:0px;top:0px;width:40px;background:#dfdfdf !important;color:#000 !important;padding:10px;text-align:right;overflow:hidden !important;'>{{linesOrder}}
-        </pre>{{this[target]}}
+
+        
+        <Card style='position:absolute;left:500px;top:10px;bottom:10px;right:10px;overflow:hidden;' class='full-card' padding ='10'>
+          <div class="flex-wrap" style="align-items:flex-start;position:relative;height:100%;">
+           <div> <Input search v-model="search_text_attr" size="small" style='margin-bottom:10px' />
+            <HsxAttribute :data="this[target]" :selected="selected" @select="selected=$event"></HSXAttribute>
+           </div>
+            
+              <div style="height:calc(100%);position:relative;width:calc(100% - 600px);overflow:hidden;overflow-y:auto;margin-left:10px;">
+                值
+                <pre ref='order' style='position:absolute;left:0px;top:35px;width:40px;background:#dfdfdf !important;color:#000 !important;padding:10px;text-align:right;overflow:hidden !important;padding-bottom:20px;'>{{linesOrder}}</pre>
+            <pre ref='pre' style='position:relative;color:#333 !important;padding:10px;margin-left:45px;padding-left:10px;overflow-y:hidden;'>{{selected?(selected.value || ""):""}}
             </pre>
+            </div>
+          </div>
+           
+           
+        </Card>
+        
+      
   </div>
 </template>
 
@@ -48,7 +68,8 @@ export default {
       linesCount:0,
       getters,
       linesOrderText:"",
-      target:'session'
+      target:'session',
+      selected:null
     }
   },
   computed:{
@@ -57,6 +78,13 @@ export default {
     appCount(){
       return {
         message:this.session.unread_msg_count
+      }
+    }
+  },
+  watch:{
+    selected:{
+      handler(v){
+        this.CalcLine()
       }
     }
   },
@@ -103,3 +131,10 @@ export default {
   }
 }
 </script>
+<style lang="less">
+.full-card{
+  .ivu-card-body{
+    position:relative;height:100%;
+  }
+}
+</style>

@@ -290,7 +290,7 @@ export default {
   justify-content: space-between;
   padding:0 20px;
   position: relative;
-  z-index: 1000;
+  z-index: 100;
 }
 
 

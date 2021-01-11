@@ -18,6 +18,18 @@ for (const file of requireComponent.keys()) {
   Vue.component(`Base${componentName}`, componentConfig.default || componentConfig)
 }
 
+const requireComponentHSX = require.context('@/components/hsx', true, /\.vue$/)
+
+for (const file of requireComponentHSX.keys()) {
+  const componentConfig = requireComponentHSX(file)
+  const name = file
+    .replace(/index.js/, '')
+    .replace(/^\.\//, '')
+    .replace(/\.\w+$/, '')
+  const componentName = upperFirst(camelCase(name))
+  Vue.component(`Hsx${componentName}`, componentConfig.default || componentConfig)
+}
+
 const files = require.context('@/pages', true, /\.vue$/)
 const fileMap = {}
 for (const rawfilePath of files.keys()) {

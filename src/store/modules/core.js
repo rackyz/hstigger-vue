@@ -194,7 +194,6 @@ const actions = {
         commit('login')
         commit('save', session)
         commit('saveAcc',session.user_menus)
-        console.log("WHOAMI:",enterprise_id)
         if (enterprise_id && enterprise_id != "self" && session.enterprises.find(v => v.id == enterprise_id) == null)
           commit('ClearEnterprise')
         else if(!enterprise_id && session.my_enterprises.length > 0){
@@ -355,7 +354,6 @@ const mutations = {
   },
   SetCurrentEnterprise(state, ent_id) {
     if(ent_id && ent_id != 'self'){
-      console.log("Set Enterprise")
       API.CORE.SetEnterprise(ent_id)
       API.ENT.SetEnterprise(ent_id)
       API.ENT_ADMIN.SetEnterprise(ent_id)

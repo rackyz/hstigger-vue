@@ -1,6 +1,19 @@
 const axios = require('axios')
 const config = require('../config')
 
+let API_OBJECT = null
+if(!API_OBJECT){
+  axios.get(config.server, {
+    headers: {
+      ['api-version']: '1.0.0'
+    }
+  }).then(res => {
+    console.log('GET_API:',res.data.data)
+    API_OBJECT = res.data.data
+  }).catch(e=>{
+    console.log("GET_API_FAILED:",e)
+  })
+}
 
 
 let Clients = {}

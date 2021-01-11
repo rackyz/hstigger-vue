@@ -31,9 +31,9 @@ import API from '@/plugins/axios'
  const actions = {
    query({
      commit
-   }) {
+   },{vdisk}) {
      return new Promise((resolve, reject) => {
-       API.CORE.GET_FILES({query:{q:'mine'}}).then(res => {
+       API.CORE.GET_FILES({query:{q:'mine',vdisk}}).then(res => {
          commit('saveList', res.data.data)
          resolve()
        })

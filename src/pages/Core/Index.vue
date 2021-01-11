@@ -20,7 +20,7 @@ import {mapGetters} from 'vuex'
 export default {
   data(){
     return{
-      idle:true
+      idle:false
     }
   },
   metaInfo:{

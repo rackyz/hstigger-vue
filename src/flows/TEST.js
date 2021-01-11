@@ -173,7 +173,6 @@ var CreateENDef = (n,compared)=>{
     if(compared)
       v.option = {...v.option,compared:compared.map(s=>v.key+s)}
   })
-  console.log(n,obj)
   return obj
 
 }

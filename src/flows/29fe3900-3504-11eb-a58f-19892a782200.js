@@ -176,7 +176,6 @@ var CreateENDef = (n, compared) => {
         compared: compared.map(s => v.key + s)
       }
   })
-  console.log(n, obj)
   return obj
 
 }
