@@ -1,12 +1,24 @@
 <template>
-  <transition name="fade">
+<transition name="fade">
+  <template v-if="initing">
+      <div>{{error || "系统初始化中..."}}</div>
+  </template>
+  <template v-else>
     <router-view />
-  </transition>
+  </template>
+   </transition>
 </template>
 
 <script>
+import api from './plugins/api'
   export default {
     name: 'App',
+    data(){
+      return {
+        initing:false,
+        error:""
+      }
+    },
     metaInfo: {
       title: '首页',
     //  titleTemplate: '%s | 企业信息平台',
@@ -17,6 +29,16 @@
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
     },
+    created(){
+      if(api && api.inited)
+        return
+      this.initing = true
+      api.InitStore().then(res=>{
+        this.initing = false
+      }).catch(e=>{
+        this.error = e
+      })
+    }
   }
 </script>
 

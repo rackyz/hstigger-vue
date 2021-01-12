@@ -39,19 +39,26 @@
 
         
         <Card style='position:absolute;left:500px;top:10px;bottom:10px;right:10px;overflow:hidden;' class='full-card' padding ='10'>
-          <div class="flex-wrap" style="align-items:flex-start;position:relative;height:100%;">
-           <div> <Input search v-model="search_text_attr" size="small" style='margin-bottom:10px' />
+          <Row :gutter="12">
+            <Col :span='12'>
+              <Input search v-model="search_text_attr" size="small" style='margin-bottom:10px' />
             <HsxAttribute :data="this[target]" :selected="selected" @select="selected=$event"></HSXAttribute>
-           </div>
-            
-              <div style="height:calc(100%);position:relative;width:calc(100% - 600px);overflow:hidden;overflow-y:auto;margin-left:10px;">
-                值
-                <pre ref='order' style='position:absolute;left:0px;top:35px;width:40px;background:#dfdfdf !important;color:#000 !important;padding:10px;text-align:right;overflow:hidden !important;padding-bottom:20px;'>{{linesOrder}}</pre>
-            <pre ref='pre' style='position:relative;color:#333 !important;padding:10px;margin-left:45px;padding-left:10px;overflow-y:hidden;'>{{selected?(selected.value || ""):""}}
-            </pre>
-            </div>
-          </div>
-           
+            </Col>
+              <Col :span='12'>
+               值 
+                 <template v-if="selected">
+                   <template v-if="typeof selected.value == 'object'">
+                   {{selected.key}}
+                 <HsxAttribute :data="selected.value"  @select="selected=$event"></HSXAttribute>
+                 </template><template v-else>
+                   <div>
+                     {{selected.value}}
+                   </div>
+                   
+                 </template>
+                 </template>
+            </Col>
+          </Row>
            
         </Card>
         

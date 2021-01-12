@@ -4,11 +4,11 @@
       <div class='hsx-attr-item flex-wrap' :class="selected==a?'hsx-attr-item-selected':''" :key='a.key'>
         <div class='key'>{{a.key}}</div>
         <div class='value' @click="handleSelect(a)">
-          <template v-if="a.value.length > 60 && typeof(a.value) != 'object'">
+          <template v-if="a.value && a.value.length > 60 && typeof(a.value) != 'object'">
           <Tooltip transfer theme="light"  max-width='300' :content="a.value">{{a.value.slice(0,60)}} ...</Tooltip>
           </template>
           <template v-else>
-            {{a.value}}
+            {{a.value!==null && a.value!==undefined ?a.value:'-'}}
           </template>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default {
     }
     .value{
       overflow: hidden;
-      width:400px;
+      width:calc(100% - 100px);
       white-space: nowrap;
       text-overflow: ellipsis;
       padding:0 5px;
