@@ -33,8 +33,11 @@ import api from './plugins/api'
       if(api && api.inited)
         return
       this.initing = true
-      api.InitStore().then(res=>{
+      api.initAPI(Vue).then(res=>{
         this.initing = false
+        this.api.public.GET_SETTINGS().then(res=>{
+          console.log('setting:',res)
+        })
       }).catch(e=>{
         this.error = e
       })
