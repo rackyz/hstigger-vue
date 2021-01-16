@@ -1,6 +1,11 @@
 <template>
-  <div style='wdith:100%;display:flex;align-items:center;flex-direction:column;' >
+  <div style='wdith:100%;display:flex;align-items:center;flex-direction:column;position:relative;height:100%;' >
+    <template v-if="items.length">
     <hs-list :data="items" :option="{tmpl:'BaseNew',offset:1}" selectable='false' style='border:none;padding:5px;' />
+    </template>
+    <template v-else>
+      <BaseEmpty  />
+    </template>
   </div>
 </template>
 

@@ -82,8 +82,8 @@ const getters = {
     return state.user_rss
   },
   my_rss(state){
-    ///return state.rss.filter(v=>state.user_rss.includes(v.id))
-    return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v)
+    return state.rss.filter(v=>state.user_rss.includes(v.id))
+    //return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v)
   },
   rss(state){
     return state.rss
@@ -338,8 +338,12 @@ const SaveTypes = data=>{
 
 const mutations = {
   SetLocalRss(state,list){
-    state.user_rss = list
-    
+    state.rss = list
+    state.my_rss.sort((a,b)=>{
+      let aIndex = list.findIndex(v=>v.id == a)
+      let bIndex =list.findIndex(v=>v.id == b)
+      return aIndex > bIndex ? 1:-1
+    })
   },
   login(state){
     state.isLogin = true

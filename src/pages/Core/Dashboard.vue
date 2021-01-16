@@ -1,5 +1,5 @@
 <template>
-<Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 10px);overflow-y:auto;'>
+<Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 40px);overflow-y:auto;'>
 
 
   <Row :key='i' :gutter="10" style='margin:10px;'>
@@ -9,12 +9,11 @@
           <BaseWeather />
          
         </Card>
-        </div>
       <Card class="panel"  style='width:100%;border:none;border-radius:0' padding="5">
-        <div class='card-title'><Icon custom='gzicon gzi-supervisor' size='19' /> 状态 <a style='float:right;font-size:12px;' href="#" @click.stop="RouteTo('/core/self')">个人中心 <Icon type="ios-arrow-forward" /></a></div>
          <BaseMyStatus />
-       
-        
+         <div style='height:25px;width:100%;padding:0 10px;'>
+       <a style='float:right;font-size:12px;color:#3af;' @click.stop="RouteTo('/core/self')">个人中心 <Icon type="ios-arrow-forward" /></a>
+        </div>
          
     </Card>
    
@@ -29,6 +28,22 @@
     </Col>
     
     <Col :span='13' :xs="24" :md='12' :lg="13">
+     <div class="flex-wrap" style="justify-content:space-between;height:20px;margin-bottom:10px;">
+       <div class="flex-wrap">
+         <div class="flex-wrap">
+          <div class='text-btn' style='background:#fff;border:1px solid #aaa;color:#aaa;padding:2px 10px;' href='#' @click='modalRSS=true'>新闻</div>
+          <div class='text-btn' :class="`text-btn-active`" style='background:rgb(35, 51, 76);padding:2px 10px;' href='#' @click='modalRSS=true'>企业</div>
+           <div class='text-btn' style='background:#fff;border:1px solid #aaa;color:#aaa;padding:2px 10px;' href='#' @click='modalRSS=true'>未命名</div>
+           </div>
+            <div class='text-btn text-icon-btn' style='background:rgb(35, 51, 76);margin-left:5px;height:22px;margin-right:5px;width:22px;display:flex;align-items:center;justify-content:center;' href='#' @click='modalRSS=true'><Icon type='md-add' size="16" /></div>
+             <div class='text-btn text-icon-btn' style='background:rgb(35, 51, 76);height:22px;margin-right:5px;width:22px;display:flex;align-items:center;justify-content:center' href='#' @click='modalRSS=true'><Icon type='ios-settings' size="16" /></div>
+       </div>
+       <div class="flex-wrap">
+          <Input placeholder="搜索内容 ..." size="small" style='width:300px;min-width:100px;max-width:300px;border-radius:0;' search clearable />
+           <div class='text-btn' style='background:#fff;border:1px solid #aaa;color:#aaa;padding:2px 10px;margin-left:5px;' href='#' @click='modalRSS=true'>全站搜索</div>
+            <div class='text-btn' style='background:#fff;border:1px solid #aaa;color:#aaa;padding:2px 10px;margin-left:5px;' href='#' @click='modalRSS=true'>百度一下</div>
+         </div>
+       </div>
        <template v-if='my_rss && my_rss.length != 0'>
           <Row :gutter="10">
           
@@ -39,7 +54,7 @@
               <Icon type="logo-rss" /> {{r.name}}  </span>
               <span class='card-more' style='float:right' @click="RouteTo(r.link,true)">MORE</span>
             </div>
-            <component :is="MapRssComponent(r.media_type)" :id="r.id" />
+            <component style='height:260px;' :is="MapRssComponent(r.media_type)" :id="r.id" />
               
             </Card>
           </Col>
@@ -47,17 +62,16 @@
           </template>
         </Row>
        </template>
-       <Card class="panel" style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;" padding='0'>
-          <div class='card-title'><Icon custom='gzicon gzi-message' size='15' /> 信息源 <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a><a href='#'></a></span></div><BaseEmpty><div class='full-container flex-wrap' style='height:300px;width:100%;justify-content:center;'>
-           点击管理<a href='#' @click='modalRSS=true'>信息源</a>
-         </div></BaseEmpty></Card>
+       
          
    
    
   
-    
+   
 
-    </Col></Col>
+    </Col>
+    
+    </Col>
     <Col :span='6' :xs="24" :md='24' :lg="6">
     <Card style='width:100%;border:none;border-radius:0' padding="0">
         <div class='card-title'><Icon custom='gzicon gzi-date' size='19' /> 活动/计划  <span style='float:right;'><a href='#' style='font-size:12px;'>MORE</a></span></div>
@@ -89,18 +103,17 @@
          </div>
        </div>
      </template>
-     <template v-if="!task || tasks.length == 0">
-       <BaseEmpty :msg="空" :loading="isLoadingPassed" />
-     </template>
+    
         </div>
     
     </Card>
  <Card class="panel"  style='width:100%;border:none;border-radius:0;margin-top:10px;' padding="0">
     <div class='card-title'><Icon custom='gzicon gzi-lianjieliu' size='19' /> 工作流 <span style='float:right;font-size:12px;'>MORE</span></div>
         <BaseUserFlowPanel />
-        
+ </Card>
+ <Card class="panel"  style='width:100%;border:none;border-radius:0;margin-top:10px;' padding="0">
          
-     <div class='card-title'><Icon custom='gzicon gzi-event' size='19' /> 待处理 <span style='float:right;font-size:12px;'>MORE</span></div>
+     <div class='card-title'><Icon custom='gzicon gzi-event' size='17' /> 待处理 <span style='float:right;font-size:12px;'>MORE</span></div>
      <template v-if="flowInstances.length == 0">
        <BaseEmpty :msg="空" :loading="isLoadingActived" />
      </template>
@@ -154,11 +167,12 @@
     <Modal title="添加RSS信息源" footer-hide v-model='modalRSS' width='400'>
       <div style='padding:20px'>
         勾选您所需要的信息源
-          <draggable v-model="draggableRss" animation='500' >
-        <template v-for="r in rss">
+          <draggable v-model="ordered_rss" animation='500' >
+        <template v-for="r in ordered_rss">
           <div :key='r.id' style='display:flex;justify-content:space-between;align-items:center;padding:2px 10px;'>{{r.name}} <i-switch :value='user_rss ? user_rss.includes(r.id):false' @on-change='handleToggleRss(r.id,$event)' /></div>
         </template>
           </draggable>
+          {{my_rss}}
       </div>
     </Modal>
     </Layout>
@@ -185,7 +199,6 @@ export default {
     ...mapGetters('core',['session','my_rss','user_rss','rss']),
     draggableRss:{
       set(e){
-        console.log("DRAG:",e)
         if(e){
            this.$store.commit('core/SetLocalRss',e.map(e=>e.id))
         }
@@ -193,6 +206,16 @@ export default {
       },
       get(){
         return this.my_rss
+      }
+    },
+    ordered_rss:{
+      set(e){
+         if(e){
+           this.$store.commit('core/SetLocalRss',e)
+        }
+      },
+      get(){
+        return this.rss
       }
     }
     
@@ -421,5 +444,33 @@ export default {
   position: relative;
   bottom:-1px;
   right:-1px;
+}
+
+.text-btn-active:active{
+   filter:none;
+  position:relative;
+  bottom:0;
+  right:0;
+} 
+
+.text-btn:hover{
+  filter:contrast(1.1);
+}
+
+
+.text-btn-active:hover{
+  filter:none;
+  position:relative;
+  bottom:0;
+  right:0;
+}
+
+
+
+.text-icon-btn{
+  border-radius: 2px;
+  i{
+    margin:0;
+  }
 }
 </style>

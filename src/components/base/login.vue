@@ -41,7 +41,7 @@
 
         <!-- SAFEMODE PuzzleVerification MODAL -->
         <PuzzleVerification
-        v-if="isVerificationShow"
+            v-if="isVerificationShow"
             v-model='isVerificationShow'
             style='top:-250px;z-index:1000;'
             deviation="20"
@@ -130,7 +130,6 @@ export default {
             })
         },
         handleVerificationSuccess(e){
-            console.log('verify:',e)
             if(this.isVerificationShow){
                 this.isVerificationShow = false
                 this.submitForm(this.loginData)
@@ -217,11 +216,9 @@ export default {
                 return
             }
 
-                console.log("LOGIN")
             this.loading = true
             this.$store.dispatch('core/login',model).then(session=>{
-                this.Success('登陆成功')
-                console.log("login",session)
+              
                 if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'
                 if(this.routeTo){

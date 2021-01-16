@@ -3,13 +3,13 @@
   <div class="flex-wrap" style='padding:10px;justify-content:space-between;'>
       <div class="flex-wrap">
           <hs-avatar :userinfo="session" size="30" style='margin-bottom:2px' />  
-          <div class='name'>早上好,<a href="#" @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
+          <div class='name'>早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
         </div> 
         <Dropdown trigger="click" @on-click="handleSaveStatus">
-      <div class='status-mark hs-dropdown' :style="`border-radius:30px;color:#fff;background:${statusColors[session.status || 0]};`">{{status[session.status || 0]}} <Icon custom='gzicon gzi-down' style='color:#FFFFFFaa;'></Icon></div>
+      <div class='status-mark hs-dropdown' :style="`border-radius:5px;color:#fff;background:${statusColors[session.status || 0]};`">{{status[session.status || 0]}} <Icon custom='gzicon gzi-down' style='color:#FFFFFFaa;'></Icon></div>
         <DropdownList slot='list'>
           <template v-for="(s,si) in status">
-          <DropdownItem class='status-item' :key='si' :name='si'><span style='display:inline-block;width:20px;height:20px;' :style='`background:${statusColors[si]};filter:saturate(70%);margin-right:5px;`'></span>{{s}}</DropdownItem>
+          <DropdownItem class='status-item' :key='si' :name='si'><span style='display:inline-block;width:15px;height:15px;border-radius: 50%;' :style='`background:${statusColors[si]};filter:saturate(70%);margin-right:10px;`'></span>{{s}}</DropdownItem>
           </template>
         </DropdownList>
       </Dropdown>
@@ -97,7 +97,10 @@ export default {
 .name{
   font-size:14px;
   margin-bottom:2px;
-  background:linear-gradient(to right,#e9fcff,#fff);
+  background:#fafafa;
+  padding-right:15px;
+  border-top-right-radius:12px ;
+  border-bottom-right-radius:12px ;
   height:30px;
   line-height:30px;
   padding-left:5px;
@@ -112,12 +115,13 @@ export default {
 .status-item{
   display: flex;
   align-items: center;
+  
 }
 
 .status-mark{
   cursor: pointer;
   font-size:14px;
-  box-shadow: 0px 0px 3px #ddd;
+  
   border:1px solid #ddd;
   padding:2px 15px;
   filter:saturate(80%);

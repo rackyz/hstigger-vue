@@ -17,7 +17,9 @@
   
 </style>
 <template>
-  <div class="l-menu  ">
+  <div class="l-menu ">
+      <div class="l-acc-menu-mask-top"  v-show="showAppSelector"  />
+   
      <!-- Dashboard Button -->
     <a class='text-btn' @click="RouteTo('/core/dashboard')" style='margin:0 15px;margin-left:5px;'>
       <Icon custom="gzicon gzi-desktop" size="16" style='margin-right:6px' /> 工作台
@@ -33,7 +35,7 @@
     
     <!-- Accelerators -->
     <template v-for='m in acc_apps'>
-      <a class='text-btn d-none d-sm-block' :class="{'text-button-deleting':showAppSelector}" style='margin-right:10px;padding:0 5px;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.key'  @click="showAppSelector?removeAcc(m.key):RouteTo(m.path)">
+      <a class='text-btn d-none d-sm-block' :class="{'text-button-deleting':showAppSelector}" style='margin-right:10px;padding:0 5px;z-index:1000;position:relative;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.key'  @click="showAppSelector?removeAcc(m.key):RouteTo(m.path)">
         {{m.name}}
       </a>
     </template>
@@ -44,7 +46,7 @@
 
 
     <!-- Transfer Menu -->
-    
+    <div class="l-menu-mask-top"  v-show="open" @click='open=false' v-transfer/>
     <div class="l-menu-mask"  v-show="open" @click.prevent='open=false' v-transfer/>
      <transition name='move-up'>
     <div class="l-menu-wrap"  v-show="open" v-transfer>
@@ -165,12 +167,30 @@ export default {
  
 }
 
+.l-acc-menu-mask-top{
+  position: absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  right:0;
+  z-index:100;
+  background:rgb(2, 45, 48);
+  opacity: 0.5;
+}
+
 .text-button-deleting{
   border:1px dashed #fff;
   padding:2px 8px !important;
 }
 
-
+.l-menu-mask-top{
+   position: fixed;
+  z-index:9901;
+  left:0;
+  right:0;
+  top:0;
+  height:44px;
+}
 .l-menu-mask{
   position: fixed;
   z-index:901;
@@ -178,6 +198,7 @@ export default {
   right:0;
   top:44px;
   bottom:0;
+  pointer-events: auto;
 }
 
 .l-list-wrap{

@@ -3,11 +3,10 @@
     <template v-if='!ent'>
       <img src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" />
       <span style='color:#fff'>个人模式</span>
-      <Icon type='ios-arrow-down' style='position:relative;top:-2px;font-weight:normal;margin-left:5px;' size='12' v-show='my_enterprises.length > 0' />
     </template>
     <template v-else>
       <img :src="ent.avatar" />
-      <span style='color:gold;font-size:16px;'>{{ent.shortname}}</span> <Icon type='ios-arrow-down' style='position:relative;top:-2px;font-weight:normal;' size='12' v-show='my_enterprises.length > 0' />
+      <span style='color:gold;font-size:16px;'>{{ent.shortname}}</span> 
       
     </template>
   </div>
@@ -42,6 +41,7 @@
   text-shadow:1px 1px 1px #333;
   border:1px solid #ffffff00;
   border-radius: 2px;
+  cursor: pointer;
   img{
     width:23px;
     height:23px;
@@ -74,15 +74,10 @@
 
 .l-logo:hover{
   filter:brightness(1.2);
-  background:linear-gradient(to bottom right,#ffffff55,#33333355);
-  
-  transition: all 1s;
-  border:1px solid #333;
-  cursor: pointer;
 }
 
+
 .l-logo:active{
-  background:linear-gradient(to bottom right,#33333355,#ffffff55);
   position: relative;
   bottom:-1px;
 }

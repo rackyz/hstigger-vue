@@ -21,8 +21,7 @@ import api from './plugins/api'
     },
     metaInfo: {
       title: '首页',
-    //  titleTemplate: '%s | 企业信息平台',
-       titleTemplate: '%s | 宁波高专建设项目管理系统',
+     titleTemplate: '%s | 企业信息平台',
      htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
@@ -35,9 +34,7 @@ import api from './plugins/api'
       this.initing = true
       api.initAPI(Vue).then(res=>{
         this.initing = false
-        this.api.public.GET_SETTINGS().then(res=>{
-          console.log('setting:',res)
-        })
+        this.$store.dispatch('context/Init')
       }).catch(e=>{
         this.error = e
       })

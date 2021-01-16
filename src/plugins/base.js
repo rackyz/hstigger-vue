@@ -16,6 +16,7 @@ Vue.prototype.Download = function(url){
    let a = document.createElement("a")
    a.href = url
    a.download = "download"
+   a.target = "blank"
 
    document.body.appendChild(a)
 

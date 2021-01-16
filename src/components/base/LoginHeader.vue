@@ -2,7 +2,7 @@
   <div class="system-name">
     
     <!-- <div class="caption">企业信息平台</div>  -->
-    <div class="caption">建设项目管理系统</div>
+    <div class="caption">企业信息平台</div>
     <div class="version">
      NINGBO GAOZHUAN EIP PLATFORM <span style='color:gold'>v1.0</span>
     </div>
