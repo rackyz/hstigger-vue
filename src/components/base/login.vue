@@ -217,8 +217,11 @@ export default {
             }
 
             this.loading = true
+            this.$store.dispatch('context/login',model).then(session=>{
+                console.log('session:',session)
+            })
+            return
             this.$store.dispatch('core/login',model).then(session=>{
-              
                 if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'
                 if(this.routeTo){
