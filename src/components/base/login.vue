@@ -217,8 +217,10 @@ export default {
             }
 
             this.loading = true
-            this.$store.dispatch('context/login',model).then(session=>{
+            this.$store.dispatch('ctx/Login',model).then(session=>{
                 console.log('session:',session)
+            }).finally(()=>{
+                this.loading = false
             })
             return
             this.$store.dispatch('core/login',model).then(session=>{

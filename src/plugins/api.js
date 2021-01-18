@@ -1,6 +1,6 @@
 import axios from 'axios'
 import config from '../config'
-let o = {}
+var o = {}
 
 let apiAxios = axios.create({baseURL:config.server,timeout:3000})
 apiAxios.defaults.headers = {
@@ -16,6 +16,17 @@ apiAxios.SetEnterprise = function (ent_id) {
     apiAxios.defaults.headers.Enterprise = ent_id
   else
     delete apiAxios.defaults.headers.Enterprise
+}
+
+apiAxios.ClearEnterprise = function () {
+  delete apiAxios.defaults.headers.Enterprise
+}
+
+apiAxios.Clear = function () {
+  delete apiAxios.defaults.headers.Authorization
+  delete apiAxios.defaults.headers.Enterprise
+  localStorage.removeItem('hs-token')
+  localStorage.removeItem('current_enterprise')
 }
 
  const getAPI = function (api_path, {
@@ -51,7 +62,7 @@ apiAxios.SetEnterprise = function (ent_id) {
  }
 
 const createAPIPromise = (axiosClient,api_path)=>{
-   return (config, data)=>{
+   return (data, config)=>{
       let apiObject = getAPI(api_path, config)
       if (apiObject.method === 'get' || apiObject.method == 'delete') {
         config = data
@@ -79,12 +90,10 @@ const createAPIPromise = (axiosClient,api_path)=>{
    }
    
 }
-o.API = {}
+o.SERVER = apiAxios
 const createAPI = (axiosClient,apiObject)=>{
-  console.log('createAPI:',apiObject)
   for(let group_key in apiObject){
     let apis = {}
-    console.log('key:', group_key)
     for (let api_key in apiObject[group_key]) {
       let api = apiObject[group_key][api_key]
       if(!api)
@@ -94,10 +103,9 @@ const createAPI = (axiosClient,apiObject)=>{
     let UppercaseGroupKey = group_key
     axiosClient[UppercaseGroupKey] = apis
    
-    o.API[UppercaseGroupKey] = apis
+    o.SERVER[UppercaseGroupKey] = apis
   }
-  console.log('api:',o.API)
-  return o.API
+  return o.SERVER
 }
 
 o.initAPI = async (vue) => {
@@ -111,21 +119,25 @@ o.initAPI = async (vue) => {
         createAPI(apiAxios, res.data.data)
         o.inited = true
         if(vue)
-          vue.api = o.API
+          vue.api = o.SERVER
         resolve(o.API)
       }).catch(e => {
         console.error(e)
         reject("API Loading Failed:"+e)
       })
     }else{
-      resolve(o.API)
+      resolve(o.SERVER)
     }
   })
 
 }
 
-// foreach server
 
-
+// Tencent COS Server
+var COS = axios.create({
+  baseURL: config.cosServer
+})
+COS.baseURL = config.cosServer
+o.COS = COS
 
 export default o

@@ -1,5 +1,6 @@
 import API from '@/plugins/api'
 import StoreHelper from '@/plugins/store'
+const crypto = require('crypto')
 const state = {
   inited:false,
   session:{},
@@ -45,9 +46,14 @@ const actions = {
     })
   },
 
-  Login:({commit},{account,password})=>{
+  Login:({commit},{user,password})=>{
     return new Promise((resolve,reject)=>{
-      API.public.LOGIN({account,password}).then(res=>{
+      password = crypto.createHash("md5").update(password).digest('hex')
+      API.SERVER.Clear()
+      API.SERVER.public.LOGIN({
+          account: user,
+          password
+        }).then(res => {
         let session = res.data.data
         commit('SaveSession', session)
         resolve(session)
@@ -58,7 +64,6 @@ const actions = {
 
 const mutations = {
   SaveDevice:(state)=>{
-    console.log('save-device')
     state.device = {
       href:document.location.href,
       width: document.body.clientWidth,

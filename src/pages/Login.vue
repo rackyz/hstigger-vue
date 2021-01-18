@@ -6,7 +6,7 @@
       :autoplay-speed="8000"
       radius-dot
       loop
-      style='position:absolute;left:0;top:0;bottom:0;right:0;overflow:hidden;'
+      class='absolute-full'
     >
       <CarouselItem
         v-for="p in settings.carouselItems"
@@ -48,7 +48,7 @@ import { mapGetters } from 'vuex'
 export default {
   metaInfo: { title: '用户登录' },
   computed: {
-    ...mapGetters('context', ['device', 'settings']),
+    ...mapGetters('ctx', ['device', 'settings']),
     companyName() {
       if (this.device.width <= 400) {
         return "宁波高专"
