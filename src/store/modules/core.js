@@ -368,8 +368,6 @@ const mutations = {
       mutations.ClearEnterprise(state)
       state.current_enterprise = 'self'
     }
-
-   
   },
   ClearEnterprise(state){
     API.CORE.ClearEnterprise()
@@ -414,31 +412,29 @@ const mutations = {
     state.users = users
   },
   localPatchTypes(state,item){
-       
-
-    let index = state.types.findIndex(v=>v.id == item.id)
-    if(index != -1){
-        item = Object.assign({}, state.types[index], item)
-        state.types.splice(index, 1, item)
-    }
-    else{
-        state.types.splice(state.types.length - 1, 0, item)
-        if (item && item.parent_id) {
-            let index = state.types.findIndex(v => v.id == item.parent_id)
-            if (index != -1) {
-                state.types[index].count++
-            }
-        }
-    }
-},
-localDeleteTypes(state,ids){
-    ids.forEach(id=>{
-         let index = state.types.findIndex(v => v.id == id)
-         if (index != -1)
-             state.types.splice(index, 1)
-    })
-   
-},
+      let index = state.types.findIndex(v=>v.id == item.id)
+      if(index != -1){
+          item = Object.assign({}, state.types[index], item)
+          state.types.splice(index, 1, item)
+      }
+      else{
+          state.types.splice(state.types.length - 1, 0, item)
+          if (item && item.parent_id) {
+              let index = state.types.findIndex(v => v.id == item.parent_id)
+              if (index != -1) {
+                  state.types[index].count++
+              }
+          }
+      }
+  },
+  localDeleteTypes(state,ids){
+      ids.forEach(id=>{
+          let index = state.types.findIndex(v => v.id == id)
+          if (index != -1)
+              state.types.splice(index, 1)
+      })
+    
+  },
 
   // Concerned Projects
   AddConcernProjects: (state, ids = []) => {

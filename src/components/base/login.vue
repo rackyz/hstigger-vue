@@ -222,7 +222,6 @@ export default {
             }).finally(()=>{
                 this.loading = false
             })
-            return
             this.$store.dispatch('core/login',model).then(session=>{
                 if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'

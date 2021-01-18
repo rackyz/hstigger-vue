@@ -39,7 +39,7 @@ export default {
       }
       timer = setTimeout(()=>{
         this.idle = true
-      },120000)
+      },10 * 60 * 1000)
     }
   }
 }
