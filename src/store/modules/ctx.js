@@ -59,6 +59,14 @@ const actions = {
         resolve(session)
       }).catch(reject)
     })
+  },
+  Logout:()=>{
+    return new Promise((resolve,reject)=>{
+      API.SERVER.public.LOGOUT().then(res=>{
+        console.log("退出成功")
+        resolve()
+      })
+    })
   }
 }
 

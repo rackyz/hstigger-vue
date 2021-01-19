@@ -45,7 +45,7 @@
       <Dropdown
         ref='dm'
         transfer
-        :trigger="my_enterprises.length == 0?'custom':'click'"
+        :trigger="showEntMenu?'click':'custom'"
         placement="bottom-start"
         @on-visible-change='showEnterpriseMenu=$event'
         @on-click='onSelectEnterprise'
@@ -53,7 +53,7 @@
         <BaseLogo
           class='d-none d-sm-block'
           style="margin-right:20px;"
-          :class="{'text-btn-dropdown':my_enterprises.length != 0 && !showEnterpriseMenu,'text-btn-dropdown-active':my_enterprises.length != 0 && showEnterpriseMenu}"
+          :class="{'text-btn-dropdown':showEntMenu && !showEnterpriseMenu,'text-btn-dropdown-active':showEntMenu && showEnterpriseMenu}"
         ></BaseLogo>
 
         <DropdownMenu slot="list">
@@ -254,7 +254,10 @@ export default {
       isLogin: 'isLogin',
       my_enterprises: 'my_enterprises',
       current_enterprise: "current_enterprise"
-    })
+    }),
+    showEntMenu(){
+      return this.my_enterprises.length > 1 || (this.my_enterprises.length == 1 && this.session.type < 2)
+    }
   },
   mounted() {
     if (!this.session.id) {

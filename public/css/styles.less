@@ -285,20 +285,28 @@ body {
     }
   }
 }
+
+
 .ivu-modal-content .ivu-modal-confirm-head, .ivu-modal-content .ivu-modal-header{
   border-color:#666;
+  
+}
+
+.ivu-modal-mask{
+  background:rgba(55,55,55,0.2);
 }
 
 
 .ivu-modal-content{
   background:none;
    backdrop-filter: blur(15px);
+   border:1px solid #333 !important;
   .ivu-modal-header{
-    background:#33333355;
+    background:#33333333;
   }
   .ivu-modal-body{
     position:relative;
-    background:rgba(255,255,255, 0.2);
+    background:rgba(255,255,255, 0.8);
     top:0;
    
   }
@@ -306,7 +314,7 @@ body {
   .l-form-action{
     .l-button,.ivu-btn{
       background:#33333333;
-      color:#aaa;
+      color:#333;
     }
 
     .l-button-primay,.ivu-btn-primary{

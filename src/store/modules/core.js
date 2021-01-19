@@ -233,8 +233,11 @@ const actions = {
   },
   logout({commit}){
     return new Promise((resolve,reject)=>{
-      commit('logout')
-      resolve()
+      API.CORE.LOGOUT().then(res=>{
+        commit('logout')
+        resolve()
+      })
+      
     })
   },
   saveAcc({commit},acc_list){
@@ -378,12 +381,11 @@ const mutations = {
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)
-    if (session.type > 0)
-      API.ENT.SetAuthorization(session.token)
-    if (session.type  > 1)
+    API.ENT.SetAuthorization(session.token)
+    if (session.isAdmin)
       API.ADMIN.SetAuthorization(session.token)
     
-    if(session.ent_admin)
+    if(session.isEntAdmin)
       API.ENT_ADMIN.SetAuthorization(session.token)
 
     localStorage.setItem('hs-token',session.token)
@@ -403,6 +405,7 @@ const mutations = {
   logout(state){
      state.isLogin = false
     state.session = {}
+    
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {

@@ -1,5 +1,22 @@
+<style lang="less">
+.fix-height-tabs{
+	position: relative;
+	width:100%;
+	.ivu-tabs-content{
+		position: relative;
+		height:100%;
+		width:100%;
+		.ivu-tabs-tabpane{
+		position: relative;
+		width:100%;
+		height:100%;
+		overflow: hidden;
+		}
+	}
+}
+</style>
 <template>
-	<div class="hs-conatiner hs-conatiner-scrollable">
+	<div class="hs-conatiner hs-conatiner-scrollable" style='background:#aaa;'>
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff"
@@ -21,7 +38,21 @@
 			>
 			
 			<Input v-model="searchText" search style="width: 200px" clearable />
-			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 账号类型 -">
+			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 部门 -">
+				<template v-for="t in AccountTypes">
+					<Option :value='t.value' :key='t.value' :label="t.name">
+						<span :style='`color:${t.color}`'>{{t.name}}</span>
+					</Option>
+				</template>
+			</Select>
+			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 职务 -">
+				<template v-for="t in AccountTypes">
+					<Option :value='t.value' :key='t.value' :label="t.name">
+						<span :style='`color:${t.color}`'>{{t.name}}</span>
+					</Option>
+				</template>
+			</Select>
+			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 性别 -">
 				<template v-for="t in AccountTypes">
 					<Option :value='t.value' :key='t.value' :label="t.name">
 						<span :style='`color:${t.color}`'>{{t.name}}</span>
@@ -39,19 +70,23 @@
 			
 		</div>
     <!-- table -->
+		
+	 <Tabs size="small" type="card" :animated="false" :value="tabIndex" style='height:calc(100% - 125px);width:100%;margin:5px 0;' class="fix-height-tabs">
+        <TabPane label="员工列表" name="list">
 		<div
 			style="
-				height: calc(100% - 160px);
+				height: calc(100% - 150px);
+				width:100%;
 				overflow: hidden;
 				background: #ddd;
 				position: relative;
 			"
 		>
 			<hs-table
-        ref='table'
-				style="height:100%;width:100%;"
+        ref='itable'
 				:columns="columns"
-				:data="filterdAccounts"
+				:data="filteredAccounts"
+				:loading="loading"
 				:paged="false"
 				:page="page"
 				:pageSize="pageSize"
@@ -74,7 +109,7 @@
 			"
 		>
 			<Page
-				:total="filterdAccounts.length"
+				:total="filteredAccounts.length"
 				size="small"
 				:current="page"
 				:page-size="pageSize"
@@ -86,6 +121,12 @@
 				@on-page-size-change="pageSize=$event"
 			/>
 		</div>
+    </TabPane>
+		<TabPane label="申请记录" name="request">
+		</TabPane>
+			<TabPane label="邀请记录" name="invited">
+		</TabPane>
+	 </Tabs>
     <!-- modal for create/edit user data -->
 		<hs-modal-form
 			ref="form"
@@ -94,27 +135,13 @@
 			:width="420"
 			style="margin: 10px"
 			footer-hide
-			:form="user_form"
+			:form="Form('ent_employee')"
 			:data="current"
 			editable
 			@on-submit="patchUser"
 			@on-event="handleEvent"
 		/>
-    <!-- modal for changing user password -->
-		<hs-modal-form
-			ref="formpwd"
-			:title="`修改密码${selected_user ? (':'+selected_user.user) : ''}`"
-			v-model="showModalPassword"
-			:width="320"
-     
-			style="margin: 10px"
-			:form="user_password_form"
-			:data="current"
-			editable
-			@on-submit="patchUserPassword"
-			@on-event="handleEvent"
-
-		/>
+  
 
 		<!-- modal for importing -->
 		<Modal
@@ -201,6 +228,7 @@ export default {
 		return {
 			page:1,
 			pageSize:100,
+			tabIndex:'list',
 			type:undefined,
 			changed:undefined,
 			loadingImport: false,
@@ -221,25 +249,33 @@ export default {
         { type: "index", title: "序号" },
         	
 			
-					{ type: "text", key: "user", width: 250, title: "用户",
+					{ type: "text", key: "user", width: 100, title: "用户",
 				render(h,param){
-					let avatar = h('hs-avatar',{props:{size:30,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
-					let name = h('a',{attrs:{href:"#"},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name ?`${param.row.name} (${param.row.user})`:param.row.user)
+					let avatar = h('hs-avatar',{props:{size:25,name:param.row.user,avatar:param.row.avatar || "https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/icon/guest.png",frame:param.row.frame}})
+					let name = h('a',{attrs:{href:"/core/users/"+param.row.id,target:'blank'},style:{marginLeft:"10px",fontSize:"14px"}},param.row.name ?`${param.row.name}`:param.row.user)
 					return h('div',{class:'flex-wrap',style:{marginLeft:"8px",marginTop:"10px",marginBottom:"10px"}},[avatar,name])
 				}},
-			{
-					type: "type",
-					title: "账户类型",
-					key: "type",
-					width: 100,
-					option: {
-							getters:"core/getTypes",
-							getters_key:"AccountType",
-							labelKey:"value"
-					},
+					{
+					title:"性别",
+					type:"text"
 				},
-
-				{ type: "text", key: "phone", width: 150, title: "联系电话" },
+				{
+					title:"部门",
+					type:"text"
+				},
+				{
+					title:"职务",
+					type:"text"
+				},
+				{
+					key:'hiredDate',
+					title:"入职时间",
+					type:'datetime',
+					option:{
+						type:"date"
+					}
+				},
+				{ type: "text", key: "phone", width: 150, title: "联系电话",option:{align:"center"} },
 				 { key: "lastlogin_at", type: "time",title: "最近登录",width:100 },
          { key: "created_at", type: "time",title: "注册时间",width:100,option:{
            type:'date'
@@ -305,6 +341,11 @@ export default {
 					icon: "md-add",
 				},
 				{
+					key: "addexist",
+					name: "邀请加入",
+					icon: "md-add",
+				},
+				{
 					key: "edit",
 					name: "编辑",
 					icon: "md-create",
@@ -353,11 +394,7 @@ export default {
 		};
 	},
 	mounted() {
-		this.getData();
-		this.$nextTick(()=>{
-			this.$refs.table.calcTableHeight()
-		})
-    
+		this.getData()
 	},
 	computed: {
 		...mapGetters('core',['getTypes']),
@@ -367,36 +404,36 @@ export default {
 		},
 		toolDisabled() {
 			const baseConfig = {
-				add:true,				// add
-				edit:false,			// edit
-				delete:false,			// del
-				resetpwd:false,			// reset
-				resetpwdto:false,			// changepwd
-				lock:false,			// lock
-				unlock:false,			// unlock
-				import:false,			// import
-				"import-tmpl":false,			// download
+				add:false,				// add
+				edit:true,			// edit
+				delete:true,			// del
+				resetpwd:true,			// reset
+				resetpwdto:true,			// changepwd
+				lock:true,			// lock
+				unlock:true,			// unlock
+				import:true,			// import
+				"import-tmpl":true,			// download
 			}
 			if (this.multiple) {
 				if (this.selected && this.selected.length > 0) {
-					baseConfig.delete = 1
-					baseConfig.resetpwd = 1
-					baseConfig.lock = 1
-					baseConfig.unlock = 1
+					baseConfig.delete = 0
+					baseConfig.resetpwd = 0
+					baseConfig.lock = 0
+					baseConfig.unlock = 0
 				} 
 			} else {
         if (this.selected ){
 					 if(this.selected.includes('sys')){
-						baseConfig.edit = 1
+						baseConfig.edit = 0
           }
 					let selectedItem = this.users.find(v=>v.id == this.selected)
 					let locked = selectedItem ? selectedItem.locked : 0
-						baseConfig.edit = 1
-					baseConfig.delete = 1
-					baseConfig.resetpwd = 1
-					baseConfig.resetpwdto = 1
-					baseConfig.lock =  (locked == 0)
-					baseConfig.unlock = (locked == 1)
+						baseConfig.edit = 0
+					baseConfig.delete = 0
+					baseConfig.resetpwd = 0
+					baseConfig.resetpwdto = 0
+					baseConfig.lock =  (locked == 1)
+					baseConfig.unlock = (locked == 0)
 				}else {
 
 				}
@@ -509,9 +546,10 @@ export default {
      * @computed filteredUsers
      * @description find users after many filters
      */
-		filterdAccounts() {
+		filteredAccounts() {
 			return (
-				this.users.filter((v) => {
+				this.users ?
+				(this.users.filter((v) => {
 					if (
 						this.searchText &&
 						(!v.name || !v.name.includes(this.searchText.trim())) &&
@@ -523,7 +561,7 @@ export default {
 					if (this.type != undefined && v.type != this.type) return false;
 
 					return true;
-				}) || []
+				}) || []) : []
 			);
     },
     /**
@@ -534,10 +572,12 @@ export default {
 			return this.importData.filter((v) => !this.TestImportState(v));
     },
     selected_user(){
+			if(!Array.isArray(this.users))
+					return []
       if(Array.isArray(this.selected)){
         return this.selected.map(id=>this.users.find(v=>v.id == id)).filter(v=>v)
       }else{
-        return this.users.find(v=>v.id == this.selected)
+			
       }
     }
 	},
@@ -547,7 +587,7 @@ export default {
      * @description binding 'select all' button for select all current users
      */
 		onSelectAll() {
-			this.selected = this.filterdAccounts.map((v) => v.id);
+			this.selected = this.filteredAccounts.map((v) => v.id);
     },
     /**
      * @method onTableEvent
@@ -615,14 +655,16 @@ export default {
      */
 		onToolEvent(e) {
       var that = this;
-      let selected_id = this.selected
-			let selected =
+			let selected_id = this.selected
+			let selected = null
+			if(selected_id){
+			selected =
 				(this.multiple
 					? (selected_id
 							.map((v) => this.users.find((item) => item.id == v))
 							.filter((v) => v))
 					: (this.users.find((v) => v.id == selected_id)))
-      
+			}
 			if (e == "add") {
 				this.current = {}
 				this.showModal = true;
@@ -633,7 +675,7 @@ export default {
 				this.getData();
 			} else if (e == "lock") {
 				this.$store.dispatch("admin/LockAccounts", selected_id).then(()=>{
-					this.$refs.table.$forceUpdate()
+					this.$refs.itable.$forceUpdate()
 					this.Success("操作成功")
 				}).catch(e=>{
 					this.Error(e)

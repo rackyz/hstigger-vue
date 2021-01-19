@@ -57,6 +57,18 @@ Vue.prototype.Confirm = function (content, cb, cb2, option={}) {
 //         })
 //     }, 1000)
 // }
+
+Vue.prototype.Form = (form_name) => {
+    let form = null
+    try{
+        form = require('@/forms/'+form_name)
+    }catch(e){
+        console.error('Form Load Error:',e)
+    }
+    if(form)
+     return form.default || form
+}
+
 // API transfer
 Object.entries(Clients).forEach(([k,v])=>{
     Vue.prototype[k] = v
