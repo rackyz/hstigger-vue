@@ -4,6 +4,7 @@ LocalServer = 'http://192.168.0.110:6001'
 const ProductServer = 'https://api.hstigger.com'
 module.exports = {
   version:1000,
+  server:process.env.NODE_ENV == 'production' ? ProductServer : LocalServer,
   Servers:[
     {
       Name:"CORE",
@@ -231,19 +232,13 @@ module.exports = {
         // ----------
          // core
      
-         LOGIN: "POST /sessions",
-         WHO_IS: "GET /sessions/current",
-         GET_ACCLERATES: "GET /users/self/menus",
-         SAVE_ACCELERATES: "POST /users/self/menus",
-         GET_ACTIONS: "GET /users/self/action-menus",
-         SAVE_ACTIONS: "GET /users/self/action-menus",
-         GET_USERS: "GET /users",
-         GET_USER: "GET /users/:id",
-         POST_USER: "POST /users",
-         POST_USERS: "POST /users/create-users",
-         PATCH_USER: "PATCH /users/:id",
-         DEL_USER: "DELETE /users/:id",
-         DEL_USERS: "POST /users/delete",
+         GET_USERS: "GET /employees",
+         GET_USER: "GET /employees/:id",
+         POST_USER: "POST /employees",
+         POST_USERS: "POST /employees/create-users",
+         PATCH_USER: "PATCH /employees/:id",
+         DEL_USER: "DELETE /employees/:id",
+         DEL_USERS: "POST /employees/delete",
          ADD_USER_CONCERNED_PROJECT: "",
  
  

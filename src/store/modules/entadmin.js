@@ -41,7 +41,7 @@ const actions = {
   PatchUser(e){
     return new Promise((resolve,reject)=>{
       if(e.id){
-         API.ENT_ADMIN.PATCH_EMPLOYEE(e,{param:{id:e.id}}).then(res => {
+         API.ENT_ADMIN.PATCH_USER(e,{param:{id:e.id}}).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)
@@ -49,7 +49,7 @@ const actions = {
            reject(e)
          })
       }else{
-         API.ENT_ADMIN.POST_EMPLOYEE(e).then(res => {
+         API.ENT_ADMIN.POST_USER(e).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)

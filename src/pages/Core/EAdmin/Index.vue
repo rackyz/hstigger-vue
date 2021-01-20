@@ -25,18 +25,48 @@ import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
-       menus:[{
+       
+    }
+   
+  },
+  metaInfo:{
+    title:'企业后台'
+  },
+  mounted(){
+    this.$store.dispatch('entadmin/GetUsers')
+  },
+  computed:{
+    ...mapGetters('core',['current_ent','deps']),
+    ...mapGetters('entadmin',['users']),
+    MenuMap(){
+      let map = {}
+      this.menus.forEach(v=>{
+        map[v.path] = v
+        if(Array.isArray(v.subs)){
+          v.subs.forEach(s=>{
+            map[s.path] = s
+          })
+        }
+      })
+      return map
+    },
+    menus(){
+      let emCount = this.users.length
+      let depCount = this.deps.length
+      return [{
         name:"账号与权限",
         icon:'apps',
         is_group:true,
         subs:[{
         name:'员工管理',
         icon:"user",
-        path:'/core/eadmin/user'
+        path:'/core/eadmin/user',
+        count:emCount
       },{
         name:'部门管理',
         icon:"organization",
-        path:'/core/eadmin/dep'
+        path:'/core/eadmin/dep',
+        count:depCount
       }
       // ,{
       //   name:'角色权限',
@@ -113,27 +143,7 @@ export default {
         //   icon:'config'
         // }
        // ]}
-        ]
-    }
-   
-  },
-  metaInfo:{
-    title:'企业后台'
-  },
-  computed:{
-    ...mapGetters('core',['current_ent']),
-    MenuMap(){
-      let map = {}
-      this.menus.forEach(v=>{
-        map[v.path] = v
-        if(Array.isArray(v.subs)){
-          v.subs.forEach(s=>{
-            map[s.path] = s
-          })
-        }
-      })
-      return map
-    },
+        ]},
     ActiveMenu(){
       return this.MenuMap[this.ActivePath]
     },

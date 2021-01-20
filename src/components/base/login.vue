@@ -56,7 +56,7 @@
 
 <script>
 import PuzzleVerification from 'vue-puzzle-verification'
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import RegForm from '@/forms/login_register'
 import ForgetForm from '@/forms/login_forget'
 import ResetForm from '@/forms/login_reset'
@@ -99,6 +99,9 @@ export default {
     components:{PuzzleVerification},
     mounted(){
         this.GetServerState()
+    },
+    computed:{
+         ...mapGetters('core',['dashboard_path'])
     },
     methods: {
         onSubmitChangingPwd(model){
@@ -226,7 +229,7 @@ export default {
                 if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'
                 if(this.routeTo){
-                    this.RouteTo(this.routeTo)
+                    this.RouteTo(this.dashboard_path)
                 }else{
                     window.location.reload()
                 }
