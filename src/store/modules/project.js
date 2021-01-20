@@ -4,7 +4,11 @@
  */
 import API from '@/plugins/axios'
 const state = {
-    list:[]
+    list: [{
+      id: "123",
+      code: "N2020931",
+      name: "慈城高中"
+    }]
 }
 
 const getters = {

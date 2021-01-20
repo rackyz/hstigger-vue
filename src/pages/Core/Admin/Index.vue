@@ -1,21 +1,16 @@
 <template>
-  <Layout style='overflow:hidden;'>
-      <Header style="background:#23334c;color:#fff;font-size:18px;line-height:45px;padding-left:10px;position:relative;text-shadow:0px 0px 2px #000;font-family:Arial Black;color:#dfdfdf;height:45px;"><span style='font-size:30px;color:gold;position:relative;margin-right:10px;'>NEIP<span style='font-size:14px;margin-left:5px;font-weight:bold;'>后台管理</span> </span>
-        <div class='hs-light' style='position:absolute;right:10px;top:4px;height:40px;line-height:15px;display:flex;'>
-          <template v-for="a in Array(16)">
-            <div :key='a' style='margin-right:4px;'></div>
-          </template>
-          
-          </div>
-          <div class="hs-caption" style='position:absolute;bottom:0;left:200px;right:0;height:30px;font-size:14px;display:flex;align-items:center;padding:0 20px;border-top-left-radius:20px;color:#ddd;border-bottom:2px solid #fff;' v-if="ActiveMenu"><Icon custom='gzicon gzi-parameter' size='18' style='margin-right:8px;' /> 控制台<Icon type='ios-arrow-forward' size='12' style='margin:0 5px;margin-left:10px;' /><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" size='16' style='margin-right:7px;' /> {{ActiveMenu.name}}</div>
-      </Header>
-      <Layout style='flex-direction:row;'>
+  <Layout style='flex-direction:row;overflow:hidden;'>
+    
      <hs-menu style='min-width:200px;width:200px;padding-bottom:60px;padding:0;' :data="menus" @on-select='onClickMenu' :current="ActivePath">
      </hs-menu>
+      <transition name='fadeIn'>
       <Content>
-            <router-view></router-view>
-      </Content>
-      </Layout>
+        	<div class="hs-caption" v-if="ActiveMenu"><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" /> {{ActiveMenu.name}}
+          </div>
+          <router-view></router-view>
+     </Content>
+      </transition>
+      
   </Layout>
    
   
@@ -41,11 +36,6 @@ export default {
       let flowsCount = this.flows.length
 
       return [{
-        name:'总览',
-        icon:'bar-chart',
-        path:'/core/admin/dashboard',
-  
-      },{
         name:"账号管理",
         icon:'apps',
         is_group:true,

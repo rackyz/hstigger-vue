@@ -2,15 +2,11 @@
   <Layout style='flex-direction:row;overflow:hidden;'>
     
      <hs-menu style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #333;'  :data="menus"  @on-select='onClickMenu' :current="ActivePath" >
-     <div class='hs-menu-title' slot='title'>
-       <h2>企业后台</h2>
-       <span>{{current_ent.name}}</span>
-       <Avatar shape='square' :src='current_ent.avatar' size='40' class='hs-menu-title-avatar' />
-      </div>
+    
      </hs-menu>
     <transition name='fadeIn'>
       <Content>
-        	<div class="hs-caption" v-if="ActiveMenu"><Icon :custom="`gzicon gzi-${ActiveMenu.icon}`" /> {{ActiveMenu.name}}</div>
+        
         <router-view></router-view>
       </Content>
       
@@ -30,10 +26,6 @@ export default {
   data(){
     return {
        menus:[{
-        name:'总览',
-        icon:'bar-chart',
-        path:'/core/eadmin/dashboard'
-      },{
         name:"账号与权限",
         icon:'apps',
         is_group:true,
@@ -46,74 +38,82 @@ export default {
         icon:"organization",
         path:'/core/eadmin/dep'
       }
-      ,{
-        name:'角色权限',
-        icon:"quanxianliebiao",
-        path:'/core/eadmin/role'
-      }]
-        },{
-          name:"数据管理",
-          is_group:true,
-          subs:[
-          {
-        name:'项目管理',
-        path:'/core/admin/project',
-        icon:'xiangmu'
-      },{
-        name:'档案资料',
-        path:'/core/eadmin/archive',
-        icon:'xiangmu2'
-      },{
-        name:'文件管理',
-        path:'/core/eadmin/file',
-        icon:'file'
-      },{
-        name:'计划任务',
-        path:'/core/eadmin/task',
-        icon:'renwujincheng'
-      },{
-          name:'数据记录',
-        path:'/core/eadmin/record',
-        icon:'jiludanzilishijilu'
-      }]
-      },{
-          name:"应用管理",
-          is_group:true,
-          subs:[
-          {
-        name:'订阅管理',
-        path:'/core/eadmin/project',
-        icon:'xiangmu'
-      },{
-        name:'流程模板',
-        path:'/core/eadmin/flow',
-        icon:'shenjing'
-      }]
-      },{
-        name:'系统配置',
-        icon:'apps',
-        is_group:true,
-        subs:[{
-          name:'企业信息',
-          path:'/core/eadmin/config',
-          icon:'controls-5'
-        },{
-          name:'平台对接',
-          path:'/core/admin/tool',
-          icon:'codelibrary-fill'
-        },{
-          name:'类型管理',
-          path:'/core/eadmin/type',
-          icon:'tag'
-        },{
-          name:'系统日志',
-          path:'/core/eadmin/log',
-          icon:'rizhi'
-        },{
-          name:'备份和恢复',
-          path:'/core/eadmin/maintain',
-          icon:'config'
-        }]}]
+      // ,{
+      //   name:'角色权限',
+      //   icon:"quanxianliebiao",
+      //   path:'/core/eadmin/role'
+      // }
+      ]
+        },
+      //   {
+      //     name:"数据管理",
+      //     is_group:true,
+      //     subs:[
+      //     {
+      //   name:'项目管理',
+      //   path:'/core/eadmin/project',
+      //   icon:'xiangmu'
+      // },{
+      //   name:'档案资料',
+      //   path:'/core/eadmin/archive',
+      //   icon:'xiangmu2'
+      // },{
+      //   name:'文件管理',
+      //   path:'/core/eadmin/file',
+      //   icon:'file'
+      // },{
+      //   name:'计划任务',
+      //   path:'/core/eadmin/task',
+      //   icon:'renwujincheng'
+      // },{
+      //     name:'数据记录',
+      //   path:'/core/eadmin/record',
+      //   icon:'jiludanzilishijilu'
+      // }]
+      // },{
+      //     name:"应用管理",
+      //     is_group:true,
+      //     subs:[
+      //     {
+      //   name:'订阅管理',
+      //   path:'/core/eadmin/project',
+      //   icon:'xiangmu'
+      // },{
+      //   name:'流程模板',
+      //   path:'/core/eadmin/flow',
+      //   icon:'shenjing'
+      // }]
+      // },{
+      //   name:'系统配置',
+      //   icon:'apps',
+      //   is_group:true,
+      //   subs:[{
+      //     name:'企业信息',
+      //     path:'/core/eadmin/config',
+      //     icon:'controls-5'
+      //   },
+      //   // {
+      //   //   name:'平台对接',
+      //   //   path:'/core/admin/tool',
+      //   //   icon:'codelibrary-fill'
+      //   // },
+      //   {
+      //     name:'类型管理',
+      //     path:'/core/eadmin/type',
+      //     icon:'tag'
+      //   },
+        
+        // {
+        //   name:'系统日志',
+        //   path:'/core/eadmin/log',
+        //   icon:'rizhi'
+        // },{
+        //   name:'备份和恢复',
+        //   path:'/core/eadmin/maintain',
+        //   icon:'config'
+        // }
+       // ]}
+        ]
     }
    
   },

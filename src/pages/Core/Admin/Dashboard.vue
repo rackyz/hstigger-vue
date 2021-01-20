@@ -3,7 +3,7 @@
   <Row :gutter='10' style='margin:10px 5px;'>
     <Col :span='4'>
       <Card style='height:80px;'>
-        用户数 {{users.length}}
+        用户数 {{users?users.length:""}}
       </Card>
     </Col>
      <Col :span='4'>

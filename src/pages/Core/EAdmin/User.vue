@@ -361,11 +361,6 @@ export default {
 					icon: "md-key",
 				},
 				{
-					key: "resetpwdto",
-					name: "修改密码",
-					icon: "ios-key",
-				},
-				{
 					key: "lock",
 					name: "锁定",
 					icon: "md-lock",
@@ -825,7 +820,7 @@ export default {
 				item.id = this.current.id;
 			}
 			this.$store
-				.dispatch("admin/PatchUser", item)
+				.dispatch("entadmin/PatchUser", item)
 				.then((res) => {
 					that.Success(item.id ? "修改成功" : "新增用户成功");
 					that.showModal = false;

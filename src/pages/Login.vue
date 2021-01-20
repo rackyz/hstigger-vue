@@ -25,7 +25,7 @@
           <BaseLoginHeader />
           <BaseLogin
             style="margin-top:20px;width:380px;"
-            :routeTo="'/core'"
+            :routeTo="dashboard_path"
           />
         </div>
       </div>
@@ -49,6 +49,7 @@ export default {
   metaInfo: { title: '用户登录' },
   computed: {
     ...mapGetters('ctx', ['device', 'settings']),
+    ...mapGetters('core',['dashboard_path']),
     companyName() {
       if (this.device.width <= 400) {
         return "宁波高专"

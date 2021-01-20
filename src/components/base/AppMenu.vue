@@ -21,7 +21,7 @@
       <div class="l-acc-menu-mask-top"  v-show="showAppSelector"  />
    
      <!-- Dashboard Button -->
-    <a class='text-btn' @click="RouteTo('/core/dashboard')" style='margin:0 15px;margin-left:5px;'>
+    <a class='text-btn' @click="RouteTo(dashboard_path)" style='margin:0 15px;margin-left:5px;'>
       <Icon custom="gzicon gzi-desktop" size="16" style='margin-right:6px' /> 工作台
     </a>
     <!-- Base Menu Button -->
@@ -98,7 +98,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['apps','app_groups','acc_list']),
+    ...mapGetters('core',['apps','app_groups','acc_list','dashboard_path']),
     acc_apps(){
       if(this.showAppSelector)
         return this.acc_config_list.map(v=>this.apps[v]).filter(v=>v)

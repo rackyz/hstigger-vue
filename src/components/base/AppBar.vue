@@ -256,7 +256,7 @@ export default {
       current_enterprise: "current_enterprise"
     }),
     showEntMenu(){
-      return this.my_enterprises.length > 1 || (this.my_enterprises.length == 1 && this.session.type < 2)
+      return (this.my_enterprises.length >= 1  && this.session.type < 2)
     }
   },
   mounted() {

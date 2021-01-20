@@ -12,7 +12,12 @@ const state = {
   rss:[],
   isLogin:false,
   roles:[],
-  projects:[],
+  my_projects:[{
+    id:"123",
+    code:"N2020931",
+    name:"慈城高中"
+  }],
+  
   current_enterprise:null,
   my_enterprises:[],
   modules:[],
@@ -31,6 +36,14 @@ const getters = {
   },
   getUser:(state)=>(id)=>{
     return state.users.find(v=>v.id == id)
+  },
+  dashboard_path(state){
+    if(state.session.type == 3)
+      return "/core/admin/dashboard"
+    else if(state.session.type == 2)
+      return  "/core/eadmin/dashboard"
+    else
+      return "/core/dashboard"
   },
   uid(state){
     return state.session.user_id
@@ -101,10 +114,16 @@ const getters = {
     return state.session.user_flows
   },
   deps(state){
-    return state.deps
+    return state.session.deps.concat({id:1,name:"我的企业"})
+  },
+  my_deps(state){
+    return state.session.my_deps
   },
   roles(state){
-    return state.roles
+    return state.session.roles
+  },
+  my_roles(state){
+    return state.session.my_roles
   },
   settings(state){
     return state.session.settings

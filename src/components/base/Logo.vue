@@ -1,6 +1,10 @@
 <template>
   <div class="l-logo flex-wrap">
-    <template v-if='!ent'>
+    <template v-if="session.type==3">
+       <img src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" />
+      <span style='color:#fff'>平台管理</span>
+    </template>
+    <template v-else-if='!ent'>
       <img src="http://www.hstigger.com/img/logo-flat.0ce4c896.png" />
       <span style='color:#fff'>个人模式</span>
     </template>
@@ -18,7 +22,7 @@
   export default {
     name: 'BaseImage',
     computed:{
-      ...mapGetters('core',['my_enterprises','current_enterprise']),
+      ...mapGetters('core',['session','my_enterprises','current_enterprise']),
       ent(){
       
         if(this.my_enterprises && this.my_enterprises.length > 0){

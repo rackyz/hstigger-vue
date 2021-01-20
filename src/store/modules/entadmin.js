@@ -37,6 +37,27 @@ const actions = {
         reject(e)
       })
     })
+  },
+  PatchUser(e){
+    return new Promise((resolve,reject)=>{
+      if(e.id){
+         API.ENT_ADMIN.PATCH_EMPLOYEE(e,{param:{id:e.id}}).then(res => {
+           let user = Object.assign({}, e, res.data.data)
+           commit('SaveUser', user)
+           resolve(user)
+         }).catch(e => {
+           reject(e)
+         })
+      }else{
+         API.ENT_ADMIN.POST_EMPLOYEE(e).then(res => {
+           let user = Object.assign({}, e, res.data.data)
+           commit('SaveUser', user)
+           resolve(user)
+         }).catch(e => {
+           reject(e)
+         })
+      }
+    })
   }
 
 }
