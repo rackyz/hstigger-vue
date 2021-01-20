@@ -114,7 +114,7 @@ const getters = {
     return state.session.user_flows
   },
   deps(state){
-    return state.session.deps.concat({id:1,name:"我的企业"})
+    return state.session.deps.concat({id:0,name:"( 无部门 )"},{id:1,name:"我的企业"})
   },
   my_deps(state){
     return state.session.my_deps

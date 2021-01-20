@@ -71,11 +71,11 @@
 		</div>
     <!-- table -->
 		
-	 <Tabs size="small" type="card" :animated="false" :value="tabIndex" style='height:calc(100% - 125px);width:100%;margin:5px 0;' class="fix-height-tabs">
+	 <Tabs size="small" type="card" :animated="false" :value="tabIndex" style='height:calc(100% - 110px);width:100%;margin:5px 0;' class="fix-height-tabs">
         <TabPane label="员工列表" name="list">
 		<div
 			style="
-				height: calc(100% - 150px);
+				height: calc(100% - 80px);
 				width:100%;
 				overflow: hidden;
 				background: #ddd;
@@ -130,7 +130,7 @@
     <!-- modal for create/edit user data -->
 		<hs-modal-form
 			ref="form"
-			:title="current && current.id ? '修改信息' : '新增用户'"
+			:title="current && current.id ? '修改信息' : '新增员工'"
 			v-model="showModal"
 			:width="420"
 			style="margin: 10px"
