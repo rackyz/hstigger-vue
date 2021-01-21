@@ -8,7 +8,12 @@ const state = {
       id: "123",
       code: "N2020931",
       name: "慈城高中"
-    }]
+    }],
+    "123":{
+         id: "123",
+           code: "N2020931",
+           name: "慈城高中"
+    }
 }
 
 const getters = {

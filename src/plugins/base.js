@@ -73,6 +73,8 @@ Vue.prototype.Form = (form_name) => {
 Object.entries(Clients).forEach(([k,v])=>{
     Vue.prototype[k] = v
 })
+import gzTable from '../plugins/old/table'
+Vue.component("gzTable", gzTable)
 
 Vue.prototype.RouteTo = function (path, newtab = false) {
     if (newtab) {

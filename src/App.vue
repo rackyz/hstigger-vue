@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 import api from './plugins/api'
   export default {
     name: 'App',
@@ -27,6 +28,22 @@ import api from './plugins/api'
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
+    },
+    computed:{
+      ...mapGetters('core',['dashboard_path','session'])
+    },
+    watch:{
+      $route:{
+        handler(e){
+          var that = TouchList
+          this.$store.dispatch('core/auth',e.fullPath).then(authed=>{
+            if(authed == false){
+               that.$router.replace(this.dashboard_path)
+            }
+          })
+            
+        }
+      }
     },
     created(){
       if(api && api.inited)

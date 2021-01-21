@@ -30,7 +30,10 @@ export default {
    
   },
   metaInfo:{
-    title:'企业后台'
+    title:'企业后台',
+    auth:(session)=>{
+      return session.type == 2
+    }
   },
   mounted(){
     this.$store.dispatch('entadmin/GetUsers')

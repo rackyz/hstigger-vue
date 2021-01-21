@@ -125,7 +125,6 @@ Object.keys(fileMap).forEach(k => {
     APP_ROUTES.push(route)
   }
 })
-console.log('ROUTE:', APP_ROUTES)
 
 let core = APP_ROUTES.find(v=>v.path == '/core')
 let iframe = core.children.find(v=>v.path == '/core/iframecontainer')
@@ -135,7 +134,6 @@ core.children.push({
   path:'/app/:appkey'
 })
 
-console.log('CORE:',core)
 
 
 

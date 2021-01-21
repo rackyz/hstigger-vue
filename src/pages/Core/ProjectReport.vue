@@ -175,7 +175,7 @@
         </div>
         </div>
           <div class="table-wrap" style="height:calc(100% - 150px);padding-bottom:30px;margin:10px;position:relative;	overflow: hidden;">
-          <hs-table ref="table" :columns="columns" :data="FilterData(contracts)" :option="options" :pageSize="100" :onEvent="onEvent" />
+          <gzTable ref="table" :columns="columns" :data="FilterData(contracts)" :option="options" :pageSize="100" :onEvent="onEvent" />
           </div></div>
     </div>
 </template>

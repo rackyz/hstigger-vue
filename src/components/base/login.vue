@@ -229,7 +229,12 @@ export default {
                 if(!session.lastlogin_at)
                     this.routeTo = '/core/welcome'
                 if(this.routeTo){
-                    this.RouteTo(this.dashboard_path)
+                    let path = "/core/dashboard"
+                    if(session.type == 3)
+                     path =  "/core/admin/dashboard"
+                    else if(session.type == 2)
+                        path ="/core/eadmin/dashboard"
+                    this.RouteTo(path)
                 }else{
                     window.location.reload()
                 }

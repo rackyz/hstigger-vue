@@ -379,7 +379,6 @@
             </div>
           </template>
         </draggable>
-        {{my_rss}}
       </div>
     </Modal>
   </Layout>

@@ -54,8 +54,8 @@ const getters = {
   my_enterprises(state){
     return state.my_enterprises
   },
-  projects(state){
-    return state.session.my_projects
+  my_projects(state) {
+    return state.my_projects
   },
   current_enterprise(state){
     return state.current_enterprise
@@ -179,6 +179,26 @@ const getters = {
 }
 
 const actions = {
+  init({commit}){
+    return new Promise((resolve,reject)=>{
+      commit('init')
+    })
+  },
+  auth({state},path){
+    console.log("AUTHED:",path,state)
+    return new Promise((resolve,reject)=>{
+      if (path.indexOf("/core/admin") == 0) {
+        if (state.session.type != 3)
+            resolve(false)
+        
+      }else if(path.indexOf("/core/eadmin") == 0){
+        if(state.session.type != 2)
+          resolve(false)
+      }
+
+      resolve(true)
+    })
+  },
   debug_change_user({commit},id){
     return new Promise((resolve,reject)=>{
       API.CORE.DEBUG_CHANGE_USER({id}).then(res=>{
@@ -359,6 +379,29 @@ const SaveTypes = data=>{
 }
 
 const mutations = {
+  init(state){
+    state = {
+      session: {},
+      types: [],
+      users: [],
+      deps: [],
+      rss: [],
+      isLogin: false,
+      roles: [],
+      my_projects: [{
+        id: "123",
+        code: "N2020931",
+        name: "慈城高中"
+      }],
+
+      current_enterprise: null,
+      my_enterprises: [],
+      modules: [],
+      acc_list: [],
+      user_rss: [],
+      loading: false
+    }
+  },
   SetLocalRss(state,list){
     state.rss = list
     state.my_rss.sort((a,b)=>{
@@ -424,7 +467,7 @@ const mutations = {
   logout(state){
      state.isLogin = false
     state.session = {}
-    
+    mutations.init(state)
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {
