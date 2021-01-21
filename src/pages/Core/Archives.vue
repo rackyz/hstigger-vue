@@ -1,9 +1,9 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">我的文件</Header>
+    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">资料管理</Header>
     <Content style="padding:10px;">
     <div class="filter-box" style="margin:5px 0;">
-      <Input style="width:200px;" search /> <Button>上传文件</Button>
+      <Button>上传文件</Button> <Input style="width:200px;" search /> 
     </div>
     <div style="height:400px;position:relative;">
     <hs-table ref="table_private" :columns="columns" bordered :data="files" @event="onTableEvent" selectable="false" />
