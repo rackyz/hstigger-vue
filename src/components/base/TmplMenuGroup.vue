@@ -35,7 +35,7 @@
       <div class="l-app-group-list">
         <template v-for="app in items">
           <template v-if='!editable'>
-              <a class='text-btn' :class="{'text-btn-disabled':app.dev}" :key='app.key' :href="app.dev?'':app.path">{{app.name}}<span class='l-version' :class="{'l-version-dev':app.dev}">{{app.dev?'研发中':app.version}}</span></a>
+              <span class='text-btn' :class="{'text-btn-disabled':app.dev}" :key='app.key' @click="RouteTo(app.dev?'':app.path)">{{app.name}}<span class='l-version' :class="{'l-version-dev':app.dev}">{{app.dev?'研发中':app.version}}</span></span>
           </template>
           <template v-else>
               <Checkbox :key='app.key' class='l-app-check' :disabled='app.dev || !checked[app.key] && checked_count>=10' :value="checked[app.key]" @on-change='onChangeAcc(app.key,$event)'>{{app.name}}</Checkbox>

@@ -77,6 +77,8 @@ import gzTable from '../plugins/old/table'
 Vue.component("gzTable", gzTable)
 
 Vue.prototype.RouteTo = function (path, newtab = false) {
+    if(!path)
+        return
     if (newtab) {
         if(!path.includes('http')){
             let routerUrl = this.$router.resolve({

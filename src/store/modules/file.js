@@ -53,7 +53,8 @@ import API from '@/plugins/axios'
      rootState
    }, {
      files,
-     vdisk
+     vdisk,
+     onProgress
    }) {
      return new Promise((resolve, reject) => {
        if (!files)
@@ -111,6 +112,9 @@ import API from '@/plugins/axios'
                },
                cancelToken: fileObjects[i].source.token,
                onUploadProgress: progressEvent => {
+                 if(onProgress){
+                   onProgress(progressEvent,i)
+                 }
                  let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
                  commit('setUploadingFileState', {
                    files: fileObjects,
