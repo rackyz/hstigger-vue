@@ -1,6 +1,6 @@
 export default {
   title: '上传资料',
-  layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='6'>{{code}}</Col><Col :span='18'>{{name}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='12'>{{project_id}}</Col><Col :span='12'>{{dep_id}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='6'>{{type}}</Col><Col :span='6'>{{type2}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{desc}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{files}}</Col></Row></div>",
+  layout: "<div style='position:relative;'><Row :gutter='10'><Col :span='6'>{{code}}</Col><Col :span='18'>{{name}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='12'>{{project_id}}</Col><Col :span='12'>{{dep_id}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='8'>{{type}}</Col><Col :span='8'>{{type2}}</Col><Col :span='8'>{{type3}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{desc}}</Col></Row><Row :gutter='10' style='margin-top:10px'><Col :span='24'>{{files}}</Col></Row></div>",
   def: {
     code: {
       label: "资料编号",
@@ -34,7 +34,7 @@ export default {
       }
     },
     type: {
-      label: "一级分类",
+      label: "一级目录",
       control: 'select',
       option: {
         getters: 'core/getTypes',
@@ -42,7 +42,17 @@ export default {
       }
     },
     type2: {
-      label: "二级分类",
+      label: "二级目录",
+      control: 'select',
+      option: {
+        relativeGetter: 'core/getTypesByID',
+        relKey: 'project_type',
+        relMode: 'replace',
+        idKey: 'id',
+        labelKey: 'name'
+      }
+    }, type3: {
+      label: "三级目录",
       control: 'select',
       option: {
         relativeGetter: 'core/getTypesByID',
@@ -67,6 +77,7 @@ export default {
         type:'list',
         required:true,
         uploader:"upload",
+        rename:"file/rename",
         uploaderSource:"env"
       }
     }

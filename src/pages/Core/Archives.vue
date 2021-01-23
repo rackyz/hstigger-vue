@@ -7,7 +7,9 @@
         <Input style="width:230px;" search clearable placeholder="输入资料关键字" />
         <Select style="width:200px;margin-left:5px;text-align:center" placeholder="- - 所属项目 - -" clearable></Select>
          <Select style="width:150px;margin-left:5px;text-align:center" placeholder="- - 所属部门 - -" clearable></Select>
-         <Select style="width:150px;margin-left:5px;text-align:center" placeholder="- - 所属类别 - -" clearable></Select>
+         <Select style="width:150px;margin-left:5px;text-align:center" placeholder="- - 一级目录 - -" clearable></Select>
+          <Select style="width:150px;margin-left:5px;text-align:center" placeholder="- - 二级目录 - -" clearable></Select>
+           <Select style="width:150px;margin-left:5px;text-align:center" placeholder="- - 三级目录 - -" clearable></Select>
       </div>
       <div class="flex-wrap">
         <!-- authed.ArchiveCategoryManage -->
@@ -162,13 +164,14 @@ export default {
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
     },
   methods:{
-    upload(files,onFilesProgress){
+    async upload(files,onFilesProgress){
      return this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress})
     },
     onTableEvent(e){
       
     },
     handleCreateArchive(e){
+      console.log("submit:",e)
       // 创建资料
     },
     getData(){
