@@ -244,8 +244,9 @@ export default {
       // 创建资料
     },
     getData(){
+      console.log(this.api.enterprise)
        this.loading = true
-       this.ENT.LIST_ARCHIVE().then(res=>{
+       this.api.enterprise.LIST_ARCHIVES().then(res=>{
          this.items = res.data.data
        }).finally(e=>{
          this.loading = false

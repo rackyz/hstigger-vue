@@ -90,7 +90,7 @@ const createAPIPromise = (axiosClient,api_path)=>{
    }
    
 }
-o.SERVER = apiAxios
+o.SERVER = {}
 const createAPI = (axiosClient,apiObject)=>{
   for(let group_key in apiObject){
     let apis = {}
@@ -109,6 +109,8 @@ const createAPI = (axiosClient,apiObject)=>{
 }
 
 o.initAPI = async (vue) => {
+  
+  o.SERVER = {}
   return new Promise((resolve, reject) => {
     if (!o.inited) {
       axios.get(config.server, {
@@ -119,8 +121,10 @@ o.initAPI = async (vue) => {
         createAPI(apiAxios, res.data.data)
         o.inited = true
         if(vue)
-          vue.api = o.SERVER
+          vue.prototype.api = o.SERVER
+        console.log("API inited:",o.SERVER)
         resolve(o.API)
+       
       }).catch(e => {
         console.error(e)
         reject("API Loading Failed:"+e)
