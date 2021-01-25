@@ -9,6 +9,7 @@ const state = {
   types:[],
   users:[],
   deps:[],
+  ent_types:[],
   rss:[],
   isLogin:false,
   roles:[],
@@ -154,14 +155,20 @@ const getters = {
       //行政： 詹红岩
   },
   getTypes:(state)=>key=>{
-    if(!state.types)
+    if(!state.types && !state.ent_types)
       return []
-    let typeRoot = state.types.find(v=>v.key == key)
-    if(typeRoot)
-        return state.types.filter(v=>v.parent_id == typeRoot.id)
-    else{
-      console.error("KEY is not exist:",key)
-      return []
+
+    let typeRoot = state.ent_types.find(v => v.key == key)
+    if (typeRoot)
+      return state.ent_types.filter(v => v.parent_id == typeRoot.id)
+    else {
+      typeRoot = state.types.find(v => v.key == key)
+      if (typeRoot)
+        return state.types.filter(v => v.parent_id == typeRoot.id)
+      else {
+        console.error("KEY is not exist:", key)
+        return []
+      }
     }
     },
      getTypesByID: (state) => id => {
@@ -398,6 +405,7 @@ const mutations = {
       my_enterprises: [],
       modules: [],
       acc_list: [],
+      ent_types:[],
       user_rss: [],
       loading: false
     }
@@ -456,6 +464,7 @@ const mutations = {
     state.users = session.users
     state.modules = session.modules
     state.rss = session.rss
+    state.ent_types = session.ent_types
     state.user_rss = Array.isArray(state.rss) ? state.rss.map(v => v.id):[]
     if (Array.isArray(session.my_enterprises))
       return state.my_enterprises = session.my_enterprises.map(

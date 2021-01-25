@@ -21,13 +21,13 @@
 
     </div>
     <div style="height:400px;position:relative;">
-      <hs-table ref="table_private" :total="1000" :columns="columns" bordered :data="files" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
 
     <hs-modal-form
 			ref="form"
-			title="新增资料"
+			:title="model.id?'修改资料':'新增资料'"
 			v-model="modalCreateArchive"
 			:width="620"
       :env="{upload}"
@@ -36,7 +36,7 @@
 			:form="Form('archive')"
 			:data="model"
 			editable
-			@on-submit="handleCreateArchive"
+			@on-submit="handlePatchArchive"
 			@on-event="handleEvent"
 		/>
   </Layout>
@@ -46,8 +46,8 @@
 import {mapGetters} from "vuex"
 export default {
   data(){
-   
     return {
+      items:[],
       modalCreateArchive:false,
       filterProjectId:null,
       filterDepId:null,
@@ -65,10 +65,20 @@ export default {
         sortable:false,
         width:40,
         render:(h)=>{
-          return h('icon',{props:{type:'ios-folder-open',size:20}})
+          return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#3af"}})
         }
         },{
+        title:"档案号",
+        key:"code",
+        width:80,
+        type:"text",
+         algin:"center",
+        option:{
+          algin:"center"
+        }
+      },{
         title:"资料名称",
+        width:300,
         type:"text",
         key:"name",
         linkEvent:"open"
@@ -90,21 +100,36 @@ export default {
 
         }
       },{
-        title:"一级分类",
-        type:"text",
-        key:"ext",
-        width:80,
+        title:"业务类别",
+        type:"type",
+        key:"type",
+        width:100,
         option:{
-          align:"center"
+          align:"center",
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_WORKTYPE"
         }
 
       },{
-        title:"二级分类",
-        type:"text",
-        key:"ext",
-        width:80,
+        title:"归档目录",
+        type:"type",
+        key:"type2",
+        width:130,
         option:{
-          align:"center"
+          align:"center",
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_SAVETYPE"
+        }
+
+      },{
+        title:"资料类型",
+        type:"type",
+        key:"type3",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_DOCTYPE"
         }
 
       },{
@@ -155,29 +180,73 @@ export default {
   },
   mounted(){
     this.$nextTick(()=>{
-      this.$refs.table_private.calcTableHeight()
-      this.$refs.table_public.calcTableHeight()
+      this.$refs.table.calcTableHeight()
     })
     this.getData()
   },
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      filteredItems(){
+        return this.items
+      }
     },
   methods:{
     async upload(files,onFilesProgress){
-     return this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress})
+     return new Promise((resolve,reject)=>{
+       this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
+         console.log(files)
+         resolve(files.map(v=>v.url))
+       }).catch(reject)
+     })
     },
     onTableEvent(e){
-      
+      if(e.type == 'edit'){
+        this.model = e.data
+        this.modalCreateArchive = true
+      }
     },
-    handleCreateArchive(e){
-      console.log("submit:",e)
+    handlePatchArchive(item){
+      console.log("submit:",item)
+      if(item.id){
+        let id = item.id
+        delete item.id
+        this.ENT.PATCH_ARCHIVE(item,{param:{id}}).then(res=>{
+          let updateInfo = res.data.data
+         
+          let new_item = Object.assign({},item,updateInfo)
+          let index = this.items.findIndex(v=>v.id == id)
+          if(index != -1){
+            new_item = Object.assign({},this.items[index],new_item)
+           this.items.splice(index,1,new_item)
+          }
+          this.modalCreateArchive = false
+          this.Success('修改成功')
+         
+        }).catch(e=>{
+          this.Error('修改失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })    
+      }else{
+        this.ENT.POST_ARCHIVE(item).then(res=>{
+          let updateInfo = res.data.data
+          let new_item = Object.assign({},item,updateInfo)
+          this.items.splice(0,0,new_item)
+           this.modalCreateArchive = false
+          this.Success('创建成功')
+        }).catch(e=>{
+          this.Error('创建失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })
+      }
+     
       // 创建资料
     },
     getData(){
        this.loading = true
-       this.$store.dispatch('file/query',{vdisk:"tmp"}).then(res=>{
-
+       this.ENT.LIST_ARCHIVE().then(res=>{
+         this.items = res.data.data
        }).finally(e=>{
          this.loading = false
        })

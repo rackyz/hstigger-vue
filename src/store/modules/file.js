@@ -2,6 +2,7 @@
  *  @功能描述 文件上传/下载服务，状态/进度管理
  */
 import API from '@/plugins/axios'
+import CONFIG from '@/config'
  var CancelToken = axios.CancelToken
  const getFileExt = (url) => {
 
@@ -136,22 +137,28 @@ import API from '@/plugins/axios'
                    source: undefined
                  }
                })
-               resolve(resFiles[i])
               
              }).catch(e => {
                if (e && e.message == "取消上传") {
                  commit('cancelUploading', a[i])
-                 resolve()
+
+               }else{
+                reject({
+                  e,
+                  file: a[i]
+                })
                }
-               reject({
-                 e,
-                 file: a[i]
-               })
+               
              })
            })).then(res => {
            // all file uploaded successfully
            commit('append', fileObjects)
-           resolve(resFiles)
+           
+           resolve(resFiles.map((v,i) => ({
+             name:files[i].name,
+             url: CONFIG.server + '/public/files/' + v.id,
+             ext: fileObjects[i].ext
+           })))
          })
        }).catch((err) => {
          if (typeof err == 'object') {
