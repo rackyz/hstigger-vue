@@ -7,6 +7,7 @@ const PuzzleVerification = require('vue-puzzle-verification')
 import Clients from './axios'
 import moment from 'moment'
 import SplitPane from 'vue-splitpane'
+import API from './api'
 // Setup PuzzleVerification plugins
 Vue.use(PuzzleVerification)
 Vue.prototype.moment = moment
@@ -101,6 +102,70 @@ Vue.prototype.RouteTo = function (path, newtab = false) {
 
 
 }
+function getBlob(url, cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.responseType = "blob";
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      cb(xhr.response);
+    }
+  };
+  xhr.send();
+    // console.log("URL:",url,API.SERVER)
+    // axios.get({
+    //     url,
+    //     method:'GET',
+    //     responseType: 'blob'
+    // }).then(res=>{
+    //     console.log("ok")
+    //     cb(res)
+    // }).catch(e=>{
+    //     console.error('errpr:',e)
+    // })
+}
+
+/**
+ * 保存
+ * @param  {Blob} blob
+ * @param  {String} filename 想要保存的文件名称
+ */
+function saveAs(blob, filename) {
+    console.log("save:",blob)
+  if (window.navigator.msSaveOrOpenBlob) {
+    navigator.msSaveBlob(blob, filename);
+  } else {
+    var link = document.createElement("a");
+    var body = document.querySelector("body");
+
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+
+    // fix Firefox
+    link.style.display = "none";
+    body.appendChild(link);
+
+    link.click();
+    body.removeChild(link);
+
+    window.URL.revokeObjectURL(link.href);
+  }
+}
+
+/**
+ * 下载
+ * @param  {String} url 目标文件地址
+ * @param  {String} filename 想要保存的文件名称
+ */
+function download(url, filename) {
+  getBlob(url, function (blob) {
+      console.log('blob:',blob)
+    saveAs(blob, filename);
+  });
+}
+
+
+Vue.prototype.DownloadWithName = download 
 
 Vue.directive('transfer',{
     inserted:el=>{

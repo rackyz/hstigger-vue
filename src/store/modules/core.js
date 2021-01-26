@@ -3,6 +3,8 @@
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
 import API from '@/plugins/axios'
+import HSAPI from '@/plugins/api'
+const SERVER = HSAPI.SERVER
 const crypto = require('crypto')
 const state = {
   session:{},
@@ -10,6 +12,7 @@ const state = {
   users:[],
   deps:[],
   ent_types:[],
+  projects:[],
   rss:[],
   isLogin:false,
   roles:[],
@@ -92,6 +95,9 @@ const getters = {
   session(state){
     return state.session
   },
+  projects(state){
+    return state.projects
+  },
   user_rss(state){
     return state.user_rss
   },
@@ -166,7 +172,6 @@ const getters = {
       if (typeRoot)
         return state.types.filter(v => v.parent_id == typeRoot.id)
       else {
-        console.error("KEY is not exist:", key)
         return []
       }
     }
@@ -432,6 +437,7 @@ const mutations = {
   SetCurrentEnterprise(state, ent_id) {
     if(ent_id && ent_id != 'self'){
       API.CORE.SetEnterprise(ent_id)
+      SERVER.SetEnterprise(ent_id)
       API.ENT.SetEnterprise(ent_id)
       API.ENT_ADMIN.SetEnterprise(ent_id)
       localStorage.setItem('current_enterprise',ent_id)
@@ -444,6 +450,7 @@ const mutations = {
   },
   ClearEnterprise(state){
     API.CORE.ClearEnterprise()
+    SERVER.ClearEnterprise()
     API.ENT.ClearEnterprise()
     API.ENT_ADMIN.ClearEnterprise()
     localStorage.removeItem('current_enterprise')
@@ -451,6 +458,7 @@ const mutations = {
   },
   save(state,session){
     API.CORE.SetAuthorization(session.token)
+    SERVER.SetAuthorization(session.token)
     API.ENT.SetAuthorization(session.token)
     if (session.isAdmin)
       API.ADMIN.SetAuthorization(session.token)
@@ -463,6 +471,7 @@ const mutations = {
      state.types = session.types //SaveTypes(session.types)
     state.users = session.users
     state.modules = session.modules
+    state.projects = session.projects
     state.rss = session.rss
     state.ent_types = session.ent_types
     state.user_rss = Array.isArray(state.rss) ? state.rss.map(v => v.id):[]
@@ -477,6 +486,7 @@ const mutations = {
      state.isLogin = false
     state.session = {}
     mutations.init(state)
+    SERVER.Clear()
     localStorage.removeItem('hs-token')
   },
   saveAcc(state, acc_list) {
@@ -531,7 +541,20 @@ const mutations = {
   },
   saveUserinfo:(state,userinfo)=>{
    Object.assign(state.session,userinfo) 
+  },
+  saveProject:(state,project)=>{
+    let index = state.projects.findIndex(v=>v.id == project.id)
+    if(index == -1)
+      state.projects.push(project)
+    else
+      state.projects.splice(index,1,project)
+  },
+  delProject:(state,project_id)=>{
+    let index = state.projects.findIndex(v => v.id == project_id)
+    if(index != -1)
+      state.projects.splice(index,1)
   }
+
 }
 
 export default {

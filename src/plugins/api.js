@@ -6,23 +6,54 @@ let apiAxios = axios.create({baseURL:config.server,timeout:3000})
 apiAxios.defaults.headers = {
     "api-version": "v0"
 }
-apiAxios.SetAuthorization = function (token) {
+// axios 响应 预处理
+apiAxios.interceptors.response.use(data => {
+  if (data && data.data && data.data.code === -1) {
+    return Promise.reject((data.data.error ? data.data.error : (data.data.message ? data.data.message : '未知')))
+  }
+  return data;
+}, err => {
+  if (err.message && err.message.includes('timeout')) {
+    return Promise.reject('网络连接超时')
+  }
+
+  if (err.response) {
+    if (err.response.status == 504 || err.response.status == 404) {
+      return Promise.reject(`网络连接失败:[${err.response.status}]`)
+    } else if (err.response.status == 403) {
+      return Promise.reject('403-权限不足,请联系管理员!')
+    } else if (err.response.status == 401) {
+      client.Clear()
+      window.location.reload()
+      return Promise.reject()
+    } else {
+      return Promise.reject(`${err.response.status}] ${err}`)
+    }
+  }
+
+  if (err.config && err.config.method == 'options') {
+    return Promise.reject('服务器访问失败')
+  }
+  return Promise.reject(err);
+})
+o.SERVER = {axios:apiAxios}
+o.SERVER.SetAuthorization = function (token) {
   if (token)
     apiAxios.defaults.headers.Authorization = token
 }
 
-apiAxios.SetEnterprise = function (ent_id) {
+o.SERVER.SetEnterprise = function (ent_id) {
   if (ent_id)
     apiAxios.defaults.headers.Enterprise = ent_id
   else
     delete apiAxios.defaults.headers.Enterprise
 }
 
-apiAxios.ClearEnterprise = function () {
+o.SERVER.ClearEnterprise = function () {
   delete apiAxios.defaults.headers.Enterprise
 }
 
-apiAxios.Clear = function () {
+o.SERVER.Clear = function () {
   delete apiAxios.defaults.headers.Authorization
   delete apiAxios.defaults.headers.Enterprise
   localStorage.removeItem('hs-token')
@@ -90,7 +121,6 @@ const createAPIPromise = (axiosClient,api_path)=>{
    }
    
 }
-o.SERVER = {}
 const createAPI = (axiosClient,apiObject)=>{
   for(let group_key in apiObject){
     let apis = {}
