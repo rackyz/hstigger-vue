@@ -121,31 +121,20 @@ export default {
         key:"type1",
         width:300
       },{
-        title:"归档目录",
+        title:"项目状态",
         type:"type",
-        key:"type2",
-        width:130,
-        option:{
-          align:"center",
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_SAVETYPE"
-        }
-
-      },{
-        title:"资料类型",
-        type:"type",
-        key:"type3",
+        key:"state",
         width:100,
         option:{
           align:"center",
           getters:"core/getTypes",
-          getters_key:"ARCHIVE_DOCTYPE"
+          getters_key:"ProjectState"
         }
 
       },{
         title:"项目负责人",
         type:"user",
-        key:"created_by",
+        key:"charger",
         width:100,
         option:{
           align:"center",

@@ -1,6 +1,6 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">合同管理</Header>
+    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">合约管理</Header>
     <Content style="padding:10px;">
     <div class="filter-box flex-between" style="margin:5px 0;">
       <div class="flex-wrap">
@@ -39,13 +39,13 @@
 
     <hs-modal-form
 			ref="form"
-			:title="model.id?'修改项目':'新增项目'"
+			:title="model.id?'修改合约':'新增合约'"
 			v-model="modalCreate"
 			:width="620"
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('project')"
+			:form="Form('contract')"
 			:data="model"
       :initData="filterInitData"
 			editable

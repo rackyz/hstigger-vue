@@ -1,6 +1,6 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">资料管理</Header>
+    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">档案管理</Header>
     <Content style="padding:10px;">
     <div class="filter-box flex-between" style="margin:5px 0;">
       <div class="flex-wrap">
@@ -18,18 +18,18 @@
          </Select>
          <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_1" placeholder="- - 业务类别 - -" clearable>
             <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_WORKTYPE')">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
+             <Option :value="d.value" :key="d.value">{{d.name}}</Option>
            </template>
          </Select>
           <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 归档目录 - -" clearable>
              <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
+             <Option :value="d.value" :key="d.value">{{d.name}}</Option>
            </template>
 
           </Select>
            <Select style="width:150px;margin-left:5px;text-align:center;margin-right:10px;" v-model="f_type_3" placeholder="- - 资料类型 - -" clearable>
               <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_DOCTYPE')">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
+             <Option :value="d.value" :key="d.value">{{d.name}}</Option>
            </template>
            </Select>
             <Button @click="handleClearFilter()" type="info" v-show="isFiltering">清除筛选条件</Button>
@@ -279,7 +279,7 @@ export default {
     handlePreCreate(){
       this.model={}
       if(this.f_project_id !== null)
-        this.model.project_id = this,f_project_id
+        this.model.project_id = this.f_project_id
       if(this.f_dep_id)
         this.model.dep_id = this.f_dep_id
       if(this.f_type_1 !== null)

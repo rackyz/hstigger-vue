@@ -1,600 +1,375 @@
-<style lang="less" >
-.block-input {
-  border-right: 1px solid #000;
-  border-bottom: 1px solid #000;
-  position: relative;
-  height: 30px;
-  input {
-    border-radius: 0;
-    background: #333;
-    border: none;
-    width: 100%;
-    height: 29px;
-    color: #fff;
-    padding-left:10px;
-    font-size:12px;
-  }
-
-  input:focus {
-    filter: brightness(1.1);
-    box-shadow: none;
-    background:#fff;
-    color:#333;
-  }
-  .ivu-input-icon {
-    line-height: 30px;
-  }
-}
-</style>
 <template>
-  <div
-    class="page"
-    style='position:relative;height:100%;'
-  >
-    <Drawer
-      v-model='showSider'
-      placement="left"
-      :closable='false'
-      :transfer="false"
-      inner
-      styles='background:#23334c;border-right:1px solid #000;border-top:1px solid #000'
-    >
-      <Input
-        class='block-input'
-        style='border:1px solid #000;height:32px;'
-        placeholder="查询"
-      />
-    </Drawer>
-    <div
-      class="content"
-      :class="{'content-on':showSider}"
-    >
+  <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
+    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">任务管理</Header>
+    <Content style="padding:10px;">
+    <div class="filter-box flex-between" style="margin:5px 0;">
+      <div class="flex-wrap">
+        <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable>
+             <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
+             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
+           </template>
 
-      <div
-        class="flex-wrap"
-        style="justify-content:space-between;"
-      >
-        <div
-          class="block"
-          style='width:60px;'
-          @click='showSider=true'
-        >
-          <div class='label'>我的任务</div>
-          <div class='count'>{{items.length}}</div>
-        </div>
-        <div class="block block-button">
-          <Icon custom='gzicon gzi-backarrow' />
-          上一级
-        </div>
-        <div
-          class="block block-task"
-          style="flex:1"
-        >
-          <hs-avatar
-            :userinfo='session'
-            size='40'
-            class='avatar'
-          />
-          <div
-            class="flex-wrap"
-            style='font-size:12px;'
-          >
-            <div class='attr'>任务编号 <span class='value'>102314</span></div>
-            <div class="attr">类型 <span class='value'>自由任务</span></div>
-            <div class="attr">所属项目 <a class='value'>GI201901 - EIP企业信息平台</a></div>
-            <div class="attr">创建时间 <span class='value'>3 小时前</span></div>
-            <div class="attr">花费时间 <span class='value'>8.2 h</span></div>
-            <div class="attr">负责人 <span class='value'>马骍</span></div>
-          </div>
-          <div class='title'>流程问题处理</div>
-        </div>
-        <div class="block">
-          <div class='label'>工作量统计</div>
-          <div class='count'>62.3%</div>
-        </div>
-        <div class="block">
-          <div class='label'>花费时间</div>
-          <div class='count'>2.87h</div>
-        </div>
-        <div class="block">
-          <div class='label'>人力成本</div>
-          <div class='count'>2.13 Ph</div>
-        </div>
-        <div class="block block-button">
-          <Icon custom='gzicon gzi-config' />
-          配置
-        </div>
-      </div>
-      <div
-        class="flex-wrap"
-        style=""
-      >
-       <div class="block attr-block">
-      <div
-            class='label'
+          </Select>
+        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 项目类型 - -" clearable>
           
-            style='flex:1;text-align:center;'
-          
-          >
-            <Icon type="md-create" /> 任务处理
-          </div>
-          </div>
-        <div class="block attr-block"   :class="showSubs>0?'block-actived':''"    @click='showSubs>0?showSubs=0:showSubs=1'>
-          
-          <div
-            class='label'
-          
-            style='flex:1;text-align:center;'
-          
-          >
-            <Icon type="md-add" /> 任务拆分 {{subs.length}}
-          </div>
-        </div>
-        
-         
-        <div
-          class="block attr-block"
-          style="flex:1"
-        >
-        </div>
 
-      </div>
-      <div style='position:relative;height:calc(100% - 100px);overflow:hidden;'>
+        </Select>
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_dep_id" placeholder="- - 建筑类型 - -" clearable>
+           <template v-for="d in $store.getters['core/deps']">
+             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
+           </template>
+         </Select>
        
-     
-
-      <split-pane class='workspace-wrap' v-on:resize="resize" :min-percent='20' :default-percent='30' split="vertical">
-        <div class='task-detail' slot="paneL">
-          <div class='flex-wrap'>
-            <div class='block attr-block' style='width:100%;background:#333;'>
-              <div class='label'><Icon type='md-paper' /> 任务资料区</div>
-              <Icon type='md-close' />
-            </div>
-          </div>
-         
-         <div class=""></div>
-          <div class='flex-wrap'>
-            <div class='block block-dropdown'  @click="showViewMenu=!showViewMenu" style='width:100%;background:#eee;border-bottom-color:#aaa;'>
-              <div class='label' style='color:#333;'><Icon type='md-paper' /> 任务动态</div>
-              <div class='count' style='color:#555;float:left;'>任务动态</div>
-            </div>
-          </div>
-           <div  style='position:absolute;top:0;left:0;right:0;z-index:100;bottom:0;background:#fff;overflow-y:auto;' v-show="showViewMenu" >
-          <template v-for="d in [1,2,3]">
-             <div :key='d' class='block block-dropdown' style='width:100%;background:#eee;border-bottom-color:#aaa;'>
-              <div class='label' style='color:#333;'><Icon type='md-paper' /> 任务动态</div>
-              <div class='count' style='color:#555;float:left;'>任务动态</div>
-            </div>
-          </template>
-          </div>
-          <div class='task-detail-content'>
-            <div class='item' style='padding:10px;color:#333;margin-bottom:5px;'>
-              <div class='status' style='display:flex;'>
-                <span class='date' style='margin-right:10px;font-weight:bold;background:#333;color:#ddd;font-size:12px;padding:2px 5px;'>1 小时前</span>
-               
-              </div>
-
-              <div class='item-detail' style='padding:10px;background:#ccc;border-bottom-right-radius:10px;'>
-                <div class="flex-wrap"> <hs-avatar :userinfo="session" style='margin-right:5px' /> <a href="#">{{session.name}}</a> 完成了任务</div>
-                 <div style='margin-top:5px;'>更新了平行责任人的读取方式，现在能正确匹配3位平行责任人和打分结果</div>
-                
-              </div>
-            </div>  <div class='item' style='padding:10px;color:#333;margin-bottom:5px;'>
-              <div class='status' style='display:flex;'>
-                <span class='date' style='margin-right:10px;font-weight:bold;background:#333;color:#ddd;font-size:12px;padding:2px 5px;'>3 小时前</span>
-               
-              </div>
-
-              <div class='item-detail' style='padding:10px;background:#ccc;border-bottom-right-radius:10px;'>
-                <div class="flex-wrap"> <hs-avatar :userinfo="session" style='margin-right:5px' /> <a href="#">{{session.name}}</a> 提交了任务动态</div>
-                 <div style='margin-top:5px;'>更新了平行责任人的读取方式，现在能正确匹配3位平行责任人和打分结果</div>
-                
-              </div>
-            </div>  <div class='item' style='padding:10px;color:#333;margin-bottom:5px;'>
-              <div class='status' style='display:flex;'>
-                <span class='date' style='margin-right:10px;font-weight:bold;background:#333;color:#ddd;font-size:12px;padding:2px 5px;'>5 小时前</span>
-               
-              </div>
-
-              <div class='item-detail' style='padding:10px;background:#ccc;border-bottom-right-radius:10px;'>
-                <div class="flex-wrap"> <hs-avatar :userinfo="session" style='margin-right:5px' /> <a href="#">{{session.name}}</a> 提交了任务动态</div>
-                 <div style='margin-top:5px;'>更新了平行责任人的读取方式，现在能正确匹配3位平行责任人和打分结果</div>
-                
-              </div>
-            </div>
-            
-          </div>
-
-        </div>
-        <div class='workspace' slot="paneR" style='background:#dfdfdf;'>
-           <div class='block attr-block block-dropdown' style='width:100%;background:#333;'>
-              <div class='label'><Icon type='md-paper' /> 任务处理区</div>
-              
-            </div>
-            <div class='workspace-detail' style='position:relative;height:calc(100% - 30px);padding:20px;overflow:hidden;'>
-               <transition name="dropdown">
-
-          <div
-            v-show='showSubs'
-            style='position:absolute;top:0;left:0;right:0;z-index:100;bottom:0;background:#fff;overflow-y:auto;'
-          >
-            <div class='flex-wrap'>
-                <Input
-          class='block-input'
-          style='width:200px;'
-          size='small'
-          search
-          clearable
-        />
-              <div
-          class="block attr-block attr-block-dark"
-          @click='showSubs==1?showSubs=0:showSubs=1'
-          :class="showSubs==1?'block-actived':''"
-        >
-          <div class='label'>全部</div>
-          <div class='count'>{{subs.length}}</div>
-        </div>
-        <div
-          class="block attr-block attr-block-dark"
-          @click='showSubs==2?showSubs=0:showSubs=2'
-          :class="showSubs==2?'block-actived':''"
-        >
-          <div class='label'>进行中</div>
-          <div class='count'>2</div>
-        </div>
-        <div
-          class="block attr-block attr-block-dark"
-          @click='showSubs==3?showSubs=0:showSubs=3'
-          :class="showSubs==3?'block-actived':''"
-        >
-          <div class='label'>已完成</div>
-          <div class='count'>1</div>
-        </div>
-        <div
-          class="block attr-block attr-block-dark"
-          @click='showSubs==4?showSubs=0:showSubs=4'
-          :class="showSubs==4?'block-actived':''"
-        >
-          <div class='label'>已挂起</div>
-          <div class='count'>1</div>
-        </div>
-        <div
-          class="block attr-block attr-block-dark"
-          style="flex:1"
-        >
-        </div>
-            </div>
-            <div class='task task-title'>
-              <div class='code'>
-                编号
-              </div>
-              <div class='title'>
-                任务名称
-              </div>
-              <div class='work'>
-               状态
-              </div>
-              <div class='work'>
-                工作量
-              </div>
-              <div class='time'>
-                计划时间
-              </div>
-              <div class='charger'>
-                负责人
-              </div>
-              <div
-                class='result'
-                style='width:80px;'
-              >
-                成果
-              </div>
-              <div
-                class='result'
-                style='width:80px;'
-              >
-                花费时间
-              </div>
-            </div>
-            <template v-for='t in subs'>
-              <div
-                :key='t.id'
-                class="task"
-              >
-                <div class='code'>
-                  {{t.parent_id}}-{{t.id}}
-                </div>
-                <div class='title'>
-                  {{t.name}}
-                </div>
-                 <div class='work'>
-               已完成
-              </div>
-                <div class='work'>
-                  30%
-                </div>
-                <div class='time'>
-                  3.5 h
-                </div>
-                <div class='flex-wrap charger'>
-                  <hs-avatar
-                    :userinfo='session'
-                    size='20'
-                    class='avatar'
-                    style='margin-right:5px;'
-                  /> {{session.name}}
-                </div>
-                 <div
-                class='result'
-                style='width:80px;'
-              >
-                <a href="#">查看</a>
-              </div>
-              <div
-                class='result'
-                style='width:80px;'
-              >
-                0.5 h
-              </div>
-
-              </div>
-            </template>
-          </div>
-        </transition>
-              <hs-form style='width:600px;' :form="projectForm" editable :data='projectFormData' :option="{hideCancel:true}" />
-            </div>
-        </div>
-      </split-pane>
+            <Button @click="handleClearFilter()" type="info" v-show="isFiltering">清除筛选条件</Button>
+      </div>
+      <div class="flex-wrap">
+        <!-- authed.ArchiveCategoryManage -->
+          <Button @click="handlePreCreate()" type="primary" icon="md-add">新建项目</Button>
+      <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
+      </div>
     </div>
- </div>
-  </div>
+    <div class="filter-box">
+
+    </div>
+    <div style="height:400px;position:relative;">
+      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+    </div>
+    </Content>
+
+    <hs-modal-form
+			ref="form"
+			:title="model.id?'修改项目':'新增项目'"
+			v-model="modalCreate"
+			:width="620"
+      :env="{upload}"
+			style="margin: 10px"
+			footer-hide
+			:form="Form('project')"
+			:data="model"
+      :initData="filterInitData"
+			editable
+			@on-submit="handlePatchArchive"
+			@on-event="handleEvent"
+		/>
+  </Layout>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import projectForm from '@/forms/project'
+import {mapGetters} from "vuex"
 export default {
-  data() {
+  data(){
     return {
-      showSubs: false,
-      showSider: false,
-      showViewMenu:false,
-      projectForm,
-      projectFormData:{},
-      items: [{
-        id: 1,
-        name: "流程的问题"
-      }, {
-        id: 2,
-        name: "考核数据问题处理"
-      }, {
-        id: 3,
-        name: "考核数据提取"
-      }],
-      subs: [{
-        id: 4,
-        name: "FORM提交数据的问题",
-        parent_id: 1
-      }, {
-        id: 5,
-        name: "节点与状态",
-        parent_id: 1
-      }, {
-        id: 6,
-        name: "流程图",
-        parent_id: 1
-      }, {
-        id: 7,
-        name: "历史与结构",
-        parent_id: 1
+      f_project_id:null,
+      f_dep_id:null,
+      f_search_text:"",
+      f_type_1:null,
+      f_type_2:null,
+      f_type_3:null,
+      //
+      items:[],
+      modalCreate:false,
+    
+      model:{}, 
+      columns:[{
+        title:"序号",
+        key:"id",
+        type:"index"
+      },{
+        title:"项目编号",
+        key:"code",
+        width:100,
+        type:"text",
+        option:{
+          align:"center",
+          color:"darkred"
+        },
+        render:(h,param)=>{
+          return h('div',{style:{textAlign:"center",color:"red",fontWeight:"bold"}},param.row.code || '-')
+        }
+      },{
+        title:"项目类型",
+        key:"stype",
+        sortable:false,
+        width:100,
+        render:(h)=>{
+          return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#aaa"}})
+        }
+        },{
+        title:"项目名称",
+        width:300,
+        type:"text",
+        key:"name",
+        linkEvent:"open"
+      },{
+        title:"项目简称",
+        width:100,
+        type:"text",
+        key:"name"
+      },{
+        title:"所属部门",
+        type:"type",
+        width:150,
+        key:"dep_id",
+        option:{
+          align:"center",
+          getters:"core/deps"
+        }
+      },{
+        title:"项目地址",
+        type:"text",
+        key:"type1",
+        width:300
+      },{
+        title:"归档目录",
+        type:"type",
+        key:"type2",
+        width:130,
+        option:{
+          align:"center",
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_SAVETYPE"
+        }
+
+      },{
+        title:"资料类型",
+        type:"type",
+        key:"type3",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_DOCTYPE"
+        }
+
+      },{
+        title:"项目负责人",
+        type:"user",
+        key:"created_by",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
+        }
+      },{
+        title:"创建时间",
+        type:"time",
+        key:"created_at",
+        width:100,
+        option:{
+          align:"center"
+        }
+      },{
+        title:"创建人",
+        type:"user",
+        key:"created_by",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
+        }
+      },{
+        title:"操作",
+        type:'tool',
+        buttons:["edit","delete"],
+        option:{
+          
+        }
       }]
     }
   },
-  computed: {
-    ...mapGetters('core', ['session'])
+  mounted(){
+    this.$nextTick(()=>{
+      this.$refs.table.calcTableHeight()
+    })
+    this.getData()
+  },
+   computed:{
+      ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      isFiltering(){
+        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
+      },
+      filterInitData(){
+        return {
+          project_id:this.f_project_id,
+          dep_id:this.f_dep_id,
+          type1:this.f_type_1,
+          type2:this.f_type_2,
+          type3:this.f_type_3
+        }
+      },
+      filteredItems(){
+        return this.items.filter(v=>{
+          let search_text = this.f_search_text ? this.f_search_text.trim() : ""
+          if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
+            return false
+          if(this.f_project_id && v.project_id != this.f_project_id)
+            return false
+          
+          if(this.f_dep_id && v.dep_id != this.f_dep_id)
+            return false
+
+          if(this.f_type_1 && v.type1 != this.f_type_1)
+            return false
+          
+          if(this.f_type_2 && v.type2 != this.f_type_2)
+            return false
+          
+          if(this.f_type_3 && v.type3 != this.f_type_3)
+            return false
+
+          return true
+        })
+      }
+    },
+  methods:{
+    handleClearFilter(){
+      this.f_search_text=""
+      this.f_type_1 = null 
+      this.f_type_2 = null 
+      this.f_type_3 = null 
+      this.f_project_id = null 
+      this.f_dep_id = null 
+    },
+    handlePreCreate(){
+      this.model={}
+      if(this.f_project_id !== null)
+        this.model.project_id = this,f_project_id
+      if(this.f_dep_id)
+        this.model.dep_id = this.f_dep_id
+      if(this.f_type_1 !== null)
+        this.model.type1 = this.f_type_1
+       if(this.f_type_2 !== null)
+        this.model.type2 = this.f_type_2
+       if(this.f_type_3 !== null)
+        this.model.type3 = this.f_type_3
+      console.log(this.model)
+      this.modalCreate=true;
+    },
+    handlePreview(e){
+
+    },
+    handleDownload(id){
+      this.get_archive(id,data=>{
+        console.log(data)
+        let files = data.files.split(';').map(v=>v.split(','))
+        if(files.length > 5)
+          this.Confirm('文件数量较多，确定继续?',()=>{
+            files.forEach(([name,url,ext])=>{
+               this.DownloadWithName(url,name+'.'+ext)
+            })
+          })
+        else{
+             files.forEach(([name,url,ext])=>{
+                this.DownloadWithName(url,name+'.'+ext)
+            })
+        }
+      })
+    },
+    get_archive(id, cb){
+      this.api.enterprise.GET_CONTRACTS({param:{id}}).then(res=>{
+        let model = res.data.data
+        console.log(model)
+        cb(model)
+      }).catch(e=>{
+        this.Error('打开资料失败:',e)
+      })
+    },
+    handleOpen(id){
+       this.get_archive(id,data=>{
+        this.model = this.current
+        this.modalArchivePreview = true 
+      })
+    },
+    handleBeforeEdit(id){
+      this.get_archive(id,data=>{
+        this.model = data
+        this.modalCreate = true 
+      })
+    },
+    handleDelete(model){
+      console.log(this.api.enterprise)
+      this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
+        this.api.enterprise.DELETE_CONTRACTS({param:{id:model.id}}).then(res=>{
+          setTimeout(() => {
+            this.Success('删除成功')
+            this.items.splice(this.items.findIndex(v=>v.id == model.id),1)
+          }, (1000));
+          
+        }).catch(e=>{
+          this.Error('删除失败')
+        })
+      })
+    },
+    async upload(files,onFilesProgress){
+     return new Promise((resolve,reject)=>{
+       this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
+         console.log(files)
+         resolve(files.map(v=>v.url))
+       }).catch(reject)
+     })
+    },
+    onTableEvent(e){
+      if(!e.data)
+        return
+      if(e.type == 'edit'){
+       this.handleBeforeEdit(e.data.id)
+      }else if(e.type == 'delete'){
+        this.handleDelete(e.data)
+      }else if(e.type == 'open'){
+        this.handleOpen(e.data.id)
+      }
+    },
+    handlePatchArchive(item){
+      console.log("submit:",item)
+      if(item.id){
+        let id = item.id
+        delete item.id
+        this.api.enterprise.PATCH_CONTRACTS(item,{param:{id}}).then(res=>{
+          let updateInfo = res.data.data
+         
+          let new_item = Object.assign({},item,updateInfo)
+          let index = this.items.findIndex(v=>v.id == id)
+          if(index != -1){
+            new_item = Object.assign({},this.items[index],new_item)
+           this.items.splice(index,1,new_item)
+          }
+          this.modalCreate = false
+          this.Success('修改成功')
+         
+        }).catch(e=>{
+          this.Error('修改失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })    
+      }else{
+        this.api.enterprise.POST_CONTRACTS(item).then(res=>{
+          let updateInfo = res.data.data
+          let new_item = Object.assign({},item,updateInfo)
+          this.items.splice(0,0,new_item)
+           this.modalCreate = false
+          this.Success('创建成功')
+        }).catch(e=>{
+          this.Error('创建失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })
+      }
+     
+      // 创建资料
+    },
+    getData(){
+       this.loading = true
+       this.api.enterprise.LIST_CONTRACTS().then(res=>{
+         this.items = res.data.data
+       }).finally(e=>{
+         this.loading = false
+       })
+     },
   }
+
 }
 </script>
-<style lang="less" scoped>
-.action-button {
-  width: 220px;
-  height: 80px;
-  background: linear-gradient(to bottom right, #aaa, #fff);
-  transition: left 0.2s ease-in-out;
-}
 
-.block {
-  padding: 5px 10px;
-  position: relative;
-  color: #aaa;
-  border-right: 1px solid #000;
-  height: 60px;
-  border-bottom: 1px solid #000;
-  background: #394865;
-  cursor: pointer;
-  min-width: 100px;
-  margin: 0;
-  .label {
-    font-size: 12px;
-  }
-
-  .count {
-    font-size: 20px;
-    text-align: center;
-    color: #fff;
-  }
-
-  .attr {
-    font-size: 12px;
-    color: #aaa;
-    margin-right: 15px;
-    .value {
-      color: #fff;
-    }
-  }
-
-  .title {
-    color: #fff;
-    display: flex;
-    align-items: center;
-    height: 30px;
-  }
-}
-
-.dropdown-enter,.dropdown-leave-to{
-            opacity: 0;
-            transform: translateY(-320px);
-        }
-
-        .dropdown-enter-active,.dropdown-leave-active{
-            transition: all 0.6s ease;
-        }
-
-.block-task {
-  padding-left: 60px;
-
-  .avatar {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-  }
-}
-
-.task {
-  background: #fff;
-  color: #333;
-
-  border-bottom: 1px solid #dfdfdf;
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  > * {
-    border-right: 1px solid #dfdfdf;
-    padding: 10px;
-  }
-  .code {
-    width: 80px;
-    text-align: center;
-  }
-  .title {
-    flex: 1;
-    color: #000;
-    text-shadow:1px 1px 1px #aaa;
-  }
-
-  .work {
-    min-width: 80px;
-    text-align: center;
-  }
-
-  .time {
-    width: 80px;
-    text-align: center;
-  }
-
-  .charger {
-    width: 120px;
-  }
-
-  .result{
-    text-align: center;
-  }
-
-  
-}
-
-.task-title {
-  font-size:12px;
-  > * {
-    background: #333;
-    height: 30px;
-    padding: 5px;
-    color: #ddd !important;
-    border-color: #000;
-    text-align: center;
-  }
-}
-
-.block-dropdown {
-  padding-right: 25px;
-}
-
-.block-button {
-  display: flex;
-  min-width: 60px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  i {
-    font-size: 22px;
-    margin-bottom: 3px;
-  }
-}
-
-.block-dropdown:after {
-  content: "\e614";
-  font-family: "gzicon";
-  position: absolute;
-  right: 5px;
-  top: calc(50% - 10px);
-}
-
-.block:hover {
-  filter: brightness(1.2);
-}
-
-.attr-block {
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  .lable {
-  }
-  .count {
-    font-size: 12px;
-  }
-}
-
-.block-actived {
-  background: rgb(11, 209, 223);
-  color: rgb(45, 45, 45);
-}
-.content {
-  margin-left: 0;
-  transition: margin-left 0.2s ease-in;
-  position: relative;
-  height:100%;
-}
-
-.content-on {
-  margin-left: 255px;
-  transition: margin-left 0.2s ease-in;
-}
-
-.workspace-wrap {
-  height: 100%;
-  position: relative;
-  background:#444;
-  .task-detail {
-    background: #dfdfdf;
-    overflow:hidden;
-    height:100%;
-    .task-detail-content{
-      height:calc(100% - 90px);
-      border-right:1px solid #000;
-      overflow-y:auto;
-    }
-  }
-  .workspace{
-    background:#aaa;
-    overflow:hidden;
-     height:100%;
-  }
-}
-
-.attr-block-dark{
-  background:#333;
-  color:#dfdfdf;
-}
+<style>
 </style>
