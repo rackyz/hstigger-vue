@@ -1,17 +1,17 @@
 <template>
-  <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">档案管理</Header>
-    <Content style="padding:10px;">
-    <div class="filter-box flex-between" style="margin:5px 0;">
+  <Layout class="hs-container hs-container-full statistics" >
+   
+    <Content style="padding:5px;">
+    <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">
       <div class="flex-wrap">
         <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入资料编号或名称查询" />
-        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 所属项目 - -" clearable>
+        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 所属项目 - -" clearable v-show="!filter.f_project_id">
            <template v-for="d in $store.getters['core/projects']">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
 
         </Select>
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_dep_id" placeholder="- - 所属部门 - -" clearable>
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_dep_id" placeholder="- - 所属部门 - -" clearable v-show="!filter.f_dep_id">
            <template v-for="d in $store.getters['core/deps']">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
@@ -228,7 +228,14 @@ export default {
       this.$refs.table.calcTableHeight()
     })
     this.getData()
+    for(let key in this.filter){
+      this[key] = this.filter[key]
+    }
   },
+  props:{filter:{
+    type:Object,
+    default:()=>{}
+  }},
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       isFiltering(){

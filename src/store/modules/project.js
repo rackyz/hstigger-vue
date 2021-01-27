@@ -3,17 +3,11 @@
  *  @功能描述 用户的登录状态/信息/基础数据/系统路由
  */
 import API from '@/plugins/axios'
+import HSAPI from '@/plugins/api'
+var SERVER = HSAPI.SERVER
 const state = {
-    list: [{
-      id: "123",
-      code: "N2020931",
-      name: "慈城高中"
-    }],
-    "123":{
-         id: "123",
-           code: "N2020931",
-           name: "慈城高中"
-    }
+    list: [],
+    
 }
 
 const getters = {
@@ -26,7 +20,7 @@ const getters = {
         return mylist
     },
     get:(state)=>(id)=>{
-        return state[id]
+        return state[id] || {}
     },
     getByIds:(state)=>(ids=[])=>{
         return state.list.filter(v=>ids.includes(v.id))
@@ -146,7 +140,8 @@ const getters = {
 const actions = {
     get:({commit},id)=>{
         return new Promise((resolve,reject)=>{
-            API.CORE.GET_PROJECT({param:{id},query:{q:"full"}}).then(res=>{
+            console.log(SERVER)
+            SERVER.enterprise.GET_PROJECTS({param:{id},query:{q:"full"}}).then(res=>{
                 let item = res.data.data
 
                 item.positions = [{
@@ -209,7 +204,7 @@ const actions = {
     },
     getList({commit}){
         return new Promise((resolve,reject)=>{
-          API.CORE.GET_PROJECTS().then(res=>{
+          SERVER.enteprise.LIST_PROJECTS().then(res=>{
                 commit("saveList",res.data.data)
                 resolve(res.data.data)
             }).catch(reject)
@@ -253,6 +248,9 @@ const actions = {
 }
 
 const mutations = {
+    init_api(state,api){
+        SERVER = api
+    },
     saveList(state,list){
         // preprocesser
         list.forEach(v=>{

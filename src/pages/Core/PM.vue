@@ -307,7 +307,7 @@ export default {
       }else if(e.type == 'delete'){
         this.handleDelete(e.data)
       }else if(e.type == 'open'){
-        this.handleOpen(e.data.id)
+        this.RouteTo(`/core/projects/${e.data.id}`)
       }
     },
     handlePatchArchive(item){

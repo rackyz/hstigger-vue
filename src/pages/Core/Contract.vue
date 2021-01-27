@@ -76,7 +76,7 @@ export default {
         key:"id",
         type:"index"
       },{
-        title:"项目编号",
+        title:"合约编号",
         key:"code",
         width:100,
         type:"text",
@@ -88,68 +88,62 @@ export default {
           return h('div',{style:{textAlign:"center",color:"red",fontWeight:"bold"}},param.row.code || '-')
         }
       },{
-        title:"项目类型",
-        key:"stype",
+        title:"合约类型",
+        key:"type",
         sortable:false,
         width:100,
-        render:(h)=>{
-          return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#aaa"}})
-        }
         },{
-        title:"项目名称",
+        title:"合约名称",
         width:300,
         type:"text",
         key:"name",
         linkEvent:"open"
       },{
-        title:"项目简称",
-        width:100,
-        type:"text",
-        key:"name"
-      },{
-        title:"所属部门",
+        title:"所属项目",
         type:"type",
         width:150,
         key:"dep_id",
         option:{
           align:"center",
-          getters:"core/deps"
+          getters:"core/projects"
         }
       },{
-        title:"项目地址",
+        title:"合同金额",
+        type:"number",
+        key:"amount",
+        width:220,
+        option:{
+          type:"amount",
+          
+                    formatter:(v)=>'¥ '+util.formatSalary(v),
+                     hideZero:true
+        }
+      },{
+        title:"甲方",
         type:"text",
-        key:"type1",
-        width:300
+        key:"partA",
+        width:220
       },{
-        title:"归档目录",
-        type:"type",
-        key:"type2",
-        width:130,
-        option:{
-          align:"center",
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_SAVETYPE"
-        }
-
+        title:"乙方",
+        type:"text",
+        key:"partB",
+        width:120
       },{
-        title:"资料类型",
-        type:"type",
-        key:"type3",
-        width:100,
-        option:{
-          align:"center",
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_DOCTYPE"
-        }
-
-      },{
-        title:"项目负责人",
+        title:"联系人",
         type:"user",
         key:"created_by",
         width:100,
         option:{
           align:"center",
           getters:"core/users"
+        }
+      },{
+        title:"签约时间",
+        type:"time",
+        key:"registered_at",
+        width:100,
+        option:{
+          align:"center"
         }
       },{
         title:"创建时间",

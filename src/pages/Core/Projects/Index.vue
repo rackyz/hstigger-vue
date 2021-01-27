@@ -35,9 +35,7 @@
         
       </transition>
 
-      <hs-menu style='min-width:150px;width:250px;' :data="menus2" @on-select='onClickMenu' :current="ActivePath" >
-       
-      </hs-menu>
+    
       </Layout>
 
       
@@ -76,7 +74,7 @@ export default {
         ,{
           name:'项目资料',
           icon:'xiangmu2',
-          key:'management'
+          key:'archive',
         },{
           name:'项目文件',
           icon:'file',
@@ -183,6 +181,7 @@ export default {
         if(v.subs){
           v.subs.forEach(b=>{
             b.path = '/core/projects/'+this.id+'/'+b.key
+
             console.log(b)
           })
         }
@@ -192,8 +191,8 @@ export default {
     }
   },
   mounted(){
+    this.$store.commit('project/init_api',this.api)
     this.getData()
-    this.RouteMenu()
   },
   methods:{
     getData(){
@@ -203,7 +202,7 @@ export default {
       
     },
     onClickMenu(e){
-      this.RouteTo(e)
+      this.RouteTo(e,{params:{f_project_id:this.id}})
     }
   }
 }

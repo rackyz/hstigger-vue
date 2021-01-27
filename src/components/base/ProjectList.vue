@@ -18,7 +18,7 @@ export default {
     
   },
   computed:{
-    ...mapGetters('core',['my_projects'])
+    ...mapGetters('core',['projects'])
   }
 }
 </script>
