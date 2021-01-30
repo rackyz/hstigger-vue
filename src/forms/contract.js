@@ -14,9 +14,17 @@ export default {
       <Col :span='12'>{{partA}}</Col>
       <Col :span='12'>{{partB}}</Col>
     </Row>
-    <Row :gutter='10'>
-      <Col :span='12'>{{file_id}}</Col>
+    <Row :gutter='10' style='margin-top:10px'>
+      <Col :span='12'>{{file}}</Col>
       <Col :span='12'>{{file_assurance}}</Col>
+    </Row>
+    <Row :gutter='10' style='margin-top:10px'>
+     <Col :span='24'>{{paycondition_raw}}</Col>
+    
+    </Row>
+    <Row :gutter='10' style='margin-top:10px'>
+     <Col :span='24'>{{important_raw}}</Col>
+    
     </Row>
   </div>`,
   def: {
@@ -58,7 +66,7 @@ export default {
       label: "甲方名称",
       control: "select",
       option: {
-        getters: "core/users",
+        getters: "core/enterprises",
         idKey: "id",
         labelKey: "name"
       }
@@ -67,7 +75,7 @@ export default {
       label: "乙方名称",
       control: "select",
       option: {
-        getters: "core/users",
+        getters: "core/enterprises",
         idKey: "id",
         labelKey: "name"
       }
@@ -80,12 +88,28 @@ export default {
         height: 100
       }
     },
-    file_id: {
+    pay_condition_raw:{
+      label:"付款条件",
+      control:"input",
+      option:{
+        type:"textarea",
+        height:200
+      }
+    },
+    important_raw: {
+      label: "其他重要条款",
+      control: "input",
+      option: {
+        type: "textarea",
+        height: 200
+      }
+    },
+    file: {
       label: "合同文件",
 
       control: "files",
       option: {
-         single: true,
+        single: true,
         uploader: "file/upload"
       }
     },

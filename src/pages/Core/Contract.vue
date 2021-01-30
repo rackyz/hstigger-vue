@@ -1,8 +1,8 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">合约管理</Header>
-    <Content style="padding:10px;">
-    <div class="filter-box flex-between" style="margin:5px 0;">
+   
+    <Content style="padding:5px;">
+    <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">
       <div class="flex-wrap">
         <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
          <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable>
@@ -25,14 +25,19 @@
       </div>
       <div class="flex-wrap">
         <!-- authed.ArchiveCategoryManage -->
-          <Button @click="handlePreCreate()" type="primary" icon="md-add">新建项目</Button>
+          <Button @click="handlePreCreate()" type="primary" icon="md-add">新增合同</Button>
       <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
       </div>
     </div>
     <div class="filter-box">
 
     </div>
-    <div style="height:400px;position:relative;">
+     <Tabs type="card" @on-click="handleTabChanged">
+        <TabPane label="付款合同" name="partA"></TabPane>
+        <TabPane label="收款合同" name="partB"></TabPane>
+        <TabPane label="第三方合同" name="third"></TabPane>
+    </Tabs>
+    <div style="height:calc(100% - 100px);position:relative;">
       <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
@@ -62,6 +67,7 @@ export default {
     return {
       f_project_id:null,
       f_dep_id:null,
+      part_mode:"partA",
       f_search_text:"",
       f_type_1:null,
       f_type_2:null,
@@ -94,7 +100,7 @@ export default {
         width:100,
         },{
         title:"合约名称",
-        width:300,
+        width:200,
         type:"text",
         key:"name",
         linkEvent:"open"
@@ -108,42 +114,94 @@ export default {
           getters:"core/projects"
         }
       },{
-        title:"合同金额",
-        type:"number",
-        key:"amount",
+        title:"甲方",
+        type:"user",
+        key:"partA",
         width:220,
         option:{
-          type:"amount",
-          
-                    formatter:(v)=>'¥ '+util.formatSalary(v),
-                     hideZero:true
+          getters:"core/enterprises",
+          idKey:'id',
+          labelKey:'name'
         }
       },{
-        title:"甲方",
-        type:"text",
-        key:"partA",
-        width:220
-      },{
         title:"乙方",
-        type:"text",
-        key:"partB",
-        width:120
-      },{
-        title:"联系人",
         type:"user",
-        key:"created_by",
-        width:100,
+        key:"partB",
+        width:220,
         option:{
-          align:"center",
-          getters:"core/users"
+          getters:"core/enterprises",
+          idKey:'id',
+          labelKey:'name'
         }
       },{
         title:"签约时间",
         type:"time",
-        key:"registered_at",
+        key:"register_date",
         width:100,
         option:{
+          type:'date',
           align:"center"
+        }
+      },{
+        title:"合同金额",
+        type:"number",
+        key:"amount",
+        width:150,
+        option:{
+          type:"fullAmount"
+        }
+      },{
+        title:"超概",
+        width:80,
+        key:'isOverPlan',
+        sortable:false
+      },{
+        title:"累计支付",
+        width:80,
+        key:'payed',
+        type:'number',
+        option:{
+          type:'progress',
+          percentTo:'adjusted_amount'
+        }
+      }, {
+          title:"合同",
+          width:40,
+          sortable:false,
+          render:(h,params)=>{
+            let file = params.row.file
+            if(file){
+            return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
+              this.handleDownload(file)
+            }}  
+            }) }else{
+              return h('span','-')
+            }
+
+          }
+          }, {
+          title:"担保",
+          width:40,
+          sortable:false,
+          render:(h,params)=>{
+            let file = params.row.file_assurance
+            if(file){
+            return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
+              this.handleDownload(file)
+            }}  
+            }) }else{
+              return h('span','-')
+            }
+
+          }
+          },{
+        title:"联系人",
+        type:"user",
+        key:"contactor",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
         }
       },{
         title:"创建时间",
@@ -163,7 +221,9 @@ export default {
           getters:"core/users"
         }
       },{
+        fixed:"right",
         title:"操作",
+        minWidth:200,
         type:'tool',
         buttons:["edit","delete"],
         option:{
@@ -212,11 +272,27 @@ export default {
           if(this.f_type_3 && v.type3 != this.f_type_3)
             return false
 
+          if(this.part_mode){
+            let ent_id = this.$store.getters['core/current_enterprise']
+            if(this.part_mode == 'partA' && v.partA != ent_id){
+               return false
+            }
+            if(this.part_mode == 'partB' && v.partB != ent_id){
+              return false
+            }
+            if(this.part_mode == 'third' && v.partA == ent_id || v.partB == ent_id){
+              return false
+            }
+          }
+
           return true
         })
       }
     },
   methods:{
+    handleTabChanged(e){
+      this.part_mode = e
+    },
     handleClearFilter(){
       this.f_search_text=""
       this.f_type_1 = null 
@@ -237,28 +313,14 @@ export default {
         this.model.type2 = this.f_type_2
        if(this.f_type_3 !== null)
         this.model.type3 = this.f_type_3
-      console.log(this.model)
       this.modalCreate=true;
     },
     handlePreview(e){
 
     },
-    handleDownload(id){
-      this.get_archive(id,data=>{
-        console.log(data)
-        let files = data.files.split(';').map(v=>v.split(','))
-        if(files.length > 5)
-          this.Confirm('文件数量较多，确定继续?',()=>{
-            files.forEach(([name,url,ext])=>{
-               this.DownloadWithName(url,name+'.'+ext)
-            })
-          })
-        else{
-             files.forEach(([name,url,ext])=>{
-                this.DownloadWithName(url,name+'.'+ext)
-            })
-        }
-      })
+    handleDownload(file_str){
+      let [name,url,ext] = file_str.split(',')
+     this.DownloadWithName(url,name+'.'+ext)
     },
     get_archive(id, cb){
       this.api.enterprise.GET_CONTRACTS({param:{id}}).then(res=>{
@@ -276,6 +338,7 @@ export default {
       })
     },
     handleBeforeEdit(id){
+      this.model = {}
       this.get_archive(id,data=>{
         this.model = data
         this.modalCreate = true 
@@ -283,7 +346,7 @@ export default {
     },
     handleDelete(model){
       console.log(this.api.enterprise)
-      this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
+      this.Confirm(`确定删除该合约<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
         this.api.enterprise.DELETE_CONTRACTS({param:{id:model.id}}).then(res=>{
           setTimeout(() => {
             this.Success('删除成功')
@@ -355,7 +418,13 @@ export default {
     getData(){
        this.loading = true
        this.api.enterprise.LIST_CONTRACTS().then(res=>{
-         this.items = res.data.data
+         let items = res.data.data
+         items.forEach(v=>{
+           v.payed = 0
+           v.adjusted_amount = v.amount || 0
+           v.isOverPlan = v.payed > v.adjusted_amount ? '是':'否'
+         })
+          this.items = items
        }).finally(e=>{
          this.loading = false
        })

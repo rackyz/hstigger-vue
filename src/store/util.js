@@ -12,10 +12,14 @@ const THROW = (exception_desc,...keys)=>{
 
 
 out.LocalSaveItems = (state,key,value,idkey='id')=>{
-  if(!Array.isArray(state[key]))
-    THROW(E.INVALID_KEY, key)
+  if(!Array.isArray(state[key])){
+    state[key] = value
+    return
+  }
+  
   if(!Array.isArray(value))
     THROW(E.INVALID_VALUE, key, value)
+
   value.forEach(item=>{
     let index = state[key].findIndex(v=>v[idkey] == item[idkey])
     if(index == -1)

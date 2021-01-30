@@ -156,7 +156,7 @@ import CONFIG from '@/config'
            
            resolve(resFiles.map((v,i) => ({
              name:files[i].name,
-             url: CONFIG.server + '/public/files/' + v.id,
+             url: API.COS.baseURL +  "/files/" + resFiles[i].url,
              ext: fileObjects[i].ext
            })))
          })

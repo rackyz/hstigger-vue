@@ -1,5 +1,5 @@
 
-import API from '@/plugins/axios'
+import API from '@/plugins/api'
 import UTIL from '../util.js'
 const state = {
   users:[],
@@ -19,17 +19,20 @@ const getters = {
 
 const actions = {
   GetUsers({commit}){
+     console.log("ENT:",API)
     return new Promise((resolve,reject)=>{
-      API.ENT_ADMIN.GET_USERS().then(res=>{
+      API.SERVER.entadmin.LIST_EMPLOYEES().then(res => {
         let users = res.data.data
         commit('SaveUsers',users)
         resolve(users)
       })
     })
   },
-  CreateEmployee(e){
+  CreateEmployee({
+      commit
+    }, e) {
     return new Promise((resolve,reject)=>{
-      API.ENT_ADMIN.POST_USER(e).then(res=>{
+      API.SERVER.entadmin.POST_EMPLOYEES(e).then(res=>{
         let user = Object.assign({},e,res.data.data)
         commit('SaveUser',user)
         resolve(user)
@@ -38,10 +41,22 @@ const actions = {
       })
     })
   },
-  PatchUser(e){
+  DeleteUser({commit},id){
+    return new Promise((resolve, reject) => {
+      API.SERVER.entadmin.DELETE_EMPLOYEES({param:id}).then(res => {
+        commit('removeUser', id)
+        resolve(user)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  PatchUser({
+      commit
+    }, e) {
     return new Promise((resolve,reject)=>{
       if(e.id){
-         API.ENT_ADMIN.PATCH_USER(e,{param:{id:e.id}}).then(res => {
+         API.SERVER.entadmin.PATCH_EMPLOYEES(e,{param:{id:e.id}}).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)
@@ -49,7 +64,7 @@ const actions = {
            reject(e)
          })
       }else{
-         API.ENT_ADMIN.POST_USER(e).then(res => {
+         API.SERVER.entadmin.POST_EMPLOYEES(e).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)
@@ -63,15 +78,14 @@ const actions = {
 }
 
 const mutations = {
-  SaveUsers(state,users){
-    state.users = users
+  SaveUsers(state, users) {
+    UTIL.LocalSaveItems(state, 'users', users)
   },
   SaveUser(state,user){
-    let index = state.users.findIndex(u=>u.id == user.id)
-    if(index != -1)
-      state.users.splice(index,1,user)
-    else
-      state.users.splice(0,user)
+    UTIL.LocalSaveItems(state,'users',[user])
+  },
+  removeUser(state,id){
+    UTIL.LocalDeleteItem(state,'users',id)
   }
 }
 

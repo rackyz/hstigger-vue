@@ -100,7 +100,7 @@ export default {
         sortable:false,
         width:40,
         render:(h)=>{
-          return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#aaa"}})
+          return h('icon',{props:{custom:'gzicon gzi-iconset0118',size:20,color:"#aaa"}})
         }
         },{
         title:"档案号",
@@ -234,12 +234,12 @@ export default {
   },
   props:{filter:{
     type:Object,
-    default:()=>{}
+    default:{}
   }},
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       isFiltering(){
-        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
+        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null || (!this.filter.f_project_id && this.f_project_id != null) ||  this.f_dep_id != null 
       },
       filterInitData(){
         return {
@@ -255,19 +255,20 @@ export default {
           let search_text = this.f_search_text ? this.f_search_text.trim() : ""
           if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
             return false
-          if(this.f_project_id && v.project_id != this.f_project_id)
+          if(this.f_project_id && v.project_id !== this.f_project_id)
             return false
           
-          if(this.f_dep_id && v.dep_id != this.f_dep_id)
+          if(this.f_dep_id &&  v.dep_id !== this.f_dep_id)
             return false
 
-          if(this.f_type_1 && v.type1 != this.f_type_1)
+          console.log(v)
+          if(this.f_type_1 != undefined && (v.type1 === null || v.type1 !== this.f_type_1))
             return false
           
-          if(this.f_type_2 && v.type2 != this.f_type_2)
+          if(this.f_type_2!= undefined && v.type2 !== this.f_type_2)
             return false
           
-          if(this.f_type_3 && v.type3 != this.f_type_3)
+          if(this.f_type_3!= undefined && v.type3 !== this.f_type_3)
             return false
 
           return true
@@ -285,17 +286,17 @@ export default {
     },
     handlePreCreate(){
       this.model={}
-      if(this.f_project_id !== null)
-        this.model.project_id = this.f_project_id
-      if(this.f_dep_id)
-        this.model.dep_id = this.f_dep_id
-      if(this.f_type_1 !== null)
-        this.model.type1 = this.f_type_1
-       if(this.f_type_2 !== null)
-        this.model.type2 = this.f_type_2
-       if(this.f_type_3 !== null)
-        this.model.type3 = this.f_type_3
-      console.log(this.model)
+      // if(this.f_project_id !== null)
+      //   this.model.project_id = this.f_project_id
+      // if(this.f_dep_id)
+      //   this.model.dep_id = this.f_dep_id
+      // if(this.f_type_1 !== null)
+      //   this.model.type1 = this.f_type_1
+      //  if(this.f_type_2 !== null)
+      //   this.model.type2 = this.f_type_2
+      //  if(this.f_type_3 !== null)
+      //   this.model.type3 = this.f_type_3
+      // console.log(this.model)
       this.modalCreateArchive=true;
     },
     handlePreview(e){

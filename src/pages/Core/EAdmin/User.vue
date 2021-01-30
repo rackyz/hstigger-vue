@@ -95,7 +95,6 @@
 				@event="onTableEvent"
 			>
 			</hs-table>
-     
 		</div>
     <!-- paging -->
 		<div
