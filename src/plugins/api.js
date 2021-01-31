@@ -173,5 +173,7 @@ var COS = axios.create({
 })
 COS.baseURL = config.cosServer
 o.COS = COS
-
+o.GetServerAPI = ()=>{
+  return o.SERVER
+}
 export default o

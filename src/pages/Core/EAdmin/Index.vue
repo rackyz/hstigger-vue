@@ -35,6 +35,9 @@ export default {
       return session.type == 2
     }
   },
+  created(){
+    this.$store.commit('entadmin/init',this.api)
+  },
   mounted(){
     this.$store.dispatch('entadmin/GetUsers')
   },
@@ -71,11 +74,11 @@ export default {
         path:'/core/eadmin/dep',
         count:depCount
       }
-      // ,{
-      //   name:'角色权限',
-      //   icon:"quanxianliebiao",
-      //   path:'/core/eadmin/role'
-      // }
+      ,{
+        name:'角色权限',
+        icon:"quanxianliebiao",
+        path:'/core/eadmin/role'
+      }
       ]
         },
       //   {

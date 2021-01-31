@@ -26,8 +26,8 @@ import { mapGetters } from "vuex";
 export default {
   data(){
     return {
-      loading:false,
-      currentDep:null,
+      loading: false,
+      currentDep: null,
       tools: [
 				{
 					key: "add",
@@ -52,8 +52,7 @@ export default {
     
   },
   computed:{
-    ...mapGetters("core", ["deps"]),
-    ...mapGetters("entadmin",["users"]),
+    ...mapGetters("entadmin",["deps","users"]),
     filteredUsers(){
         if(this.currentDep)
             return this.users.find(v=>v.deps.include(this.currentDep.id))
@@ -71,7 +70,7 @@ export default {
     },
     onToolEvent(e){
       if(e == 'add'){
-
+        this.preCreateDep()
       }else if(e == 'edit'){
         
       }else if(e == 'delete'){
@@ -83,6 +82,10 @@ export default {
 			return [1,1,1]
 		},
     onEvent(e){
+
+    },
+    preCreateDep(){
+      this.model = {}
 
     },
     onDelete(){

@@ -604,7 +604,7 @@ export default {
 			this.loadingImport = true;
 			let accounts = this.importData.filter((v) => !this.TestImportState(v));
 			this.$store
-				.dispatch("admin/CreateUsers", accounts)
+				.dispatch("entadmin/CreateUsers", accounts)
 				.then((results) => {
 					let succees = results.filter((v) => v == 0);
 					let map = {};
@@ -640,7 +640,7 @@ export default {
      */
 		getData() {
 			this.loading = true;
-			this.$store.dispatch('entadmin/GetUsers').finally(e=>{
+			this.$store.dispatch('entadmin/GetUsers').then(()=>{}).finally(e=>{
 				this.loading = false
 			})
     },
@@ -668,14 +668,14 @@ export default {
 			} else if (e == "refresh") {
 				this.getData();
 			} else if (e == "lock") {
-				this.$store.dispatch("admin/LockAccounts", selected_id).then(()=>{
+				this.$store.dispatch("entadmin/LockAccounts", selected_id).then(()=>{
 					this.$refs.itable.$forceUpdate()
 					this.Success("操作成功")
 				}).catch(e=>{
 					this.Error(e)
 				});
 			} else if (e == "unlock") {
-				this.$store.dispatch("admin/UnlockAccounts", selected_id).then(()=>{
+				this.$store.dispatch("entadmin/UnlockAccounts", selected_id).then(()=>{
 					this.Success("操作成功")
 				}).catch(e=>{
 					this.Error(e)
@@ -686,7 +686,7 @@ export default {
 						`确定要重置<span style="color:red">${selected
 							.map(v => v.user)
 							.join(",")}</span>等<span style="color:red">${selected.length}</span>名用户的密码?`,
-						() => this.$store.dispatch("admin/ResetPassword", selected_id).then(res=>{
+						() => this.$store.dispatch("entadmin/ResetPassword", selected_id).then(res=>{
 							this.Success("操作完成")
 						}).catch(e=>{
 							this.Error(e)
@@ -696,14 +696,14 @@ export default {
 					this.Confirm(
 						`确定要重置用户<span style="color:red">${selected.user}</span>的密码?`,
 						() =>
-							this.$store.dispatch("admin/ResetPassword", [selected.id]).then(res=>{
+							this.$store.dispatch("entadmin/ResetPassword", [selected.id]).then(res=>{
 							this.Success("操作完成")
 						}).catch(e=>{
 							this.Error(e)
 						})
 					);
 				}
-				this.$store.dispatch("admin/ResetPassword", { id: selected.id });
+				this.$store.dispatch("entadmin/ResetPassword", { id: selected.id });
 			} else if (e == "resetpwdto") {
 				this.showModalPassword = true;
 			} else if (e == "delete") {
@@ -718,7 +718,7 @@ export default {
 						if (this.multiple) {
 							this.$store
 								.dispatch(
-									"admin/DeleteUsers",
+									"entadmin/DeleteUsers",
 									selected_id
 								)
 								.then((res) => {
@@ -729,7 +729,7 @@ export default {
 								});
 						} else {
 							this.$store
-								.dispatch("admin/DeleteUser", selected_id)
+								.dispatch("entadmin/DeleteUser", selected_id)
 								.then((res) => {
 									this.Success("删除成功");
 								})

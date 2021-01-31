@@ -4,7 +4,8 @@
  */
 import API from '@/plugins/axios'
 import HSAPI from '@/plugins/api'
-var SERVER = HSAPI.SERVER
+var SERVER = HSAPI.GetServerAPI()
+console.log("SERVER:",SERVER)
 const state = {
     list: [],
     

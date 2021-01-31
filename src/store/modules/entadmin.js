@@ -1,6 +1,6 @@
 
-import API from '@/plugins/api'
 import UTIL from '../util.js'
+var SERVER = {}
 const state = {
   users:[],
   enterprises:[],
@@ -19,9 +19,8 @@ const getters = {
 
 const actions = {
   GetUsers({commit}){
-     console.log("ENT:",API)
     return new Promise((resolve,reject)=>{
-      API.SERVER.entadmin.LIST_EMPLOYEES().then(res => {
+      SERVER.entadmin.LIST_EMPLOYEES().then(res => {
         let users = res.data.data
         commit('SaveUsers',users)
         resolve(users)
@@ -32,7 +31,7 @@ const actions = {
       commit
     }, e) {
     return new Promise((resolve,reject)=>{
-      API.SERVER.entadmin.POST_EMPLOYEES(e).then(res=>{
+      SERVER.entadmin.POST_EMPLOYEES(e).then(res=>{
         let user = Object.assign({},e,res.data.data)
         commit('SaveUser',user)
         resolve(user)
@@ -41,10 +40,47 @@ const actions = {
       })
     })
   },
+  ResetPassword({commit},user_id_list){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.RESET_PASSWORD(user_id_list).then(res=>{
+        commit('SaveUsers',user_id_list.map(id=>({id,changed:false})))
+        resolve()
+        
+      }).catch(reject)
+    })
+  },
+  LockAccounts({commit},user_id_list){
+    if(user_id_list && !Array.isArray(user_id_list))
+      user_id_list = [user_id_list]
+    return new Promise((resolve, reject) => {
+      SERVER.entadmin.LOCK_ACCOUNTS(user_id_list).then(res => {
+        commit('SaveUsers', user_id_list.map(id => ({
+          id,
+          locked:1
+        })))
+        resolve()
+
+      }).catch(reject)
+    })
+  },
+  UnlockAccounts({commit},user_id_list){
+      if (user_id_list && !Array.isArray(user_id_list))
+        user_id_list = [user_id_list]
+     return new Promise((resolve, reject) => {
+      SERVER.entadmin.UNLOCK_ACCOUNTS(user_id_list).then(res => {
+         commit('SaveUsers', user_id_list.map(id => ({
+           id,
+           locked: 0
+         })))
+         resolve()
+
+       }).catch(reject)
+     })
+  },
   DeleteUser({commit},id){
     return new Promise((resolve, reject) => {
-      API.SERVER.entadmin.DELETE_EMPLOYEES({param:id}).then(res => {
-        commit('removeUser', id)
+      SERVER.entadmin.DELETE_EMPLOYEES({param:id}).then(res => {
+        commit('SaveUser', id)
         resolve(user)
       }).catch(e => {
         reject(e)
@@ -56,7 +92,7 @@ const actions = {
     }, e) {
     return new Promise((resolve,reject)=>{
       if(e.id){
-         API.SERVER.entadmin.PATCH_EMPLOYEES(e,{param:{id:e.id}}).then(res => {
+         SERVER.entadmin.PATCH_EMPLOYEES(e,{param:{id:e.id}}).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)
@@ -64,7 +100,7 @@ const actions = {
            reject(e)
          })
       }else{
-         API.SERVER.entadmin.POST_EMPLOYEES(e).then(res => {
+         SERVER.entadmin.POST_EMPLOYEES(e).then(res => {
            let user = Object.assign({}, e, res.data.data)
            commit('SaveUser', user)
            resolve(user)
@@ -78,6 +114,9 @@ const actions = {
 }
 
 const mutations = {
+  init(state,api){
+    SERVER = api
+  },
   SaveUsers(state, users) {
     UTIL.LocalSaveItems(state, 'users', users)
   },
