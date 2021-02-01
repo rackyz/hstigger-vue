@@ -25,7 +25,8 @@
       </div>
       <div class="flex-wrap">
         <!-- authed.ArchiveCategoryManage -->
-          <Button @click="handlePreCreate()" type="primary" icon="md-add">新建项目</Button>
+          <Button @click="handlePreCreate()" type="primary" icon="md-add">新建任务</Button>
+          <Button @click="modalCreateTeml = true" type="primary" icon="md-add" style="margin-left:5px;">由模板创建</Button>
       <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
       </div>
     </div>
@@ -39,19 +40,35 @@
 
     <hs-modal-form
 			ref="form"
-			:title="model.id?'修改项目':'新增项目'"
+			:title="model.id?'修改任务':'新增任务'"
 			v-model="modalCreate"
 			:width="620"
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('project')"
+			:form="Form('task')"
 			:data="model"
       :initData="filterInitData"
 			editable
 			@on-submit="handlePatchArchive"
 			@on-event="handleEvent"
 		/>
+
+    <Modal v-model="modalCreateTeml" title="选择任务模板" footer-hide width="800">
+      <div style="position:relative;height:440px;">
+        <div class="flex-wrap">
+         <Input search placeholder="输入关键字搜索" style="margin:5px;width:200px" />
+         <Button icon="md-settings" style='float:right;margin-right:10px;'>任务模板管理</Button>
+        </div>
+        <div style="display:flex;position:relative;height:400px;border-top:1px solid #ddd;">
+        <hs-menu :data="tmplClasses" style='width:150px;border-right:1px solid #dfdfdf;height:100%;padding:0;' :current="selectedTmplClass" @on-select="selectedTmplClass=$event"></hs-menu>
+        <div style="width:calc(100% - 150px)">
+         
+          <hs-list :data="filteredTmpls" :option="{tmpl:'BaseTaskTemplate'}" style='height:380px;overflow-y:auto;border:none;' />
+        </div>
+        </div>
+      </div>
+    </Modal>
   </Layout>
 </template>
 
@@ -60,6 +77,17 @@ import {mapGetters} from "vuex"
 export default {
   data(){
     return {
+      selectedTmplClass:1,
+      tmplClasses:[{
+        id:1,
+        name:"项目部",
+        path:1,
+      },{
+        id:2,
+        name:"总师办",
+        path:2
+      }],
+      modalCreateTeml:false,
       f_project_id:null,
       f_dep_id:null,
       f_search_text:"",
@@ -69,40 +97,49 @@ export default {
       //
       items:[],
       modalCreate:false,
-    
+      tmpls:[{
+        id:1,
+        name:"前期工作 v1",
+        desc:"项目默认前期工作列表",
+        version:"1.0.0",
+        
+        group:1
+      },{
+        id:2,
+        name:"合同工作 v1",
+        desc:"项目默认合同工作列表",
+        version:"1.0.0",
+        
+        group:1
+      },{
+        id:3,
+        name:"考核任务 v1",
+        desc:"项目默认合同工作列表",
+        version:"1.0.0",
+        
+        group:2
+      }],
       model:{}, 
       columns:[{
         title:"序号",
         key:"id",
-        type:"index"
+        type:"index",
       },{
-        title:"项目编号",
-        key:"code",
-        width:100,
-        type:"text",
-        option:{
-          align:"center",
-          color:"darkred"
-        },
-        render:(h,param)=>{
-          return h('div',{style:{textAlign:"center",color:"red",fontWeight:"bold"}},param.row.code || '-')
-        }
-      },{
-        title:"项目类型",
+        title:"类型", // 流程 任务 审批
         key:"stype",
         sortable:false,
-        width:100,
+        width:60,
         render:(h)=>{
           return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#aaa"}})
         }
         },{
-        title:"项目名称",
+        title:"任务名称",
         width:300,
         type:"text",
         key:"name",
         linkEvent:"open"
       },{
-        title:"项目简称",
+        title:"所属项目",
         width:100,
         type:"text",
         key:"name"
@@ -116,12 +153,11 @@ export default {
           getters:"core/deps"
         }
       },{
-        title:"项目地址",
+        title:"上级任务",
         type:"text",
-        key:"type1",
-        width:300
+        key:"type1"
       },{
-        title:"归档目录",
+        title:"子任务",
         type:"type",
         key:"type2",
         width:130,
@@ -132,18 +168,43 @@ export default {
         }
 
       },{
-        title:"资料类型",
-        type:"type",
-        key:"type3",
+        title:"负责人",
+        type:"user",
+        key:"created_by",
         width:100,
         option:{
           align:"center",
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_DOCTYPE"
+          getters:"core/users"
         }
-
       },{
-        title:"项目负责人",
+        title:"任务状态",
+        type:"user",
+        key:"created_by",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
+        }
+      },{
+        title:"已完成工作量",
+        type:"user",
+        key:"created_by",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
+        }
+      },{
+        title:"任务期限",
+        type:"user",
+        key:"created_by",
+        width:100,
+        option:{
+          align:"center",
+          getters:"core/users"
+        }
+      },{
+        title:"任务成果",
         type:"user",
         key:"created_by",
         width:100,
@@ -188,6 +249,9 @@ export default {
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       isFiltering(){
         return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
+      },
+      filteredTmpls(){
+        return this.tmpls.filter(v=>v.group == this.selectedTmplClass)
       },
       filterInitData(){
         return {

@@ -29,7 +29,7 @@ const getters = {
 }
 
 const actions = {
-  Init:({commit},vue)=>{
+  Init:({commit,rootState},vue)=>{
     commit('StartLoading')
     return new Promise((resolve)=>{
       API.initAPI(vue).then(() => {

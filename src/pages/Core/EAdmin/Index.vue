@@ -40,10 +40,13 @@ export default {
   },
   mounted(){
     this.$store.dispatch('entadmin/GetUsers')
+    this.$store.dispatch('entadmin/GetDeps')
+     this.$store.dispatch('entadmin/GetRoles')
+    
   },
   computed:{
-    ...mapGetters('core',['current_ent','deps']),
-    ...mapGetters('entadmin',['users']),
+    ...mapGetters('core',['current_ent']),
+    ...mapGetters('entadmin',['users','deps','roles']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -57,8 +60,6 @@ export default {
       return map
     },
     menus(){
-      let emCount = this.users.length
-      let depCount = this.deps.length
       return [{
         name:"账号与权限",
         icon:'apps',
@@ -67,17 +68,18 @@ export default {
         name:'员工管理',
         icon:"user",
         path:'/core/eadmin/user',
-        count:emCount
+        count:this.users.length
       },{
         name:'部门管理',
         icon:"organization",
         path:'/core/eadmin/dep',
-        count:depCount
+        count:this.deps.length
       }
       ,{
-        name:'角色权限',
+        name:'角色管理',
         icon:"quanxianliebiao",
-        path:'/core/eadmin/role'
+        path:'/core/eadmin/role',
+        count:this.roles.length
       }
       ]
         },

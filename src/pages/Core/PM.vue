@@ -138,7 +138,7 @@ export default {
         width:100,
         option:{
           align:"center",
-          getters:"core/users"
+          getters:"core/employees"
         }
       },{
         title:"创建时间",

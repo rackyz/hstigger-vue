@@ -27,6 +27,7 @@ const state = {
   modules:[],
   acc_list: [],
   user_rss:[],
+  employees:[],
   loading:false
 }
 
@@ -59,7 +60,7 @@ const getters = {
     return state.my_enterprises
   },
   my_projects(state) {
-    return state.my_projects
+    return state.projects.filter(v=>v.charger == state.session.id)
   },
   current_enterprise(state){
     return state.current_enterprise
@@ -114,6 +115,9 @@ const getters = {
   users(state){
     return state.users
   },
+  employees(state){
+    return state.employees
+  },
   flows(state){
     return state.session.flows
   },
@@ -121,7 +125,7 @@ const getters = {
     return state.session.user_flows
   },
   deps(state){
-    return state.session.deps.concat({id:0,name:"( 无部门 )"},{id:1,name:"我的企业"})
+    return state.session.deps
   },
   my_deps(state){
     return state.session.my_deps
@@ -471,6 +475,7 @@ const mutations = {
      state.types = session.types //SaveTypes(session.types)
     state.users = session.users
     state.modules = session.modules
+    state.employees = session.employees
     state.projects = session.projects
     state.rss = session.rss
     state.ent_types = session.ent_types

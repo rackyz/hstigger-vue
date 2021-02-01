@@ -16,7 +16,7 @@ out.LocalSaveItems = (state,key,value,idkey='id')=>{
     state[key] = value
     return
   }
-  
+
   if(!Array.isArray(value))
     THROW(E.INVALID_VALUE, key, value)
 
@@ -41,6 +41,12 @@ out.LocalDeleteItem = (state,key,value,idkey='id')=>{
     state[key].splice(index,1)
   else
     THROW(E.VALUE_NOT_FOUND, key, value)
+}
+
+out.LocalDeleteItems = (state,key,values,idkey='id')=>{
+  values.forEach(v=>{
+    out.LocalDeleteItem(state,key,v,idkey)
+  })
 }
 
 

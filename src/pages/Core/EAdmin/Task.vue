@@ -70,16 +70,16 @@ export default {
         key:"id"
       },{
         type:"type",
-        title:"项目类型",
+        title:"任务类型",
         width:120,
         key:"type"
       },{
         type:"text",
-        title:"项目名称",
+        title:"任务名称",
         key:"name"
       },{
         type:"user",
-        title:"创建人",
+        title:"负责人",
         width:100,
         key:"created_by"
       }],

@@ -121,10 +121,10 @@
 			/>
 		</div>
     </TabPane>
-		<TabPane label="申请记录" name="request">
+		<!-- <TabPane label="申请记录" name="request">
 		</TabPane>
 			<TabPane label="邀请记录" name="invited">
-		</TabPane>
+		</TabPane> -->
 	 </Tabs>
     <!-- modal for create/edit user data -->
 		<hs-modal-form
@@ -339,11 +339,11 @@ export default {
 					name: "新增",
 					icon: "md-add",
 				},
-				{
-					key: "addexist",
-					name: "邀请加入",
-					icon: "md-add",
-				},
+				// {
+				// 	key: "addexist",
+				// 	name: "邀请加入",
+				// 	icon: "md-add",
+				// },
 				{
 					key: "edit",
 					name: "编辑",

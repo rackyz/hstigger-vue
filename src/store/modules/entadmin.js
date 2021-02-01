@@ -4,16 +4,19 @@ var SERVER = {}
 const state = {
   users:[],
   enterprises:[],
-  modules:[],
-  rss:[],
-  status:{},
-  logs:[],
-  flows:[]
+  deps:[],
+  roles:[]
 }
 
 const getters = {
   users(state){
     return state.users
+  },
+  deps(state){
+    return state.deps
+  },
+  roles(state){
+    return state.roles
   }
 }
 
@@ -24,8 +27,116 @@ const actions = {
         let users = res.data.data
         commit('SaveUsers',users)
         resolve(users)
-      })
+      }).catch(reject)
     })
+  },
+  GetDeps({commit}){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.LIST_DEPS().then(res=>{
+        let deps = res.data.data
+        commit('SaveDeps',deps)
+        resolve(deps)
+      }).catch(reject)
+    })
+  },
+  GetRoles({commit}){
+      return new Promise((resolve, reject) => {
+        SERVER.entadmin.LIST_ROLES().then(res => {
+          let items = res.data.data
+          commit('SaveRoles', items)
+          resolve(items)
+        }).catch(reject)
+      })
+  },
+  CreateRole({
+    commit
+  }, item) {
+    return new Promise((resolve, reject) => {
+      SERVER.entadmin.POST_ROLES(item).then(res => {
+        item = Object.assign({}, item, res.data.data)
+        commit('SaveRoles', [item])
+        resolve(item)
+      }).catch(reject)
+    })
+  },
+  RemoveRole({
+      commit
+    }, item_id) {
+      return new Promise((resolve, reject) => {
+        SERVER.entadmin.DELETE_ROLES({
+          param: {
+            id:item_id
+          }
+        }).then(res => {
+         
+          commit('ReomveRoles', [item_id])
+           resolve()
+        }).catch(reject)
+      })
+    },
+    PatchRole({
+      commit
+    }, item) {
+        
+      if (item.id) {
+        return new Promise((resolve, reject) => {
+        let id = item.id
+        delete item.id
+
+        SERVER.entadmin.PATCH_ROLES(item, {
+          param: {
+            id
+          }
+        }).then(res => {
+           item = Object.assign({}, item, res.data.data)
+           item.id = id
+          commit("SaveRoles", [item])
+          resolve()
+        }).catch(reject)
+        })
+      }else{
+        return actions.CreateRole({commit},item)
+      }
+      
+    },
+  CreateDep({commit},dep){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.POST_DEPS(dep).then(res=>{
+        dep = Object.assign({},dep,res.data.data)
+        commit('SaveDeps',[dep])
+        resolve(dep)
+      }).catch(reject)
+    })
+  },
+  RemoveDep({commit},dep_id){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.DELETE_DEPS({param:{id:dep_id}}).then(res=>{
+        commit('RemoveDeps',[dep_id])
+        resolve()
+      }).catch(reject)
+    })
+  },
+  PatchDep({commit},dep){
+    return new Promise((resolve,reject)=>{
+       if (dep.id) {
+         let id = dep.id
+         delete dep.id
+         SERVER.entadmin.PATCH_DEPS(data, {
+           param: {
+             id
+           }
+         }).then(res => {
+            dep.id = dep
+           commit("SaveDeps", [dep])
+         }).catch(reject)
+       } else {
+         actions.CreateDep({
+           commit
+         }, dep)
+       }
+       resolve(dep)
+    })
+   
   },
   CreateEmployee({
       commit
@@ -125,7 +236,19 @@ const mutations = {
   },
   removeUser(state,id){
     UTIL.LocalDeleteItem(state,'users',id)
-  }
+  },
+  SaveDeps(state,deps){
+    UTIL.LocalSaveItems(state,'deps',deps)
+  },
+  RemoveDeps(state,dep_ids){
+    UTIL.LocalDeleteItems(state,"deps",dep_ids)
+  },
+  RemoveRoles(state, id_list) {
+    UTIL.LocalDeleteItems(state, "roles", id_list)
+  },
+   SaveRoles(state, items) {
+     UTIL.LocalSaveItems(state, "roles", items)
+   }
 }
 
 
