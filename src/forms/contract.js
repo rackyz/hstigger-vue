@@ -19,7 +19,7 @@ export default {
       <Col :span='12'>{{file_assurance}}</Col>
     </Row>
     <Row :gutter='10' style='margin-top:10px'>
-     <Col :span='24'>{{paycondition_raw}}</Col>
+     <Col :span='24'>{{pay_condition_raw}}</Col>
     
     </Row>
     <Row :gutter='10' style='margin-top:10px'>

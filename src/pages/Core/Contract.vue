@@ -38,7 +38,7 @@
         <TabPane label="第三方合同" name="third"></TabPane>
     </Tabs>
     <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
 
@@ -57,6 +57,14 @@
 			@on-submit="handlePatchArchive"
 			@on-event="handleEvent"
 		/>
+
+    <Modal v-model="showPay" title="支付管理" footer-hide>
+
+    </Modal>
+
+    <Modal v-model="showChange" title="变更管理" footer-hide>
+      
+    </Modal>
   </Layout>
 </template>
 
@@ -66,8 +74,10 @@ export default {
   data(){
     return {
       f_project_id:null,
+      showPay:false,
       f_dep_id:null,
       part_mode:"partA",
+      showChange:false,
       f_search_text:"",
       f_type_1:null,
       f_type_2:null,
@@ -105,10 +115,19 @@ export default {
         key:"name",
         linkEvent:"open"
       },{
-        title:"所属项目",
+        title:"所属部门",
         type:"type",
         width:150,
         key:"dep_id",
+        option:{
+          align:"center",
+          getters:"core/deps"
+        }
+      },{
+        title:"所属项目",
+        type:"type",
+        width:150,
+        key:"project_id",
         option:{
           align:"center",
           getters:"core/projects"
@@ -163,6 +182,15 @@ export default {
         option:{
           type:'progress',
           percentTo:'adjusted_amount'
+        }
+      }, {
+        title:"累计变更",
+        width:80,
+        key:'adjusted_amount',
+        type:'number',
+        option:{
+          type:'progress',
+          percentTo:'amount'
         }
       }, {
           title:"合同",
@@ -223,9 +251,9 @@ export default {
       },{
         fixed:"right",
         title:"操作",
-        minWidth:200,
+        minWidth:300,
         type:'tool',
-        buttons:["edit","delete"],
+        buttons:[{label:'支付',key:'pay',event:'pay'},{label:'变更',key:'change',event:'change'},"edit","delete"],
         option:{
           
         }
@@ -252,6 +280,15 @@ export default {
           type3:this.f_type_3
         }
       },
+      filtredColumns(){
+        let cols = [...this.columns]
+        if(this.part_mode == "partA"){
+          cols.splice(5,1)
+        }else if(this.part_mode == "partB"){
+          cols.splice(6,1)
+        }
+        return cols
+      },
       filteredItems(){
         return this.items.filter(v=>{
           let search_text = this.f_search_text ? this.f_search_text.trim() : ""
@@ -274,13 +311,14 @@ export default {
 
           if(this.part_mode){
             let ent_id = this.$store.getters['core/current_enterprise']
-            if(this.part_mode == 'partA' && v.partA != ent_id){
+            console.log(this.part_mode,v.partB,ent_id,v.partB !== ent_id)
+            if(this.part_mode == 'partA' && v.partA !== ent_id){
                return false
             }
-            if(this.part_mode == 'partB' && v.partB != ent_id){
+            if(this.part_mode == 'partB' && v.partB !== ent_id){
               return false
             }
-            if(this.part_mode == 'third' && v.partA == ent_id || v.partB == ent_id){
+            if(this.part_mode == 'third' && (v.partA == ent_id || v.partB == ent_id)){
               return false
             }
           }
@@ -367,6 +405,7 @@ export default {
      })
     },
     onTableEvent(e){
+      console.log(e)
       if(!e.data)
         return
       if(e.type == 'edit'){
@@ -375,6 +414,10 @@ export default {
         this.handleDelete(e.data)
       }else if(e.type == 'open'){
         this.handleOpen(e.data.id)
+      }else if(e.type =='pay'){
+        this.showPay = true
+      }else if(e.type == 'change'){
+        this.showChange = true
       }
     },
     handlePatchArchive(item){
