@@ -69,6 +69,23 @@
         </div>
       </div>
     </Modal>
+
+     <hs-modal-form
+			ref="form"
+			:title="`任务${current?' - '+current.name:''}`"
+			v-model="modalProcess"
+			:width="420"
+      :env="{upload}"
+			style="margin: 10px"
+			footer-hide
+			:form="Form('task_simple')"
+			:data="modelResult"
+			editable
+			@on-submit="handleProcess"
+		/>
+
+    <Modal v-model="modalInitTmpl" title="初始化模板" footer-hide width="800">
+    </Modal>
   </Layout>
 </template>
 
@@ -84,6 +101,7 @@ export default {
   data(){
     return {
       selectedTmplClass:1,
+      modelResult:{},
       tmplClasses:[{
         id:1,
         name:"项目部",
@@ -94,6 +112,8 @@ export default {
         path:2
       }],
       modalCreateTeml:false,
+      modalInitTmpl:false,
+      modalProcess:false,
       f_project_id:null,
       f_dep_id:null,
       f_search_text:"",
@@ -233,7 +253,11 @@ export default {
           if(item.sub_count){
             return h('Button',{props:{size:"small",type:"info"}},'下载')
           }else{
-            return h("Button",{props:{size:"small",type:"success"}},'提交')
+            return h("Button",{props:{size:"small",type:"success"},on:{
+              click:()=>{
+                this.ProcessTask(item)
+              }
+            }},'提交')
           }
 
         }
@@ -312,6 +336,10 @@ export default {
       }
     },
   methods:{
+    ProcessTask(item){
+      this.current = item
+      this.modalProcess = true
+    },
     handleClearFilter(){
       this.f_search_text=""
       this.f_type_1 = null 
@@ -375,6 +403,26 @@ export default {
         this.model = data
         this.modalCreate = true 
       })
+    },
+    handleProcess(data){
+      let id = this.current.id
+      if(!id)
+        return
+      this.api.enterprise.PROCESS_TASK(data,{param:id}).then(res=>{
+        let updateInfo = res.data.data
+         
+          let new_item = Object.assign({},item,updateInfo)
+          let index = this.items.findIndex(v=>v.id == id)
+          if(index != -1){
+            new_item = Object.assign({},this.items[index],new_item)
+           this.items.splice(index,1,new_item)
+          }
+          this.modalCreate = false
+          this.Success('处理成功')
+      }).catch(e=>{
+        this.Error("处理失败:",)
+      })
+
     },
     handleDelete(model){
       this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
