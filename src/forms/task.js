@@ -1,12 +1,14 @@
 export default {
   layout: `<div>
     <Row  :gutter="10">
-      <Col :span="24">{{parent_id}}</Col>
+       <Col :span="24">{{name}}</Col>
      
     </Row>
      <Row  :gutter="10" style='margin-top:10px'>
-      <Col :span="8">{{type_id}}</Col>
-      <Col :span="16">{{name}}</Col>
+      <Col :span="7">{{base_type}}</Col>
+       <Col :span="7">{{business_type}}</Col>
+        <Col :span="10">{{parent_id}}</Col>
+    
     </Row>
     <Row  :gutter="10" style='margin-top:10px'>
       <Col :span="12">{{project_id}}</Col>
@@ -15,7 +17,7 @@ export default {
      <Row  :gutter="10" style='margin-top:10px'>
      
       <Col :span="12">{{charger}}</Col>
-      <Col :span="12">{{duration}}</Col>
+      <Col :span="12">{{plan_duration}}</Col>
     </Row>
     <Row  :gutter="10" style='margin-top:10px'>
       <Col :span="24">{{desc}}</Col>
@@ -34,7 +36,7 @@ export default {
       option: {
         editable: false,
         getters: "user/tasks",
-        defaultValue: 0
+        
       }
     },
     name: {
@@ -63,15 +65,27 @@ export default {
           labelKey: 'name'
         }
       },
-      type_id:{
+      base_type:{
           label: "任务类别",
             control: 'select',
             option: {
               getters: 'core/getTypes',
+              defaultValue: 0,
               key: "TASK_TYPE",
               idKey: 'id',
               labelKey: 'name'
             }
+      },
+      business_type:{
+         label: "任务类别",
+           control: 'select',
+           option: {
+             getters: 'core/getTypes',
+             defaultValue: 0,
+             key: "ARCHIVE_WORKTYPE",
+             idKey: 'id',
+             labelKey: 'name'
+           }
       },
       charger:{
          label: "负责人",
@@ -82,7 +96,7 @@ export default {
              labelKey: 'name'
            }
       },
-      duration:{
+      plan_duration: {
         label:"期限(天)",
         control:"input",
         option:{

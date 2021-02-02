@@ -19,7 +19,7 @@
           </div>
         </div>
       </Header>
-      <Layout  style='flex-direction:row;overflow:hidden;'>
+      <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
          <hs-menu style='min-width:150px;width:150px;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
         
@@ -31,10 +31,17 @@
       <transition name='fadeIn'>
         <Content >
           <router-view></router-view>
+           <Drawer :closable="false" v-model="showProjects" placement="left" inner :transfer="false" styles='padding:0'>
+             <template v-for='p in projects'>
+               <BaseProject :data="p"  :key='p.id' v-if="id != p.id" />
+             </template>
+             
+          </Drawer>
         </Content>
         
       </transition>
 
+    
     
       </Layout>
 
@@ -45,6 +52,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   data(){
     return {
@@ -54,33 +62,35 @@ export default {
         is_group:true,
         subs:[{
           name:'项目总览',
-          icon:'bar-chart',
+          icon:'xiangmu1',
           key:'profile'
         },{
-          name:'项目管理',
-          icon:'xiangmu1',
+          name:'数据分析',
+          icon:'bar-chart',
           key:'dashboard'
         }]
       },{
-        name:'综合管理',
+        name:'通用模块',
         is_group:true,
         subs:[{
           name:'项目进度',
           icon:'xiangmu',
-          key:'tasks'
+          key:'task'
         },{name:'项目人员',
         icon:'user',
-        key:'employees'}
+        key:'employee'}
         ,{
           name:'项目资料',
           icon:'xiangmu2',
           key:'archive',
-        },{
-          name:'项目文件',
-          icon:'file',
-          key:'management'
         }]
       },{
+        name:'业务模块',
+        is_group:true,subs:[{
+          name:'合同管理',
+          icon:'file',
+          key:'contract'
+        }]},{
         name:'系统配置',
         is_group:true,subs:[{
           name:'项目角色',
@@ -111,7 +121,7 @@ export default {
         subs:[{
           name:'发布通知',
           icon:'xiangmu',
-          key:'tasks'
+          key:'task'
         },{name:'项目人员',
         icon:'user',
         key:'employees'}
@@ -152,6 +162,7 @@ export default {
      route:"/:id"
   },
   computed:{
+    ...mapGetters('core',['projects']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -202,7 +213,7 @@ export default {
       
     },
     onClickMenu(e){
-      this.RouteTo(e,{params:{f_project_id:this.id}})
+      this.RouteTo(e)
     }
   }
 }

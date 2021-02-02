@@ -1,7 +1,7 @@
 <template>
-  <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">任务管理</Header>
-    <Content style="padding:10px;">
+  <Layout class="hs-container hs-container-full statistics">
+   
+    <Content style="padding:5px 10px;">
     <div class="filter-box flex-between" style="margin:5px 0;">
       <div class="flex-wrap">
         <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
@@ -75,6 +75,12 @@
 <script>
 import {mapGetters} from "vuex"
 export default {
+  props:{
+    filter:{
+      type:Object,
+      default:{}
+    }
+  },
   data(){
     return {
       selectedTmplClass:1,
@@ -126,11 +132,21 @@ export default {
         type:"index",
       },{
         title:"类型", // 流程 任务 审批
-        key:"stype",
-        sortable:false,
+         type:"type",
+        key:"base_type",
         width:60,
-        render:(h)=>{
-          return h('icon',{props:{custom:'gzicon gzi-xiangmu2',size:20,color:"#aaa"}})
+        option:{
+          getters:"core/getTypes",
+          getters_key:"TASK_TYPE"
+        }
+        },{
+        title:"业务类型", // 流程 任务 审批
+        key:"business_type",
+         type:"type",
+        width:80,
+        option:{
+          getters:"core/getTypes",
+          getters_key:"ARCHIVE_WORKTYPE"
         }
         },{
         title:"任务名称",
@@ -138,11 +154,6 @@ export default {
         type:"text",
         key:"name",
         linkEvent:"open"
-      },{
-        title:"所属项目",
-        width:100,
-        type:"text",
-        key:"name"
       },{
         title:"所属部门",
         type:"type",
@@ -153,24 +164,33 @@ export default {
           getters:"core/deps"
         }
       },{
-        title:"上级任务",
-        type:"text",
-        key:"type1"
-      },{
-        title:"子任务",
+        title:"所属项目",
+        width:200,
         type:"type",
-        key:"type2",
-        width:130,
+        key:"project_id",
         option:{
           align:"center",
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_SAVETYPE"
+          getters:"core/projects"
         }
+      },{
+        title:"子任务",
+        type:"text",
+        key:"sub_count",
+        sortable:false,
+        width:130,
+        render:(h,param)=>{
+          let item = param.row
+          if(item.sub_count){
+            return h('Button',{props:{size:"small",type:"info"}},'进入')
+          }else{
+            return h("Button",{props:{size:"small",type:"primary"}},'创建')
+          }
 
+        }
       },{
         title:"负责人",
         type:"user",
-        key:"created_by",
+        key:"charger",
         width:100,
         option:{
           align:"center",
@@ -178,39 +198,44 @@ export default {
         }
       },{
         title:"任务状态",
-        type:"user",
-        key:"created_by",
+        type:"type",
+        key:"state",
         width:100,
         option:{
           align:"center",
-          getters:"core/users"
+          getters:"core/getTypes",
+          key:"TASK_STATE"
         }
       },{
-        title:"已完成工作量",
-        type:"user",
-        key:"created_by",
-        width:100,
-        option:{
-          align:"center",
-          getters:"core/users"
-        }
+        title:"工作量",
+        type:"text",
+        width:80,
+        key:"percent"
       },{
         title:"任务期限",
         type:"user",
-        key:"created_by",
+        key:"plan_duration",
         width:100,
         option:{
           align:"center",
-          getters:"core/users"
         }
       },{
         title:"任务成果",
         type:"user",
-        key:"created_by",
+        key:"result",
         width:100,
+        sortable:false,
         option:{
-          align:"center",
-          getters:"core/users"
+          align:"center"
+        },
+         render:(h,param)=>{
+          let item = param.row
+          if(item.sub_count){
+            return h('Button',{props:{size:"small",type:"info"}},'下载')
+          }else{
+            return h("Button",{props:{size:"small",type:"success"}},'提交')
+          }
+
         }
       },{
         title:"创建时间",
@@ -331,7 +356,7 @@ export default {
       })
     },
     get_archive(id, cb){
-      this.api.enterprise.GET_CONTRACTS({param:{id}}).then(res=>{
+      this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
         cb(model)
@@ -352,9 +377,8 @@ export default {
       })
     },
     handleDelete(model){
-      console.log(this.api.enterprise)
       this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
-        this.api.enterprise.DELETE_CONTRACTS({param:{id:model.id}}).then(res=>{
+        this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
           setTimeout(() => {
             this.Success('删除成功')
             this.items.splice(this.items.findIndex(v=>v.id == model.id),1)
@@ -385,11 +409,10 @@ export default {
       }
     },
     handlePatchArchive(item){
-      console.log("submit:",item)
       if(item.id){
         let id = item.id
         delete item.id
-        this.api.enterprise.PATCH_CONTRACTS(item,{param:{id}}).then(res=>{
+        this.api.enterprise.PATCH_TASKS(item,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
          
           let new_item = Object.assign({},item,updateInfo)
@@ -407,7 +430,7 @@ export default {
           this.loading = false
         })    
       }else{
-        this.api.enterprise.POST_CONTRACTS(item).then(res=>{
+        this.api.enterprise.POST_TASKS(item).then(res=>{
           let updateInfo = res.data.data
           let new_item = Object.assign({},item,updateInfo)
           this.items.splice(0,0,new_item)
@@ -424,7 +447,7 @@ export default {
     },
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_CONTRACTS().then(res=>{
+       this.api.enterprise.LIST_TASKS().then(res=>{
          this.items = res.data.data
        }).finally(e=>{
          this.loading = false

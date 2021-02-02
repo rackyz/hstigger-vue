@@ -1,5 +1,5 @@
 <template>
-  <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
+  <Layout class="hs-container hs-container-full statistics">
    
     <Content style="padding:5px;">
     <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">

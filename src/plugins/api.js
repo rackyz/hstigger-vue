@@ -6,6 +6,15 @@ let apiAxios = axios.create({baseURL:config.server,timeout:3000})
 apiAxios.defaults.headers = {
     "api-version": "v0"
 }
+o.SERVER = {
+  axios: apiAxios
+}
+o.SERVER.Clear = function () {
+  delete apiAxios.defaults.headers.Authorization
+  delete apiAxios.defaults.headers.Enterprise
+  localStorage.removeItem('hs-token')
+  localStorage.removeItem('current_enterprise')
+}
 // axios 响应 预处理
 apiAxios.interceptors.response.use(data => {
   if (data && data.data && data.data.code === -1) {
@@ -23,7 +32,7 @@ apiAxios.interceptors.response.use(data => {
     } else if (err.response.status == 403) {
       return Promise.reject('403-权限不足,请联系管理员!')
     } else if (err.response.status == 401) {
-      apiAxios.Clear()
+      o.SERVER.Clear()
       window.location.reload()
       return Promise.reject()
     } else {
@@ -36,7 +45,6 @@ apiAxios.interceptors.response.use(data => {
   }
   return Promise.reject(err);
 })
-o.SERVER = {axios:apiAxios}
 o.SERVER.SetAuthorization = function (token) {
   if (token)
     apiAxios.defaults.headers.Authorization = token
@@ -53,12 +61,7 @@ o.SERVER.ClearEnterprise = function () {
   delete apiAxios.defaults.headers.Enterprise
 }
 
-o.SERVER.Clear = function () {
-  delete apiAxios.defaults.headers.Authorization
-  delete apiAxios.defaults.headers.Enterprise
-  localStorage.removeItem('hs-token')
-  localStorage.removeItem('current_enterprise')
-}
+
 
  const getAPI = function (api_path, {
    param,

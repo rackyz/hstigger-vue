@@ -1,12 +1,12 @@
 <template>
-  <Task :filter="{f_project_id:id}" />
+  <Employee :filter="{f_project_id:id}" />
 </template>
 
 <script>
-import Task from '../Task'
+import Employee from '../Employee'
 export default {
   components:{
-    Task
+    Employee
   },
   computed:{
      id(){

@@ -50,7 +50,7 @@ config.Servers.forEach((server,i)=>{
       } else if (err.response.status == 403) {
         return Promise.reject('403-权限不足,请联系管理员!')
       } else if (err.response.status == 401) {
-        client.Clear()
+        axiosClient.Clear()
         window.location.reload()
         return Promise.reject()
       } else {
