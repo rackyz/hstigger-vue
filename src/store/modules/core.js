@@ -11,6 +11,7 @@ const state = {
   types:[],
   users:[],
   deps:[],
+  contracts:[],
   ent_types:[],
   projects:[],
   rss:[],
@@ -38,6 +39,9 @@ const getters = {
   },
   isLogin(state){
     return state.isLogin
+  },
+  contracts(state){
+    return state.contracts
   },
   getUser:(state)=>(id)=>{
     return state.users.find(v=>v.id == id)
@@ -130,6 +134,9 @@ const getters = {
   my_deps(state){
     return state.session.my_deps
   },
+  my_tasks(state) {
+    return state.session.my_tasks
+  },
   roles(state){
     return state.session.roles
   },
@@ -180,8 +187,15 @@ const getters = {
       }
     }
     },
-     getTypesByID: (state) => id => {
-        return state.types.filter(v => v.parent_id == id)
+    getType:(state)=>id=>{
+      return state.types.find(v=>v.id == id)
+    },
+     getTypesByKey: (state) => key => {
+       let type = state.types.find(v=>v.key == key)
+       if(type)
+        return state.types.filter(v => v.parent_id == type.id)
+      else
+        return []
      },
     types(state){
         return state.types
@@ -477,6 +491,7 @@ const mutations = {
     state.modules = session.modules
     state.employees = session.employees
     state.projects = session.projects
+    state.contracts = session.contracts
     state.rss = session.rss
     state.ent_types = session.ent_types
     state.user_rss = Array.isArray(state.rss) ? state.rss.map(v => v.id):[]

@@ -25,18 +25,13 @@
       </div>
       <div class="flex-wrap">
         <!-- authed.ArchiveCategoryManage -->
-          <Button @click="handlePreCreate()" type="primary" icon="md-add">新增合同</Button>
+          <Button @click="handlePreCreate()" type="primary" icon="md-add">新增支付记录</Button>
       <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
       </div>
     </div>
     <div class="filter-box">
 
     </div>
-     <Tabs type="card" @on-click="handleTabChanged">
-        <TabPane label="付款合同" name="partA"></TabPane>
-        <TabPane label="收款合同" name="partB"></TabPane>
-        <TabPane label="第三方合同" name="third"></TabPane>
-    </Tabs>
     <div style="height:calc(100% - 100px);position:relative;">
       <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
@@ -50,7 +45,7 @@
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('contract')"
+			:form="Form('payment')"
 			:data="model"
       :initData="filterInitData"
 			editable
@@ -101,7 +96,7 @@ export default {
       },{
         title:"支付时间",
         type:"time",
-        key:"register_date",
+        key:"paydate",
         width:100,
         option:{
           type:'date',
@@ -112,10 +107,11 @@ export default {
           width:60,
           sortable:false,
           render:(h,params)=>{
-            let file = params.row.file
-            if(file){
+            
+            let files = params.row.files
+            if(files){
             return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
-              this.handleDownload(file)
+              this.handleDownload(files)
             }}  
             }) }else{
               return h('span','-')
@@ -148,33 +144,10 @@ export default {
         }
       }],
       model:{}, 
-      columns:[{
-        title:"序号",
+     columns:[{
+         title:"序号",
         key:"id",
         type:"index"
-      },{
-        title:"合约编号",
-        key:"code",
-        width:100,
-        type:"text",
-        option:{
-          align:"center",
-          color:"darkred"
-        },
-        render:(h,param)=>{
-          return h('div',{style:{textAlign:"center",color:"red",fontWeight:"bold"}},param.row.code || '-')
-        }
-      },{
-        title:"合约类型",
-        key:"type",
-        sortable:false,
-        width:100,
-        },{
-        title:"合约名称",
-        width:200,
-        type:"text",
-        key:"name",
-        linkEvent:"open"
       },{
         title:"所属部门",
         type:"type",
@@ -186,44 +159,32 @@ export default {
         }
       },{
         title:"所属项目",
+        width:200,
         type:"type",
-        width:150,
         key:"project_id",
         option:{
           align:"center",
           getters:"core/projects"
         }
       },{
-        title:"甲方",
-        type:"user",
-        key:"partA",
-        width:220,
+        title:"所属合同",
+        width:200,
+        type:"type",
+        key:"contract_id",
         option:{
-          getters:"core/enterprises",
-          idKey:'id',
-          labelKey:'name'
+          align:"center",
+          getters:"core/contracts"
         }
       },{
-        title:"乙方",
-        type:"user",
-        key:"partB",
-        width:220,
+        title:"支付依据",
+        type:"text",
+        key:"desc",
+        width:200,
         option:{
-          getters:"core/enterprises",
-          idKey:'id',
-          labelKey:'name'
-        }
-      },{
-        title:"签约时间",
-        type:"time",
-        key:"register_date",
-        width:100,
-        option:{
-          type:'date',
           align:"center"
         }
       },{
-        title:"合同金额",
+         title:"支付金额",
         type:"number",
         key:"amount",
         width:150,
@@ -231,37 +192,23 @@ export default {
           type:"fullAmount"
         }
       },{
-        title:"超概",
-        width:80,
-        key:'isOverPlan',
-        sortable:false
+        title:"支付时间",
+        type:"time",
+        key:"paydate",
+        width:100,
+        option:{
+          type:'date',
+          align:"center"
+        }
       },{
-        title:"累计支付",
-        width:80,
-        key:'payed',
-        type:'number',
-        option:{
-          type:'progress',
-          percentTo:'adjusted_amount'
-        }
-      }, {
-        title:"累计变更",
-        width:80,
-        key:'adjusted_amount',
-        type:'number',
-        option:{
-          type:'progress',
-          percentTo:'amount'
-        }
-      }, {
-          title:"合同",
-          width:40,
+          title:"支付凭证",
+          width:60,
           sortable:false,
           render:(h,params)=>{
-            let file = params.row.file
-            if(file){
+            let files = params.row.files
+            if(files){
             return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
-              this.handleDownload(file)
+              this.handleDownload(files)
             }}  
             }) }else{
               return h('span','-')
@@ -269,30 +216,6 @@ export default {
 
           }
           }, {
-          title:"担保",
-          width:40,
-          sortable:false,
-          render:(h,params)=>{
-            let file = params.row.file_assurance
-            if(file){
-            return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
-              this.handleDownload(file)
-            }}  
-            }) }else{
-              return h('span','-')
-            }
-
-          }
-          },{
-        title:"联系人",
-        type:"user",
-        key:"contactor",
-        width:100,
-        option:{
-          align:"center",
-          getters:"core/users"
-        }
-      },{
         title:"创建时间",
         type:"time",
         key:"created_at",
@@ -310,15 +233,13 @@ export default {
           getters:"core/users"
         }
       },{
-        fixed:"right",
         title:"操作",
-        minWidth:300,
         type:'tool',
-        buttons:[{label:'支付',key:'pay',event:'pay'},{label:'变更',key:'change',event:'change'},"edit","delete"],
+        buttons:["edit","delete"],
         option:{
           
         }
-      }]
+      }],
     }
   },
   mounted(){
@@ -370,20 +291,6 @@ export default {
           if(this.f_type_3 && v.type3 != this.f_type_3)
             return false
 
-          if(this.part_mode){
-            let ent_id = this.$store.getters['core/current_enterprise']
-            console.log(this.part_mode,v.partB,ent_id,v.partB !== ent_id)
-            if(this.part_mode == 'partA' && v.partA !== ent_id){
-               return false
-            }
-            if(this.part_mode == 'partB' && v.partB !== ent_id){
-              return false
-            }
-            if(this.part_mode == 'third' && (v.partA == ent_id || v.partB == ent_id)){
-              return false
-            }
-          }
-
           return true
         })
       }
@@ -417,12 +324,25 @@ export default {
     handlePreview(e){
 
     },
-    handleDownload(file_str){
-      let [name,url,ext] = file_str.split(',')
-     this.DownloadWithName(url,name+'.'+ext)
+    handleDownload(id){
+      this.get_archive(id,data=>{
+        console.log(data)
+        let files = data.files.split(';').map(v=>v.split(','))
+        if(files.length > 5)
+          this.Confirm('文件数量较多，确定继续?',()=>{
+            files.forEach(([name,url,ext])=>{
+               this.DownloadWithName(url,name+'.'+ext)
+            })
+          })
+        else{
+             files.forEach(([name,url,ext])=>{
+                this.DownloadWithName(url,name+'.'+ext)
+            })
+        }
+      })
     },
     get_archive(id, cb){
-      this.api.enterprise.GET_CONTRACTS({param:{id}}).then(res=>{
+      this.api.enterprise.GET_PAYMENTS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
         cb(model)
@@ -446,7 +366,7 @@ export default {
     handleDelete(model){
       console.log(this.api.enterprise)
       this.Confirm(`确定删除该合约<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
-        this.api.enterprise.DELETE_CONTRACTS({param:{id:model.id}}).then(res=>{
+        this.api.enterprise.DELETE_PAYMENTS({param:{id:model.id}}).then(res=>{
           setTimeout(() => {
             this.Success('删除成功')
             this.items.splice(this.items.findIndex(v=>v.id == model.id),1)
@@ -488,7 +408,7 @@ export default {
       if(item.id){
         let id = item.id
         delete item.id
-        this.api.enterprise.PATCH_CONTRACTS(item,{param:{id}}).then(res=>{
+        this.api.enterprise.PATCH_PAYMENTS(item,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
          
           let new_item = Object.assign({},item,updateInfo)
@@ -506,7 +426,7 @@ export default {
           this.loading = false
         })    
       }else{
-        this.api.enterprise.POST_CONTRACTS(item).then(res=>{
+        this.api.enterprise.POST_PAYMENTS(item).then(res=>{
           let updateInfo = res.data.data
           let new_item = Object.assign({},item,updateInfo)
           this.items.splice(0,0,new_item)
@@ -523,7 +443,7 @@ export default {
     },
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_CONTRACTS().then(res=>{
+       this.api.enterprise.LIST_PAYMENTS().then(res=>{
          let items = res.data.data
          items.forEach(v=>{
            v.payed = 0

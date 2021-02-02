@@ -227,15 +227,15 @@
           />
         </div>
 
-        <template v-for="(fi,i) in tasks">
+        <template v-for="(fi,i) in my_tasks">
           <div
             class='ti-item'
             :key='fi.id'
           >
-            <div class='ti-icon'>{{fi.iconText}}</div>
+            <div class='ti-icon'>{{getTypesByKey("TASK_TYPE")[fi.base_type].name}}</div>
             <div class='ti-info'>
               <div class='ti-flowinfo'>
-                {{fi.root}}
+                {{fi.root}} {{fi.project_id}} {{fi.dep_id}} 
               </div>
               <div class='ti-desc'>
                 {{fi.desc}}
@@ -402,7 +402,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss']),
+    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypesByKey']),
     draggableRss: {
       set(e) {
         if (e) {
@@ -592,7 +592,7 @@ export default {
     bottom: 0;
     color: #fff;
     text-shadow: 1px 1px 1px #333;
-    font-size: 18px;
+    font-size: 13px;
     text-align: center;
     width: 40px;
     line-height: 47px;
