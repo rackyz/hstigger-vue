@@ -100,17 +100,8 @@ export default {
   },
   data(){
     return {
-      selectedTmplClass:1,
+      selectedTmplClass:95,
       modelResult:{},
-      tmplClasses:[{
-        id:1,
-        name:"项目部",
-        path:1,
-      },{
-        id:2,
-        name:"总师办",
-        path:2
-      }],
       modalCreateTeml:false,
       modalInitTmpl:false,
       modalProcess:false,
@@ -296,11 +287,22 @@ export default {
   },
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      tmplClasses(){
+        var that = this
+        return this.$store.getters['core/getTypes']('ARCHIVE_WORKTYPE').map(v=>{
+          return {
+            id:v.id,
+            name:v.name,
+            path:v.id,
+            count:that.tmpls.filter(t=>t.business_type == v.id).length
+          }
+        })
+      },
       isFiltering(){
         return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
       },
       filteredTmpls(){
-        return this.tmpls.filter(v=>v.group == this.selectedTmplClass)
+        return this.tmpls.filter(v=>v.business_type == this.selectedTmplClass)
       },
       filterInitData(){
         return {
@@ -499,6 +501,16 @@ export default {
          this.items = res.data.data
        }).finally(e=>{
          this.loading = false
+       })
+       this.api.enterprise.LIST_TASK_TEMPLATES().then(res=>{
+         let tmpls = res.data.data
+         tmpls.forEach(v=>{
+           if(!v.desc && v.sub_task_count){
+             v.desc = `共${v.sub_task_count}个子任务`
+           }
+         })
+         this.tmpls = tmpls
+         console.log("TMPLATES:",this.tmpls)
        })
      },
   }

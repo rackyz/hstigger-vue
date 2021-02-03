@@ -43,8 +43,8 @@
     <div class="filter-box">
 
     </div>
-    <div style="height:400px;position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+    <div style="height:calc(100% - 30px);position:relative;">
+      <hs-table ref="table" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
 
@@ -178,15 +178,15 @@ export default {
         width:20,
         key:"count"
         },
-        // {
-        //   title:"预览",
-        //   width:40,
-        //   sortable:false,
-        //   render:(h,params)=>{
-        //     return h('Button',{props:{icon:'md-eye',size:'small'},on:{click:()=>{
-        //       this.handlePreview(params.row.id)
-        //     }}})
-        //   }},
+        {
+          title:"预览",
+          width:40,
+          sortable:false,
+          render:(h,params)=>{
+            return h('Button',{props:{icon:'md-eye',size:'small'},on:{click:()=>{
+              this.handlePreview(params.row.id)
+            }}})
+          }},
           {
           title:"下载",
           width:40,
@@ -261,7 +261,6 @@ export default {
           if(this.f_dep_id &&  v.dep_id !== this.f_dep_id)
             return false
 
-          console.log(v)
           if(this.f_type_1 != undefined && (v.type1 === null || v.type1 !== this.f_type_1))
             return false
           
@@ -299,12 +298,11 @@ export default {
       // console.log(this.model)
       this.modalCreateArchive=true;
     },
-    handlePreview(e){
-
+    handlePreview(id){
+      this.RouteTo('/core/archives/'+id,true)
     },
     handleDownload(id){
       this.get_archive(id,data=>{
-        console.log(data)
         let files = data.files.split(';').map(v=>v.split(','))
         if(files.length > 5)
           this.Confirm('文件数量较多，确定继续?',()=>{
@@ -316,7 +314,6 @@ export default {
           })
         else{
              files.forEach(([name,url,ext])=>{
-                console.log(name,ext,name.lastIndexOf('.'+ext),name.length)
                let filename = name.lastIndexOf('.'+ext) == name.length-4?name:name+'.'+ext
                 this.DownloadWithName(url,filename)
             })
@@ -326,7 +323,6 @@ export default {
     get_archive(id, cb){
       this.api.enterprise.GET_ARCHIVES({param:{id}}).then(res=>{
         let model = res.data.data
-        console.log(model)
         cb(model)
       }).catch(e=>{
         this.Error('打开资料失败:',e)
@@ -360,7 +356,7 @@ export default {
     async upload(files,onFilesProgress){
      return new Promise((resolve,reject)=>{
        this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
-         console.log(files)
+       
          resolve(files.map(v=>v.url))
        }).catch(reject)
      })
@@ -377,7 +373,6 @@ export default {
       }
     },
     handlePatchArchive(item){
-      console.log("submit:",item)
       if(item.id){
         let id = item.id
         delete item.id

@@ -38,7 +38,7 @@
         <TabPane label="第三方合同" name="third"></TabPane>
     </Tabs>
     <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
 
@@ -344,9 +344,9 @@ export default {
       filtredColumns(){
         let cols = [...this.columns]
         if(this.part_mode == "partA"){
-          cols.splice(5,1)
-        }else if(this.part_mode == "partB"){
           cols.splice(6,1)
+        }else if(this.part_mode == "partB"){
+          cols.splice(7,1)
         }
         return cols
       },

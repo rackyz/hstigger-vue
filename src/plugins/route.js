@@ -106,6 +106,10 @@ Object.keys(fileMap).forEach(k => {
       let parentIndex = route.parent.lastIndexOf('/')
       route.parent = route.parent.slice(0,parentIndex)
       parentRoute = fileMap[route.parent]
+      if (!parentRoute){
+        console.log('route.parent:',route)
+        return
+      }
     }
     if (parentRoute.children) {
       parentRoute.children.push(route)

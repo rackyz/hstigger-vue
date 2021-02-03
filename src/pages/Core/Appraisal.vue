@@ -86,7 +86,7 @@
 				>详细评分</Button
 			>
 
-      
+      <div class="flex-wrap" v-if="!ob">
       <span class='filter-label'>评分筛选</span>
        <Button
 				style="margin-left: 5px"
@@ -121,9 +121,10 @@
 				@click="showSecond = !showSecond;"
 				>第二责任人</Button
 			>
+      </div>
   <Button
 				style="float:right"
-			
+        v-if="!ob"
 				@click="ExportXLSX"
 				>导出EXCEL</Button
 			>
@@ -735,7 +736,8 @@ export default {
                  })
                  return h('div',{class:'cell-row-wrapper'},domActiveNodes)
                }},{
-                type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'}
+                type:'tool',width:200,fixed:"right",cat:"flow",title:"操作",buttons:['delete'],option:{type:'button'},
+                op:true
               },
         
           {
@@ -1040,6 +1042,9 @@ export default {
           if(this.fpos.length == 1 && v.key == 'position')
             return false
 
+          if(this.ob && v.op)
+            return false
+
           return true
          
          })
@@ -1052,6 +1057,9 @@ export default {
     },
     canSubmitScore(){
       return Object.keys(this.model).length
+    },
+    ob(){
+      return this.session.id == "ed49e6a9-3b83-11eb-8e1e-c15d5c7db744"
     }
   },
   mounted(){
@@ -1519,7 +1527,10 @@ export default {
         })
         items = items.sort((a,b)=>{moment(a.created_at).isBefore(moment(b.created_at)?1:-1)})
         this.items = items
-        
+        if(this.ob){
+          this.showFirst=this.showFirstExtra=this.showSecond=false;
+          this.showSelf = true
+        }
       }).catch(e=>{
         this.Error(e)
       }).finally(e=>{

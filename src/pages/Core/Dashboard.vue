@@ -200,23 +200,6 @@
               style='font-size:12px;'
             >MORE</a></span>
         </div>
-        <BaseCalender />
-      </Card>
-      <Card
-        class="panel"
-        style="width:100%;border:none;margin-top:10px;"
-        padding='0'
-      >
-
-        <div class='card-title'>
-          <Icon
-            custom='gzicon gzi-eventavailable'
-            size='19'
-          /> 今日计划 <span style='float:right;'><a
-              href='#'
-              style='font-size:12px;'
-            >MORE</a></span>
-        </div>
         <div class="flex-wrap flex-between">
           <BaseNow />
           <Icon
@@ -226,7 +209,42 @@
             style='margin-right:10px;'
           />
         </div>
+        <BaseCalender style='border-bottom:1px solid #dfdfdf' />
 
+      </Card>
+      <Card
+        class="panel"
+        style='width:100%;border:none;border-radius:0;margin-top:10px;'
+        padding="0"
+      >
+        <div class='card-title'>
+          <Icon
+            custom='gzicon gzi-lianjieliu'
+            size='19'
+          /> 快捷操作 <span style='float:right;font-size:12px;'>MORE</span>
+        </div>
+        <BaseUserFlowPanel />
+      </Card>
+      <Card
+        class="panel"
+        style='width:100%;border:none;border-radius:0;margin-top:10px;'
+        padding="0"
+      >
+
+        <div class='card-title'>
+          <span class='tab tab-actived'>
+          <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 待处理 {{my_tasks.length?`(${my_tasks.length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab'> <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 关注中</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab'> <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 已处理</span> <span style='float:right;font-size:12px;'>MORE</span>
+        </div>
+        
         <template v-for="(fi,i) in my_tasks">
           <div
             class='ti-item'
@@ -250,38 +268,6 @@
 
         </div>
 
-      </Card>
-      <Card
-        class="panel"
-        style='width:100%;border:none;border-radius:0;margin-top:10px;'
-        padding="0"
-      >
-        <div class='card-title'>
-          <Icon
-            custom='gzicon gzi-lianjieliu'
-            size='19'
-          /> 工作流 <span style='float:right;font-size:12px;'>MORE</span>
-        </div>
-        <BaseUserFlowPanel />
-      </Card>
-      <Card
-        class="panel"
-        style='width:100%;border:none;border-radius:0;margin-top:10px;'
-        padding="0"
-      >
-
-        <div class='card-title'>
-          <Icon
-            custom='gzicon gzi-event'
-            size='17'
-          /> 待处理 <span style='float:right;font-size:12px;'>MORE</span>
-        </div>
-        <template v-if="flowInstances.length == 0">
-          <BaseEmpty
-            :msg="空"
-            :loading="isLoadingActived"
-          />
-        </template>
         <template v-for="(fi,i) in flowInstances">
           <div
             class='fi-item'
@@ -306,42 +292,7 @@
             </div>
           </div>
         </template>
-        <div class='card-title'>
-          <Icon
-            custom='gzicon gzi-eventavailable'
-            size='19'
-          /> 已处理 <span style='float:right;font-size:12px;'>MORE</span>
-        </div>
-        <template v-if="flowPassed.length == 0">
-          <BaseEmpty
-            :msg="空"
-            :loading="isLoadingPassed"
-          />
-        </template>
-        <template v-for="(fi,i) in flowPassed">
-          <div
-            class='fi-item'
-            :key='fi.id'
-            @click='OpenWorkflow(fi)'
-          >
-            <Icon
-              :custom='`gzicon gzi-${fi.icon}`'
-              size='25'
-            />
-            <div class='fi-info'>
-              <div class='fi-flowinfo'>
-                [{{fi.name}}]
-              </div>
-              <div class='fi-desc'>
-                {{fi.desc}}
-              </div>
-            </div>
-            <div class='fi-date'>
-              <div class='fi-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
-              <div class='fi-executor'>{{fi.executor}}</div>
-            </div>
-          </div>
-        </template>
+        
 
       </Card>
 
@@ -673,5 +624,9 @@ export default {
   i {
     margin: 0;
   }
+}
+
+.tab-actived{
+  color:#3af;
 }
 </style>
