@@ -14,6 +14,10 @@
     border-color:#aaa;
   }
  }
+
+ .text-button-active{
+   color:rgb(255, 198, 28) !important;
+ }
   
 </style>
 <template>
@@ -35,7 +39,7 @@
     
     <!-- Accelerators -->
     <template v-for='m in acc_apps'>
-      <a class='text-btn d-none d-sm-block' :class="{'text-button-deleting':showAppSelector}" style='margin-right:10px;padding:0 5px;z-index:1000;position:relative;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.key'  @click="showAppSelector?removeAcc(m.key):RouteTo(m.path)">
+      <a class='text-btn d-none d-sm-block' :class="{'text-button-deleting':showAppSelector,'text-button-active':ActivePath==m.path}" style='margin-right:10px;padding:0 5px;z-index:1000;position:relative;' :style="value?'border:1px dashed #dfdfdf':''" :key='m.key'  @click="showAppSelector?removeAcc(m.key):RouteTo(m.path)">
         {{m.name}}
       </a>
     </template>
@@ -107,6 +111,9 @@ export default {
     },
     acc_config_list(){
       return Object.keys(this.checked)
+    },
+    ActivePath(){
+      return this.$route.path
     }
   },
   props:{

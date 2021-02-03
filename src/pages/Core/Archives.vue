@@ -309,12 +309,16 @@ export default {
         if(files.length > 5)
           this.Confirm('文件数量较多，确定继续?',()=>{
             files.forEach(([name,url,ext])=>{
-               this.DownloadWithName(url,name+'.'+ext)
+             
+              let filename = name.lastIndexOf('.'+ext) == name.length-4?name:name+'.'+ext
+               this.DownloadWithName(url,filename)
             })
           })
         else{
              files.forEach(([name,url,ext])=>{
-                this.DownloadWithName(url,name+'.'+ext)
+                console.log(name,ext,name.lastIndexOf('.'+ext),name.length)
+               let filename = name.lastIndexOf('.'+ext) == name.length-4?name:name+'.'+ext
+                this.DownloadWithName(url,filename)
             })
         }
       })
@@ -341,7 +345,6 @@ export default {
       })
     },
     handleDelete(model){
-      console.log(this.api.enterprise)
       this.Confirm(`确定删除该资料<b style='color:red;margin:0 2px;'>${model.name}</b>及相关文件`,()=>{
         this.api.enterprise.DELETE_ARCHIVES({param:{id:model.id}}).then(res=>{
           setTimeout(() => {
@@ -378,7 +381,7 @@ export default {
       if(item.id){
         let id = item.id
         delete item.id
-        this.ENT.PATCH_ARCHIVE(item,{param:{id}}).then(res=>{
+        this.api.enterprise.PATCH_ARCHIVES(item,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
          
           let new_item = Object.assign({},item,updateInfo)
@@ -396,7 +399,7 @@ export default {
           this.loading = false
         })    
       }else{
-        this.ENT.POST_ARCHIVE(item).then(res=>{
+        this.api.enterprise.POST_ARCHIVES(item).then(res=>{
           let updateInfo = res.data.data
           let new_item = Object.assign({},item,updateInfo)
           this.items.splice(0,0,new_item)

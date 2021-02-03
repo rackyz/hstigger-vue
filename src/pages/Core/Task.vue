@@ -224,7 +224,7 @@ export default {
         option:{
           align:"center",
           getters:"core/getTypes",
-          key:"TASK_STATE"
+          getters_key:"TASK_STATE"
         }
       },{
         title:"工作量",

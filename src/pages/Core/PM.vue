@@ -1,12 +1,11 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" style="border-top:1px solid #000;">
-    <Header style="color:#fff;padding:20px;font-size:20px;display:flex;align-items:center;background:#234;">项目管理</Header>
-    <Content style="padding:10px;">
-    <div class="filter-box flex-between" style="margin:5px 0;">
+    <Content style="padding:5px;">
+    <div class="filter-box flex-between" style="margin:5px 0">
       <div class="flex-wrap">
         <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
          <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable>
-             <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
+             <template v-for="d in $store.getters['core/deps']">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
 
@@ -128,7 +127,7 @@ export default {
         option:{
           align:"center",
           getters:"core/getTypes",
-          getters_key:"ProjectState"
+          getters_key:"TASK_STATE"
         }
 
       },{

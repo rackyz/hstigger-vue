@@ -159,7 +159,6 @@ function saveAs(blob, filename) {
  */
 function download(url, filename) {
   getBlob(url, function (blob) {
-      console.log('blob:',blob)
     saveAs(blob, filename);
   });
 }
