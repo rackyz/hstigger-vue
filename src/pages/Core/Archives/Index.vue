@@ -1,7 +1,7 @@
 <template>
-  <Layout style='width:1200px;margin:0 auto;'>
-    文件预览 {{files}}
-    
+  <Layout>
+    {{files[0].url}}
+    <BasePreview :url="files[0][1]" />
   </Layout>
 </template>
 
@@ -21,12 +21,18 @@ export default {
   computed:{
     archive_id(){
       return this.$route.params.id
-    }
+    },
+    menus(){
+      return this.files.map(v=>{
+        v[0]
+      })
+    },
   },
   mounted(){
     this.getData()
   },
   methods:{
+    
     getData(){
       this.loading = true
       let id =  this.archive_id

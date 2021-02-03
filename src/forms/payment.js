@@ -1,3 +1,4 @@
+const moment = require('moment')
 export default {
   title: '上传资料',
   layout: `<div style='position:relative;'>
@@ -66,7 +67,10 @@ export default {
     },
     paydate:{
       label:"支付日期",
-      control:"time"
+      control:"time",
+      option:{
+        defaultValue:moment().format()
+      }
     },
     files: {
       label: '凭证文件',

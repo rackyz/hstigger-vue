@@ -40,6 +40,9 @@
     <div style="height:calc(100% - 100px);position:relative;">
       <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
+     <Modal v-model="showPay" styles="position:absolute;"  :title="`支付管理${current?' — '+current.name+'':''}`" footer-hide width="1200px" :transfer="false">
+      <Payment :filter="{contract_id:this.current?this.current.id:null}"  @update="handleUpdateContract" />
+    </Modal>
     </Content>
 
     <hs-modal-form
@@ -58,9 +61,7 @@
 			@on-event="handleEvent"
 		/>
 
-    <Modal v-model="showPay" title="支付管理" footer-hide width="800">
-      <hs-table ref='table2' :columns="payColumns" :data="pay_events" @event="onPayTableEvent" selectable="false" :paged="false" />
-    </Modal>
+   
 
     <Modal v-model="showChange" title="变更管理" footer-hide>
       
@@ -70,6 +71,7 @@
 
 <script>
 import {mapGetters} from "vuex"
+import Payment from "./Payment"
 export default {
   data(){
     return {
@@ -238,7 +240,7 @@ export default {
       },{
         title:"累计支付",
         width:80,
-        key:'payed',
+        key:'payed_amount',
         type:'number',
         option:{
           type:'progress',
@@ -327,6 +329,9 @@ export default {
     })
     this.getData()
   },
+  components:{
+    Payment
+  },
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       isFiltering(){
@@ -389,6 +394,14 @@ export default {
       }
     },
   methods:{
+    handleUpdateContract(id){
+       this.api.enterprise.GET_CONTRACTS({param:{id}}).then(res=>{
+        let item = res.data.data
+        let index = this.items.findIndex(v=>v.id == id)
+          if(index != -1)
+            this.items.splice(index,1,item)
+      })
+    },
     handleTabChanged(e){
       this.part_mode = e
     },
@@ -523,12 +536,15 @@ export default {
     },
     getData(){
        this.loading = true
+    
        this.api.enterprise.LIST_CONTRACTS().then(res=>{
          let items = res.data.data
          items.forEach(v=>{
-           v.payed = 0
-           v.adjusted_amount = v.amount || 0
-           v.isOverPlan = v.payed > v.adjusted_amount ? '是':'否'
+           v.payed_amount = v.payed_amount || 0
+           v.adjusted_amount = ((v.adjusted_amount || 0) + (v.amount || 0))
+           v.plan_amount = v.plan_amount || 0
+           if(v.plan_amount)
+              v.isOverPlan = v.adjusted_amount > v.plan_amount ? '是':'否'
          })
           this.items = items
        }).finally(e=>{

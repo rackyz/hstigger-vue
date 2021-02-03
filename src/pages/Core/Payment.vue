@@ -4,22 +4,21 @@
     <Content style="padding:5px;">
     <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">
       <div class="flex-wrap">
-        <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable>
+        <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入凭证号或内容查询" />
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable v-if="!contract_id">
              <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
 
           </Select>
-        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 项目类型 - -" clearable>
+        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 所属项目 - -" clearable v-if="!contract_id">
           
 
         </Select>
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_dep_id" placeholder="- - 建筑类型 - -" clearable>
-           <template v-for="d in $store.getters['core/deps']">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
-           </template>
-         </Select>
+         <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 所属合同 - -" clearable v-if="!contract_id">
+          
+
+        </Select>
        
             <Button @click="handleClearFilter()" type="info" v-show="isFiltering">清除筛选条件</Button>
       </div>
@@ -39,7 +38,7 @@
 
     <hs-modal-form
 			ref="form"
-			:title="model.id?'修改合约':'新增合约'"
+			:title="model.id?'修改合约支付记录':'新增支付记录'"
 			v-model="modalCreate"
 			:width="620"
       :env="{upload}"
@@ -47,7 +46,7 @@
 			footer-hide
 			:form="Form('payment')"
 			:data="model"
-      :initData="filterInitData"
+      :initData="filter"
 			editable
 			@on-submit="handlePatchArchive"
 			@on-event="handleEvent"
@@ -242,6 +241,20 @@ export default {
       }],
     }
   },
+  props:{
+    filter:{
+      type:Object,
+      default:{}
+    }
+  },
+  watch:{
+    contract_id:{
+      handler(v){
+        this.getData()
+      },
+      immediate:true
+    }
+  },
   mounted(){
     this.$nextTick(()=>{
       this.$refs.table.calcTableHeight()
@@ -249,6 +262,10 @@ export default {
     this.getData()
   },
    computed:{
+     contract_id(){
+       if(this.filter && this.filter.contract_id)
+        return this.filter.contract_id
+     },
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       isFiltering(){
         return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
@@ -264,10 +281,8 @@ export default {
       },
       filtredColumns(){
         let cols = [...this.columns]
-        if(this.part_mode == "partA"){
-          cols.splice(5,1)
-        }else if(this.part_mode == "partB"){
-          cols.splice(6,1)
+        if(this.contract_id){
+          cols.splice(1,2)
         }
         return cols
       },
@@ -365,7 +380,7 @@ export default {
     },
     handleDelete(model){
       console.log(this.api.enterprise)
-      this.Confirm(`确定删除该合约<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
+      this.Confirm(`确定删除该合约<b style='color:red;margin:0 2px;'>${model.desc}</b>的所有资料`,()=>{
         this.api.enterprise.DELETE_PAYMENTS({param:{id:model.id}}).then(res=>{
           setTimeout(() => {
             this.Success('删除成功')
@@ -403,6 +418,9 @@ export default {
         this.showChange = true
       }
     },
+    handleUpdateContract(id){
+     this.$emit('update',id)
+    },
     handlePatchArchive(item){
       console.log("submit:",item)
       if(item.id){
@@ -418,6 +436,7 @@ export default {
            this.items.splice(index,1,new_item)
           }
           this.modalCreate = false
+          this.handleUpdateContract(id)
           this.Success('修改成功')
          
         }).catch(e=>{
@@ -443,7 +462,8 @@ export default {
     },
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_PAYMENTS().then(res=>{
+        let queryCondition = this.contract_id?{query:{contract_id:this.contract_id}}:undefined
+       this.api.enterprise.LIST_PAYMENTS(queryCondition).then(res=>{
          let items = res.data.data
          items.forEach(v=>{
            v.payed = 0
