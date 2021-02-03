@@ -1,6 +1,6 @@
 <template>
-    <iframe :src='src' v-if="url" />
-    <span v-else>该文件无法预览</span>
+    <iframe :src='src' v-if="src" />
+    <span v-else style="margin:10px;">该文件无法预览,点击<a :href="url">下载</a></span>
 </template>
 
 <script>
@@ -9,14 +9,20 @@ export default {
    props:['url'],
   computed:{
     isDOC(){
-      if(this.url.slice(-3) == 'doc')
+      const exts = ['doc','docx','xls','xlsx','ppt','pptx']
+      if(exts.includes(this.url.slice(-3)))
+        return true
+    },
+    isPreviewable(){
+      const exts = ['pdf','gif','jpeg','png']
+      if(exts.includes(this.url.slice(-3)))
         return true
     },
     src(){
-      if(this.isDOC){
+      if(this.isOffice){
         return "https://view.officeapps.live.com/op/view.aspx?src="+this.url
-      }
-      return this.url
+      }else if(this.isPreviewable)
+        return this.url
     }
   }
 }
