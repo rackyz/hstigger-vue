@@ -6,7 +6,7 @@
         <div class="text-btn" :class="{'text-btn-active':current_url==f[1]}" style="padding:10px;background:#333;" :key="f.name" @click="current_url=f[1]">{{f[0]}}</div>
       </template>
     </Sider>
-    <BasePreview style="width:calc(100% - 420px);position:relative;" :url="current_url" />
+    <BasePreview style="width:100%;position:relative;" :url="current_url" />
   </Layout>
 </template>
 

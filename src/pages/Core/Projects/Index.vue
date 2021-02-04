@@ -161,6 +161,14 @@ export default {
     title:'项目管理',
      route:"/:id"
   },
+  watch:{
+    id:{
+      handler(v){
+        this.showProjects = false
+      },
+      immediate:true
+    }
+  },
   computed:{
     ...mapGetters('core',['projects']),
     MenuMap(){
@@ -185,7 +193,7 @@ export default {
     return this.$route.params.id
     },
     project(){
-      return this.$store.getters['project/get'](this.id)
+      return this.$store.getters['core/get_project'](this.id)
     },
     RouteMenu(){
       return this.menus.map(v=>{

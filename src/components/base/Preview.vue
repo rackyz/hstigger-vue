@@ -1,6 +1,6 @@
 <template>
     <iframe :src='src' v-if="src" />
-    <span v-else style="margin:10px;">该文件无法预览,点击<a :href="url">下载</a></span>
+    <span v-else style="margin:10px;">该文件格式 {{getFileExt(url)}} 无法预览,点击<a :href="url">下载</a></span>
 </template>
 
 <script>
@@ -8,14 +8,14 @@ let server = 'url'
 export default {
    props:['url'],
   computed:{
-    isDOC(){
+    isOffice(){
       const exts = ['doc','docx','xls','xlsx','ppt','pptx']
-      if(exts.includes(this.url.slice(-3)))
+      if(exts.includes(this.getFileExt(this.url)))
         return true
     },
     isPreviewable(){
-      const exts = ['pdf','gif','jpeg','png']
-      if(exts.includes(this.url.slice(-3)))
+      const exts = ['pdf','gif','jpeg','png','jpg']
+      if(exts.includes(this.getFileExt(this.url)))
         return true
     },
     src(){
@@ -24,6 +24,13 @@ export default {
       }else if(this.isPreviewable)
         return this.url
     }
+  },methods:{
+    getFileExt(url) {
+			if (url) {
+				let ext = url.substring(url.lastIndexOf(".") + 1);
+				return ext;
+			}
+		},
   }
 }
 </script>

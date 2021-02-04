@@ -121,11 +121,13 @@ export default {
       //   path:'/core/eadmin/flow',
       //   icon:'shenjing'
       // }]
-      // },{
-      //   name:'系统配置',
-      //   icon:'apps',
-      //   is_group:true,
-      //   subs:[{
+      //}
+      ,{
+        name:'系统配置',
+        icon:'apps',
+        is_group:true,
+        subs:[
+          //{
       //     name:'企业信息',
       //     path:'/core/eadmin/config',
       //     icon:'controls-5'
@@ -135,11 +137,11 @@ export default {
       //   //   path:'/core/admin/tool',
       //   //   icon:'codelibrary-fill'
       //   // },
-      //   {
-      //     name:'类型管理',
-      //     path:'/core/eadmin/type',
-      //     icon:'tag'
-      //   },
+        {
+          name:'类型管理',
+          path:'/core/eadmin/type',
+          icon:'tag'
+        },
         
         // {
         //   name:'系统日志',
@@ -150,7 +152,7 @@ export default {
         //   path:'/core/eadmin/maintain',
         //   icon:'config'
         // }
-       // ]}
+        ]}
         ]},
     ActiveMenu(){
       return this.MenuMap[this.ActivePath]
