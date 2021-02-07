@@ -25,6 +25,7 @@
 			:disabled="toolDisabled"
 		/>
     <!-- filters -->
+	
 		<div class="filter-wrap" style="padding: 5px">
 			<Button
 				style="margin-right: 5px"
@@ -70,43 +71,42 @@
 			
 		</div>
     <!-- table -->
-		
 	 <Tabs size="small" type="card" :animated="false" :value="tabIndex" style='height:calc(100% - 110px);width:100%;margin:5px 0;' class="fix-height-tabs">
-        <TabPane label="员工列表" name="list">
-		<div
-			style="
-				height: calc(100% - 80px);
-				width:100%;
-				overflow: hidden;
-				background: #ddd;
-				position: relative;
-			"
-		>
-			<hs-table
-        ref='itable'
-				:columns="columns"
-				:data="filteredAccounts"
-				:loading="loading"
-				:paged="false"
-				:page="page"
-				:pageSize="pageSize"
-				:selectable="multiple ? 'multiple' : 'single'"
-				:selection="selected"
-				@event="onTableEvent"
+    <TabPane label="员工列表" name="list">
+			<div
+				style="
+					height: calc(100% - 80px);
+					width:100%;
+					overflow: hidden;
+					background: #ddd;
+					position: relative;
+				"
 			>
-			</hs-table>
-		</div>
-    <!-- paging -->
-		<div
-			style="
-				height: 50px;
-				background: #fff;
-				display: flex;
-				justify-content: center;
-				border-top: 1px solid #dfdfdf;
-				align-items: center;
-			"
-		>
+				<hs-table
+					ref='itable'
+					:columns="columns"
+					:data="filteredAccounts"
+					:loading="loading"
+					:paged="false"
+					:page="page"
+					:pageSize="pageSize"
+					:selectable="multiple ? 'multiple' : 'single'"
+					:selection="selected"
+					@event="onTableEvent"
+				>
+				</hs-table>
+			</div>
+			<!-- paging -->
+			<div
+				style="
+					height: 50px;
+					background: #fff;
+					display: flex;
+					justify-content: center;
+					border-top: 1px solid #dfdfdf;
+					align-items: center;
+				"
+			>
 			<Page
 				:total="filteredAccounts.length"
 				size="small"
@@ -270,10 +270,12 @@ export default {
 				},
 				{
 					title:"部门",
+					key:'deps',
 					type:"text"
 				},
 				{
 					title:"职务",
+					key:"roles",
 					type:"text"
 				},
 				{
@@ -595,7 +597,7 @@ export default {
       if(Array.isArray(this.selected)){
         return this.selected.map(id=>this.users.find(v=>v.id == id)).filter(v=>v)
       }else{
-			
+				return this.users.find(v=>v.id == this.selected)
       }
     }
 	},
