@@ -216,6 +216,14 @@
 				@change="parse"
 			/>
 		</Modal>
+
+		<Modal v-model="showModalDep" :title="`部门调整 ${current?' — '+current.name:''}`">
+			<BaseTreeSelector :data="$store.getters['entadmin/deps']" @select="handleDepChanged" />
+		</Modal>
+
+			<Modal v-model="showModalRole" :title="`角色调整 ${current?' — '+current.name:''}`">
+			<BaseTreeSelector :data="$store.getters['entadmin/roles']" @select="handleDepChanged" />
+		</Modal>
 	</div>
 </template>
 
@@ -231,6 +239,8 @@ export default {
 			type:undefined,
 			changed:undefined,
 			loadingImport: false,
+			showModalDep:false,
+			showModalRole:false,
 			selected: null,
 			loading: false,
 			hidingLocked: false,
@@ -365,6 +375,16 @@ export default {
 					icon: "md-lock",
 				},
 				{
+					key: "dep",
+					name: "部门调整",
+					custom: "organization",
+				},
+				{
+					key: "role",
+					name: "角色调整",
+					custom: "quanxianliebiao",
+				},
+				{
 					key: "unlock",
 					name: "启用",
 					icon: "md-unlock",
@@ -407,6 +427,8 @@ export default {
 				unlock:true,			// unlock
 				import:true,			// import
 				"import-tmpl":true,			// download
+				dep:true,
+				role:true
 			}
 			if (this.multiple) {
 				if (this.selected && this.selected.length > 0) {
@@ -414,6 +436,7 @@ export default {
 					baseConfig.resetpwd = 0
 					baseConfig.lock = 0
 					baseConfig.unlock = 0
+					baseConfig.role = baseConfig.dep = 0
 				} 
 			} else {
         if (this.selected ){
@@ -428,6 +451,7 @@ export default {
 					baseConfig.resetpwdto = 0
 					baseConfig.lock =  (locked == 1)
 					baseConfig.unlock = (locked == 0)
+						baseConfig.role = baseConfig.dep = 0
 				}else {
 
 				}
@@ -576,6 +600,9 @@ export default {
     }
 	},
 	methods: {
+		handleDepChanged(deps){
+			this.showModalDep = true
+		},
     /** 
      * @method onSelectAll
      * @description binding 'select all' button for select all current users
@@ -665,7 +692,13 @@ export default {
 			} else if (e == "edit") {
 				this.current = selected;
 				this.showModal = true;
-			} else if (e == "refresh") {
+			}else if(e == "dep"){
+				this.current = selected;
+				this.showModalDep = true
+			}else if(e=="role"){
+					this.current = selected;
+				this.showModalRole = true
+			}else if (e == "refresh") {
 				this.getData();
 			} else if (e == "lock") {
 				this.$store.dispatch("entadmin/LockAccounts", selected_id).then(()=>{
