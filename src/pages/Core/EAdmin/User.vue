@@ -131,10 +131,10 @@
 			ref="form"
 			:title="current && current.id ? '修改信息' : '新增员工'"
 			v-model="showModal"
-			:width="420"
+			:width="620"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('ent_employee')"
+			:form="Form('employee')"
 			:data="current"
 			editable
 			@on-submit="patchUser"
@@ -217,12 +217,20 @@
 			/>
 		</Modal>
 
-		<Modal v-model="showModalDep" :title="`部门调整 ${current?' — '+current.name:''}`">
-			<BaseTreeSelector :data="$store.getters['entadmin/deps']" @select="handleDepChanged" />
+		<Modal v-model="showModalDep" :title="`部门调整 ${current?' — '+current.name:''}`" footer-hide width="300">
+			<BaseTreeSelector :data="$store.getters['entadmin/deps']" v-model="current_deps" />
+			<div class="flex-wrap flex-between" style="padding:10px 20%"> 
+				<Button type='primary' @click="handleSubmitDeps">保存</Button>
+				<Button @click="showModalDep=false">取消</Button>
+			</div>
 		</Modal>
 
-			<Modal v-model="showModalRole" :title="`角色调整 ${current?' — '+current.name:''}`">
-			<BaseTreeSelector :data="$store.getters['entadmin/roles']" @select="handleDepChanged" />
+			<Modal v-model="showModalRole" :title="`角色调整 ${current?' — '+current.name:''}`" footer-hide width="300">
+			<BaseTreeSelector :data="$store.getters['entadmin/roles']" v-model="current_roles" />
+			<div class="flex-wrap flex-between" style="padding:10px 20%"> 
+				<Button type='primary' @click="handleSubmitRoles">保存</Button>
+				<Button @click="showModalRole=false">取消</Button>
+			</div>
 		</Modal>
 	</div>
 </template>
@@ -236,6 +244,8 @@ export default {
 			page:1,
 			pageSize:100,
 			tabIndex:'list',
+			current_deps:[],
+			current_roles:[],
 			type:undefined,
 			changed:undefined,
 			loadingImport: false,
@@ -271,12 +281,40 @@ export default {
 				{
 					title:"部门",
 					key:'deps',
-					type:"text"
+					type:"text",
+					render:(h,param)=>{
+						let deps = param.row.deps || []
+						let depsDom =  deps.map((d)=>{
+							let dep = this.deps.find(v=>v.id == d)
+							if(dep){
+								return h('a',{href:'deps/'+dep.id,style:{
+									marginRight:'2px'
+								}},dep.name)
+							}
+							
+						})
+
+						return h('span',depsDom)
+					}
 				},
 				{
 					title:"职务",
 					key:"roles",
-					type:"text"
+					type:"text",
+					render:(h,param)=>{
+						let roles = param.row.roles || []
+						let doms =  roles.map((d)=>{
+							let role = this.roles.find(v=>v.id == d)
+							if(role){
+								return h('a',{href:'roles/'+role.id,style:{
+									marginRight:'2px'
+								}},role.name)
+							}
+							
+						})
+
+						return h('span',doms)
+					}
 				},
 				{
 					key:'hiredDate',
@@ -414,7 +452,7 @@ export default {
 	},
 	computed: {
 		...mapGetters('core',['getTypes']),
-		...mapGetters('entadmin',['users']),
+		...mapGetters('entadmin',['users','deps','roles']),
 		AccountTypes(){
 			return this.getTypes('AccountType')
 		},
@@ -604,6 +642,30 @@ export default {
 	methods: {
 		handleDepChanged(deps){
 			this.showModalDep = true
+		},
+		handleSubmitDeps(){
+			// patch user deps
+			this.$store.dispatch('entadmin/PatchUserDeps',{id:this.current.id,deps:this.current_deps}).then(res=>{
+				this.Success("部门修改成功")
+				this.current_deps = []
+				this.showModalDep = false
+			}).catch(e=>{
+				this.Error("修改失败:",e)
+			})
+			//this.showModalDep = false
+			//this.current_deps = []
+		},
+		handleSubmitRoles(){
+			// patch user deps
+			this.$store.dispatch('entadmin/PatchUserRoles',{id:this.current.id,roles:this.current_roles}).then(res=>{
+				this.Success("职务修改成功")
+				this.current_roles = []
+				this.showModalRole = false
+			}).catch(e=>{
+				this.Error("修改失败:",e)
+			})
+			//this.showModalDep = false
+			//this.current_deps = []
 		},
     /** 
      * @method onSelectAll

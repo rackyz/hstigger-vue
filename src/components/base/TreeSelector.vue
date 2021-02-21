@@ -42,11 +42,11 @@ export default {
   },
   methods:{
     onSelect(e){
-      if(this.value.includes(e)){
-        let index = this.value.findIndex(v=>v==e)
+      if(this.value.includes(e.id)){
+        let index = this.value.findIndex(v=>v==e.id)
         this.value.splice(index,1)
       }else{
-        this.value.push(e)
+        this.value.push(e.id)
       }
       this.$emit('input',this.value)
     },

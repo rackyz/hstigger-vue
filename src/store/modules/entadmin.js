@@ -1,4 +1,5 @@
 
+
 import UTIL from '../util.js'
 var SERVER = {}
 const state = {
@@ -148,6 +149,26 @@ const actions = {
         resolve(user)
       }).catch(e=>{
         reject(e)
+      })
+    })
+  },
+  PatchUserDeps({commit},{id,deps}){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.PATCH_USER_DEPS(deps,{param:{id}}).then(res=>{
+        commit('SaveUser',{id,deps})
+        resolve()
+      }).catch(e=>{
+      reject(e)
+      })
+    })
+  },
+  PatchUserRoles({commit},{id,roles}){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.PATCH_USER_ROLES(roles,{param:{id}}).then(res=>{
+        commit('SaveUser',{id,roles})
+        resolve()
+      }).catch(e=>{
+      reject(e)
       })
     })
   },
