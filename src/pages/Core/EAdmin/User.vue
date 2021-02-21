@@ -276,7 +276,14 @@ export default {
 				}},
 					{
 					title:"性别",
-					type:"text"
+					type:"type",
+					key:"gender",
+					option:{
+						getters:"core/getTypes",
+						getters_key:"Gender",
+							labelKey:"value"
+					}
+
 				},
 				{
 					title:"部门",
@@ -695,7 +702,7 @@ export default {
 			this.loadingImport = true;
 			let accounts = this.importData.filter((v) => !this.TestImportState(v));
 			this.$store
-				.dispatch("entadmin/CreateUsers", accounts)
+				.dispatch("entadmin/CreateEmployee", accounts)
 				.then((results) => {
 					let succees = results.filter((v) => v == 0);
 					let map = {};

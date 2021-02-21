@@ -94,6 +94,7 @@ export default {
           option:{
               getters:"entadmin/deps",
               labelKey:"name",
+              multiple:true,
               idKey:'id'
           }
       },
@@ -103,6 +104,8 @@ export default {
           option:{
               getters:"entadmin/roles",
               labelKey:"name",
+              
+              multiple:true,
               idKey:"id"
           }
       },
