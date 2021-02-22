@@ -212,7 +212,7 @@ const actions = {
   DeleteUser({commit},id){
     return new Promise((resolve, reject) => {
       SERVER.entadmin.DELETE_EMPLOYEES({param:id}).then(res => {
-        commit('SaveUser', id)
+        commit('removeUser', id)
         resolve(user)
       }).catch(e => {
         reject(e)

@@ -2,7 +2,6 @@ export default {
     def: {
       user: {
         label: "登录名",
-        editable: true,
         control: "input",
         option: {
           required: true,
@@ -18,7 +17,6 @@ export default {
       },
       name: {
         label: "姓名",
-        editable: true,
         control: "input",
         option: {
           required: true,
@@ -27,6 +25,9 @@ export default {
       avatar: {
         label: "头像",
         control: "avatar",
+         option: {
+           uploader: "file/uploadAvatar"
+         }
       },
       phone: {
         label:"绑定手机",
@@ -36,39 +37,71 @@ export default {
           label:"EMAIL",
         control: "input",
       },
+      address:{
+          label:"地址",
+        control: "input",
+      },
       gender:{
           label:"性别",
           control:"select",
           option:{
-              options:['男','女'],
+               getters: "core/getTypes",
+                 key: "Gender",
+                 idKey: 'id',
+                 labelKey: 'name',
               defaultValue:0
           }
       },
-      birth:{
+      birthday:{
           label:"出生日期",
           control:"time"
       },
-      jiguan:{
+      native_place:{
           label:"籍贯",
           control:"input"
       },
-      married:{
+      qq:{
+         label:"QQ",
+          control:"input"
+      },
+      zzl_id:{
+        label: "zzl_id",
+        control: "input"
+      },
+      ding_id: {
+        label: "ding_id",
+        control: "input"
+      },
+      wechat_id: {
+        label: "wechat_id",
+        control: "input"
+      },
+      marital_status: {
           label:"婚姻状况",
           control:"select",
           option:{
-            options:['未婚','已婚'],
+            getters: "core/getTypes",
+              key: "MaritalStatus",
+              idKey: 'id',
+              labelKey: 'name',
             defaultValue:0
         }
       },
       photo:{
           label:'证件照',
-          control:"avatar"
+          control:"avatar",
+           option: {
+               uploader:"file/uploadAvatar"
+           }
       },
-      politics:{
+      political_status: {
           label:'政治面貌',
           control:"select",
           option:{
-              options:['群众','党员'],
+               getters: "core/getTypes",
+                 key: "PoliticalStatus",
+                 idKey: 'id',
+                 labelKey: 'name',
               defaultValue:0
           }
       },
@@ -76,18 +109,35 @@ export default {
           label:"学历",
           control:"select",
           option:{
-              options:['博士','研究生','本科(全日制)','本科(非全日制)','专科','高中及以下'],
+                getters: "core/getTypes",
+                  key: "Education",
+                  idKey: 'id',
+                  labelKey: 'name',
               defaultValue:2
           }
       },
-      xw:{
-          label:"学位",
+      professor_rank: {
+          label:"职称",
           control:"select",
           option:{
-              options:['博士','硕士','学士','无'],
+              getters:"core/getTypes",
+              key: "ProfessorRank",
+                idKey: 'id',
+                labelKey: 'name',
               defaultValue:3
           }
       },
+       degree: {
+         label: "学位",
+         control: "select",
+         option: {
+            getters: "core/getTypes",
+              key: "Degree",
+              idKey: 'id',
+              labelKey: 'name',
+           defaultValue: 2
+         }
+       },
       deps:{
           label:"部门",
           control:"select",
@@ -109,25 +159,121 @@ export default {
               idKey:"id"
           }
       },
-      jointime:{
+      employee_date:{
           label:"入职时间"
           ,control:"time"
       },
-      subject:{
+      major:{
           label:"所学专业",
           control:"input"
       },
-      undergraduatedTime:{
+      graduate_time: {
           label:"毕业时间",
           control:"time"
       },
-      undergradutedSchool:{
+      graduate_institution: {
           label:"毕业院校",
           control:"input"
-      }
+      },
+      education_history:{
+        label:"教育经历",
+        control:"dataset",
+        option:{
+            columns:[{
+                key:"from",
+                control:"time",
+                label:"起始时间",
+                span:5
+            },{
+                key:"to",
+                label: "截止时间",
+                control:"time",
+                span:5
+            },{
+                key:"education_level",
+                label:"学历",
+                control:"select",
+                span:5,
+                option:{
+                    getters: "core/getTypes",
+                    key: "Education",
+                    idKey: 'id',
+                    labelKey: 'name'
+                }
+            },{
+                key:"school_name",
+                label: "就读院校",
+                control:"input",
+                span:9
+            }]
+        }
+      },
+      emergency_contact:{
+        label:"紧急联系人",
+        control:"input"
+      },
+      emergency_phone:{
+        label:"紧急联系电话",
+        control:"input"
+      },
+      family_contact:{
+         label: "家庭成员",
+           control: "dataset",
+           option: {
+             columns: [{
+                   key: "name",
+                   label: "姓名",
+                   control: "input",
+                   span: 4,
+                 }, {
+               key: "relation",
+               label: "家庭关系",
+               control: "input",
+               span: 3,
+             }, {
+               key: "phone",
+               label: "联系电话",
+               control: "input",
+               span: 6,
+             }, {
+               key: "workplace",
+               label: "工作单位",
+               control: "input",
+               span: 10
+             }, ]
+           }
+      },
+       work_history: {
+         label: "工作经历",
+         control: "dataset",
+         option: {
+           columns: [{
+             key: "from",
+             control: "time",
+             label: "起始时间",
+             span: 5
+           }, {
+             key: "to",
+             label: "截止时间",
+             control: "time",
+             span: 5
+           }, {
+             key: "position",
+             label: "岗位职务",
+             control: "input",
+             span: 5,
+           }, {
+             key: "workplace",
+             label: "工作单位",
+             control: "input",
+             span: 9
+           }]
+         }
+       }
+
     },
-    layout: `<div>
-    <div style="margin:5px 0;color:#aaa;">账号信息</div>
+    layout: `<div style="padding:40px;">
+    <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">账号信息</div>
     <div class="flex-wrap flex-between" style="width:100%">
         <Row :gutter='10' style="width:calc(100% - 60px)">
             <Col span='12'>{{user}}</Col>
@@ -137,36 +283,71 @@ export default {
             {{avatar}}
         </div>
     </div>
-    <Row :gutter="10" style="margin-top:10px">
-        <Col span='12'>{{deps}}</Col>
-        <Col span='12'>{{roles}}</Col>
+     <Row :gutter='10' style="margin-top:10px">
+        <Col span='8'>{{email}}</Col>
+        <Col span='8'>{{qq}}</Col>
+        <Col span='8'>{{zzl_id}}</Col>
     </Row>
-    <div style="margin:5px 0;color:#aaa;">员工信息</div>
+     <Row :gutter='10' style="margin-top:10px">
+        <Col span='8'>{{ding_id}}</Col>
+        <Col span='8'>{{wechat_id}}</Col>
+    </Row>
+   
+    <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">员工信息</div>
     <div class="flex-wrap flex-between" style="width:100%">
         <Row :gutter='10' style="width:calc(100% - 100px)">
             <Col span='8'>{{name}}</Col>
             <Col span='6'>{{gender}}</Col>
-            <Col span='10'>{{birth}}</Col>
-            <Col span='24' style='margin-top:5px'>{{jiguan}}</Col>
+            <Col span='10'>{{birthday}}</Col>
+             <Col span='6' style='margin-top:5px'>{{marital_status}}</Col>
+        <Col span='6' style='margin-top:5px'>{{political_status}}</Col>
+            <Col span='12' style='margin-top:5px'>{{native_place}}</Col>
         </Row>
         <div style="width:100px;height:130px;position:relative;">
             {{photo}}
         </div>
     </div>
     <Row :gutter='10' style="margin-top:10px">
-        <Col span='6'>{{married}}</Col>
-        <Col span='6'>{{politics}}</Col>
+        <Col span='24'>{{address}}</Col>
         
     </Row>
-    <div style="margin:5px 0;color:#aaa;">学历信息</div>
+    <Row :gutter='10' style="margin-top:10px">
+        <Col span='6'>{{emergency_contact}}</Col>
+        <Col span='8'>{{emergency_phone}}</Col>
+        
+    </Row>
+     <Row :gutter='10' style="margin-top:10px">
+        <Col span='24'>{{family_contact}}</Col>
+        
+    </Row>
+    
+    <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">工作信息</div>
     <Row :gutter='10'>
-        <Col span='6'>{{education}}</Col>
-        <Col span='6'>{{xw}}</Col>
-        <Col span='6'>{{subject}}</Col>
-        <Col span='6'>{{undergraduatedTime}}</Col>
+        <Col span='6'>{{employee_date}}</Col>
+        <Col span='6'>{{professor_rank}}</Col>
+    </Row>
+     <Row :gutter="10" style="margin-top:10px">
+        <Col span='12'>{{deps}}</Col>
+        <Col span='12'>{{roles}}</Col>
     </Row>
     <Row :gutter='10' style="margin-top:10px">
-        <Col span='24'>{{undergradutedSchool}}</Col>
+        <Col span='24'>{{work_history}}</Col>
+    </Row>
+  
+
+    <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">学历信息</div>
+    <Row :gutter='10'>
+        <Col span='6'>{{education}}</Col>
+        <Col span='6'>{{degree}}</Col>
+        <Col span='6'>{{major}}</Col>
+        <Col span='6'>{{graduate_time}}</Col>
+    </Row>
+    <Row :gutter='10' style="margin-top:10px">
+        <Col span='24'>{{graduate_institution}}</Col>
+        
+    </Row>
+    <Row :gutter='10' style="margin-top:10px">
+        <Col span='24'>{{education_history}}</Col>
         
     </Row>
     </div>`,

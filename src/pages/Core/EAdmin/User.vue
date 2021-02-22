@@ -75,7 +75,7 @@
     <TabPane label="员工列表" name="list">
 			<div
 				style="
-					height: calc(100% - 80px);
+					height: calc(100% - 110px);
 					width:100%;
 					overflow: hidden;
 					background: #ddd;
@@ -131,7 +131,7 @@
 			ref="form"
 			:title="current && current.id ? '修改信息' : '新增员工'"
 			v-model="showModal"
-			:width="620"
+			:width="820"
 			style="margin: 10px"
 			footer-hide
 			:form="Form('employee')"

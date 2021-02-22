@@ -44,8 +44,9 @@ import CONFIG from '@/config'
    uploadAvatar(ctx,file){
     return new Promise((resolve,reject)=>{
       ctx.dispatch('upload',{files:[file],vdisk:"avatars"}).then(res=>{
-       
-        resolve(API.COS.baseURL +'files/'+ res.url)
+        if(Array.isArray(res))
+          res = res[0]
+        resolve(res.url)
       }).catch(reject)
     })
    },
