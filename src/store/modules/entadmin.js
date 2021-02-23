@@ -22,6 +22,15 @@ const getters = {
 }
 
 const actions = {
+  GetUser({commit},id){
+     return new Promise((resolve, reject) => {
+       SERVER.entadmin.GET_EMPLOYEES({param:{id}}).then(res => {
+         let user = res.data.data
+         commit('SaveUser', user)
+         resolve(user)
+       }).catch(reject)
+     })
+  },
   GetUsers({commit}){
     return new Promise((resolve,reject)=>{
       SERVER.entadmin.LIST_EMPLOYEES().then(res => {

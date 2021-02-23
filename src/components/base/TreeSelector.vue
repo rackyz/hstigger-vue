@@ -24,8 +24,10 @@
 }
 
 </style>
-<template>
+<template><div>
+  {{value}}
   <hs-tree class="transparent" :data="data"  @on-select='onSelect' :nodeRenderer="nodeRenderer"  />
+  </div>
 </template>
 
 <script>
@@ -38,6 +40,15 @@ export default {
     value:{
     type:Array,
     default:[]
+    }
+  },
+  watch:{
+    value:{
+      handler(v){
+        this.$forceUpdate()
+      },
+      immediate:true,
+      deep:true
     }
   },
   methods:{

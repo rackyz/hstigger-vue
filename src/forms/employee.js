@@ -91,7 +91,8 @@ export default {
           label:'证件照',
           control:"avatar",
            option: {
-               uploader:"file/uploadAvatar"
+               uploader:"file/uploadAvatar",
+               w2h:0.7
            }
       },
       political_status: {
@@ -243,6 +244,36 @@ export default {
              }, ]
            }
       },
+      certifications:{
+        label:"证书",
+        control:'dataset',
+         option: {
+             columns: [{
+                key:'pass_date',
+                control:"time",
+                label:"获得日期",
+                span:5
+            },{
+                   key: "cert_type",
+                   control: "select",
+                   label: "证书种类",
+                   getters:"core/getTypes",
+                   key:"CertType",
+                    labelKey:"name",
+                    idKey:"id",
+                   span: 12
+                 }, {
+                   key: "locked",
+                   label: "锁定中",
+                   control: "select",
+                   option:{
+                    options:['未锁定','已锁定'],
+                    defaultValue:0
+                   },
+                   span: 5
+                 }]
+                }
+      },
        work_history: {
          label: "工作经历",
          control: "dataset",
@@ -332,6 +363,9 @@ export default {
     </Row>
     <Row :gutter='10' style="margin-top:10px">
         <Col span='24'>{{work_history}}</Col>
+    </Row>
+    <Row :gutter='10' style="margin-top:10px">
+        <Col span='24'>{{certifications}}</Col>
     </Row>
   
 

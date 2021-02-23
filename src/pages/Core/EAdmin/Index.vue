@@ -4,13 +4,12 @@
      <hs-menu style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #333;'  :data="menus"  @on-select='onClickMenu' :current="ActivePath" >
     
      </hs-menu>
-    <transition name='fadeIn'>
       <Content>
-        
+        <keep-alive>
         <router-view></router-view>
+        </keep-alive>
       </Content>
       
-    </transition>
      
   
      

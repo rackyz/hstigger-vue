@@ -1,18 +1,7 @@
 <style lang="less">
-.fix-height-tabs{
-	position: relative;
-	width:100%;
-	.ivu-tabs-content{
-		position: relative;
-		height:100%;
-		width:100%;
-		.ivu-tabs-tabpane{
-		position: relative;
-		width:100%;
-		height:100%;
-		overflow: hidden;
-		}
-	}
+.ivu-table-row-highlight{
+	border:none !important;
+	filter:1px solid #2ba7ff;
 }
 </style>
 <template>
@@ -39,24 +28,24 @@
 			>
 			
 			<Input v-model="searchText" search style="width: 200px" clearable />
-			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 部门 -">
-				<template v-for="t in AccountTypes">
+			<Select clearable v-model='dep' style='width:120px;margin-left:5px;' placeholder="- 部门 -">
+				<template v-for="t in deps">
 					<Option :value='t.value' :key='t.value' :label="t.name">
 						<span :style='`color:${t.color}`'>{{t.name}}</span>
 					</Option>
 				</template>
 			</Select>
-			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 职务 -">
-				<template v-for="t in AccountTypes">
+			<Select clearable v-model='role' style='width:120px;margin-left:5px;' placeholder="- 职务 -">
+				<template v-for="t in roles">
 					<Option :value='t.value' :key='t.value' :label="t.name">
 						<span :style='`color:${t.color}`'>{{t.name}}</span>
 					</Option>
 				</template>
 			</Select>
-			<Select clearable v-model='type' style='width:120px;margin-left:5px;' placeholder="- 性别 -">
-				<template v-for="t in AccountTypes">
-					<Option :value='t.value' :key='t.value' :label="t.name">
-						<span :style='`color:${t.color}`'>{{t.name}}</span>
+			<Select clearable v-model='gender' style='width:120px;margin-left:5px;' placeholder="- 性别 -">
+				<template v-for="(t,i) in ['男','女']">
+					<Option :value='i' :key='i' :label="t">
+						<span :style='``'>{{t}}</span>
 					</Option>
 				</template>
 			</Select>
@@ -75,7 +64,7 @@
     <TabPane label="员工列表" name="list">
 			<div
 				style="
-					height: calc(100% - 110px);
+					height: calc(100% - 80px);
 					width:100%;
 					overflow: hidden;
 					background: #ddd;
@@ -324,9 +313,9 @@ export default {
 					}
 				},
 				{
-					key:'hiredDate',
+					key:'employee_date',
 					title:"入职时间",
-					type:'datetime',
+					type:'time',
 					option:{
 						type:"date"
 					}
@@ -388,7 +377,9 @@ export default {
 				}},
          { type: "text", title: " "},
 			],
-
+			dep:null,
+			role:null,
+			gender:null,
 			current: {},
 			tools: [
 				{
@@ -507,106 +498,7 @@ export default {
 
 			return baseConfig
 		},
-		user_password_form() {
-			return {
-				layout:
-					"<div><Row><Col :span='24'>{{password}}</Col></Row><Row style='margin-top:10px'><Col :span='24'>{{passwordAgain}}</Col></Row></div>",
-				def: {
-					password: {
-						label: "输入密码",
-						control: "input",
-						option: {
-							type: "password",
-							require: true,
-						},
-					},
-					passwordAgain: {
-						label: "密码确认",
-						control: "input",
-						option: {
-							type: "password",
-							require: true,
-						},
-					},
-				},
-			};
-		},
-		user_form() {
-			return {
-				def: {
-					user: {
-						label: "登录名",
-						editable: true,
-						control: "input",
-						option: {
-							required: true,
-							rules: [
-								{
-									type: "name",
-								},
-								{
-									msg: "该名称已存在,请更换",
-								},
-							],
-						},
-					},
-					name: {
-						label: "姓名",
-						editable: true,
-						control: "input",
-						option: {
-							required: true,
-						},
-					},
-					type:{
-						control:"select",
-						option:{
-							
-							required:true,
-							labelKey:"name",
-							idKey:"value",
-							getters:"core/getTypes",
-							key:"AccountType",
-							defaultValue:0
-						}
-					},
-					avatar: {
-						label: "头像",
-						editable: true,
-						control: "image",
-					},
-					password:{
-						label:'密码',
-						control:'input',
-						option:{
-							required:true,
-							defaultValue:'123456'
-						}
-					},
-					phone: {
-						control: "input",
-					},
-					email:{
-						control: "input",
-					}
-				},
-				layout: `<div>
-				<Row :gutter='10'>
-		
-        <Col span='5' style='line-height:40px;text-align:right;' >账号类型</Col><Col span='19'>{{type}}</Col></Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >用户名</Col><Col span='19'>{{user}}</Col>
-        </Row>
-        <Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >电话</Col><Col span='19'>{{phone}}</Col>
-        </Row><Row :gutter='10' style='margin-top:10px;'><Col span='5' style='line-height:40px;text-align:right;' >邮箱</Col><Col span='19'>{{email}}</Col>
-				</Row>
-				<Row :gutter='10' style='margin-top:0px;'><Col span='5' style='line-height:40px;text-align:right;' ><div style='color:red;'>密码</div></Col><Col span='19' style='padding:10px 5px'>随机生成发送给手机 or 指定密码</Col>
-        </Row></div>`,
-
-				option: {
-					hideReset:true
-				},
-			};
-    },
+	
     /**
      * @computed filteredUsers
      * @description find users after many filters
@@ -623,7 +515,11 @@ export default {
 					return false;
 					if (this.changed != undefined && v.changed != this.changed) return false;
 
-					if (this.type != undefined && v.type != this.type) return false;
+					if (this.dep != undefined && !v.deps.includes(this.dep)) return false;
+
+					if(this.role != undefined && !v.roles.includes(this.role)) return false
+
+					if(this.gender != undefined && !v.gender != this.gender) return false
 
 					return true;
 				}) || []) : []
@@ -737,7 +633,10 @@ export default {
      * @description our old friend get data from remote server
      */
 		getData() {
+			if(this.users.length > 0)
+				return
 			this.loading = true;
+		
 			this.$store.dispatch('entadmin/GetUsers').then(()=>{}).finally(e=>{
 				this.loading = false
 			})
@@ -761,13 +660,18 @@ export default {
 				this.current = {}
 				this.showModal = true;
 			} else if (e == "edit") {
-				this.current = selected;
-				this.showModal = true;
+				this.$store.dispatch('entadmin/GetUser',selected.id).then(user=>{
+					this.current = user;
+					this.showModal = true;
+				})
+			
 			}else if(e == "dep"){
 				this.current = selected;
+				this.current_deps = selected.deps
 				this.showModalDep = true
 			}else if(e=="role"){
 					this.current = selected;
+					this.current_roles = selected.roles
 				this.showModalRole = true
 			}else if (e == "refresh") {
 				this.getData();
@@ -943,7 +847,23 @@ export default {
 	},
 };
 </script>
-
+<style lang="less">
+.fix-height-tabs{
+	position: relative;
+	width:100%;
+	.ivu-tabs-content{
+		position: relative;
+		height:100%;
+		width:100%;
+		.ivu-tabs-tabpane{
+		position: relative;
+		width:100%;
+		height:100%;
+		overflow: hidden;
+		}
+	}
+}
+</style>
 <style lang="less" scoped>
 
 
