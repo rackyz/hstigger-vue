@@ -1,7 +1,13 @@
 <template>
   <Layout class="hs-container hs-container-full statistics">
-   
-    <Content style="padding:5px;">
+    <Header class="flex-wrap" style="padding:5px 10px;height:80px;">
+      <div style="color:#fff;font-size:12px;line-height:15px;display:flex;flex-direction:column;align-items:center;" >
+        <div style="width:40px;height:40px;background:#235;border-radius:10px;justify-content:center;" class="flex-wrap flex-center"><img style="width:80%;height:80%;" src="https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/system/hr.png"></img>
+        </div>
+        <div style="height:25px;line-height:25px;">总览</div>
+      </div>
+    </Header>
+    <Content style="padding:5px;position:relative;height:calc(100% - 80px)">
     <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">
       <div class="flex-wrap">
         <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
@@ -25,27 +31,27 @@
       </div>
       <div class="flex-wrap">
         <!-- authed.ArchiveCategoryManage -->
-          <Button @click="handlePreCreate()" type="primary" icon="md-add">新增支付记录</Button>
+          <Button @click="handlePreCreate()" type="primary" icon="md-add">新增员工</Button>
       <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
       </div>
     </div>
     <div class="filter-box">
 
     </div>
-    <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+    <div style="height:calc(100% - 82px);position:relative;overflow-y:auto;">
+      <hs-list  :data="filteredItems" @event="onListEvent" :option='{tmpl:"hsx-employee"}' style='border:none;' />
     </div>
     </Content>
 
     <hs-modal-form
 			ref="form"
-			:title="model.id?'修改合约':'新增合约'"
+			title="新增员工"
 			v-model="modalCreate"
 			:width="620"
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('payment')"
+			:form="Form('employee')"
 			:data="model"
       :initData="filterInitData"
 			editable
@@ -53,13 +59,7 @@
 			@on-event="handleEvent"
 		/>
 
-    <Modal v-model="showPay" title="支付管理" footer-hide width="800">
-      <hs-table ref='table2' :columns="payColumns" :data="pay_events" @event="onPayTableEvent" selectable="false" :paged="false" />
-    </Modal>
 
-    <Modal v-model="showChange" title="变更管理" footer-hide>
-      
-    </Modal>
   </Layout>
 </template>
 
@@ -81,172 +81,15 @@ export default {
       //
       items:[],
       modalCreate:false,
-      payColumns:[{
-         title:"序号",
-        key:"id",
-        type:"index"
-      },{
-         title:"支付金额",
-        type:"number",
-        key:"amount",
-        width:150,
-        option:{
-          type:"fullAmount"
-        }
-      },{
-        title:"支付时间",
-        type:"time",
-        key:"paydate",
-        width:100,
-        option:{
-          type:'date',
-          align:"center"
-        }
-      },{
-          title:"支付凭证",
-          width:60,
-          sortable:false,
-          render:(h,params)=>{
-            
-            let files = params.row.files
-            if(files){
-            return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
-              this.handleDownload(files)
-            }}  
-            }) }else{
-              return h('span','-')
-            }
-
-          }
-          }, {
-        title:"创建时间",
-        type:"time",
-        key:"created_at",
-        width:100,
-        option:{
-          align:"center"
-        }
-      },{
-        title:"创建人",
-        type:"user",
-        key:"created_by",
-        width:100,
-        option:{
-          align:"center",
-          getters:"core/users"
-        }
-      },{
-        title:"操作",
-        type:'tool',
-        buttons:["edit","delete"],
-        option:{
-          
-        }
-      }],
+     
       model:{}, 
-     columns:[{
-         title:"序号",
-        key:"id",
-        type:"index"
-      },{
-        title:"所属部门",
-        type:"type",
-        width:150,
-        key:"dep_id",
-        option:{
-          align:"center",
-          getters:"core/deps"
-        }
-      },{
-        title:"所属项目",
-        width:200,
-        type:"type",
-        key:"project_id",
-        option:{
-          align:"center",
-          getters:"core/projects"
-        }
-      },{
-        title:"所属合同",
-        width:200,
-        type:"type",
-        key:"contract_id",
-        option:{
-          align:"center",
-          getters:"core/contracts"
-        }
-      },{
-        title:"支付依据",
-        type:"text",
-        key:"desc",
-        width:200,
-        option:{
-          align:"center"
-        }
-      },{
-         title:"支付金额",
-        type:"number",
-        key:"amount",
-        width:150,
-        option:{
-          type:"fullAmount"
-        }
-      },{
-        title:"支付时间",
-        type:"time",
-        key:"paydate",
-        width:100,
-        option:{
-          type:'date',
-          align:"center"
-        }
-      },{
-          title:"支付凭证",
-          width:60,
-          sortable:false,
-          render:(h,params)=>{
-            let files = params.row.files
-            if(files){
-            return h('Button',{props:{icon:'md-download',size:'small'},on:{click:()=>{
-              this.handleDownload(files)
-            }}  
-            }) }else{
-              return h('span','-')
-            }
-
-          }
-          }, {
-        title:"创建时间",
-        type:"time",
-        key:"created_at",
-        width:100,
-        option:{
-          align:"center"
-        }
-      },{
-        title:"创建人",
-        type:"user",
-        key:"created_by",
-        width:100,
-        option:{
-          align:"center",
-          getters:"core/users"
-        }
-      },{
-        title:"操作",
-        type:'tool',
-        buttons:["edit","delete"],
-        option:{
-          
-        }
-      }],
     }
   },
   mounted(){
-    this.$nextTick(()=>{
-      this.$refs.table.calcTableHeight()
-    })
     this.getData()
+  },
+  metaInfo:{
+    title:"人事管理"
   },
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
@@ -262,34 +105,12 @@ export default {
           type3:this.f_type_3
         }
       },
-      filtredColumns(){
-        let cols = [...this.columns]
-        if(this.part_mode == "partA"){
-          cols.splice(5,1)
-        }else if(this.part_mode == "partB"){
-          cols.splice(6,1)
-        }
-        return cols
-      },
       filteredItems(){
         return this.items.filter(v=>{
           let search_text = this.f_search_text ? this.f_search_text.trim() : ""
           if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
             return false
-          if(this.f_project_id && v.project_id != this.f_project_id)
-            return false
-          
-          if(this.f_dep_id && v.dep_id != this.f_dep_id)
-            return false
-
-          if(this.f_type_1 && v.type1 != this.f_type_1)
-            return false
-          
-          if(this.f_type_2 && v.type2 != this.f_type_2)
-            return false
-          
-          if(this.f_type_3 && v.type3 != this.f_type_3)
-            return false
+         
 
           return true
         })
@@ -385,22 +206,9 @@ export default {
        }).catch(reject)
      })
     },
-    onTableEvent(e){
-      console.log(e)
-      if(!e.data)
-        return
-      if(e.type == 'edit'){
-       this.handleBeforeEdit(e.data.id)
-      }else if(e.type == 'delete'){
-        this.handleDelete(e.data)
-      }else if(e.type == 'open'){
-        this.handleOpen(e.data.id)
-      }else if(e.type =='pay'){
-        this.current = e.data
-        this.showPay = true
-      }else if(e.type == 'change'){
-        this.current = e.data
-        this.showChange = true
+    onListEvent(e){
+      if(e.event == 'open'){
+        this.RouteTo('/core/users/'+e.param.id,true)
       }
     },
     handlePatchArchive(item){
@@ -408,7 +216,7 @@ export default {
       if(item.id){
         let id = item.id
         delete item.id
-        this.api.enterprise.PATCH_PAYMENTS(item,{param:{id}}).then(res=>{
+        this.api.enterprise.PATCH_EMPLOYEES(item,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
          
           let new_item = Object.assign({},item,updateInfo)
@@ -426,7 +234,7 @@ export default {
           this.loading = false
         })    
       }else{
-        this.api.enterprise.POST_PAYMENTS(item).then(res=>{
+        this.api.enterprise.POST_EMPLOYEES(item).then(res=>{
           let updateInfo = res.data.data
           let new_item = Object.assign({},item,updateInfo)
           this.items.splice(0,0,new_item)
@@ -443,13 +251,9 @@ export default {
     },
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_PAYMENTS().then(res=>{
+       this.api.enterprise.LIST_EMPLOYEES().then(res=>{
          let items = res.data.data
-         items.forEach(v=>{
-           v.payed = 0
-           v.adjusted_amount = v.amount || 0
-           v.isOverPlan = v.payed > v.adjusted_amount ? '是':'否'
-         })
+         
           this.items = items
        }).finally(e=>{
          this.loading = false

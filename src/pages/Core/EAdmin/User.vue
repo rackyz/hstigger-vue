@@ -618,16 +618,7 @@ export default {
 					this.loadingImport = false;
 				});
 		},
-  		GetStateColor(s) {
-			if (s == 0) return "yellowgreen";
-			else if (s == 1) return "darkred";
-			else return "orange";
-		},
-		GetStateText(s) {
-			if (s == 0) return "正常";
-			else if (s == 1) return "禁用";
-			else return "锁定";
-    },
+  	
     /** 
      * @method getData
      * @description our old friend get data from remote server
@@ -662,6 +653,7 @@ export default {
 			} else if (e == "edit") {
 				this.$store.dispatch('entadmin/GetUser',selected.id).then(user=>{
 					this.current = user;
+					user.id = selected.id
 					this.showModal = true;
 				})
 			
@@ -794,29 +786,6 @@ export default {
 				});
 		},
 
-		/** @method patchUserPassword
-		 *  @description Remote method, for patching user password
-		 */
-		patchUserPassword(item) {
-			var that = this;
-			if (item.password != item.passwordAgain) {
-				this.$refs.formpwd.setError("passwordAgain", "两次密码不一致,请检查");
-				return;
-			}
-			if (this.selected) {
-				item.id = this.selected
-				delete item.passwordAgain
-				this.$store
-					.dispatch("admin/ChangePassword", item)
-					.then((res) => {
-						that.Success("修改成功");
-						that.showModalPassword = false;
-					})
-					.catch((e) => {
-						that.Error(e);
-					});
-			}
-		},
 
 		/** @method patchUser
 		 *  @description Remote method, for patching user information
