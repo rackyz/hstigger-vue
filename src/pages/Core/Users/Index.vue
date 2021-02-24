@@ -1,47 +1,195 @@
+<style lang="less">
+.user-tab{
+  width:100%;
+  .ivu-tabs-nav-wrap{
+    background:#fff;
+    width:100%;
+  }
+  .ivu-tabs-content{
+    position: relative;
+    height:calc(100% - 40px);
+  }
+  .ivu-tabs-tabpane{
+    height:100%;
+    background:linear-gradient(to bottom right,#eee,#fff);
+    overflow-y:auto;
+  }
+}
+</style>
 <template>
-  <Layout style='width:1200px;margin:0 auto;'>
+  <Layout style='background:#dfdfdf;'>
     <Spin fix v-show="loading">加载中...</Spin>
-    <Card style='color:#fff;display:flex;align-items:center;height:150px;background:background: #373B44;
-background: -webkit-linear-gradient(to right, #4286f4, #373B44);background: linear-gradient(to right, #4286f4, #373B44);margin-top:5px;border:5px solid #fff;' :padding='30'>
-      <hs-avatar style='margin-right:10px' :userinfo="userinfo" size="50"></hs-avatar>  <span style='color:#fff;font-size:25px'>{{userinfo.name}}</span>
-    </Card>
-     <Tabs value="name1">
-        <TabPane label="基本信息" name="name1">
-           <div class="group">
-          <div class='group-title'>账户信息</div>
+    <Sider width='255' style="padding:15px;">
+        <hsx-employee style='margin-right:10px;background:#ffffff55;' :nohover='true' :data="userinfo" size="50"></hsx-employee>
+
+        <div class="section">
+          <h2>所在项目</h2>
+        </div>
+
+
+        <div class="section">
+          <h2>近期工作</h2>
+        </div>
+
+        <div class="section">
+          <h2>个人动态</h2>
+        </div>
+
+    </Sider>
+    
+     <Tabs value="name1" class="user-tab" :animated="false" v-if="ready">
+        <TabPane label="档案" name="name1" >
+          
+          <div class="group">
+          <div class='group-title'>基本情况 <span class='warning'>(本信息段只对管理员和个人开放)</span></div>
+          
           <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
-            <Col :span='8'><div class='flex-wrap'><div class='seg-label'>用户名</div><div class='seg-value'>{{userinfo.user}}</div></div></Col>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>姓名</div><div class='seg-value'>{{userinfo.name}}</div></div></Col>
+             <Col :span='6'><div class='flex-wrap'><div class='seg-label'>性别</div><div class='seg-value'>{{getTypeName('Gender',userinfo.gender)}}</div></div></Col>
+              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>出生日期</div><div class='seg-value'>{{FormatDate(userinfo.birthday)}}</div></div></Col>
+               <Col :span='6'><div class='flex-wrap'><div class='seg-label'>年龄</div><div class='seg-value'>{{yearsold}}</div></div></Col>
+          </Row>
+           <Row :gutter="12" style='margin:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>籍贯</div><div class='seg-value'>{{userinfo.native_place}}</div></div></Col>
+             <Col :span='6'><div class='flex-wrap'><div class='seg-label'>婚姻状况</div><div class='seg-value'>{{getTypeName('MaritalStatus',userinfo.marital_status)}}</div></div></Col>
+              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>政治面貌</div><div class='seg-value'>{{getTypeName('PoliticalStatus',userinfo.political_status)}}</div></div></Col>
+              
+               
+          </Row>
+           <Row :gutter="12" style='margin:10px;margin-right:100px;'>
+              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>电话</div><div class='seg-value'>{{userinfo.phone}}</div></div></Col>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>QQ</div><div class='seg-value'>{{userinfo.qq}}</div></div></Col>
+             <Col :span='6'><div class='flex-wrap'><div class='seg-label'>EMAIL</div><div class='seg-value'>{{userinfo.email}}</div></div></Col>
+             
+              
+               
+          </Row>
+           <Row :gutter="12" style='margin:10px;margin-right:100px;'>
+              <Col :span='24'><div class='flex-wrap'><div class='seg-label'>家庭住址</div><div class='seg-value'>{{userinfo.address}}</div></div></Col>
             
              
-               <Col :span='6'><div class='flex-wrap'><div class='seg-label'>最近登录</div><div class='seg-value'>{{userinfo.lastlogin_at || "无"}}</div></div></Col>
+              
+               
+          </Row>
+          <Row :gutter="12" style='margin:10px;margin-right:100px;'>
+              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>紧急联系人</div><div class='seg-value'>{{userinfo.emergency_contact}}</div></div></Col>
+               <Col :span='6'><div class='flex-wrap'><div class='seg-label'>紧急联系电话</div><div class='seg-value'>{{userinfo.emergency_phone}}</div></div></Col>
+            
+             
+              
+               
+          </Row>
+            <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'>
+              <div class='seg-label'>家庭成员</div></div></Col></Row>
+              <hsx-datasetview style='margin:0 15px;margin-top:10px;margin-right:100px;' :columns="family_contact_dataset_def" :data="userinfo.family_contact" />
+         
+          </div>
+            <div class="group">
+          <div class='group-title'>工作信息 </div>
+             <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>入职时间</div><div class='seg-value'>{{FormatDate(userinfo.employee_date)}}</div></div></Col>
+             <Col :span='6'><div class='flex-wrap'><div class='seg-label'>当前部门</div><div class='seg-value'>{{getDeps(userinfo.deps)}}</div></div></Col>
+              
+               
+              </Row>
+                <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'>
+              <div class='seg-label'>工作经历</div></div></Col></Row>
+              <hsx-datasetview style='margin:0 15px;margin-top:10px;margin-right:100px;' :columns="work_history_dataset_def" :data="userinfo.work_history" />
+          </div>
+            <div class="group">
+          <div class='group-title'>教育情况 </div>
+            <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>学历</div><div class='seg-value'>{{getTypeName('Education',userinfo.education)}}</div></div></Col>
+             <Col :span='6'><div class='flex-wrap'><div class='seg-label'>学位</div><div class='seg-value'>{{getTypeName('Degree',userinfo.degree)}}</div></div></Col>
+              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>所学专业</div><div class='seg-value'>{{userinfo.major}}</div></div></Col>
+               
+              </Row>
+                <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'><div class='seg-label'>毕业时间</div><div class='seg-value'>{{FormatDate(userinfo.graduate_time)}}</div></div></Col>
+             <Col :span='12'><div class='flex-wrap'><div class='seg-label'>毕业院校</div><div class='seg-value'>{{userinfo.graduate_institution}}</div></div></Col>
+               
+              </Row>
+<Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'>
+              <div class='seg-label'>教育经历</div></div></Col></Row>
+              <hsx-datasetview style='margin:0 15px;margin-top:10px;margin-right:100px;' :columns="education_school_dataset_def" :data="userinfo.education_history" />
+          </div>
+           
+           
+        </TabPane>
+        <TabPane label="能力*(2)" name="ability">标签三的内容</TabPane>
+        <TabPane label="任务(2)" name="task">标签三的内容</TabPane>
+        <TabPane label="项目(15)" name="project">标签二的内容</TabPane>
+        <TabPane label="培训(3)" name="study">标签三的内容</TabPane>
+        <TabPane label="薪酬*(2)" name="salary">标签三的内容</TabPane>
+        <TabPane label="劳务合同(2)" name="contract">标签三的内容</TabPane>
+        <TabPane label="福利待遇*(2)" name="goody">标签三的内容</TabPane>
+        <TabPane label="考核*(3)" name="check">标签三的内容</TabPane>
+        <TabPane :label="`证书(${userinfo.certifacitons?userinfo.certifacitons.length:0})`" name="cert">
+           <div class="group">
+              <div class='group-title'>证书情况</div>
+              <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='6'><div class='flex-wrap'>
+              <div class='seg-label'>证书台账</div></div></Col></Row>
+              <hsx-datasetview style='margin:0 15px;margin-top:10px;margin-right:100px;' :columns="certifications_dataset_def" :data="userinfo.certifications || []" />
+          </div>
+          
+           
+        </TabPane>
+         <TabPane label="系统*" name="system">
+             <div class="group">
+               
+          <div class='group-title'>账户信息</div>
+         
+          <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='12'><div class='flex-wrap'><div class='seg-label'>用户名</div><hs-avatar :userinfo="userinfo" size="30" style="margin-right:10px" /><div class='seg-value'>  {{userinfo.user}}</div></div></Col>
+            
+             
+               <Col :span='12'><div class='flex-wrap'><div class='seg-label'>最近登录</div><div class='seg-value'>{{FormatTime(userinfo.lastlogin_at)}}</div></div></Col>
           </Row>
            <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
-              <Col :span='8'><div class='flex-wrap'><div class='seg-label'>创建时间</div><div class='seg-value'>{{userinfo.created_at}}</div></div></Col>
-               <Col :span='8'><div class='flex-wrap'><div class='seg-label'>创建人</div><div class='seg-value'>{{userinfo.created_by}}</div></div></Col>
+              <Col :span='12'><div class='flex-wrap'><div class='seg-label'>创建时间</div><div class='seg-value'>{{FormatTime(userinfo.created_at)}}</div></div></Col>
+               <Col :span='12'><div class='flex-wrap'><div class='seg-label'>创建人</div><div class='seg-value'>{{userinfo.created_by}}</div></div></Col>
+           </Row>
+            <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+              <Col :span='12'><div class='flex-wrap'><div class='seg-label'>账号类型</div><div class='seg-value'>{{getTypeName('AccountType',userinfo.type)}}</div></div></Col>
+               <Col :span='12'><div class='flex-wrap'><div class='seg-label'>账号状态</div><div class='seg-value'>{{getTypeName('EntStateType',userinfo.locked)}}</div></div></Col>
+           </Row>
+           <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+              <Col :span='12'><div class='flex-wrap'><div class='seg-label'>绑定手机</div><div class='seg-value'>{{getTypeName('AccountType',userinfo.phone)}}</div></div></Col>
+               
            </Row>
           
           </div>
-          <div class="group">
-          <div class='group-title'>个人信息</div>
-          <Alert type="warning" show-icon style="margin:10px;width:300px;" closable>本信息段只对管理员和个人开放</Alert>
-          <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
-            <Col :span='5'><div class='flex-wrap'><div class='seg-label'>姓名</div><div class='seg-value'>{{userinfo.name}}</div></div></Col>
-             <Col :span='4'><div class='flex-wrap'><div class='seg-label'>性别</div><div class='seg-value'>男</div></div></Col>
-              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>出生日期</div><div class='seg-value'>1988/03/12</div></div></Col>
-               <Col :span='6'><div class='flex-wrap'><div class='seg-label'>年龄</div><div class='seg-value'>29</div></div></Col>
-          </Row>
-           <Row :gutter="12" style='margin:10px;margin-right:100px;'>
-            <Col :span='5'><div class='flex-wrap'><div class='seg-label'>联系电话</div><div class='seg-value'>{{userinfo.phone}}</div></div></Col>
-             <Col :span='4'><div class='flex-wrap'><div class='seg-label'>性别</div><div class='seg-value'>男</div></div></Col>
-              <Col :span='6'><div class='flex-wrap'><div class='seg-label'>出生日期</div><div class='seg-value'>1988/03/12</div></div></Col>
-               <Col :span='6'><div class='flex-wrap'><div class='seg-label'>年龄</div><div class='seg-value'>29</div></div></Col>
-               
-          </Row>
+<div class="group">
+          <div class='group-title'>权限信息</div>
+         
+          
           </div>
-        </TabPane>
-        <TabPane label="项目经历(15)" name="name2">标签二的内容</TabPane>
-        <TabPane label="培训经历(3)" name="name3">标签三的内容</TabPane>
-        <TabPane label="证书(2)" name="name3">标签三的内容</TabPane>
+
+           <div class="group">
+          <div class='group-title'>关联平台</div>
+         
+          <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='12'><div class='flex-wrap'><div class='seg-label'>钉钉</div><div class='seg-value'>  {{userinfo.ding_id}}</div></div></Col>
+            
+             
+          </Row>
+           <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Col :span='12'><div class='flex-wrap'><div class='seg-label'>高专项目管理</div><div class='seg-value'>  {{userinfo.zzl_id}}</div></div></Col>
+            <Col :span='12'><div class='flex-wrap'><div class='seg-label'>账户名</div><div class='seg-value'>  {{userinfo.user}}</div></div></Col>
+           
+             
+          </Row>
+           <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+               <Col :span='12'><div class='flex-wrap'><div class='seg-label'>微信</div><div class='seg-value'>  {{userinfo.wechat_id}}</div></div></Col>
+                <Col :span='12'><div class='flex-wrap'><div class='seg-label'>QQ</div><div class='seg-value'>  {{userinfo.wechat_id}}</div></div></Col>
+               </Row>
+          </div>
+
+         </TabPane>
        
     </Tabs>
     
@@ -50,10 +198,12 @@ background: -webkit-linear-gradient(to right, #4286f4, #373B44);background: line
 
 <script>
 import {mapGetters} from 'vuex'
+import EmployeeForm from '@/forms/employee'
 export default {
   data(){
     return {
       loading:false,
+      ready:false,
       userinfo:{}
     }
   },
@@ -62,45 +212,122 @@ export default {
     route:"/:id"
   },
   computed:{
+    ...mapGetters('core',['getTypes','deps','roles']),
+   
     user_id(){
-    return this.$route.params.id
+      return this.$route.params.id
+    },
+    yearsold(){
+      return Math.ceil(moment.duration(moment() - moment(this.userinfo.birthday)).as('years'))
+    },
+    education_school_dataset_def(){
+      return EmployeeForm.def.education_history.option.columns
+    },
+    family_contact_dataset_def(){
+       return EmployeeForm.def.family_contact.option.columns
+    },
+    certifications_dataset_def(){
+       return EmployeeForm.def.certifications.option.columns
+    },
+    work_history_dataset_def(){
+       return EmployeeForm.def.work_history.option.columns
     }
   },
   mounted(){
     this.getData()
   },
   methods:{
+    getDeps(dep_ids){
+      let deps = '暂无部门'
+      if(Array.isArray(dep_ids)){
+        deps = dep_ids.map(v=>{
+          let d = this.deps.find(d=>d.id == v)
+          if(d)
+            return d.name
+          else
+            return null
+        }).filter(v=>v).join(', ')
+      }
+      return deps
+    },
+     getTypeName(key,val){
+      let types = this.getTypes(key)
+      let t = types.find(v=>v.value == val)
+      if(t)
+        return t.name
+      else
+        return '无'
+    },
+    FormatDate(d){
+      if(!d)
+        return '-'
+      return moment(d).format("L")
+    },
+    FormatTime(t){
+      if(!t)
+        return '-'
+      let offset = moment.duration(moment()-moment(t)).as('days')
+      if(offset < 3)
+        return moment(t).fromNow()
+      else 
+        return moment(t).format('LL')
+    },
     getData(){
       this.loading = true
-      this.CORE.GET_USER({param:{id:this.user_id}}).then(res=>{
+      this.api.enterprise.GET_EMPLOYEES({param:{id:this.user_id}}).then(res=>{
         this.userinfo = res.data.data
+        this.$nextTick(e=>{
+          this.ready = true
+        })
         
       }).finally(e=>{
         this.loading = false
       })
-
     }
   }
 }
 </script>
 <style lang="less" scoped>
+.group{
+  max-width:1200px;
+  background:#fff;
+  margin:5px;
+  padding:5px;
+  padding-bottom:20px;
+}
 .seg-label{
 
   margin-right:10px;
-  padding:0 10px;
-  color:#37d;
+  padding:2px 10px;
   min-width:80px;
   text-align: center;
-  border-bottom:2px solid #37d;
+  background:#515a6e;
+  color:#fff;
 }
 
 .group-title{
-  margin:10px;
+  margin:0 10px;
   font-size:16px;
-  border-left:10px solid #666;
-  background:#333;
-  width:120px;
+  border-bottom:2px solid #aaa;
+  margin-bottom:20px;
+  max-width:90%;
+  color:#333;
+  padding:10px;
+}
+
+.section{
   color:#fff;
-  padding-left:10px;
+  padding:10px;
+  margin-top:10px;
+  h2{
+    font-size:14px;
+    border-bottom:1px solid #aaa;
+    padding-bottom:5px;
+  }
+}
+
+.warning{
+  color:darkred;
+  font-size:12px;
 }
 </style>
