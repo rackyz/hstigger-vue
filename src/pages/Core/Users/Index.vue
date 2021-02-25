@@ -4,10 +4,15 @@
   .ivu-tabs-nav-wrap{
     background:#fff;
     width:100%;
+    border-bottom:2px solid #aaa;
+    z-index:100;
+  }
+  .ivu-tabs-nav-scroll{
+     box-shadow: 1px 1px 1px #333;
   }
   .ivu-tabs-content{
     position: relative;
-    height:calc(100% - 40px);
+    height:calc(100% - 60px);
   }
   .ivu-tabs-tabpane{
     height:100%;
@@ -37,8 +42,8 @@
 
     </Sider>
     
-     <Tabs value="name1" class="user-tab" :animated="false" v-if="ready">
-        <TabPane label="档案" name="name1" >
+     <Tabs :value="tabIndex" class="user-tab" :animated="false" v-if="ready" @on-click="cacheTabIndex">
+        <TabPane label="档案" name="profile" >
           
           <div class="group">
           <div class='group-title'>基本情况 <span class='warning'>(本信息段只对管理员和个人开放)</span></div>
@@ -126,7 +131,12 @@
         <TabPane label="薪酬*(2)" name="salary">标签三的内容</TabPane>
         <TabPane label="劳务合同(2)" name="contract">标签三的内容</TabPane>
         <TabPane label="福利待遇*(2)" name="goody">标签三的内容</TabPane>
-        <TabPane label="考核*(3)" name="check">标签三的内容</TabPane>
+        <TabPane :label="`考核*(${appraises.length})`" name="check">
+          <div class="group" v-for="a in appraises" :key='a.id'>
+             <div class='group-title'>{{a.desc}} <span class='warning'>(本信息段只对管理层)</span></div>
+            <hsx-appraise :data="a"  />
+          </div>
+        </TabPane>
         <TabPane :label="`证书(${userinfo.certifacitons?userinfo.certifacitons.length:0})`" name="cert">
            <div class="group">
               <div class='group-title'>证书情况</div>
@@ -204,6 +214,8 @@ export default {
     return {
       loading:false,
       ready:false,
+      tabIndex:"profile",
+      appraises:[],
       userinfo:{}
     }
   },
@@ -234,9 +246,15 @@ export default {
     }
   },
   mounted(){
+    let index = localStorage.getItem('user_tab_index')
+    if(index)
+      this.tabIndex = index
     this.getData()
   },
   methods:{
+    cacheTabIndex(name){
+      localStorage.setItem('user_tab_index',name)
+    },
     getDeps(dep_ids){
       let deps = '暂无部门'
       if(Array.isArray(dep_ids)){
@@ -282,6 +300,10 @@ export default {
         
       }).finally(e=>{
         this.loading = false
+      })
+
+      this.api.enterprise.LIST_A_FLOWS({query:{user_id:this.user_id}}).then(res=>{
+        this.appraises = res.data.data
       })
     }
   }
