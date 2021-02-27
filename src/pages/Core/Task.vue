@@ -46,7 +46,7 @@
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('task')"
+			:form="form_task"
 			:data="model"
       :initData="filterInitData"
 			editable
@@ -101,6 +101,7 @@ export default {
   data(){
     return {
       selectedTmplClass:95,
+      parent_id:false,
       modelResult:{},
       modalCreateTeml:false,
       modalInitTmpl:false,
@@ -194,7 +195,11 @@ export default {
           if(item.sub_count){
             return h('Button',{props:{size:"small",type:"info"}},'进入')
           }else{
-            return h("Button",{props:{size:"small",type:"primary"}},'创建')
+            return h("Button",{props:{size:"small",type:"primary"},on:{click:()=>{
+              this.modalCreate = true
+              this.parent_id = param.row.id
+
+            }}},'创建')
           }
 
         }
@@ -287,6 +292,16 @@ export default {
   },
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      form_task(){
+        let form = this.Form('task')
+        
+        form.def.parent_id.option.options = this.root_tasks.map(v=>({value:v.id,label:v.name}))
+       
+        return form
+      },
+      root_tasks(){
+        return this.items.filter(v=>v)
+      },
       tmplClasses(){
         var that = this
         return this.$store.getters['core/getTypes']('ARCHIVE_WORKTYPE').map(v=>{
@@ -306,15 +321,17 @@ export default {
       },
       filterInitData(){
         return {
-          project_id:this.f_project_id,
-          dep_id:this.f_dep_id,
-          type1:this.f_type_1,
-          type2:this.f_type_2,
-          type3:this.f_type_3
+          project_id:this.project_id,
+
+          parent_id:this.parent_id,
+          dep_id:this.dep_id,
+          type1:this.type_1,
+          type2:this.type_2,
+          type3:this.type_3
         }
       },
       filteredItems(){
-        return this.items.filter(v=>{
+        let items = this.items.filter(v=>{
           let search_text = this.f_search_text ? this.f_search_text.trim() : ""
           if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
             return false
@@ -335,6 +352,11 @@ export default {
 
           return true
         })
+        items.forEach(v=>{
+          v.children = this.items.filter(w=>w.parent_id == v.id)
+        })
+
+        return items
       }
     },
   methods:{
@@ -352,6 +374,7 @@ export default {
     },
     handlePreCreate(){
       this.model={}
+      this.parent_id = null
       if(this.f_project_id !== null)
         this.model.project_id = this,f_project_id
       if(this.f_dep_id)
@@ -362,7 +385,6 @@ export default {
         this.model.type2 = this.f_type_2
        if(this.f_type_3 !== null)
         this.model.type3 = this.f_type_3
-      console.log(this.model)
       this.modalCreate=true;
     },
     handlePreview(e){
@@ -480,6 +502,8 @@ export default {
           this.loading = false
         })    
       }else{
+        if(this.parent_id)
+          item.parent_id = this.parent_id
         this.api.enterprise.POST_TASKS(item).then(res=>{
           let updateInfo = res.data.data
           let new_item = Object.assign({},item,updateInfo)

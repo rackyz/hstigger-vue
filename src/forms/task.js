@@ -35,7 +35,6 @@ export default {
       control: "select",
       option: {
         editable: false,
-        getters: "user/tasks",
         
       }
     },
@@ -72,7 +71,7 @@ export default {
               getters: 'core/getTypes',
               defaultValue: 0,
               key: "TASK_TYPE",
-              idKey: 'id',
+              idKey: 'value',
               labelKey: 'name'
             }
       },
@@ -83,7 +82,7 @@ export default {
              getters: 'core/getTypes',
              defaultValue: 0,
              key: "ARCHIVE_WORKTYPE",
-             idKey: 'id',
+             idKey: 'value',
              labelKey: 'name'
            }
       },
