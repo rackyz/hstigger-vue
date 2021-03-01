@@ -1,12 +1,12 @@
 <template>
-  <Task :filter="{project_id:id}" />
+  <Cob :filter="{project_id:id}" />
 </template>
 
 <script>
-import Task from '../Task'
+import Cob from '../Cob'
 export default {
   components:{
-    Task
+    Cob
   },
   computed:{
      id(){

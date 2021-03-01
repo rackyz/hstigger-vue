@@ -147,7 +147,10 @@ const getters = {
     return state.session.settings
   },
   get_project:(state)=>(id)=>{
-    return state.projects.find(v=>v.id == id)
+    if(Array.isArray(state.projects))
+      return state.projects.find(v=>v.id == id) || {}
+    else
+      return {}
   },
   enterprises(state){
     return state.session.enterprises

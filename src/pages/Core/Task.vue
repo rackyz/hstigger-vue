@@ -4,18 +4,18 @@
     <Content style="padding:5px 10px;">
     <div class="filter-box flex-between" style="margin:5px 0;">
       <div class="flex-wrap">
-        <Input style="width:230px;" v-model="f_search_text" search clearable placeholder="输入编号或名称查询" />
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_type_2" placeholder="- - 所属部门 - -" clearable>
+        <Input style="width:230px;" v-model="search_text" search clearable placeholder="输入编号或名称查询" />
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="business_type" placeholder="- - 所属部门 - -" clearable>
              <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
 
           </Select>
-        <Select style="width:200px;margin-left:5px;text-align:center" v-model="f_project_id" placeholder="- - 项目类型 - -" clearable>
+        <Select style="width:200px;margin-left:5px;text-align:center" v-model="project_id" placeholder="- - 项目类型 - -" clearable>
           
 
         </Select>
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="f_dep_id" placeholder="- - 建筑类型 - -" clearable>
+         <Select style="width:150px;margin-left:5px;text-align:center" v-model="dep_id" placeholder="- - 建筑类型 - -" clearable>
            <template v-for="d in $store.getters['core/deps']">
              <Option :value="d.id" :key="d.id">{{d.name}}</Option>
            </template>
@@ -33,8 +33,13 @@
     <div class="filter-box">
 
     </div>
+    <div class="focused-box" v-if="focused_task && focused_task.id">
+      <div class="text-btn" style="margin-right:5px;display:flex;align-items:center;justify-content:center;"><Icon class="text-btn icon-btn" style="margin:0;" type="md-home" /></div>
+       
+     \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
+    </div>
     <div style="height:400px;position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summable:true}" />
     </div>
     </Content>
 
@@ -78,7 +83,7 @@
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('task_simple')"
+			:form="GetForm(current)"
 			:data="modelResult"
 			editable
 			@on-submit="handleProcess"
@@ -103,14 +108,15 @@ export default {
       selectedTmplClass:95,
       parent_id:false,
       modelResult:{},
+      focused_task:{},
       modalCreateTeml:false,
       modalInitTmpl:false,
       modalProcess:false,
-      f_project_id:null,
-      f_dep_id:null,
-      f_search_text:"",
-      f_type_1:null,
-      f_type_2:null,
+      project_id:null,
+      dep_id:null,
+      search_text:"",
+      base_type:null,
+      business_type:null,
       f_type_3:null,
       //
       items:[],
@@ -138,7 +144,16 @@ export default {
         group:2
       }],
       model:{}, 
-      columns:[{
+    }
+  },
+  mounted(){
+    this.project_id = this.filter.project_id
+    this.getData()
+  },
+   computed:{
+      ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      columns(){
+        return [{
         title:"序号",
         key:"id",
         type:"index",
@@ -165,6 +180,7 @@ export default {
         width:300,
         type:"text",
         key:"name",
+        tree:true,
         linkEvent:"open"
       },{
         title:"所属部门",
@@ -192,8 +208,12 @@ export default {
         width:130,
         render:(h,param)=>{
           let item = param.row
-          if(item.sub_count){
-            return h('Button',{props:{size:"small",type:"info"}},'进入')
+          if(param.row.base_type != 0)
+            return h('span','-')
+          if(item.subs && item.subs.length > 0){
+            return h('Button',{props:{size:"small",type:"info"},on:{click:()=>{
+              this.focused_task = item
+            }}},`进入(${item.subs.length})`)
           }else{
             return h("Button",{props:{size:"small",type:"primary"},on:{click:()=>{
               this.modalCreate = true
@@ -226,14 +246,24 @@ export default {
         title:"工作量",
         type:"text",
         width:80,
-        key:"percent"
+        key:"percent",
+        render:(h,param)=>{
+          return h('span',param.row.percent || '100%')
+        }
       },{
-        title:"任务期限",
-        type:"user",
+        title:"计划工期",
+        type:"time",
         key:"plan_duration",
         width:100,
         option:{
           align:"center",
+        },
+        render:(h,param)=>{
+          let time = param.row.plan_duration
+          if(time)
+            return h('span',time+'天')
+          else
+            return h('span','无计划')
         }
       },{
         title:"任务成果",
@@ -282,16 +312,7 @@ export default {
           
         }
       }]
-    }
-  },
-  mounted(){
-    this.$nextTick(()=>{
-      this.$refs.table.calcTableHeight()
-    })
-    this.getData()
-  },
-   computed:{
-      ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      },
       form_task(){
         let form = this.Form('task')
         
@@ -314,7 +335,7 @@ export default {
         })
       },
       isFiltering(){
-        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null ||  this.f_project_id != null ||  this.f_dep_id != null 
+        return this.search_text || this.base_type != null || this.project_id != null ||  this.dep_id != null 
       },
       filteredTmpls(){
         return this.tmpls.filter(v=>v.business_type == this.selectedTmplClass)
@@ -325,35 +346,39 @@ export default {
 
           parent_id:this.parent_id,
           dep_id:this.dep_id,
-          type1:this.type_1,
-          type2:this.type_2,
-          type3:this.type_3
+          base_type:this.base_type,
+          business_type:this.business_type,
         }
       },
       filteredItems(){
         let items = this.items.filter(v=>{
-          let search_text = this.f_search_text ? this.f_search_text.trim() : ""
+          let search_text = this.search_text ? this.search_text.trim() : ""
           if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
             return false
-          if(this.f_project_id && v.project_id != this.f_project_id)
+          if(this.project_id && v.project_id != this.project_id)
             return false
           
-          if(this.f_dep_id && v.dep_id != this.f_dep_id)
+          if(this.dep_id && v.dep_id != this.dep_id)
             return false
 
-          if(this.f_type_1 && v.type1 != this.f_type_1)
+          if(this.base_type && v.type1 != this.base_type)
             return false
           
-          if(this.f_type_2 && v.type2 != this.f_type_2)
+          if(this.business_type && v.type2 != this.business_type)
             return false
-          
-          if(this.f_type_3 && v.type3 != this.f_type_3)
+
+          if(this.focused_task && this.focused_task.id && v.parent_id != this.focused_task.id)
             return false
+          else if(!this.focused_task || !this.focused_task.id){
+            let exist = this.items.find(t=>t.id == v.parent_id)
+            if(exist)
+              return false
+          }
 
           return true
         })
         items.forEach(v=>{
-          v.children = this.items.filter(w=>w.parent_id == v.id)
+          v.subs = this.items.filter(w=>w.parent_id == v.id)||[]
         })
 
         return items
@@ -365,26 +390,24 @@ export default {
       this.modalProcess = true
     },
     handleClearFilter(){
-      this.f_search_text=""
-      this.f_type_1 = null 
-      this.f_type_2 = null 
+      this.search_text=""
+      this.base_type = null 
+      this.business_type = null 
       this.f_type_3 = null 
-      this.f_project_id = null 
-      this.f_dep_id = null 
+      this.project_id = null 
+      this.dep_id = null 
     },
     handlePreCreate(){
       this.model={}
       this.parent_id = null
-      if(this.f_project_id !== null)
-        this.model.project_id = this,f_project_id
-      if(this.f_dep_id)
-        this.model.dep_id = this.f_dep_id
-      if(this.f_type_1 !== null)
-        this.model.type1 = this.f_type_1
-       if(this.f_type_2 !== null)
-        this.model.type2 = this.f_type_2
-       if(this.f_type_3 !== null)
-        this.model.type3 = this.f_type_3
+      if(this.project_id !== null)
+        this.model.project_id = this,project_id
+      if(this.dep_id)
+        this.model.dep_id = this.dep_id
+      if(this.base_type !== null)
+        this.model.type1 = this.base_type
+       if(this.business_type !== null)
+        this.model.type2 = this.business_type
       this.modalCreate=true;
     },
     handlePreview(e){
@@ -432,7 +455,7 @@ export default {
       let id = this.current.id
       if(!id)
         return
-      this.api.enterprise.PROCESS_TASK(data,{param:id}).then(res=>{
+      this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
         let updateInfo = res.data.data
          
           let new_item = Object.assign({},item,updateInfo)
@@ -477,8 +500,28 @@ export default {
       }else if(e.type == 'delete'){
         this.handleDelete(e.data)
       }else if(e.type == 'open'){
-        this.handleOpen(e.data.id)
+        if(e.data.base_type == 0)
+        {
+          this.focused_task = e.data
+
+        }
+        else{
+           this.handleOpen(e.data.id)
+        }
+       
       }
+    },
+    GetForm(task){
+      if(!task)
+        return {}
+      if(task.base_type == 0){
+        return this.Form('task_purchase')
+      }else if(task.base_type == 1){
+        return this.Form('task_purchase')
+      }else{
+        return this.Form('task_simple')
+      }
+
     },
     handlePatchArchive(item){
       if(item.id){
@@ -541,6 +584,21 @@ export default {
 
 }
 </script>
+<style lang="less" scoped>
+.focused-box{
+  display: flex;
+  align-items:center;
+  margin-bottom:5px;
 
-<style>
+  .text-btn{
+    background:#333;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:4px;
+    
+    color:#fff;
+  }
+
+  .task-name{
+    font-weight: bold;
+    margin:0 5px;
+  }
+}
 </style>

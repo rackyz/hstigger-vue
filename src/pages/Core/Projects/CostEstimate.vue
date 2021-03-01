@@ -1,12 +1,12 @@
 <template>
-  <Task :filter="{project_id:id}" />
+  <CostEstimate :filter="{project_id:id}" />
 </template>
 
 <script>
-import Task from '../Task'
+import CostEstimate from '../CostEstimate'
 export default {
   components:{
-    Task
+    CostEstimate
   },
   computed:{
      id(){

@@ -2,7 +2,7 @@
   <Layout style='overflow:hidden;position:relative;'>
       <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:75px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
-        <div class="project-code">代码 <span>{{id}}</span> 编号 <span>{{project.code}}</span> 类型 <span>房建监理</span></div> 
+        <div class="project-code">编号 <span>{{project.code}}</span> 类型 <span>信息系统研发项目</span></div> 
         <div class="project-name">{{project.name}}
           <Button type='primary' size='small' style='width:50px;height:20px;text-align:center;' @click="showProjects = !showProjects">切换</Button>
         </div>
@@ -11,7 +11,7 @@
         </div>
         </div>
         <div class='right'>
-          <div class="project-code" style='text-align:right;'>状态 <span style='color:yellowgreen;'>进行中</span> 负责人 <span style='margin-right:0;'>张三</span> </div> 
+          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:-5px;margin-bottom:3px;margin-right:5px;'>状态 <span style='color:yellowgreen;'>{{getTypes('TASK_STATE').find(v=>v.value==project.state).name}}</span> 负责人 <hs-avatar :userinfo="users.find(v=>v.id == project.charger)" style="margin:0 5px;"></hs-avatar> {{users.find(v=>v.id == project.charger).name}} </div> 
           <div class="project-dynamic">
             <div class='project-state'>任务<br /><span class='count'>315<span class='unit'>条</span></span></div>
             <div class='project-state'>已服务<br /><span class='count'>52<span class='unit'>天</span></span></div>
@@ -63,24 +63,27 @@ export default {
         subs:[{
           name:'项目总览',
           icon:'xiangmu1',
-          key:'profile'
-        },{
-          name:'数据分析',
-          icon:'bar-chart',
           key:'dashboard'
-        }]
+        },
+        // {
+        //   name:'数据分析',
+        //   icon:'bar-chart',
+        //   key:'dashboard'
+        // }
+        ]
+
       },{
         name:'通用模块',
         is_group:true,
         subs:[{
-          name:'项目进度',
+          name:'任务管理',
           icon:'xiangmu',
           key:'task'
-        },{name:'项目人员',
+        },{name:'人员管理',
         icon:'user',
         key:'employee'}
         ,{
-          name:'项目资料',
+          name:'档案管理',
           icon:'xiangmu2',
           key:'archive',
         }]
@@ -88,70 +91,30 @@ export default {
         name:'业务模块',
         is_group:true,subs:[{
           name:'合同管理',
-          icon:'file',
+          icon:'iconset0118',
           key:'contract'
+        },
+        {
+          name:'招标管理',
+          icon:'bid',
+          key:'cob'
+        },
+        {
+          name:'造价管理',
+          icon:'workflowdesign',
+          key:'costestimate'
         }]},{
         name:'系统配置',
-        is_group:true,subs:[{
-          name:'项目角色',
-          icon:'role',
-          key:'role'
-        },{
+        is_group:true,subs:[
+        //   {
+        //   name:'项目角色',
+        //   icon:'role',
+        //   key:'role'
+        // },
+        {
           name:'项目配置',
           icon:'config',
           key:'config'
-        }]
-      }],
-      menus2:[{
-        name:'我的',
-        is_group:true,
-        subs:[{
-          name:'我的任务',
-          icon:'bar-chart',
-          key:'profile',
-          count:15
-        },{
-          name:'我的收藏',
-          icon:'xiangmu1',
-          key:'dashboard'
-        }]
-      },{
-        name:'计划/任务',
-        is_group:true,
-        subs:[{
-          name:'发布通知',
-          icon:'xiangmu',
-          key:'task'
-        },{name:'项目人员',
-        icon:'user',
-        key:'employees'}
-        ,{
-          name:'项目资料',
-          icon:'xiangmu2',
-          key:'management'
-        },{
-          name:'项目文件',
-          icon:'file',
-          key:'management'
-        }]
-      },{
-        name:'数据/记录',
-        is_group:true,
-        subs:[{
-          name:'发布通知',
-          icon:'xiangmu',
-          key:'tasks'
-        },{name:'项目人员',
-        icon:'user',
-        key:'employees'}
-        ,{
-          name:'项目资料',
-          icon:'xiangmu2',
-          key:'management'
-        },{
-          name:'项目文件',
-          icon:'file',
-          key:'management'
         }]
       }]
     }
@@ -170,7 +133,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['projects']),
+    ...mapGetters('core',['projects','users','getTypes']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -190,7 +153,7 @@ export default {
       return this.$route.path
     },
     id(){
-    return this.$route.params.id
+      return this.$route.params.id
     },
     project(){
       return this.$store.getters['core/get_project'](this.id)
