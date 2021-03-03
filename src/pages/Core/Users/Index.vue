@@ -131,7 +131,7 @@
         <TabPane label="薪酬*(2)" name="salary">标签三的内容</TabPane>
         <TabPane label="劳务合同(2)" name="contract">标签三的内容</TabPane>
         <TabPane label="福利待遇*(2)" name="goody">标签三的内容</TabPane>
-        <TabPane :label="`考核*(${appraises.length})`" name="check">
+        <TabPane :label="`考核*(${appraises.length})`" name="check" v-if="session.my_deps.includes(48110048)">
           <div class="group" v-for="a in appraises" :key='a.id'>
              <div class='group-title'>{{a.desc}} <span class='warning'>(本信息段只对管理层)</span></div>
             <hsx-appraise :data="a"  />
@@ -224,7 +224,7 @@ export default {
     route:"/:id"
   },
   computed:{
-    ...mapGetters('core',['getTypes','deps','roles']),
+    ...mapGetters('core',['session','getTypes','deps','roles']),
    
     user_id(){
       return this.$route.params.id

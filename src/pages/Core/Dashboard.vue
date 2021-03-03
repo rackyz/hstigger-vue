@@ -245,15 +245,15 @@
           /> 已处理</span> <span style='float:right;font-size:12px;'>MORE</span>
         </div>
         
-        <template v-for="(fi,i) in my_tasks">
+        <template v-for="(fi) in my_tasks.slice(0,5)">
           <div
             class='ti-item'
             :key='fi.id'
           >
-            <div class='ti-icon'>{{getTypesByKey("TASK_TYPE")[fi.base_type].name}}</div>
+            <div class='ti-icon'>{{fi.base_type != undefined && getTypesByKey("TASK_TYPE")[fi.base_type]?getTypesByKey("TASK_TYPE")[fi.base_type].name:'任务'}}</div>
             <div class='ti-info'>
               <div class='ti-flowinfo'>
-                {{get_project(fi.project_id).name}} {{getDep(fi.dep_id).name}} {{getTypes("ARCHIVE_WORKTYPE").find(v=>v.value == fi.base_type).name}} {{fi.parent_id?'子任务':''}}
+                {{fi.project_id != undefined?get_project(fi.project_id).name:''}} {{fi.dep_id != undefined?getDep(fi.dep_id).name:''}} {{fi.base_type!=undefined && getTypes("ARCHIVE_WORKTYPE").find(v=>v.value == fi.base_type)?getTypes("ARCHIVE_WORKTYPE").find(v=>v.value == fi.base_type).name:''}} {{fi.parent_id?'子任务':''}}
               </div>
               <div class='ti-desc'>
                 {{fi.name}}
@@ -261,7 +261,7 @@
             </div>
             <div class='ti-date'>
               <div class='ti-deadline'>{{fi.start_time ? getTimeString(fi.start_time,fi.plan_duration) : ('计划:'+(fi.plan_duration?(fi.plan_duration +'天'):'无'))}}</div>
-              <div class='ti-executor'>{{getTypeByValue('TASK_STATE',fi.state).name}}</div>
+              <div class='ti-executor'>{{getTypeByValue('TASK_STATE',fi.state || 0).name}}</div>
             </div>
           </div>
         </template>
