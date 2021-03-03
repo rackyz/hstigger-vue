@@ -34,11 +34,11 @@
     </div>
      <Tabs type="card" @on-click="handleTabChanged">
         <TabPane label="付款合同" name="partA"></TabPane>
-        <TabPane label="收款合同" name="partB"></TabPane>
-        <TabPane label="第三方合同" name="third"></TabPane>
+        <TabPane label="收款合同" name="partB" v-if="filteredByProject"></TabPane>
+        <TabPane label="第三方合同" name="third" v-if="filteredByProject"></TabPane>
     </Tabs>
     <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
     </div>
      <Modal v-model="showPay" styles="position:absolute;"  :title="`支付管理${current?' — '+current.name+'':''}`" footer-hide width="1200px" :transfer="false">
       <Payment :filter="{contract_id:this.current?this.current.id:null}"  @update="handleUpdateContract" />
@@ -230,7 +230,9 @@ export default {
         key:"amount",
         width:150,
         option:{
-          type:"fullAmount"
+          type:"fullAmount",
+            sumable:true,
+          formatter:(v)=>'¥ '+this.hs.formatSalarySemicolon(v)
         }
       },{
         title:"超概",
@@ -244,6 +246,8 @@ export default {
         type:'number',
         option:{
           type:'progress',
+            sumable:true,
+          formatter:(v)=>'¥ '+this.hs.formatSalarySemicolon(v),
           percentTo:'adjusted_amount'
         }
       }, {
@@ -253,6 +257,8 @@ export default {
         type:'number',
         option:{
           type:'progress',
+            sumable:true,
+          formatter:(v)=>'¥ '+this.hs.formatSalarySemicolon(v),
           percentTo:'amount'
         }
       }, {
@@ -354,6 +360,10 @@ export default {
           cols.splice(7,1)
         }
         return cols
+      },
+      filteredByProject(){
+        if(this.filter && this.filter.project_id)
+          return true
       },
       filteredItems(){
         return this.items.filter(v=>{

@@ -212,6 +212,12 @@ const getters = {
   getRoles: state => type_id => {
     return state.roles.filter(v => v.type_id == type_id)
   },
+  getDep:state=>id=>{
+    return state.deps.find(v=>v.id) || {}
+  },
+  getTypeByValue:state=>(key,val)=>{
+    return getters.getTypes(state)(key).find(v=>v.value == val) || {}
+  }
 }
 
 const actions = {

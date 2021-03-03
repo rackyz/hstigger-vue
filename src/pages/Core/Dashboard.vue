@@ -253,15 +253,15 @@
             <div class='ti-icon'>{{getTypesByKey("TASK_TYPE")[fi.base_type].name}}</div>
             <div class='ti-info'>
               <div class='ti-flowinfo'>
-                {{fi.root}} {{fi.project_id}} {{fi.dep_id}} 
+                {{get_project(fi.project_id).name}} {{getDep(fi.dep_id).name}} {{getTypes("ARCHIVE_WORKTYPE").find(v=>v.value == fi.base_type).name}} {{fi.parent_id?'子任务':''}}
               </div>
               <div class='ti-desc'>
-                {{fi.desc}}
+                {{fi.name}}
               </div>
             </div>
             <div class='ti-date'>
-              <div class='ti-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
-              <div class='ti-executor'>{{fi.state}}</div>
+              <div class='ti-deadline'>{{fi.start_time ? getTimeString(fi.start_time,fi.plan_duration) : ('计划:'+(fi.plan_duration?(fi.plan_duration +'天'):'无'))}}</div>
+              <div class='ti-executor'>{{getTypeByValue('TASK_STATE',fi.state).name}}</div>
             </div>
           </div>
         </template>
@@ -353,7 +353,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypesByKey']),
+    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypeByValue','getTypes','getTypesByKey','get_project','getDep']),
     draggableRss: {
       set(e) {
         if (e) {

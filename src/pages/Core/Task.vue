@@ -39,7 +39,7 @@
      \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
     </div>
     <div style="height:400px;position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summable:true}" />
+      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
     </div>
     </Content>
 

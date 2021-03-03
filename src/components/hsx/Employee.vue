@@ -84,7 +84,7 @@ export default {
         role = roles.map(v=>{
           let d = this.roles.find(d=>d.id == v)
           if(d)
-            return d
+            return d.name
           else
             return null
         }).filter(v=>v).join(',') || role

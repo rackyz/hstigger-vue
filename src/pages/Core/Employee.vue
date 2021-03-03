@@ -33,7 +33,7 @@
 
     </div>
     <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
     </div>
     </Content>
 

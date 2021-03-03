@@ -1,12 +1,18 @@
 <template>
   <Layout style='flex-wrap'>
-    {{files[0].url}}
     <Sider style='width:420px;color:#fff;'>
       <template v-for="f in files">
         <div class="text-btn" :class="{'text-btn-active':current_url==f[1]}" style="padding:10px;background:#333;" :key="f.name" @click="current_url=f[1]">{{f[0]}}</div>
       </template>
     </Sider>
-    <BasePreview style="width:100%;position:relative;" :url="current_url" />
+    <template>
+      
+      <template v-for="f in files">
+        <BasePreview :key="f.id" style="width:100%;position:relative;" :url="f[1]" v-show="current_url == f[1]" />
+      </template>
+      
+    </template>
+    
   </Layout>
 </template>
 

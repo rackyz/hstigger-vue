@@ -125,6 +125,7 @@ export default {
         type:"type",
         width:150,
         key:"dep_id",
+         linkEvent:"dep",
         option:{
           align:"center",
           getters:"core/deps"
@@ -134,9 +135,11 @@ export default {
         width:200,
         type:"type",
         key:"project_id",
+         linkEvent:"project",
         option:{
           align:"center",
-          getters:"core/projects"
+          getters:"core/projects",
+         
         }
       },{
         title:"业务类别",
@@ -370,6 +373,12 @@ export default {
         this.handleDelete(e.data)
       }else if(e.type == 'open'){
         this.handleOpen(e.data.id)
+      }else if(e.type == 'project'){
+        if(e.data.project_id)
+          this.RouteTo('/core/projects/'+e.data.project_id)
+      }else if(e.type == 'dep'){
+        if(e.data.dep_id)
+          this.RouteTo('/core/deps/'+e.data.dep_id)
       }
     },
     handlePatchArchive(item){
