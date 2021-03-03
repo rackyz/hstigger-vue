@@ -116,7 +116,7 @@
              <Col :span='12'><div class='flex-wrap'><div class='seg-label'>毕业院校</div><div class='seg-value'>{{userinfo.graduate_institution}}</div></div></Col>
                
               </Row>
-<Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
+            <Row :gutter="12" style='margin:0 10px;margin-top:10px;margin-right:100px;'>
             <Col :span='6'><div class='flex-wrap'>
               <div class='seg-label'>教育经历</div></div></Col></Row>
               <hsx-datasetview style='margin:0 15px;margin-top:10px;margin-right:100px;' :columns="education_school_dataset_def" :data="userinfo.education_history" />

@@ -1,5 +1,5 @@
 <template>
-  <Contract :filter="{f_project_id:id}" />
+  <Contract :filter="{project_id:id}" />
 </template>
 
 <script>

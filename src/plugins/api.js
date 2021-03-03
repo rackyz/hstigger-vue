@@ -2,7 +2,7 @@ import axios from 'axios'
 import config from '../config'
 var o = {}
 
-let apiAxios = axios.create({baseURL:config.server,timeout:3000})
+let apiAxios = axios.create({baseURL:config.server,timeout:5000})
 apiAxios.defaults.headers = {
     "api-version": "v0"
 }

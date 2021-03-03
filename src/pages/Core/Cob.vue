@@ -122,7 +122,13 @@ export default {
           align:"center"
         }
       },{
-        title:"开标金额",
+        title:"中标单位",
+        type:"text",
+        key:"bid_unit",
+        
+        width:150
+      },{
+        title:"中标金额",
         type:"number",
         key:"bid_amount",
         
@@ -230,6 +236,9 @@ export default {
       cols(){
         if(this.filter && this.filter.project_id){
           return this.columns.filter(v=>v.key != 'project_id')
+        }else
+        {
+          return this.columns
         }
       },
       filteredItems(){

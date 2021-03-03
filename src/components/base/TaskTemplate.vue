@@ -14,7 +14,7 @@ export default {
   props:['data'],
   methods:{
     onCreate(e){
-      this.$emit('event',{type:'create',data:e})
+      this.$emit('event','create')
     }
   }
 }

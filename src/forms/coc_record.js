@@ -1,5 +1,5 @@
 export default {
-  title: '招标资料',
+  title: '造价成果',
   layout: `
   <div style='position:relative;'>
 
@@ -11,19 +11,8 @@ export default {
   <Col :span='24'>{{project_id}}</Col>
   </Row>
   <Row :gutter='10' style='margin-top:10px'>
-    <Col :span='12'>{{open_bid_date}}</Col>
-    <Col :span='12'>{{bid_amount}}</Col>
+    <Col :span='12'>{{date}}</Col>
     
-  </Row>
-  <Row :gutter='10' style='margin-top:10px'>
-   <Col :span='12'>{{down_percent}}</Col>
-    <Col :span='12'>{{charger}}</Col>
-  </Row>
-  <Row :gutter='10' style='margin-top:10px'>
-  <Col :span='24'>{{bid_unit}}</Col>
-  </Row>
-  <Row :gutter='10' style='margin-top:10px'>
-  <Col :span='24'>{{desc}}</Col>
   </Row>
   <Row :gutter='10' style='margin-top:10px'>
     <Col :span='24'>{{files}}</Col>
@@ -49,15 +38,7 @@ export default {
     },
    
 
-    charger: {
-      label: "负责人",
-      control: 'select',
-      option: {
-        getters: 'core/employees',
-        idKey: 'id',
-        labelKey: 'name'
-      }
-    },
+    
     project_id: {
       label: "项目名称",
       control: "select",
@@ -67,14 +48,7 @@ export default {
         labelKey: 'name'
       }
     },
-    desc: {
-      label: "招标详情",
-      control: "input",
-      option: {
-        type: 'textarea',
-        height: 100
-      }
-    },
+
    
      files: {
        label: '附件',
@@ -87,36 +61,14 @@ export default {
          uploaderSource: "env"
        }
      },
-    open_bid_date:{
-      label:"开标日期",
+    date:{
+      label:"日期",
       control:"time",
       option:{
         defaultValue:moment().format('YYYY-MM-DD')
       }
     },
-    bid_amount:{
-      label:"中标金额",
-      control:"input",
-      option:{
-        type:"amount",
-        defaultValue:0
-      }
-    },
-    down_percent:{
-      label:'下浮率',
-      control:'input',
-      option:{
-        type:"number",
-        defaultValue:0
-      }
-    },
-    bid_unit:{
-      label:"中标单位",
-      control:'input',
-      option:{
-        maxlen:128
-      }
-    }
+  
   },
   option: {
     editable: true

@@ -38,7 +38,7 @@
        
      \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
     </div>
-    <div style="height:400px;position:relative;">
+    <div style="height:calc(100% - 120px);position:relative;">
       <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
     </div>
     </Content>
@@ -69,7 +69,7 @@
         <hs-menu :data="tmplClasses" style='width:150px;border-right:1px solid #dfdfdf;height:100%;padding:0;' :current="selectedTmplClass" @on-select="selectedTmplClass=$event"></hs-menu>
         <div style="width:calc(100% - 150px)">
          
-          <hs-list :data="filteredTmpls" :option="{tmpl:'BaseTaskTemplate'}" style='height:380px;overflow-y:auto;border:none;' />
+          <hs-list :data="filteredTmpls" :option="{tmpl:'BaseTaskTemplate'}" style='height:380px;overflow-y:auto;border:none;' @event="handleTmplEvent" />
         </div>
         </div>
       </div>
@@ -89,7 +89,38 @@
 			@on-submit="handleProcess"
 		/>
 
-    <Modal v-model="modalInitTmpl" title="初始化模板" footer-hide width="800">
+    <hs-modal-form
+			ref="form"
+			:title="`任务安排${current?' - '+current.name:''}`"
+			v-model="modalProcess"
+			:width="420"
+      :env="{upload}"
+			style="margin: 10px"
+			footer-hide
+			:form="GetArrangeForm(current)"
+			:data="modelResult"
+			editable
+			@on-submit="handleArrange"
+		/>
+
+    <Modal v-model="modalInitTmpl" :title="'初始化模板 - '+tmpl.name" footer-hide width="800">
+      <div style="padding:10px;">{{tmpl.desc}}</div>
+      <template v-if="loadingTemplate">
+        读取中
+      </template>
+      <template v-else>
+      <CheckboxGroup v-model="selectedTemplates" style='max-height:400px;overflow-y:auto;border:1px solid #dfdfdf;'>
+          <template v-for="(sub,i) in sub_templates">
+            <Checkbox :label="sub.id" :key="i" style="padding:0 10px;width:90%;display:flex;align-items:center;" :disbaled="existedTemplates.includes(sub.id)">
+              <div style="width:20px;text-align:right;margin-right:5px;">{{i+1}}</div> 任务 {{sub.name}}
+            </Checkbox>
+      </template>
+      </CheckboxGroup>
+      </template>
+      <div class='flex-wrap' style="padding:10px;justify-content:space-between;">
+        <div class='flex-wrap'><Button style='margin-right:10px;' @click="selectedTemplates=sub_templates.map(v=>v.id)">全选</Button><Button @click='selectedTemplates=existedTemplates.map(v=>v)'>取消</Button></div>
+        <div class='flex-wrap'><Button type='primary' style='margin-right:10px;' @click="handleCreateWithTmpl">提交</Button><Button @click='handleCancelTmpl'>取消</Button></div></div>
+        {{selectedTemplates.length}} {{existedTemplates.length}}
     </Modal>
   </Layout>
 </template>
@@ -107,10 +138,15 @@ export default {
     return {
       selectedTmplClass:95,
       parent_id:false,
+      modalArrange:false,
       modelResult:{},
       focused_task:{},
+      sub_templates:[],
+      selectedTemplates:[],
+      existedTemplates:[],
       modalCreateTeml:false,
       modalInitTmpl:false,
+      tmpl:{},
       modalProcess:false,
       project_id:null,
       dep_id:null,
@@ -201,7 +237,7 @@ export default {
           getters:"core/projects"
         }
       },{
-        title:"子任务",
+        title:"拆分",
         type:"text",
         key:"sub_count",
         sortable:false,
@@ -266,7 +302,7 @@ export default {
             return h('span','无计划')
         }
       },{
-        title:"任务成果",
+        title:"执行",
         type:"user",
         key:"result",
         width:100,
@@ -276,16 +312,17 @@ export default {
         },
          render:(h,param)=>{
           let item = param.row
-          if(item.sub_count){
-            return h('Button',{props:{size:"small",type:"info"}},'下载')
+          let buttons = []
+          if(item.files){
+            buttons.push(h('Button',{props:{size:"small",type:"info"}},`查阅`))
           }else{
-            return h("Button",{props:{size:"small",type:"success"},on:{
+            buttons.push(h("Button",{props:{size:"small",type:"success"},on:{
               click:()=>{
                 this.ProcessTask(item)
               }
-            }},'提交')
+            }},'处理'))
           }
-
+          return h('span',buttons)
         }
       },{
         title:"创建时间",
@@ -387,7 +424,12 @@ export default {
   methods:{
     ProcessTask(item){
       this.current = item
-      this.modalProcess = true
+      if(item.state == 0){
+        this.modalArrange = true
+      }else{
+        this.modalProcess = true
+      }
+      
     },
     handleClearFilter(){
       this.search_text=""
@@ -450,6 +492,36 @@ export default {
         this.model = data
         this.modalCreate = true 
       })
+    },
+    handleTmplEvent(e){
+      if(e.event == 'create'){
+        this.modalCreateTeml = false
+        this.api.enterprise.LIST_TASK_TEMPLATES({query:{parent_id:e.param.id}}).then(res=>{
+          let items = res.data.data
+          this.sub_templates = items
+             this.modalInitTmpl = true
+             this.existedTemplates = this.items.filter(v=>this.sub_templates.find(t=>t.id == v.unique_tmpl_key))
+             this.selectedTmplates = [...this.existedTemplates]
+            this.tmpl = e.param
+        }).catch(e=>{
+          this.Error('模板读取失败:',e)
+        })
+       
+      }
+    },
+    handleCreateWithTmpl(){
+      let updatedList = _.difference(this.selectedTemplates,this.existedTemplates)
+      this.api.enterprise.POST_TASKS({list:updatedList,...this.filterInitData},{query:{tmpl:this.tmpl.id}}).then(res=>{
+        this.Success("添加完成")
+        this.getData()
+
+      }).catch(e=>{
+        this.Error("创建失败:"+e)
+      })
+    },
+    handleCancelTmpl(){
+      this.modalInitTmpl = false
+      this.tmpl = {}
     },
     handleProcess(data){
       let id = this.current.id
@@ -522,6 +594,20 @@ export default {
         return this.Form('task_simple')
       }
 
+    },
+    GetArrangeForm(task){
+      if(!task)
+        return {}
+      if(task.base_type == 0){
+        return this.Form('task_arrange')
+      }else if(task.base_type == 1){
+        return this.Form('task_arrange')
+      }else{
+        return this.Form('task_arrange')
+      }
+    },
+    getSubTasks(task_id){
+      return this.tmpls.filter(v=>v.parent_id == task_id)
     },
     handlePatchArchive(item){
       if(item.id){

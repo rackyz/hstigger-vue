@@ -30,12 +30,11 @@
       </div>
     </div>
     <div class="filter-box">
-
     </div>
-     <Tabs type="card" @on-click="handleTabChanged">
+     <Tabs type="card" @on-click="handleTabChanged" v-if="!filteredByProject">
         <TabPane label="付款合同" name="partA"></TabPane>
-        <TabPane label="收款合同" name="partB" v-if="filteredByProject"></TabPane>
-        <TabPane label="第三方合同" name="third" v-if="filteredByProject"></TabPane>
+        <TabPane label="收款合同" name="partB"></TabPane>
+        <TabPane label="第三方合同" name="third"></TabPane>
     </Tabs>
     <div style="height:calc(100% - 100px);position:relative;">
       <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
@@ -335,6 +334,7 @@ export default {
     })
     this.getData()
   },
+  props:['filter'],
   components:{
     Payment
   },
@@ -364,6 +364,8 @@ export default {
       filteredByProject(){
         if(this.filter && this.filter.project_id)
           return true
+        else
+          return false
       },
       filteredItems(){
         return this.items.filter(v=>{
