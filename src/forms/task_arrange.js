@@ -1,16 +1,27 @@
 const moment = require('moment')
 export default {
-  layout: `<div><Row  :gutter="10">
+  layout: `<Row>
+  <Col :span='12'>
+    <Row :gutter="10">
+      <Col :span='24'>
+        任务详情{{name}}
+      </Col>
+      
+    </Row>
+    </Col>
+    <Col :span='12'>
+  <Row  :gutter="10">
     <Col :span="12">{{started_at}}</Col>
     <Col :span="12">{{plan_finished_at}}</Col>
     </Row>
-    <Row  :gutter="10" style='margin-top:10px'>
+    <Row  :gutter="10" style='margin-top:5px'>
     <Col :span="24">{{executor}}</Col>
     </Row>
     <Row  :gutter="10"  style='margin-top:10px'>
     <Col :span="24">{{desc}}</Col>
     </Row>
-    </div>
+    </Col>
+    </Row>
   `,
   def: {
     started_at: {
@@ -21,7 +32,7 @@ export default {
       }
     },
     plan_finished_at: {
-      label: "完成时间",
+      label: "计划完成",
      control: "time"
     },
     executor:{

@@ -91,10 +91,10 @@
 
     <hs-modal-form
 			ref="form"
-			:title="`任务安排${current?' - '+current.name:''}`"
-			v-model="modalProcess"
-			:width="420"
-      :env="{upload}"
+			:title="`任务安排${current?' - '+(current.name || current.id):''}`"
+			v-model="modalArrange"
+			:width="820"
+      :env="{upload,...current}"
 			style="margin: 10px"
 			footer-hide
 			:form="GetArrangeForm(current)"
@@ -314,7 +314,11 @@ export default {
           let item = param.row
           let buttons = []
           if(item.files){
-            buttons.push(h('Button',{props:{size:"small",type:"info"}},`查阅`))
+            buttons.push(h('Button',{props:{size:"small",type:"info"},on:{
+              click:()=>{
+                this.ShowResult(item)
+              }
+            }},`查阅`))
           }else{
             buttons.push(h("Button",{props:{size:"small",type:"success"},on:{
               click:()=>{
@@ -422,14 +426,17 @@ export default {
       }
     },
   methods:{
+    ShowResult(item){
+      this.modalResult = true
+    },
     ProcessTask(item){
+      console.log('Process:',item)
       this.current = item
       if(item.state == 0){
         this.modalArrange = true
       }else{
         this.modalProcess = true
       }
-      
     },
     handleClearFilter(){
       this.search_text=""
