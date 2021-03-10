@@ -4,7 +4,7 @@ export default {
   <Col :span='12'>
     <Row :gutter="10">
       <Col :span='24'>
-        任务详情{{name}}
+        任务详情 {{name}}
       </Col>
       
     </Row>
@@ -45,7 +45,7 @@ export default {
       }
     },
     desc:{
-      label:"任务描述",
+      label:"附加信息",
       control:"input",
       option:{
         height:100

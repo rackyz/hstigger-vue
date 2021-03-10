@@ -1,9 +1,25 @@
 <template>
   <Layout class="hs-container hs-container-full statistics">
    
-    <Content style="padding:5px 10px;">
+    <Content style="padding:5px">
+      	<hs-toolbar
+			style="background: #fff;border:1px solid #dfdfdf;"
+			:data="tools"
+			@event="onToolEvent"
+			:disabled="toolDisabled"
+		/>
     <div class="filter-box flex-between" style="margin:5px 0;">
       <div class="flex-wrap">
+        	<Button
+				style="margin-right: 5px"
+				:type="multiple?'error':''"
+				@click="multiple=!multiple"
+				>{{multiple?"取消多选":"多选"}}</Button
+			>
+			<ButtonGroup style="margin-right: 5px" v-if="multiple"
+				><Button @click="onSelectAll">全选</Button
+				><Button @click="selected = []">清空</Button></ButtonGroup
+			>
         <Input style="width:230px;" v-model="search_text" search clearable placeholder="输入编号或名称查询" />
          <Select style="width:150px;margin-left:5px;text-align:center" v-model="business_type" placeholder="- - 所属部门 - -" clearable>
              <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
@@ -33,13 +49,14 @@
     <div class="filter-box">
 
     </div>
+    
     <div class="focused-box" v-if="focused_task && focused_task.id">
       <div class="text-btn" style="margin-right:5px;display:flex;align-items:center;justify-content:center;"><Icon class="text-btn icon-btn" style="margin:0;" type="md-home" /></div>
        
      \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
     </div>
-    <div style="height:calc(100% - 120px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" :option="{summary:true}" />
+    <div style="height:calc(100% - 170px);position:relative;">
+      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" :selectable="multiple ? 'multiple' : 'single'"  :option="{summary:true}" />
     </div>
     </Content>
 
@@ -120,7 +137,6 @@
       <div class='flex-wrap' style="padding:10px;justify-content:space-between;">
         <div class='flex-wrap'><Button style='margin-right:10px;' @click="selectedTemplates=sub_templates.map(v=>v.id)">全选</Button><Button @click='selectedTemplates=existedTemplates.map(v=>v)'>取消</Button></div>
         <div class='flex-wrap'><Button type='primary' style='margin-right:10px;' @click="handleCreateWithTmpl">提交</Button><Button @click='handleCancelTmpl'>取消</Button></div></div>
-        {{selectedTemplates.length}} {{existedTemplates.length}}
     </Modal>
   </Layout>
 </template>
@@ -136,8 +152,9 @@ export default {
   },
   data(){
     return {
-      selectedTmplClass:95,
+      selectedTmplClass:0,
       parent_id:false,
+      multiple:false,
       modalArrange:false,
       modelResult:{},
       focused_task:{},
@@ -154,31 +171,61 @@ export default {
       base_type:null,
       business_type:null,
       f_type_3:null,
-      //
+      	tools: [
+				{
+					key: "add",
+					name: "新增",
+					icon: "md-add",
+				},
+				{
+					key: "edit",
+					name: "编辑",
+					icon: "md-create",
+				},
+				{
+					key: "delete",
+					name: "删除",
+					icon: "md-trash",
+				},
+				{
+					key: "resetpwd",
+					name: "重置密码",
+					icon: "md-key",
+				},
+				{
+					key: "resetpwdto",
+					name: "修改密码",
+					icon: "ios-key",
+				},
+				{
+					key: "lock",
+					name: "锁定",
+					icon: "md-lock",
+				},
+				{
+					key: "unlock",
+					name: "启用",
+					icon: "md-unlock",
+				},
+				{
+					key: "import",
+					name: "导入",
+					icon: "ios-folder-open",
+				},
+				{
+					key: "import-tmpl",
+					name: "下载模板",
+					icon: "md-download",
+				},
+				{
+					key: "refresh",
+					name: "刷新",
+					icon: "md-refresh",
+				},
+			],
       items:[],
       modalCreate:false,
-      tmpls:[{
-        id:1,
-        name:"前期工作 v1",
-        desc:"项目默认前期工作列表",
-        version:"1.0.0",
-        
-        group:1
-      },{
-        id:2,
-        name:"合同工作 v1",
-        desc:"项目默认合同工作列表",
-        version:"1.0.0",
-        
-        group:1
-      },{
-        id:3,
-        name:"考核任务 v1",
-        desc:"项目默认合同工作列表",
-        version:"1.0.0",
-        
-        group:2
-      }],
+      tmpls:[],
       model:{}, 
     }
   },
@@ -239,26 +286,34 @@ export default {
       },{
         title:"拆分",
         type:"text",
-        key:"sub_count",
+        key:"sub_task_count",
         sortable:false,
-        width:130,
-        render:(h,param)=>{
-          let item = param.row
-          if(param.row.base_type != 0)
+        width:40,
+        option:{
+           align:"center"
+        },
+         render:(h,param)=>{
+          let sub = param.row.sub_task_count
+          if(sub)
+            return h('span',sub)
+          else
             return h('span','-')
-          if(item.subs && item.subs.length > 0){
-            return h('Button',{props:{size:"small",type:"info"},on:{click:()=>{
-              this.focused_task = item
-            }}},`进入(${item.subs.length})`)
-          }else{
-            return h("Button",{props:{size:"small",type:"primary"},on:{click:()=>{
-              this.modalCreate = true
-              this.parent_id = param.row.id
-
-            }}},'创建')
-          }
-
         }
+        
+      },{
+        title:"模板",
+        type:"text",
+        key:"unique_tmpl_key",
+        sortable:false,
+        width:40,
+        render:(h,param)=>{
+          let tmpl = param.row.unique_tmpl_key
+          if(tmpl)
+            return h('span','启用')
+          else
+            return h('span','-')
+        }
+        
       },{
         title:"负责人",
         type:"user",
@@ -368,10 +423,10 @@ export default {
         var that = this
         return this.$store.getters['core/getTypes']('ARCHIVE_WORKTYPE').map(v=>{
           return {
-            id:v.id,
+            id:v.value,
             name:v.name,
-            path:v.id,
-            count:that.tmpls.filter(t=>t.business_type == v.id).length
+            path:v.value,
+            count:that.tmpls.filter(t=>t.business_type == v.value).length
           }
         })
       },
@@ -426,6 +481,12 @@ export default {
       }
     },
   methods:{
+    toolDisabled() {
+        return {}
+    },
+    onToolEvent(e) {
+    
+    },
     ShowResult(item){
       this.modalResult = true
     },
@@ -521,7 +582,7 @@ export default {
       this.api.enterprise.POST_TASKS({list:updatedList,...this.filterInitData},{query:{tmpl:this.tmpl.id}}).then(res=>{
         this.Success("添加完成")
         this.getData()
-
+        this.modalInitTmpl = false
       }).catch(e=>{
         this.Error("创建失败:"+e)
       })
@@ -553,9 +614,13 @@ export default {
     handleDelete(model){
       this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
         this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
+          let id_list = res.data.data
           setTimeout(() => {
             this.Success('删除成功')
-            this.items.splice(this.items.findIndex(v=>v.id == model.id),1)
+            id_list.forEach(v=>{
+              this.items.splice(this.items.findIndex(v=>v.id == v),1)
+            })
+            
           }, (1000));
           
         }).catch(e=>{
