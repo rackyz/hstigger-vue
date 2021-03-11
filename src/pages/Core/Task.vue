@@ -1,65 +1,67 @@
 <template>
   <Layout class="hs-container hs-container-full statistics">
-   
     <Content style="padding:5px">
-      	<hs-toolbar
-			style="background: #fff;border:1px solid #dfdfdf;"
-			:data="tools"
-			@event="onToolEvent"
-			:disabled="toolDisabled"
-		/>
-    <div class="filter-box flex-between" style="margin:5px 0;">
-      <div class="flex-wrap">
-        	<Button
-				style="margin-right: 5px"
-				:type="multiple?'error':''"
-				@click="multiple=!multiple"
-				>{{multiple?"取消多选":"多选"}}</Button
-			>
-			<ButtonGroup style="margin-right: 5px" v-if="multiple"
-				><Button @click="onSelectAll">全选</Button
-				><Button @click="selected = []">清空</Button></ButtonGroup
-			>
-        <Input style="width:230px;" v-model="search_text" search clearable placeholder="输入编号或名称查询" />
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="business_type" placeholder="- - 所属部门 - -" clearable>
-             <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_SAVETYPE')">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
-           </template>
-
+      <hs-toolbar
+        style="background: #fff;border:1px solid #dfdfdf;"
+        :data="tools"
+        @event="onToolEvent"
+        :disabled="toolDisabled"
+      />
+      <div class="filter-box flex-between" style="margin:5px 0;">
+        <div class="flex-wrap">
+          <Button
+            style="margin-right: 5px"
+            :type="multiple?'error':''"
+            @click="multiple=!multiple"
+            >
+            {{multiple?"取消多选":"多选"}}
+          </Button>
+          <ButtonGroup style="margin-right: 5px" v-if="multiple"
+            ><Button @click="onSelectAll">全选</Button
+            ><Button @click="selected = []">清空</Button>
+          </ButtonGroup>
+          <Input style="width:230px;" v-model="search_text" search clearable placeholder="输入编号或名称查询" />
+          <Select style="width:150px;margin-left:5px;text-align:center" v-model="base_type" placeholder="- - 任务类型 - -" clearable>
+            <template v-for="d in $store.getters['core/getTypes']('TASK_TYPE')">
+              <Option :value="d.value" :key="d.id">{{d.name}}</Option>
+            </template>
           </Select>
-        <Select style="width:200px;margin-left:5px;text-align:center" v-model="project_id" placeholder="- - 项目类型 - -" clearable>
-          
-
-        </Select>
-         <Select style="width:150px;margin-left:5px;text-align:center" v-model="dep_id" placeholder="- - 建筑类型 - -" clearable>
-           <template v-for="d in $store.getters['core/deps']">
-             <Option :value="d.id" :key="d.id">{{d.name}}</Option>
-           </template>
-         </Select>
-       
-            <Button @click="handleClearFilter()" type="info" v-show="isFiltering">清除筛选条件</Button>
+          <Select style="width:200px;margin-left:5px;text-align:center" v-model="business_type" placeholder="- - 任务状态 - -" clearable>
+             <template v-for="d in $store.getters['core/getTypes']('TASK_STATE')">
+              <Option :value="d.value" :key="d.id">{{d.name}}</Option>
+            </template>
+          </Select>
+          <Select style="width:150px;margin-left:5px;text-align:center" v-model="state" placeholder="- - 业务类型 - -" clearable>
+            <template v-for="d in $store.getters['core/getTypes']('ARCHIVE_WORKTYPE')">
+              <Option :value="d.value" :key="d.id">{{d.name}}</Option>
+            </template>
+          </Select>
+        
+              <Button @click="handleClearFilter()" type="info" v-show="isFiltering">清除筛选条件</Button>
+        </div>
+        <div class="flex-wrap">
+          <!-- authed.ArchiveCategoryManage -->
+            <Button @click="handlePreCreate()" type="primary" icon="md-add">新建任务</Button>
+            <Button @click="modalCreateTeml = true" type="primary" icon="md-add" style="margin-left:5px;">由模板创建</Button>
+        <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
+        </div>
       </div>
-      <div class="flex-wrap">
-        <!-- authed.ArchiveCategoryManage -->
-          <Button @click="handlePreCreate()" type="primary" icon="md-add">新建任务</Button>
-          <Button @click="modalCreateTeml = true" type="primary" icon="md-add" style="margin-left:5px;">由模板创建</Button>
-      <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
-      </div>
-    </div>
-    <div class="filter-box">
+      <div class="filter-box">
 
-    </div>
+      </div>
     
-    <div class="focused-box" v-if="focused_task && focused_task.id">
-      <div class="text-btn" style="margin-right:5px;display:flex;align-items:center;justify-content:center;"><Icon class="text-btn icon-btn" style="margin:0;" type="md-home" /></div>
-       
-     \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
-    </div>
-    <div style="height:calc(100% - 170px);position:relative;">
-      <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" :selectable="multiple ? 'multiple' : 'single'"  :option="{summary:true}" />
-    </div>
+      <div class="focused-box" v-if="focused_task && focused_task.id">
+        <div class="text-btn" style="margin-right:5px;display:flex;align-items:center;justify-content:center;"><Icon class="text-btn icon-btn" style="margin:0;" type="md-home" /></div>
+        
+      \ <div class="task-name">{{focused_task.name}}</div> <div class="text-btn" @click="focused_task = items.find(v=>v.id == focused_task.parent_id)" style="width:auto;padding-right:5px;font-size:10px;"><Icon class="text-btn icon-btn" type="md-arrow-up" style="margin-right:2px;" />返回上一级</div>
+      </div>
+
+      <div style="height:calc(100% - 170px);position:relative;">
+        <hs-table ref="table" :total="1000" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" :selectable="multiple ? 'multiple' : 'single'"  :option="{summary:true}" />
+      </div>
     </Content>
 
+    <!-- TASK EDITOR -->
     <hs-modal-form
 			ref="form"
 			:title="model.id?'修改任务':'新增任务'"
@@ -68,7 +70,7 @@
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="form_task"
+			:form="Form('task')"
 			:data="model"
       :initData="filterInitData"
 			editable
@@ -76,6 +78,10 @@
 			@on-event="handleEvent"
 		/>
 
+    <!-- TASK PROCESS -->
+    <ModalProcessTask v-model="modelProcess" />
+
+    <!-- TEMPLATE SELECTOR -->
     <Modal v-model="modalCreateTeml" title="选择任务模板" footer-hide width="800">
       <div style="position:relative;height:440px;">
         <div class="flex-wrap">
@@ -92,20 +98,22 @@
       </div>
     </Modal>
 
-     <hs-modal-form
-			ref="form"
-			:title="`任务${current?' - '+current.name:''}`"
-			v-model="modalProcess"
-			:width="420"
+    <!-- TASK PROCESS -->
+    <!-- <hs-modal-form
+      ref="form"
+      :title="`任务${current?' - '+current.name:''}`"
+      v-model="modalProcess"
+      :width="420"
       :env="{upload}"
-			style="margin: 10px"
-			footer-hide
-			:form="GetForm(current)"
-			:data="modelResult"
-			editable
-			@on-submit="handleProcess"
-		/>
+      style="margin: 10px"
+      footer-hide
+      :form="GetForm(current)"
+      :data="modelResult"
+      editable
+      @on-submit="handleProcess"
+		/> -->
 
+    <!-- TASk ARRANGEMENT-->
     <hs-modal-form
 			ref="form"
 			:title="`任务安排${current?' - '+(current.name || current.id):''}`"
@@ -120,6 +128,7 @@
 			@on-submit="handleArrange"
 		/>
 
+    <!-- TEMPLATE TASKS SELECTOR -->
     <Modal v-model="modalInitTmpl" :title="'初始化模板 - '+tmpl.name" footer-hide width="800">
       <div style="padding:10px;">{{tmpl.desc}}</div>
       <template v-if="loadingTemplate">
@@ -454,13 +463,16 @@ export default {
           if(this.project_id && v.project_id != this.project_id)
             return false
           
-          if(this.dep_id && v.dep_id != this.dep_id)
+          if(this.dep_id != null && v.dep_id != this.dep_id)
             return false
 
-          if(this.base_type && v.type1 != this.base_type)
+          if(this.base_type != null && v.base_type != this.base_type)
             return false
           
-          if(this.business_type && v.type2 != this.business_type)
+          if(this.business_type != null && v.business_type != this.business_type)
+            return false
+          
+          if(this.state != null && v.state != this.state)
             return false
 
           if(this.focused_task && this.focused_task.id && v.parent_id != this.focused_task.id)
@@ -481,16 +493,21 @@ export default {
       }
     },
   methods:{
-    toolDisabled() {
+    handleArrange(model){
+      this.api.enterprise.ARRANGE_TASK({param:{id:item.id}},model).then(res=>{
+        let updateInfo = res.data.data
+        Object.assign(this.current,updateInfo)
+        this.Success('分配成功')
+      }).catch(e=>{
+        this.Error('分配失败:'+e)
+      })
+    },toolDisabled() {
         return {}
-    },
-    onToolEvent(e) {
+    },onToolEvent(e) {
     
-    },
-    ShowResult(item){
+    },ShowResult(item){
       this.modalResult = true
-    },
-    ProcessTask(item){
+    },ProcessTask(item){
       console.log('Process:',item)
       this.current = item
       if(item.state == 0){
@@ -498,32 +515,19 @@ export default {
       }else{
         this.modalProcess = true
       }
-    },
-    handleClearFilter(){
+    },handleClearFilter(){
       this.search_text=""
       this.base_type = null 
       this.business_type = null 
       this.f_type_3 = null 
       this.project_id = null 
       this.dep_id = null 
-    },
-    handlePreCreate(){
+    },handlePreCreate(){
       this.model={}
-      this.parent_id = null
-      if(this.project_id !== null)
-        this.model.project_id = this,project_id
-      if(this.dep_id)
-        this.model.dep_id = this.dep_id
-      if(this.base_type !== null)
-        this.model.type1 = this.base_type
-       if(this.business_type !== null)
-        this.model.type2 = this.business_type
       this.modalCreate=true;
-    },
-    handlePreview(e){
+    },handlePreview(e){
 
-    },
-    handleDownload(id){
+    },handleDownload(id){
       this.get_archive(id,data=>{
         console.log(data)
         let files = data.files.split(';').map(v=>v.split(','))
@@ -539,8 +543,7 @@ export default {
             })
         }
       })
-    },
-    get_archive(id, cb){
+    },get_archive(id, cb){
       this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
@@ -548,20 +551,17 @@ export default {
       }).catch(e=>{
         this.Error('打开资料失败:',e)
       })
-    },
-    handleOpen(id){
+    },handleOpen(id){
        this.get_archive(id,data=>{
         this.model = this.current
         this.modalArchivePreview = true 
       })
-    },
-    handleBeforeEdit(id){
+    },handleBeforeEdit(id){
       this.get_archive(id,data=>{
         this.model = data
         this.modalCreate = true 
       })
-    },
-    handleTmplEvent(e){
+    },handleTmplEvent(e){
       if(e.event == 'create'){
         this.modalCreateTeml = false
         this.api.enterprise.LIST_TASK_TEMPLATES({query:{parent_id:e.param.id}}).then(res=>{
@@ -576,8 +576,7 @@ export default {
         })
        
       }
-    },
-    handleCreateWithTmpl(){
+    },handleCreateWithTmpl(){
       let updatedList = _.difference(this.selectedTemplates,this.existedTemplates)
       this.api.enterprise.POST_TASKS({list:updatedList,...this.filterInitData},{query:{tmpl:this.tmpl.id}}).then(res=>{
         this.Success("添加完成")
@@ -586,12 +585,10 @@ export default {
       }).catch(e=>{
         this.Error("创建失败:"+e)
       })
-    },
-    handleCancelTmpl(){
+    },handleCancelTmpl(){
       this.modalInitTmpl = false
       this.tmpl = {}
-    },
-    handleProcess(data){
+    },handleProcess(data){
       let id = this.current.id
       if(!id)
         return
@@ -610,8 +607,7 @@ export default {
         this.Error("处理失败:",)
       })
 
-    },
-    handleDelete(model){
+    },handleDelete(model){
       this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
         this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
           let id_list = res.data.data

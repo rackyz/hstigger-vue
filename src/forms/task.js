@@ -5,14 +5,9 @@ export default {
      
     </Row>
      <Row  :gutter="10" style='margin-top:10px'>
-      <Col :span="7">{{base_type}}</Col>
-       <Col :span="7">{{business_type}}</Col>
-        <Col :span="10">{{parent_id}}</Col>
-    
-    </Row>
-    <Row  :gutter="10" style='margin-top:10px'>
-      <Col :span="12">{{project_id}}</Col>
-      <Col :span="12">{{dep_id}}</Col>
+       <Col :span="8">{{business_type}}</Col>
+         <Col :span="8">{{project_id}}</Col>
+      <Col :span="8">{{dep_id}}</Col>
     </Row>
      <Row  :gutter="10" style='margin-top:10px'>
      
@@ -47,7 +42,7 @@ export default {
       }
     },
     project_id: {
-        label: "项目名称",
+        label: "关联项目",
         control: "select",
         option: {
           getters: "core/projects",
@@ -56,7 +51,7 @@ export default {
         }
       },
       dep_id: {
-        label: "部门名称",
+        label: "关联部门",
         control: "select",
         option: {
           getters: "core/deps",
