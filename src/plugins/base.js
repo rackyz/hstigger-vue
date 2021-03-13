@@ -59,15 +59,22 @@ Vue.prototype.Confirm = function (content, cb, cb2, option={}) {
 //     }, 1000)
 // }
 
-Vue.prototype.Form = (form_name) => {
+Vue.prototype.Form = (form_name,init_func) => {
     let form = null
     try{
         form = require('@/forms/'+form_name)
     }catch(e){
         console.error('Form Load Error:',e)
     }
-    if(form)
-     return form.default || form
+    
+    if(form){
+      if(init_func){
+        return init_func(form.default || form)
+      }else{
+        return form.default || form
+      }
+    }
+
 }
 
 // API transfer

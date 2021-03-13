@@ -153,8 +153,20 @@ o.initAPI = async (vue) => {
       }).then(res => {
         createAPI(apiAxios, res.data.data)
         o.inited = true
-        if(vue)
+        if(vue){
           vue.prototype.api = o.SERVER
+          vue.prototype.Request = (level) => {
+            let server = vue.prototype.api
+            console.log(server)
+            if (!server.core)
+              throw("API is not inited")
+            if (!server[level]) {
+              throw(`API ${level} is not inted`)
+              
+            }
+            return server[level]
+          }
+        }
         console.log("API inited:",o.SERVER)
         resolve(o.API)
        

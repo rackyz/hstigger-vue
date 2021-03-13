@@ -1,8 +1,8 @@
+const moment = require('moment')
 export default {
   layout: `<div>
     <Row  :gutter="10">
        <Col :span="24">{{name}}</Col>
-     
     </Row>
      <Row  :gutter="10" style='margin-top:10px'>
        <Col :span="8">{{business_type}}</Col>
@@ -11,8 +11,9 @@ export default {
     </Row>
      <Row  :gutter="10" style='margin-top:10px'>
      
-      <Col :span="12">{{charger}}</Col>
-      <Col :span="12">{{plan_duration}}</Col>
+      <Col :span="8">{{charger}}</Col>
+      <Col :span="8">{{start_at}}</Col>
+      <Col :span="8">{{plan_duration}}</Col>
     </Row>
     <Row  :gutter="10" style='margin-top:10px'>
       <Col :span="24">{{desc}}</Col>
@@ -95,6 +96,13 @@ export default {
         control:"input",
         option:{
           type:'number'
+        }
+      },
+      start_at:{
+        label:"开始日期",
+        control:"time",
+        option:{
+          defaultValue: moment().format('YYYY-MM-DD')
         }
       },
        desc: {

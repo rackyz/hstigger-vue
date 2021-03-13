@@ -70,7 +70,7 @@
       :env="{upload}"
 			style="margin: 10px"
 			footer-hide
-			:form="Form('task')"
+			:form="Form('task',init_form)"
 			:data="model"
       :initData="filterInitData"
 			editable
@@ -179,7 +179,6 @@ export default {
       search_text:"",
       base_type:null,
       business_type:null,
-      f_type_3:null,
       	tools: [
 				{
 					key: "add",
@@ -243,6 +242,7 @@ export default {
     this.getData()
   },
    computed:{
+     ...mapGetters('core',['session']),
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       columns(){
         return [{
@@ -493,6 +493,10 @@ export default {
       }
     },
   methods:{
+    init_form(form){
+      form.def.charger.option.defaultValue = this.session.user_id
+      return form
+    },
     handleArrange(model){
       this.api.enterprise.ARRANGE_TASK({param:{id:item.id}},model).then(res=>{
         let updateInfo = res.data.data
@@ -504,11 +508,10 @@ export default {
     },toolDisabled() {
         return {}
     },onToolEvent(e) {
-    
+
     },ShowResult(item){
       this.modalResult = true
     },ProcessTask(item){
-      console.log('Process:',item)
       this.current = item
       if(item.state == 0){
         this.modalArrange = true
@@ -519,14 +522,13 @@ export default {
       this.search_text=""
       this.base_type = null 
       this.business_type = null 
-      this.f_type_3 = null 
       this.project_id = null 
       this.dep_id = null 
     },handlePreCreate(){
       this.model={}
       this.modalCreate=true;
     },handlePreview(e){
-
+      
     },handleDownload(id){
       this.get_archive(id,data=>{
         console.log(data)
@@ -544,12 +546,12 @@ export default {
         }
       })
     },get_archive(id, cb){
-      this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
+      this.Request("enterprise").GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
         cb(model)
       }).catch(e=>{
-        this.Error('打开资料失败:',e)
+        this.Error('错误:',e)
       })
     },handleOpen(id){
        this.get_archive(id,data=>{
