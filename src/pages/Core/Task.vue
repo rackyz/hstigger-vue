@@ -79,7 +79,7 @@
 		/>
 
     <!-- TASK PROCESS -->
-    <ModalProcessTask v-model="modelProcess" />
+    <ModalProcessTask v-model="modalProcess" />
 
     <!-- TEMPLATE SELECTOR -->
     <Modal v-model="modalCreateTeml" title="选择任务模板" footer-hide width="800">
@@ -246,61 +246,61 @@ export default {
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
       columns(){
         return [{
-        title:"序号",
-        key:"id",
-        type:"index",
-      },{
-        title:"类型", // 流程 任务 审批
-         type:"type",
-        key:"base_type",
-        width:60,
-        option:{
-          getters:"core/getTypes",
-          getters_key:"TASK_TYPE"
-        }
+          title:"序号",
+          key:"id",
+          type:"index",
         },{
-        title:"业务类型", // 流程 任务 审批
-        key:"business_type",
-         type:"type",
-        width:80,
-        option:{
-          getters:"core/getTypes",
-          getters_key:"ARCHIVE_WORKTYPE"
-        }
+          title:"类型", // 流程 任务 审批
+          type:"type",
+          key:"base_type",
+          width:60,
+          option:{
+            getters:"core/getTypes",
+            getters_key:"TASK_TYPE"
+          }
         },{
-        title:"任务名称",
-        width:300,
-        type:"text",
-        key:"name",
-        tree:true,
-        linkEvent:"open"
-      },{
-        title:"所属部门",
-        type:"type",
-        width:150,
-        key:"dep_id",
-        option:{
-          align:"center",
-          getters:"core/deps"
-        }
-      },{
-        title:"所属项目",
-        width:200,
-        type:"type",
-        key:"project_id",
-        option:{
-          align:"center",
-          getters:"core/projects"
-        }
-      },{
-        title:"拆分",
-        type:"text",
-        key:"sub_task_count",
-        sortable:false,
-        width:40,
-        option:{
-           align:"center"
-        },
+          title:"业务类型", // 流程 任务 审批
+          key:"business_type",
+          type:"type",
+          width:80,
+          option:{
+            getters:"core/getTypes",
+            getters_key:"ARCHIVE_WORKTYPE"
+          }
+        },{
+          title:"任务名称",
+          width:300,
+          type:"text",
+          key:"name",
+          tree:true,
+          linkEvent:"open"
+        },{
+          title:"所属部门",
+          type:"type",
+          width:150,
+          key:"dep_id",
+          option:{
+            align:"center",
+            getters:"core/deps"
+          }
+        },{
+          title:"所属项目",
+          width:200,
+          type:"type",
+          key:"project_id",
+          option:{
+            align:"center",
+            getters:"core/projects"
+          }
+        },{
+          title:"拆分",
+          type:"text",
+          key:"sub_task_count",
+          sortable:false,
+          width:40,
+          option:{
+            align:"center"
+          },
          render:(h,param)=>{
           let sub = param.row.sub_task_count
           if(sub)
@@ -513,11 +513,9 @@ export default {
       this.modalResult = true
     },ProcessTask(item){
       this.current = item
-      if(item.state == 0){
-        this.modalArrange = true
-      }else{
-        this.modalProcess = true
-      }
+     
+      this.modalProcess = true
+      
     },handleClearFilter(){
       this.search_text=""
       this.base_type = null 
