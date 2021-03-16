@@ -79,7 +79,7 @@
 		/>
 
     <!-- TASK PROCESS -->
-    <ModalProcessTask v-model="modalProcess" />
+    <ModalProcessTask v-model="modalProcess" :task="current" />
 
     <!-- TEMPLATE SELECTOR -->
     <Modal v-model="modalCreateTeml" title="选择任务模板" footer-hide width="800">
@@ -366,33 +366,6 @@ export default {
             return h('span','无计划')
         }
       },{
-        title:"执行",
-        type:"user",
-        key:"result",
-        width:100,
-        sortable:false,
-        option:{
-          align:"center"
-        },
-         render:(h,param)=>{
-          let item = param.row
-          let buttons = []
-          if(item.files){
-            buttons.push(h('Button',{props:{size:"small",type:"info"},on:{
-              click:()=>{
-                this.ShowResult(item)
-              }
-            }},`查阅`))
-          }else{
-            buttons.push(h("Button",{props:{size:"small",type:"success"},on:{
-              click:()=>{
-                this.ProcessTask(item)
-              }
-            }},'处理'))
-          }
-          return h('span',buttons)
-        }
-      },{
         title:"创建时间",
         type:"time",
         key:"created_at",
@@ -512,9 +485,15 @@ export default {
     },ShowResult(item){
       this.modalResult = true
     },ProcessTask(item){
-      this.current = item
+       this.Request("enterprise").GET_TASKS({param:{id:item.id}}).then(res=>{
+        let model = res.data.data
+         this.current = model
      
-      this.modalProcess = true
+         this.modalProcess = true
+      }).catch(e=>{
+        this.Error('错误:',e)
+      })
+     
       
     },handleClearFilter(){
       this.search_text=""
@@ -528,7 +507,7 @@ export default {
     },handlePreview(e){
       
     },handleDownload(id){
-      this.get_archive(id,data=>{
+      this.getTask(id,data=>{
         console.log(data)
         let files = data.files.split(';').map(v=>v.split(','))
         if(files.length > 5)
@@ -543,7 +522,7 @@ export default {
             })
         }
       })
-    },get_archive(id, cb){
+    },getTask(id, cb){
       this.Request("enterprise").GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
@@ -552,12 +531,12 @@ export default {
         this.Error('错误:',e)
       })
     },handleOpen(id){
-       this.get_archive(id,data=>{
+       this.getTask(id,data=>{
         this.model = this.current
         this.modalArchivePreview = true 
       })
     },handleBeforeEdit(id){
-      this.get_archive(id,data=>{
+      this.getTask(id,data=>{
         this.model = data
         this.modalCreate = true 
       })
@@ -588,25 +567,6 @@ export default {
     },handleCancelTmpl(){
       this.modalInitTmpl = false
       this.tmpl = {}
-    },handleProcess(data){
-      let id = this.current.id
-      if(!id)
-        return
-      this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
-        let updateInfo = res.data.data
-         
-          let new_item = Object.assign({},item,updateInfo)
-          let index = this.items.findIndex(v=>v.id == id)
-          if(index != -1){
-            new_item = Object.assign({},this.items[index],new_item)
-           this.items.splice(index,1,new_item)
-          }
-          this.modalCreate = false
-          this.Success('处理成功')
-      }).catch(e=>{
-        this.Error("处理失败:",)
-      })
-
     },handleDelete(model){
       this.Confirm(`确定删除该项目<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料`,()=>{
         this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
@@ -640,14 +600,8 @@ export default {
       }else if(e.type == 'delete'){
         this.handleDelete(e.data)
       }else if(e.type == 'open'){
-        if(e.data.base_type == 0)
-        {
-          this.focused_task = e.data
-
-        }
-        else{
-           this.handleOpen(e.data.id)
-        }
+        this.ProcessTask(e.data)
+        
        
       }
     },
