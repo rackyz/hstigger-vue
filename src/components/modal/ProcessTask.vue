@@ -25,8 +25,14 @@
         <Button icon='md-arrow-back' class="flex-wrap" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
           返回 {{stacks[stacks.length-1].name}}
         </Button>
-         <Button class="flex-wrap" icon='md-checkmark' style="border:1px solid #aaa;padding:0 10px;color:green;" @click="tabIndex='process'">
-          处理
+        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;color:green;" v-if="!focused.state || focused.state == 0">
+          开始
+        </Button>
+        <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 1">
+          停工
+        </Button>
+        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4">
+          继续
         </Button>
          <Button class="flex-wrap" icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;" v-if="canUndo">
           撤回
@@ -41,15 +47,7 @@
           取消分解
         </Button>
 </div><div class="flex-wrap">
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:green;" v-if="focused.state == 0">
-          开始
-        </Button>
-        <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;" v-if="focused.state == 1">
-          停工
-        </Button>
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;" v-if="focused.state == 4">
-          继续
-        </Button>
+        
       </div>
       </div>
      
@@ -59,9 +57,10 @@
             
             <div style="padding:20px;">
               
-              所属部门 <br />
-              所属项目 <br />
-              任务描述 {{task.desc || '无描述'}} <br />
+              所属部门 {{($store.getters["core/deps"].find(v=>v.id == task.dep_id) || {}).name}}<br />
+              所属项目 {{($store.getters["core/projects"].find(v=>v.id == task.project_id) || {}).name}}<br />
+              任务描述 
+              <pre style="padding:5px 20px;font-family:PingFang-SC;font-size:12px;">{{task.desc || '无描述'}}</pre>
               任务附件 {{task.files || '无'}}
               
             </div>
@@ -82,6 +81,10 @@
         </TabPane>
      
     </Tabs>
+     <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='split'">
+       工作量：工作量总和未达到/超过100%，建议进行调整 <br />
+       计划时间：计划时间总额超过总任务时间，建议进行调整
+      </div>
     <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='content'">
       <div class="flex-wrap">
               <div class="flex-wrap" style="margin-right:5px;">开始日期 {{task.start_at?moment(task.start_at).format("L"):'无'}}</div>
