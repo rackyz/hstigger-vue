@@ -1,26 +1,78 @@
 <template>
-  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;" draggable>
+  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;">
     <div  style="padding:10px;">
       <div class="flex-wrap flex-between">
       <div class="flex-wrap">
        
-        <div style="height:60px;width:100px;border:1px solid #aaa;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
+        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
         <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',task.state).color};`">{{getTypeByValue('TASK_STATE',task.state).name}}</h2>
         <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
       </div>
-      <div style="height:60px;width:650px;padding:10px;border:1px solid #aaa;margin-left:5px;">
-        <p><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',task.base_type).color};`">{{getTypeByValue('TASK_TYPE',task.base_type).name}}</span> <span :style="`font-size:10px;color:${getTypeByValue('TASK_BUSINESS_TYPE',task.business_type).color};`">{{getTypeByValue('TASK_BUSINESS_TYPE',task.business_type).name}}</span></p>
+      <div style="height:60px;width:650px;padding:10px;border:1px solid #dfdfdf;border-radius:5px;margin-left:5px;">
+        <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',task.base_type).color};`">{{getTypeByValue('TASK_TYPE',task.base_type).name}}</span> | <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',task.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',task.business_type).name}}</span></div>
         <h2 style='font-size:18px;'>{{task.name || '无标题'}}</h2>
       </div>
 
       
-        <div style="height:60px;width:100px;border:1px solid #aaa;margin-left:10px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;">
+        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;margin-left:10px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;">
         <h2 style='font-size:15px;font-weight:bold;'>胡佳翰</h2>
         <p style='font-size:10px;color:#aaa;'>负责人</p>
       </div>
       </div>
       </div>
-      <div style="margin-top:10px;display:flex;height:30px;" class="flex-between">
+     
+     
+      
+       <Tabs type="card" style="margin-top:10px;" :animated="false" v-model="tabIndex">
+        <TabPane name="content" label="任务内容" icon="md-list">
+            
+            <div style="padding:20px;">
+              <Row>
+                <Col :span='12'> 所属部门 <BaseLink style="padding:5px 20px;" :item="dep" to="/core/deps" /> 
+              所属项目 <BaseLink style="padding:5px 20px;"  :item="project" to="/core/projects" /> 
+               <div>开始时间 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
+               <div> 计划完成 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
+                <div>实际完成 <div style='padding:5px 20px;color:#000;'>{{task.finished_at?moment(task.finished_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
+              
+              
+              </Col>
+                <Col :span='12'> 任务描述 
+              <pre style="padding:5px 20px;font-family:PingFang-SC;font-size:12px;width:100%;height:auto;overflow:hidden;white-space:pre-wrap;">{{task.desc || '无描述'}}</pre>
+              任务附件 
+              <BaseFiles  :files="task.files" />
+              </Col>
+              </Row>
+              
+             
+            </div>
+          
+        </TabPane>
+         <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
+ 
+             <div style="height:calc(100% - 170px);position:relative;">
+        <hs-list  :data="task.children" selectable draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
+      </div>
+        </TabPane>
+        <TabPane name="process" v-if="task.state == 1" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
+          <template v-if="task && task.base_type == 0">
+            <hs-form :form="Form('task_simple')" editable />
+          </template>
+         
+        </TabPane>
+         <TabPane name="history" label="操作记录" icon="md-code">
+             3小时前 胡佳翰创建了任务
+             
+        </TabPane>
+     
+    </Tabs>
+     <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='split'">
+       工作量：工作量总和未达到/超过100%，建议进行调整 <br />
+       计划时间：计划时间总额超过总任务时间，建议进行调整
+      </div>
+
+    
+   </div>
+    <div style="margin:10px;margin-top:0;display:flex;height:30px;" class="flex-between">
         <div class="flex-wrap">
         <Button icon='md-arrow-back' class="flex-wrap" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
           返回 {{stacks[stacks.length-1].name}}
@@ -37,9 +89,7 @@
          <Button class="flex-wrap" icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;" v-if="canUndo">
           撤回
         </Button>
-         <Button class="flex-wrap" icon='md-close' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;">
-          中止
-        </Button>
+        
          <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
           分解
         </Button>
@@ -47,62 +97,11 @@
           取消分解
         </Button>
 </div><div class="flex-wrap">
-        
+         <Button class="flex-wrap" icon='md-close' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;">
+          退回/中止
+        </Button>
       </div>
       </div>
-     
-      
-       <Tabs type="card" style="margin-top:10px;" :animated="false" v-model="tabIndex">
-        <TabPane name="content" label="任务内容" icon="md-list">
-            
-            <div style="padding:20px;">
-              
-              所属部门 {{($store.getters["core/deps"].find(v=>v.id == task.dep_id) || {}).name}}<br />
-              所属项目 {{($store.getters["core/projects"].find(v=>v.id == task.project_id) || {}).name}}<br />
-              任务描述 
-              <pre style="padding:5px 20px;font-family:PingFang-SC;font-size:12px;">{{task.desc || '无描述'}}</pre>
-              任务附件 {{task.files || '无'}}
-              
-            </div>
-          
-        </TabPane>
-         <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
-           
-         
-             <div style="height:calc(100% - 170px);position:relative;">
-        <hs-list  :data="task.children" selectable draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
-      </div>
-        </TabPane>
-        <TabPane name="process" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
-          <template v-if="task && task.base_type == 0">
-            <hs-form :form="Form('task_simple')" editable />
-          </template>
-         
-        </TabPane>
-     
-    </Tabs>
-     <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='split'">
-       工作量：工作量总和未达到/超过100%，建议进行调整 <br />
-       计划时间：计划时间总额超过总任务时间，建议进行调整
-      </div>
-    <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='content'">
-      <div class="flex-wrap">
-              <div class="flex-wrap" style="margin-right:5px;">开始日期 {{task.start_at?moment(task.start_at).format("L"):'无'}}</div>
-               <div class="flex-wrap" style="margin-right:5px;"> 计划完成 {{task.start_at?moment(task.start_at).format("L"):'无'}}</div>
-                <div class="flex-wrap" style="margin-right:5px;">实际完成 {{task.finished_at?moment(task.finished_at).format("L"):'无'}}</div>
-              
-
-             
-
-              
-            </div>
-        3小时前 胡佳翰创建了任务
-
-        {{task.children.length}}
-    </div>
-
-    
-   </div>
     <Modal title="任务处理" v-model="modalFormProcess" footer-hide>
 
     </Modal>
@@ -180,6 +179,12 @@ export default {
   },
   computed:{
     ...mapGetters('core',['session','getTypeByValue']),
+    dep(){
+      return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
+    },
+    project(){
+      return this.$store.getters["core/projects"].find(v=>v.id == this.task.project_id) || {}
+    },
       columns(){
         return [{
           title:"序号",
