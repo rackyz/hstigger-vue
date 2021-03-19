@@ -44,7 +44,7 @@
 
     </div>
     <div style="height:calc(100% - 30px);position:relative;">
-      <hs-table ref="table" :columns="columns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
+      <hs-table ref="table" :columns="filteredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="false" />
     </div>
     </Content>
 
@@ -241,6 +241,14 @@ export default {
   }},
    computed:{
       ...mapGetters('file',['files','uploadingFiles','makeURL']),
+      filteredColumns(){
+        let filteredKeys = []
+        if(this.filter.f_project_id)
+          filteredKeys.push('project_id')
+        if(this.filter.f_dep_id)
+          filteredKeys.push('dep_id')
+        return this.columns.filter(v=>!filteredKeys.includes(v.key))
+      },
       isFiltering(){
         return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null || (!this.filter.f_project_id && this.f_project_id != null) ||  this.f_dep_id != null 
       },
@@ -421,7 +429,9 @@ export default {
     getData(){
        this.loading = true
        this.api.enterprise.LIST_ARCHIVES().then(res=>{
-         this.items = res.data.data
+         let items = res.data.data
+         items.sort((a,b)=>(moment(a.created_at).isBefore(moment(b.created_at)?1:-1)))
+         this.items = items
        }).finally(e=>{
          this.loading = false
        })

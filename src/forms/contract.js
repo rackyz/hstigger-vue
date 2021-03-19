@@ -10,13 +10,18 @@ export default {
       <Col :span='8'>{{amount}}</Col>
       <Col :span='8'>{{plan_amount}}</Col>
     </Row>
+     <Row :gutter='10' style='margin-top:5px'>
+      <Col :span='24'>{{project_id}}</Col>
+      </Row>
     <Row :gutter='10' style='margin-top:10px'>
       <Col :span='12'>{{partA}}</Col>
       <Col :span='12'>{{partB}}</Col>
     </Row>
     <Row :gutter='10' style='margin-top:10px'>
-      <Col :span='12'>{{file}}</Col>
-      <Col :span='12'>{{file_assurance}}</Col>
+      <Col :span='24'>{{file}}</Col>
+    </Row>
+    <Row :gutter='10' style='margin-top:10px'>
+      <Col :span='24'>{{file_assurance}}</Col>
     </Row>
     <Row :gutter='10' style='margin-top:10px'>
      <Col :span='24'>{{pay_condition_raw}}</Col>
@@ -52,6 +57,14 @@ export default {
       control: "input",
       option: {
         type: "amount"
+      }
+    }, project_id: {
+      label: "项目名称",
+      control: "select",
+      option: {
+        getters: "core/projects",
+        idKey: 'id',
+        labelKey: 'name'
       }
     },
     plan_amount:{

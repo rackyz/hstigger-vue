@@ -5,12 +5,12 @@
       <div class="flex-wrap">
        
         <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
-        <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',task.state).color};`">{{getTypeByValue('TASK_STATE',task.state).name}}</h2>
+        <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',focused.state).color};`">{{getTypeByValue('TASK_STATE',focused.state).name}}</h2>
         <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
       </div>
       <div style="height:60px;width:650px;padding:10px;border:1px solid #dfdfdf;border-radius:5px;margin-left:5px;">
-        <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',task.base_type).color};`">{{getTypeByValue('TASK_TYPE',task.base_type).name}}</span> | <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',task.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',task.business_type).name}}</span></div>
-        <h2 style='font-size:18px;'>{{task.name || '无标题'}}</h2>
+        <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',focused.base_type).color};`">{{getTypeByValue('TASK_TYPE',focused.base_type).name}}</span>  <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).name}}</span></div>
+        <h2 style='font-size:18px;'>{{focused.name || '无标题'}}</h2>
       </div>
 
       
@@ -33,33 +33,30 @@
                <div>开始时间 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
                <div> 计划完成 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
                 <div>实际完成 <div style='padding:5px 20px;color:#000;'>{{task.finished_at?moment(task.finished_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
-              
-              
               </Col>
                 <Col :span='12'> 任务描述 
               <pre style="padding:5px 20px;font-family:PingFang-SC;font-size:12px;width:100%;height:auto;overflow:hidden;white-space:pre-wrap;">{{task.desc || '无描述'}}</pre>
               任务附件 
-              <BaseFiles  :files="task.files" />
+              <BaseFiles  :files="task.files || ''" />
               </Col>
               </Row>
-              
-             
             </div>
           
         </TabPane>
          <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
  
              <div style="height:calc(100% - 170px);position:relative;">
-        <hs-list  :data="task.children" selectable draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
+        <hs-list  :data="focused.children" selectable draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
       </div>
         </TabPane>
-        <TabPane name="process" v-if="task.state == 1" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
-          <template v-if="task && task.base_type == 0">
-            <hs-form :form="Form('task_simple')" editable />
+        <TabPane name="process" v-if="focused.state != 0" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
+          <template>
+            <hs-form :form="Form('task_simple')" :data="focused.state==1?{}:focused"  :editable='focused.state == 1' @on-submit="handleProcess" :env="{upload}" />
           </template>
          
         </TabPane>
-         <TabPane name="history" label="操作记录" icon="md-code">
+        
+         <TabPane name="history" label="操作记录" icon="md-code" v-if="false">
              3小时前 胡佳翰创建了任务
              
         </TabPane>
@@ -77,27 +74,27 @@
         <Button icon='md-arrow-back' class="flex-wrap" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
           返回 {{stacks[stacks.length-1].name}}
         </Button>
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;color:green;" v-if="!focused.state || focused.state == 0">
+        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;color:green;margin-right:5px;" v-if="!focused.state || focused.state == 0" @click="handleChangeState(1)">
           开始
         </Button>
-        <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 1">
-          停工
-        </Button>
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4">
+        <!-- <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 1" @click="handleChangeState(4)">
+           暂停
+        </Button> -->
+        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4" @click="handleChangeState(1)">
           继续
         </Button>
-         <Button class="flex-wrap" icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;" v-if="canUndo">
+         <Button class="flex-wrap" icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="canUndo" @click="handleCancel()">
           撤回
         </Button>
         
-         <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
+         <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
           分解
         </Button>
         <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;" v-if="focused.splited" @click="focused.splited=null;tabIndex='content';">
           取消分解
         </Button>
 </div><div class="flex-wrap">
-         <Button class="flex-wrap" icon='md-close' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;">
+         <Button class="flex-wrap" icon='md-close' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;" @click="handleChangeState(3)">
           退回/中止
         </Button>
       </div>
@@ -121,6 +118,20 @@ export default {
     default:()=>{}
     }
   },
+  watch:{
+    task:{
+      handler(v){
+        this.focused = v
+        if(v.state == 0){
+          this.tabIndex = 'content'
+        }else{
+          this.tabIndex = 'process'
+        }
+      },
+      deep:true,
+      immediate:true
+    }
+  },
   mounted(){
     if(this.task && this.task.id){
        this.focused = this.task
@@ -133,7 +144,7 @@ export default {
     return {
       focused:{},
       splited:false,
-      tabIndex:"process",
+      tabIndex:"content",
         stacks:[],
       	tools: [{
 					key: "resetpwd",
@@ -179,6 +190,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',['session','getTypeByValue']),
+     ...mapGetters('file',['files','uploadingFiles','makeURL']),
     dep(){
       return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
     },
@@ -318,6 +330,14 @@ export default {
     }
   },
   methods:{
+    async upload(files,onFilesProgress){
+     return new Promise((resolve,reject)=>{
+       this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
+         console.log(files)
+         resolve(files.map(v=>v.url))
+       }).catch(reject)
+     })
+    },
     handleExit(e){
       this.$emit('input',false)
     },
@@ -330,20 +350,27 @@ export default {
     onListEvent(e){
 
     },
+    handleChangeState(state){
+      
+      let data = {state}
+      let id = this.focused.id
+      this.api.enterprise.PATCH_TASKS(data,{param:{id}}).then(res=>{
+        if(state != 0){
+          this.tabIndex = 'process'
+        }
+        this.$set(this.focused,'state',state)
+        this.$forceUpdate()
+        this.$emit('update',data)
+      })
+    },
     handleProcess(data){
-      let id = this.current.id
+      let id = this.focused.id
       if(!id)
         return
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
         let updateInfo = res.data.data
-         
-          let new_item = Object.assign({},item,updateInfo)
-          let index = this.items.findIndex(v=>v.id == id)
-          if(index != -1){
-            new_item = Object.assign({},this.items[index],new_item)
-           this.items.splice(index,1,new_item)
-          }
-          this.modalCreate = false
+          this.$set(this,'focused',updateInfo)
+          this.$emit('update',updateInfo)
           this.Success('处理成功')
       }).catch(e=>{
         this.Error("处理失败:",)

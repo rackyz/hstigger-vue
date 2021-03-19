@@ -22,14 +22,14 @@ export default {
   `,
   def: {
     code: {
-      label: "招标编号",
+      label: "资料编号",
       control: 'input',
       option: {
         required: true
       }
     },
     name: {
-      label: "招标名称",
+      label: "资料名称",
       control: 'input',
 
       option: {

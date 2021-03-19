@@ -1,10 +1,10 @@
 const moment = require('moment')
 export default {
   layout:`<div><Row  :gutter="10">
-    <Col :span="24">{{finished_at}}</Col>
+    <Col :span="6">{{finished_at}}</Col>
     </Row>
     <Row  :gutter="10" style='margin-top:10px'>
-    <Col :span="24">{{desc}}</Col>
+    <Col :span="24">{{comment}}</Col>
     </Row>
     <Row  :gutter="10"  style='margin-top:10px'>
     <Col :span="24">{{files}}</Col>
@@ -14,13 +14,13 @@ export default {
   def: {
     finished_at:{
       label:"完成时间",
-      control:"time",
-      option:{
-        defaultValue:moment().format()
-      }
+         control: "time",
+         option: {
+           defaultValue: moment().format('YYYY-MM-DD')
+         }
     },
-    desc: {
-      label: "备注",
+    comment: {
+      label: "完成情况说明",
       control: "input",
       option: {
         type: 'textarea',

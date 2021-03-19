@@ -86,7 +86,7 @@
       <div style="position:relative;height:440px;">
         <div class="flex-wrap">
          <Input search placeholder="输入关键字搜索" style="margin:5px;width:200px" />
-         <Button icon="md-settings" style='float:right;margin-right:10px;'>任务模板管理</Button>
+         <!-- <Button icon="md-settings" style='float:right;margin-right:10px;'>任务模板管理</Button> -->
         </div>
         <div style="display:flex;position:relative;height:400px;border-top:1px solid #ddd;">
         <hs-menu :data="tmplClasses" style='width:150px;border-right:1px solid #dfdfdf;height:100%;padding:0;' :current="selectedTmplClass" @on-select="selectedTmplClass=$event"></hs-menu>
@@ -275,24 +275,27 @@ export default {
           tree:true,
           linkEvent:"open"
         },{
-          title:"所属部门",
-          type:"type",
-          width:150,
-          key:"dep_id",
-          option:{
-            align:"center",
-            getters:"core/deps"
-          }
-        },{
-          title:"所属项目",
-          width:200,
-          type:"type",
-          key:"project_id",
-          option:{
-            align:"center",
-            getters:"core/projects"
-          }
-        },{
+        title:"所属部门",
+        type:"type",
+        width:150,
+        key:"dep_id",
+         linkEvent:"dep",
+        option:{
+          align:"center",
+          getters:"core/deps"
+        }
+      },{
+        title:"所属项目",
+        width:200,
+        type:"type",
+        key:"project_id",
+         linkEvent:"project",
+        option:{
+          align:"center",
+          getters:"core/projects",
+         
+        }
+      },{
           title:"拆分",
           type:"text",
           key:"sub_task_count",
@@ -546,6 +549,7 @@ export default {
         this.api.enterprise.LIST_TASK_TEMPLATES({query:{parent_id:e.param.id}}).then(res=>{
           let items = res.data.data
           this.sub_templates = items
+          console.log('items:',items)
              this.modalInitTmpl = true
              this.existedTemplates = this.items.filter(v=>this.sub_templates.find(t=>t.id == v.unique_tmpl_key))
              this.selectedTmplates = [...this.existedTemplates]
@@ -603,6 +607,12 @@ export default {
         this.ProcessTask(e.data)
         
        
+      }else if(e.type == 'project'){
+        if(e.data.project_id)
+          this.RouteTo('/core/projects/'+e.data.project_id)
+      }else if(e.type == 'dep'){
+        if(e.data.dep_id)
+          this.RouteTo('/core/deps/'+e.data.dep_id)
       }
     },
     GetForm(task){

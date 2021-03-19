@@ -232,23 +232,24 @@
       >
 
         <div class='card-title'>
-          <span class='tab tab-actived'>
+          <span class='tab' :class="taskStateFilter==1?'tab-actived':''" @click="taskStateFilter=1">
           <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 待处理 {{my_tasks.length?`(${my_tasks.length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab'> <Icon
+          /> 待处理 {{state_categoried_tasks[1].length?`(${state_categoried_tasks[1].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==0?'tab-actived':''" @click="taskStateFilter=0"> <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 关注中</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab'> <Icon
+          /> 准备中 {{state_categoried_tasks[0].length?`(${state_categoried_tasks[0].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==2?'tab-actived':''" @click="taskStateFilter=2"> <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 已处理</span> <span style='float:right;font-size:12px;'>MORE</span>
+          /> 已处理 {{state_categoried_tasks[2].length?`(${state_categoried_tasks[2].length})`:''}}</span> <span style='float:right;font-size:12px;'>MORE</span>
         </div>
         
-        <template v-for="(fi) in my_tasks.slice(0,5)">
+        <template v-for="(fi) in state_categoried_tasks[taskStateFilter].slice(0,10)">
           <div
             class='ti-item'
             :key='fi.id'
+            @click="OpenTask(fi.id)"
           >
             <div class='ti-icon'>{{fi.base_type != undefined && getTypesByKey("TASK_TYPE")[fi.base_type]?getTypesByKey("TASK_TYPE")[fi.base_type].name:'任务'}}</div>
             <div class='ti-info'>
@@ -265,7 +266,7 @@
             </div>
           </div>
         </template>
-
+        <BaseEmpty v-if='!state_categoried_tasks[taskStateFilter] || state_categoried_tasks[taskStateFilter].length == 0' />
         </div>
 
         <template v-for="(fi,i) in flowInstances">
@@ -306,6 +307,9 @@
       @update='getWorkflows'
     />
 
+    
+    <ModalProcessTask v-model="modalProcessTask" :task="current_flow" @update="handleUpdateTask" />
+
     <Modal
       title="添加RSS信息源"
       footer-hide
@@ -343,13 +347,15 @@ export default {
     return {
       modalRSS: false,
       isConfiguring: false,
+      modalProcessTask:false,
       //examples
       flowInstances: [],
       flowPassed: [],
       showFlow: false,
       current_flow: {},
       isLoadingActived: false,
-      isLoadingPassed: false
+      isLoadingPassed: false,
+      taskStateFilter:1
     }
   },
   computed: {
@@ -364,6 +370,9 @@ export default {
       get() {
         return this.my_rss
       }
+    },
+    state_categoried_tasks(){
+      return [this.my_tasks.filter(v=>v.state == 0),this.my_tasks.filter(v=>v.state == 1 || v.state == 4),this.my_tasks.filter(v=>v.state == 2 || v.state == 3 || v.state == 5)]
     },
     ordered_rss: {
       set(e) {
@@ -395,6 +404,16 @@ export default {
   },
   methods: {
     ...mapMutations('core', ['toggleRss']),
+    OpenTask(id){
+      this.Request("enterprise").GET_TASKS({param:{id}}).then(res=>{
+        let model = res.data.data
+         this.current_flow = model
+     
+         this.modalProcessTask = true
+      }).catch(e=>{
+        this.Error('错误:',e)
+      })
+    },
     getTimeString(date, deadline) {
       let now = moment()
       if (deadline) {
@@ -403,6 +422,10 @@ export default {
         return moment(date).fromNow()
       else
         return '-'
+    },
+    handleUpdateTask(data){
+      data.id = this.current_flow.id
+      this.$store.dispatch('core/update_tasks',data)
     },
     MapRssComponent(media_type) {
       const MEDIA_TYPES = ['', 'BasePictureNews', 'BaseNewsList', 'BaseNoticeList', 'BaseArticles', 'BaseProjects']
@@ -624,6 +647,10 @@ export default {
   i {
     margin: 0;
   }
+}
+
+.tab{
+  cursor: pointer;
 }
 
 .tab-actived{

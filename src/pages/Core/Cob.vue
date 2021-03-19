@@ -148,21 +148,21 @@ export default {
           return h('span',param.row.down_percent?((param.row.down_percent*100).toFixed(2)+'%'):'-')
         }
       },
-        {
-          title:"预览",
-          width:60,
-          sortable:false,
-          render:(h,params)=>{
-              let count = 0
-            let files = params.row.files
-            if(files.includes(','))
-            {  files = files.split(';')
-              count = files.length
-            }
-            return h('Button',{props:{icon:'md-eye',size:'small'},on:{click:()=>{
-              this.handlePreview(params.row.id)
-            }}},count || '')
-          }},
+        // {
+        //   title:"预览",
+        //   width:60,
+        //   sortable:false,
+        //   render:(h,params)=>{
+        //       let count = 0
+        //     let files = params.row.files
+        //     if(files.includes(','))
+        //     {  files = files.split(';')
+        //       count = files.length
+        //     }
+        //     return h('Button',{props:{icon:'md-eye',size:'small'},on:{click:()=>{
+        //       this.handlePreview(params.row.id)
+        //     }}},count || '')
+        //   }},
           {
           title:"下载",
           width:60,

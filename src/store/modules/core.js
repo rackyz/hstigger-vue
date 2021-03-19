@@ -227,6 +227,12 @@ const actions = {
       commit('init')
     })
   },
+  update_tasks({commit},data){
+    return new Promise((resolve,reject)=>{
+      commit('update_my_tasks',data)
+      resolve()
+    })
+  },
   auth({state},path){
     console.log("AUTHED:",path,state)
     return new Promise((resolve,reject)=>{
@@ -422,6 +428,18 @@ const SaveTypes = data=>{
 }
 
 const mutations = {
+  update_my_tasks(state,data){
+    if(data &&data.id)
+    {
+      let index = state.session.my_tasks.findIndex(e=>e.id == data.id)
+      if(index == -1)
+        return
+      let newItem = Object.assign({}, state.session.my_tasks[index], data)
+      state.session.my_tasks.splice(index, 1, newItem)
+
+    }
+
+  },
   init(state){
     state = {
       session: {},
