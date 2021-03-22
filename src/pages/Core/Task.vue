@@ -488,7 +488,7 @@ export default {
     },ShowResult(item){
       this.modalResult = true
     },ProcessTask(item){
-       this.Request("enterprise").GET_TASKS({param:{id:item.id}}).then(res=>{
+       this.api.enterprise.GET_TASKS({param:{id:item.id}}).then(res=>{
         let model = res.data.data
          this.current = model
      
@@ -526,7 +526,7 @@ export default {
         }
       })
     },getTask(id, cb){
-      this.Request("enterprise").GET_TASKS({param:{id}}).then(res=>{
+      this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
         console.log(model)
         cb(model)

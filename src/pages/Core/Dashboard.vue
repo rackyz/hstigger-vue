@@ -405,7 +405,7 @@ export default {
   methods: {
     ...mapMutations('core', ['toggleRss']),
     OpenTask(id){
-      this.Request("enterprise").GET_TASKS({param:{id}}).then(res=>{
+      this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
          this.current_flow = model
      

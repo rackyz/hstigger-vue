@@ -32,7 +32,10 @@ apiAxios.interceptors.response.use(data => {
     } else if (err.response.status == 403) {
       return Promise.reject('403-权限不足,请联系管理员!')
     } else if (err.response.status == 401) {
-      o.SERVER.Clear()
+       delete apiAxios.defaults.headers.Authorization
+       delete apiAxios.defaults.headers.Enterprise
+       localStorage.removeItem('hs-token')
+       localStorage.removeItem('current_enterprise')
       window.location.reload()
       return Promise.reject()
     } else {
@@ -167,7 +170,7 @@ o.initAPI = async (vue) => {
             return server[level]
           }
         }
-        console.log("API inited:",o.SERVER)
+        console.log("API inited:", o.SERVER, vue.prototype.Request)
         resolve(o.API)
        
       }).catch(e => {

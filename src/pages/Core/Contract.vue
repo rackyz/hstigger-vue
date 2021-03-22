@@ -43,8 +43,8 @@
         <TabPane label="收款合同" name="partB"></TabPane>
         <TabPane label="第三方合同" name="third"></TabPane>
     </Tabs>
-    <div style="height:calc(100% - 100px);position:relative;">
-      <hs-table ref="table" full :total="1000" :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="single" :option="{summary:true}" />
+    <div style="height:calc(100% - 200px);position:relative;">
+      <hs-table ref="table" full  :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="single" :option="{summary:true}" />
     </div>
      <Modal v-model="showPay" styles="position:absolute;"  :title="`支付管理${current?' — '+current.name+'':''}`" footer-hide width="1200px" :transfer="false">
       <Payment :filter="{contract_id:this.current?this.current.id:null}"  @update="handleUpdateContract" />
@@ -200,9 +200,16 @@ export default {
         }
       },{
         title:"合约类型",
-        key:"type",
+        key:"type_id",
+        type:"type",
         sortable:false,
         width:100,
+        option:{
+          getters:'core/getTypes',
+          key:'CONTRACT_TYPE',
+          idKey:'value',
+          labelKey:'name'
+        }
         },{
         title:"合约名称",
         minWidth:200,
@@ -232,7 +239,7 @@ export default {
         }
       },{
         title:"甲方名称",
-        type:"user",
+        type:"text",
         key:"partA",
         width:220,
         option:{
