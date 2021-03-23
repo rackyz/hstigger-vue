@@ -41,11 +41,11 @@ export default {
     this.$store.dispatch('entadmin/GetUsers')
     this.$store.dispatch('entadmin/GetDeps')
      this.$store.dispatch('entadmin/GetRoles')
-    
+     this.$store.dispatch('entadmin/GetModules')
   },
   computed:{
     ...mapGetters('core',['current_ent']),
-    ...mapGetters('entadmin',['users','deps','roles']),
+    ...mapGetters('entadmin',['users','deps','roles','modules']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -79,7 +79,12 @@ export default {
         icon:"quanxianliebiao",
         path:'/core/eadmin/role',
         count:this.roles.length
-      }
+      },{
+        name:'模块管理',
+        path:'/core/eadmin/module',
+        icon:'apps',
+        count:this.modules.length
+      },
       ]
         },
       //   {
@@ -107,20 +112,21 @@ export default {
       //   path:'/core/eadmin/record',
       //   icon:'jiludanzilishijilu'
       // }]
-      // },{
-      //     name:"应用管理",
-      //     is_group:true,
-      //     subs:[
-      //     {
-      //   name:'订阅管理',
-      //   path:'/core/eadmin/project',
-      //   icon:'xiangmu'
-      // },{
-      //   name:'流程模板',
-      //   path:'/core/eadmin/flow',
-      //   icon:'shenjing'
-      // }]
-      //}
+      // }
+      ,{
+          name:"应用管理",
+          is_group:true,
+          subs:[
+          {
+        name:'订阅管理',
+        path:'/core/eadmin/project',
+        icon:'xiangmu'
+      },{
+        name:'流程模板',
+        path:'/core/eadmin/flow',
+        icon:'shenjing'
+      }]
+      }
       ,{
         name:'系统配置',
         icon:'apps',

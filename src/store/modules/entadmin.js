@@ -6,7 +6,8 @@ const state = {
   users:[],
   enterprises:[],
   deps:[],
-  roles:[]
+  roles:[],
+  modules:[]
 }
 
 const getters = {
@@ -18,6 +19,9 @@ const getters = {
   },
   roles(state){
     return state.roles
+  },
+  modules(state){
+    return state.modules
   }
 }
 
@@ -30,6 +34,15 @@ const actions = {
          resolve(user)
        }).catch(reject)
      })
+  },
+  GetModules({commit}){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.LIST_MODULES().then(res=>{
+        let modules = res.data.data
+        commit('SaveModules',modules)
+        resolve(users)
+      }).catch(reject)
+    })
   },
   GetUsers({commit}){
     return new Promise((resolve,reject)=>{
@@ -161,6 +174,16 @@ const actions = {
       })
     })
   },
+  PatchModules({commit},{id,active}){
+    return new Promise((resolve,reject)=>{
+      SERVER.entadmin.PATCH_MODULES({active},{param:{id}}).then(res=>{
+        commit('SaveModule',{id,active})
+        resolve()
+      }).catch(e=>{
+        reject(e)
+      })
+    })
+  },
   PatchUserDeps({commit},{id,deps}){
     return new Promise((resolve,reject)=>{
       SERVER.entadmin.PATCH_USER_DEPS(deps,{param:{id}}).then(res=>{
@@ -278,6 +301,8 @@ const mutations = {
   },
    SaveRoles(state, items) {
      UTIL.LocalSaveItems(state, "roles", items)
+   },SaveModules(state,items){
+       UTIL.LocalSaveItems(state, "modules", items)
    }
 }
 
