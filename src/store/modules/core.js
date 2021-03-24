@@ -76,6 +76,8 @@ const getters = {
    apps(state) {
        let o = {}
        state.modules.forEach(v => {
+         if(v.disabled)
+          return
          o[v.key] = Object.assign({}, v)
          o[v.key].path = o[v.key].url
        })

@@ -631,7 +631,6 @@ export default {
     }, 
     editDeps(){
       let id = this.session.user_id
-      console.log('id:',this.session.user_id)
       if(id == 'ed49e690-3b83-11eb-8e1e-c15d5c7db744'){
         return [0,6]
       }else if(id == 'ed4a8300-3b83-11eb-8e1e-c15d5c7db744' || id == 'ed4a34b4-3b83-11eb-8e1e-c15d5c7db744' || id == 'b8cabcb0-4014-11eb-813c-c1c9b9ee54e7'){
@@ -753,7 +752,6 @@ export default {
                let pos = that.fpos.length == 1?that.fpos[0]:undefined
                
                 let sheet = getQASheet(dep,pos)
-                console.log('SHEET:',sheet)
                 if(sheet)
                   sheet.shorts.forEach((v,i)=>{
                     titles[i+1] = sheet.shorts[i]
@@ -1187,7 +1185,6 @@ export default {
         s = -50
       sheet.heavy.forEach((v,i)=>{
         s += (values[value[i+1]] || 0) * v / 10
-        console.log('s=',s)
       })
       return s
       }
@@ -1307,6 +1304,116 @@ export default {
       const filename = '2020年终考核分类汇总表.xlsx';
       
       const workbook = XLSX.utils.book_new()
+      let filteredData = []
+      let filteredTitles = []
+       let Caption = [`2020年终考核汇总表`]
+    this.deps_count.forEach((v,i)=>{
+        let dep_name = this.deps[i]
+        if(v > 0){
+          let depusers = this.items.filter(v=>v.dep == i)
+          let title = ['序号','姓名','部门','职务','所在项目','职称','岗位证书','学历','入职时间']
+          this.positions.forEach((p,pi)=>{
+            let pos_name = this.positions[pi]
+            let users = depusers.filter(v=>v.position == pi)
+            if(users.length <= 0)
+              return
+            let scoreTitle = ['职业道德',...getQASheet(i,pi).cats,"总分"]
+            let qaTitle = getEVSheet(p,'n4').questions.map(v=>v.title)
+            let cmtTitle = ['评级','推荐','评语']
+            let SheetTitle = [...title,...scoreTitle,...qaTitle,...cmtTitle]
+            let data = users.map((v,i)=>[i+1,v.name,this.deps[v.dep],this.positions[v.position],v.project,v.rank,v.cerificate,v.education,moment(v.hire_date).format('YYYY-MM'),...v.scoresDesc,v.totalScore,...v.evDesc,v.CommitLevel_n4,v.CommitPride_n4,v.Commit_n4])
+            
+            filteredTitles = [...SheetTitle.slice(0,9),SheetTitle[23],SheetTitle[27],SheetTitle[28]]
+            filteredData = filteredData.concat(data.map(v=>[...v.slice(0,9),v[23],v[27],v[28]]))
+
+
+           
+            //XLSX.utils.aoa_to_sheet([Caption,SheetTitle,...data])
+            
+            //  let borderStyle = {
+            //     top: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     bottom: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     left: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     right: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     }
+            // };
+            // const cols = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC']
+            // for(let i=0;i<28;i++){
+            //   worksheet[cols[i]+2].s = {
+            //     fill: {
+            //                     fgColor: {
+            //                         rgb: "eeeeee"
+            //                     }
+            //                 },
+            //     font: {
+            //       name: '宋体',
+            //       sz: 14,
+            //       color: {rgb: "#FFFF0000"},
+            //       bold: true,
+            //       italic: false,
+            //       underline: false
+            //     },
+            //     alignment: {
+            //       horizontal: "center" ,
+            //       vertical: "center"
+            //     },
+            //      border: borderStyle
+            //   }
+            // }
+
+            
+          })
+         
+        }
+      })
+
+      filteredData.forEach((v,i)=>{
+        v[0] = i+1
+      })
+      let worksheet = XLSX.utils.aoa_to_sheet([Caption,filteredTitles,...filteredData])
+          
+            // console.log(worksheet)
+            worksheet["!merges"]=[{s:{
+              c:0,r:0
+            },e:{
+              c:28,r:0
+            }}]
+            worksheet["A1"].s = {
+              font:{sz:24,bold:true},
+              alignment:{horizontal:"center",vertical:"center",wrap_text:true}
+
+            }
+     XLSX.utils.book_append_sheet(workbook, worksheet,'汇总表');
+
+     const wbout = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+      const blob = new Blob([wbout], {type: 'application/octet-stream'});
+      // save file
+      let link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      setTimeout(function() {
+          // 延时释放掉obj
+          URL.revokeObjectURL(link.href);
+          link.remove();
+      }, 500);
+    },
+    //岗位分类
+    ExportXLSX_old(){
+      const filename = '2020年终考核分类汇总表.xlsx';
+      
+      const workbook = XLSX.utils.book_new()
       this.deps_count.forEach((v,i)=>{
         let dep_name = this.deps[i]
         if(v > 0){
@@ -1322,11 +1429,16 @@ export default {
             let cmtTitle = ['评级','推荐','评语']
             let SheetTitle = [...title,...scoreTitle,...qaTitle,...cmtTitle]
             let data = users.map((v,i)=>[i+1,v.name,this.positions[v.position],v.project,v.rank,v.cerificate,v.education,moment(v.hire_date).format('YYYY-MM'),...v.scoresDesc,v.totalScore,...v.evDesc,v.CommitLevel_n4,v.CommitPride_n4,v.Commit_n4])
-            console.log(dep_name,pos_name,data)
+            
+            let filteredTitles = [...SheetTitle.slice(0,8),SheetTitle[22],SheetTitle[26],SheetTitle[27]]
+            let filteredData = data.map(v=>[...v.slice(0,8),v[22],v[26],v[27]])
+
+
             let Caption = [`2020年终考核汇总表(${dep_name+'-'+pos_name})`]
-            let worksheet = XLSX.utils.aoa_to_sheet([Caption,SheetTitle,...data])
+            //XLSX.utils.aoa_to_sheet([Caption,SheetTitle,...data])
+            let worksheet = XLSX.utils.aoa_to_sheet([Caption,filteredTitles,...filteredData])
             pos_name = pos_name.replace('/','-')
-            console.log(worksheet)
+            // console.log(worksheet)
             worksheet["!merges"]=[{s:{
               c:0,r:0
             },e:{
@@ -1337,47 +1449,47 @@ export default {
               alignment:{horizontal:"center",vertical:"center",wrap_text:true}
 
             }
-             let borderStyle = {
-                top: {
-                    style: "thin",
-                    color: { rgb: "000000" }
-                },
-                bottom: {
-                    style: "thin",
-                    color: { rgb: "000000" }
-                },
-                left: {
-                    style: "thin",
-                    color: { rgb: "000000" }
-                },
-                right: {
-                    style: "thin",
-                    color: { rgb: "000000" }
-                }
-            };
-            const cols = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC']
-            for(let i=0;i<28;i++){
-              worksheet[cols[i]+2].s = {
-                fill: {
-                                fgColor: {
-                                    rgb: "eeeeee"
-                                }
-                            },
-                font: {
-                  name: '宋体',
-                  sz: 14,
-                  color: {rgb: "#FFFF0000"},
-                  bold: true,
-                  italic: false,
-                  underline: false
-                },
-                alignment: {
-                  horizontal: "center" ,
-                  vertical: "center"
-                },
-                 border: borderStyle
-              }
-            }
+            //  let borderStyle = {
+            //     top: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     bottom: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     left: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     },
+            //     right: {
+            //         style: "thin",
+            //         color: { rgb: "000000" }
+            //     }
+            // };
+            // const cols = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC']
+            // for(let i=0;i<28;i++){
+            //   worksheet[cols[i]+2].s = {
+            //     fill: {
+            //                     fgColor: {
+            //                         rgb: "eeeeee"
+            //                     }
+            //                 },
+            //     font: {
+            //       name: '宋体',
+            //       sz: 14,
+            //       color: {rgb: "#FFFF0000"},
+            //       bold: true,
+            //       italic: false,
+            //       underline: false
+            //     },
+            //     alignment: {
+            //       horizontal: "center" ,
+            //       vertical: "center"
+            //     },
+            //      border: borderStyle
+            //   }
+            // }
 
             XLSX.utils.book_append_sheet(workbook, worksheet, dep_name+'-'+pos_name);
           })
@@ -1461,10 +1573,8 @@ export default {
          
           if(v.historyNodes){
              v.historyNodes.forEach(n=>{
-               console.log(n.key,v.executors.n3)
                if(n.key == 'n3' && v.executors && Array.isArray(v.executors.n3)){
                  let index = v.executors.n3.findIndex(v=>v == n.op)
-                 console.log("n3:",index)
                  if(index != -1){
                    
                   if(!n.op)
@@ -1520,7 +1630,6 @@ export default {
                 this.table = QN1
           })
           }
-          console.log(v.opusers)
           v.opn1 = "已录"
 
          

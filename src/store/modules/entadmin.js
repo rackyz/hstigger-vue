@@ -40,7 +40,7 @@ const actions = {
       SERVER.entadmin.LIST_MODULES().then(res=>{
         let modules = res.data.data
         commit('SaveModules',modules)
-        resolve(users)
+        resolve(modules)
       }).catch(reject)
     })
   },
@@ -174,15 +174,33 @@ const actions = {
       })
     })
   },
-  PatchModules({commit},{id,active}){
+  PatchModules({commit},{id,disabled}){
     return new Promise((resolve,reject)=>{
-      SERVER.entadmin.PATCH_MODULES({active},{param:{id}}).then(res=>{
-        commit('SaveModule',{id,active})
+      SERVER.entadmin.PATCH_MODULES({disabled},{param:{id}}).then(res=>{
+        commit('SaveModules',[{id,disabled}])
         resolve()
       }).catch(e=>{
         reject(e)
       })
     })
+  },
+  ToggleModuleEnabled({commit},id){
+     return new Promise((resolve, reject) => {
+       SERVER.entadmin.PATCH_MODULES({}, {
+         param: {
+           id
+         }
+       }).then(res => {
+         let disabled = res.data.data
+         commit('SaveModules', [{
+           id,
+           disabled
+         }])
+         resolve()
+       }).catch(e => {
+         reject(e)
+       })
+     })
   },
   PatchUserDeps({commit},{id,deps}){
     return new Promise((resolve,reject)=>{

@@ -38,7 +38,7 @@ import api from './plugins/api'
           var that = TouchList
           this.$store.dispatch('core/auth',e.fullPath).then(authed=>{
             if(authed == false){
-               that.$router.replace(this.dashboard_path)
+               this.$router.replace(this.dashboard_path)
             }
           })
             

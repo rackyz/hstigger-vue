@@ -1,8 +1,8 @@
 <template>
-  <div class="l-admin-module" :class="{'l-admin-module-disabled':data.disabled}">
+  <div class="l-admin-module" :class="{'l-admin-module-disabled':data.disabled}" @click.self="onChangeEnabled">
     <div class="flex-wrap flex-between">
-       <div class="l-module-type"> {{getTypeByValue('ModuleType',data.type).name}} {{data.type}}</div>
-        <div>  <i-switch size="small" :value="!data.disabled" @change='onChangeEnabled' /></div>
+       <div class="l-module-type"><Icon size="14" :custom="`gzicon gzi-${getTypeByValue('ModuleType',data.type).icon || 'apps'}`" /> {{getTypeByValue('ModuleType',data.type).name}}</div>
+        <div>  <i-switch size="small" :value="!data.disabled" @on-change='onChangeEnabled'  /></div>
     </div>
     
     <div class="l-module-name">
@@ -15,11 +15,9 @@
       {{data.desc}}
     </div>
     <div class="l-module-state" :style="`color:${getTypeByValue('ModuleState',data.state).color}`">
-     {{getTypeByValue('ModuleState',data.state).name}}
+     <span style='font-size:10px'>{{getTypeByValue('ModuleState',data.state).name}}</span> v.{{data.version}} 
     </div>
-     <div class="l-module-version">
-      v {{data.version}} 
-    </div>
+    <div></div>
     
   </div>
 </template>
@@ -32,19 +30,21 @@ export default {
     ...mapGetters('core',['getTypeByValue'])
   },
   methods:{
-    onChangeEnabled(e){
-      this.data.disabled = e
+    onChangeEnabled(){
+      this.$emit('event',{type:'disabled',data:!this.data.disabled})
     }
   }
 }
 </script>
 <style lang="less">
 .l-admin-module{
-  width:220px;height:150px;border-radius:10px;padding:8px;background:#333;border:1px solid #ddd;color:#fff;flex-direction:column;
+  width:220px;height:150px;border-radius:10px;padding:8px 10px;border:1px solid #ddd;color:#fff;flex-direction:column;
+  background:#fff;
+  color:#333;
 
   .l-module-version{
     font-size:10px;
-    background:#111;
+    background:#ddd;
     border-radius:3px;
     width:50px;
     text-align: center;
@@ -52,27 +52,31 @@ export default {
     position: absolute;
     right:8px;
     bottom:8px;
-    color:#aaa;
+    color:#333;
   }
 
   .l-module-state{
-     font-size:10px;
+     font-size:8px;
+     font-family: '宋体';
     border-radius:3px;
     padding:0 5px;
     text-align: center;
 
     position: absolute;
-    left:8px;
-    bottom:8px;
+    right:5px;
+    bottom:5px;
   }
 
   .l-module-name{
-    color:#3af;
+    margin-top:5px;
+    color:#2d8cf0;
     font-size:18px;
+     font-weight: bold;
   }
 
   .l-module-type{
     font-size:10px;
+    font-weight: bold;
   }
 
   
@@ -88,13 +92,28 @@ export default {
 }
 
 .l-admin-module-disabled{
-  filter:brightness(0.8) grayscale(1);
+  background:#dfdfdf;
+  .l-module-name{
+    color:#aaa;
+  }
+  .l-module-desc{
+    color:#444;
+  }
+
+  .l-module-name{
+  
+     font-weight: normal;
+  }
+
+  .l-module-type{
+   font-weight: normal;
+  }
 }
 
 
 .l-admin-module:hover{
-  background:#333;
-  filter:brightness(1.2);
+  
+  filter:brightness(1.05);
 }
 
 
