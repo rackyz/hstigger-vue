@@ -7,7 +7,9 @@ const state = {
   enterprises:[],
   deps:[],
   roles:[],
-  modules:[]
+  modules:[],
+  projects:[],
+  rss:[]
 }
 
 const getters = {
@@ -22,6 +24,15 @@ const getters = {
   },
   modules(state){
     return state.modules
+  },
+  enabled_modules(state){
+    return state.modules.filter(v=>!v.disabled)
+  },
+  projects(state){
+    return state.projects
+  },
+  rss(state){
+    return state.rss
   }
 }
 
@@ -34,6 +45,24 @@ const actions = {
          resolve(user)
        }).catch(reject)
      })
+  },
+  GetRss({commit},id){
+     return new Promise((resolve, reject) => {
+       SERVER.entadmin.LIST_RSS().then(res => {
+         let items = res.data.data
+         commit('SaveRss', items)
+         resolve(items)
+       }).catch(reject)
+     })
+  },
+  GetProjects({commit}){
+    return new Promise((resolve, reject) => {
+      SERVER.entadmin.LIST_PROJECTS().then(res => {
+        let items = res.data.data
+        commit('SaveProjects', items)
+        resolve(items)
+      }).catch(reject)
+    })
   },
   GetModules({commit}){
     return new Promise((resolve,reject)=>{
@@ -321,7 +350,12 @@ const mutations = {
      UTIL.LocalSaveItems(state, "roles", items)
    },SaveModules(state,items){
        UTIL.LocalSaveItems(state, "modules", items)
-   }
+   }, SaveProjects(state, items) {
+     UTIL.LocalSaveItems(state, "projects", items)
+   }, SaveRss(state, items) {
+     UTIL.LocalSaveItems(state, "rss", items)
+   },
+
 }
 
 

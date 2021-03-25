@@ -166,16 +166,14 @@
         @on-submit="Patch"
     />
 
-    <Modal v-model="showModalConfig" :title="`配置角色 / ${role.name}`" footer-hide width="800">
+    <Modal v-model="showModalConfig" :title="`配置角色 / ${role.name}`" footer-hide fullscreen>
         <div class="l-toolbox l-list">
                 <div class="l-tool">
                     <Icon type="md-document" size="25" />
                     <div class="label">保存</div>
                     </div>
         </div>
-        <div style="height:400px;padding:20px;background:#fff;">
-            自由权限系统后续加入
-        </div>    
+       
     </Modal> 
   </div>
 </template>
@@ -192,7 +190,10 @@ export default {
             showModalConfig:false,
             current:undefined,
             selected:null,
-
+           
+            depPermissions:[{name:'mod1'}],
+            projectPermissions:[{name:'mod2'}],
+            archivePermissions:[{name:"mod3"}],
            
             role:{},
             type_id:11,
@@ -214,6 +215,7 @@ export default {
     searcher: {
         containsIn: ['gy_user','gy_name','gy_phone']
     },
+    
     filter: {},
     tools: {
         button: ['add']

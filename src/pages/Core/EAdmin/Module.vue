@@ -21,7 +21,8 @@ export default {
   data(){
     return {
       search_text:"",
-      selected_index:-1
+      selected_index:-1,
+      
     }
   },
   computed:{

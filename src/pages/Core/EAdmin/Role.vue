@@ -172,16 +172,42 @@
 
       <!-- modal -->
     
-    <Modal v-model="showModalConfig" :title="`配置角色 / ${role.name}`" footer-hide>
-        <div class="l-toolbox l-list">
+    <Modal v-model="showModalConfig" icon="md-person" :title="`配置角色`" footer-hide fullscreen>
+     <div class="l-toolbox l-list" style='background:#23334c;padding:0;height:60px;'>
+         <div class="l-tool" style="width:195px;height:100%;border-right:1px solid #555;font-size:14px;display:flex;justify-content:space-between;align-items:center;color:#fff;padding:0 15px;margin-left:0;">
+             <div class="flex-wrap" style='min-width:150px;'>
+             <Icon :type='role.icon' size="30" style="margin-right:10px;border:1px solid #aaa;" />
+             <div>{{role.name}}<div style='font-size:10px;color:#aaa;text-align:left;'>{{getTypeById(role.type_id).name}}</div></div>
+             </div>
+             <Icon type='md-arrow-dropdown' size="25" />
+             </div>
                 <div class="l-tool">
                     <Icon type="md-document" size="25" />
                     <div class="label">保存</div>
                     </div>
+                     <div class="l-tool">
+                    <Icon type="md-exit" size="25" />
+                    <div class="label">取消</div>
+                    </div>
+                  <div class="l-tool">
+                    <Icon type="md-unlock" size="25" />
+                    <div class="label">全部启用</div>
+                    </div>
+                      <div class="l-tool">
+                    <Icon type="md-lock" size="25" />
+                    <div class="label">全部禁用</div>
+                    </div>
         </div>
-        <div style="height:400px;padding:20px;">
-            自由权限系统后续加入
-        </div>    
+    <Layout style='flex-direction:row;overflow:hidden;'>
+       
+         <hs-menu style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #dfdfdf;background:#eee;'  :data="filteredMenus"  @on-select='onClickMenu' :current="menuIndex" />
+        
+        <Content style="background:#fff;position:relative;">
+            
+            <keep-alive><hs-list :selectable="false" :data="ValuedPermissions" :option="{tmpl:'BasePermission'}" style="border:none;height:calc(100% - 100px);" /></keep-alive>
+            
+        </Content>  
+        </Layout>  
     </Modal> 
 
      <Modal v-model="showModal" :title="!role.id?'新建角色':'编辑角色'"  footer-hide>
@@ -197,6 +223,8 @@ export default {
     
     data(){
         return {
+            menuIndex:"module",
+            acl:{},
             tabIndex:'basic',
             loading:false,
             showModal:false,
@@ -206,14 +234,32 @@ export default {
             role:{},
             type_id:11,
            selection:[],
+           
+            depPermissions:[{name:'mod1'}],
+            projectPermissions:[{name:'mod2'}],
+            archivePermissions:[{name:"mod3"}],
         }
     },
     computed:{
-        ...mapGetters("core",['types','getTypes']),
-        ...mapGetters("entadmin",['users','roles','deps']),
+        ...mapGetters("core",['types','getTypes','getTypeById']),
+        ...mapGetters("entadmin",['users','roles','deps','projects','enabled_modules','rss']),
         tableDef(){
             return tableDef
         },
+        filteredMenus(){
+            return [this.menus[1]]
+        },
+        ValuedPermissions(){
+            return this.GetPermissionList(this.menuIndex).map(v=>{
+                return {
+                    id:v.id,
+                    name:v.name,
+                    desc:v.desc,
+                    value:this.acl[v.id]
+                }
+            })
+        },
+       
         filteredRoles(){
             return this.getRoles(this.type_id)
         },
@@ -223,6 +269,64 @@ export default {
         user_form(){
             return tableDef.form
         },
+         menus(){
+            return [{
+                name:"资源权限",
+                icon:'apps',
+                is_group:true,
+                subs:[{
+                name:'模块',
+                icon:"user",
+                path:'module',
+                count:"50%"
+                },{
+                    name:'项目',
+                    icon:"organization",
+                    path:'project',
+                    count:this.deps.length
+                },{
+                    name:'部门',
+                    icon:"organization",
+                    path:'dep',
+                    count:this.deps.length
+                },{
+                    name:'信息',
+                    icon:"organization",
+                    path:'rss',
+                    count:this.deps.length
+                }]
+            },{
+                name:"对象详情",
+                icon:'apps',
+                is_group:true,
+                subs:[{
+                    name:'项目',
+                    icon:"organization",
+                    path:'/core/eadmin/dep',
+                    count:this.deps.length
+                },{
+                    name:'部门',
+                    icon:"organization",
+                    path:'/core/eadmin/dep',
+                    count:this.deps.length
+                },{
+                    name:'员工',
+                    icon:"organization",
+                    path:'/core/eadmin/dep',
+                    count:this.deps.length
+                },{
+                    name:'后台管理',
+                    icon:"organization",
+                    path:'/core/eadmin/dep',
+                    count:this.deps.length
+                }]
+            },{
+                name:"业务模块",
+                icon:'apps',
+                is_group:true,
+                subs:[]
+            }]
+      },
         roleForm(){
            return {
               layout:`<div><Row  :gutter="10"><Col :span="4">{{icon}}</Col><Col :span="14">{{name}}</Col><Col :span="6">{{color}}</Col></Row><Row style='margin-top:10px' :gutter="10"><Col :span="24">{{desc}}</Col></Row></div>`,
@@ -272,6 +376,35 @@ export default {
         this.$store.dispatch('entadmin/GetRoles')
     },
     methods:{
+        GetPermissionList(key){
+             if(this.menuIndex == 'module'){
+                return this.enabled_modules
+            }else if(this.menuIndex == 'dep'){
+                return this.deps
+            }else if(this.menuIndex == 'project'){
+                return this.projects
+            }else if(this.menuIndex == 'rss'){
+                return this.rss
+            }
+            return []
+        },
+         GetPercent(key){
+            let permissions = this.GetPermissionList(key)
+            let c = 0
+            permissions.forEach(v=>{
+                if((!v.type || v.type == 'boolean') && this.acl[v.id]){
+                    c = c + 1
+                }
+            })
+            if(permissions.length == 0 || c == 0)
+                return  ""
+
+            return (c / permissions.length).toFixed(0) + '%'
+        },
+        onClickMenu(e){
+            console.log(e)
+            this.menuIndex = e
+        },
         getRoles(type_id){
             return this.roles.filter(v=>v.type_id == type_id)
         },
@@ -329,9 +462,12 @@ export default {
     padding:10px;
     .l-tool{
         text-align: center;
-        padding:0 10px;
-        margin:0 10px;
+        width:50px;
+        height:100%;
+        padding:5px 0;
+        margin:0 5px;
         font-size:12px;
+        color:#aaa;
         cursor: pointer;
         .label{
             margin-top:3px;

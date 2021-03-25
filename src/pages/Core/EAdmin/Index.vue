@@ -42,6 +42,8 @@ export default {
     this.$store.dispatch('entadmin/GetDeps')
      this.$store.dispatch('entadmin/GetRoles')
      this.$store.dispatch('entadmin/GetModules')
+     this.$store.dispatch('entadmin/GetProjects')
+     this.$store.dispatch('entadmin/GetRss')
   },
   computed:{
     ...mapGetters('core',['current_ent']),

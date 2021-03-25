@@ -218,6 +218,9 @@ const getters = {
   getDep:state=>id=>{
     return state.deps.find(v=>v.id) || {}
   },
+  getTypeById:state=>(id)=>{
+    return state.types.find(v=>v.id == id) || {}
+  },
   getTypeByValue:state=>(key,val)=>{
     return getters.getTypes(state)(key).find(v=>v.value == val) || {}
   }
