@@ -247,7 +247,7 @@ export default {
             return tableDef
         },
         filteredMenus(){
-            return [this.menus[1]]
+            return this.menus
         },
         ValuedPermissions(){
             return this.GetPermissionList(this.menuIndex).map(v=>{
