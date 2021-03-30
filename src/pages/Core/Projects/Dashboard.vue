@@ -28,7 +28,17 @@
     </Row>
      <Row :gutter="20" style='margin-top:20px;'>
       <Col :span='24'>
-      <Card style='height:200px;' title="进度安排"></Card>
+      <Card style='height:200px;' title="进度安排">
+          <Steps :current="1">
+        <Step title="已完成" content="这里是该步骤的描述信息"></Step>
+        <Step title="进行中" content="这里是该步骤的描述信息"></Step>
+        <Step title="待进行" content="这里是该步骤的描述信息"></Step>
+        <Step title="待进行" content="这里是该步骤的描述信息"></Step>
+         <Step title="待进行" content="这里是该步骤的描述信息"></Step>
+        <Step title="待进行" content="这里是该步骤的描述信息"></Step>
+    </Steps>
+
+      </Card>
       </Col>
     </Row>
     <Row :gutter="20" style='margin-top:20px;margin-bottom:20px;'>

@@ -20,7 +20,7 @@
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
-         <hs-menu style='min-width:150px;width:150px;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
+         <hs-menu style='min-width:150px;width:150px;padding:5px 0;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
         
         <div class='l-menu'>
@@ -75,7 +75,11 @@ export default {
       },{
         name:'通用模块',
         is_group:true,
-        subs:[{
+        subs:[ {
+           name:'通知公告',
+           icon:'bar-chart',
+           key:'notice'
+         },{
           name:'任务管理',
           icon:'xiangmu',
           key:'task'

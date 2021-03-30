@@ -9,14 +9,29 @@
         </div>
     </div>
     <div class="l-perm-value">
-      <i-switch v-model="data.value" />
+      <i-switch :value="data.value" @on-change="handleChange" />
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props:['data']
+  props:['data'],
+  watch:{
+    "data.value":{
+      handler(v){
+        console.log('change',v)
+        this.$forceUpdate()
+      },
+      deep:true,
+      immediate:true
+    }
+  },
+  methods:{
+    handleChange(e){
+      this.$emit('event',e)
+    }
+  }
 }
 </script>
 

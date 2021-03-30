@@ -181,19 +181,19 @@
              </div>
              <Icon type='md-arrow-dropdown' size="25" />
              </div>
-                <div class="l-tool">
+                <div class="l-tool" @click="onSavePermission">
                     <Icon type="md-document" size="25" />
                     <div class="label">保存</div>
                     </div>
-                     <div class="l-tool">
+                     <div class="l-tool" @click="onCancelPermission">
                     <Icon type="md-exit" size="25" />
                     <div class="label">取消</div>
                     </div>
-                  <div class="l-tool">
+                  <div class="l-tool" @click="onEnableAllPermission">
                     <Icon type="md-unlock" size="25" />
                     <div class="label">全部启用</div>
                     </div>
-                      <div class="l-tool">
+                      <div class="l-tool" @click="onDisabledAllPermission">
                     <Icon type="md-lock" size="25" />
                     <div class="label">全部禁用</div>
                     </div>
@@ -204,7 +204,7 @@
         
         <Content style="background:#fff;position:relative;">
             
-            <keep-alive><hs-list :selectable="false" :data="ValuedPermissions" :option="{tmpl:'BasePermission'}" style="border:none;height:calc(100% - 100px);" /></keep-alive>
+            <keep-alive><hs-list ref="list" :selectable="false" :data="ValuedPermissions" :option="{tmpl:'BasePermission'}" style="border:none;height:calc(100% - 100px);" /></keep-alive>
             
         </Content>  
         </Layout>  
@@ -451,6 +451,25 @@ export default {
             }).catch(e=>{
                 that.Error(e)
             })
+            })
+        },
+        onSavePermission(){
+
+        },
+        onCancelPermission(){
+
+        },
+        onEnableAllPermission(){
+            console.log('enable all')
+            this.ValuedPermissions.forEach(v=>{
+                v.value = true
+            })
+            this.$refs.list.$forceUpdate()
+        },
+        onDisabledAllPermission(){
+            console.log('disabled all')
+             this.ValuedPermissions.forEach(v=>{
+                v.value = false
             })
         }
     }
