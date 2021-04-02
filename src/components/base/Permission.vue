@@ -2,7 +2,7 @@
   <div class="l-permission">
     <div class='l-perm-info'>
       <div class='l-perm-info-name'>
-        {{data.name}}
+        {{data.name}}  <span style='color:#bbb;font-size:10px;font-weight:normal;'>{{data.key}} {{data.id}} {{data.value}}</span>
       </div>
        <div class='l-perm-info-desc'>
          {{data.desc}}
@@ -20,7 +20,6 @@ export default {
   watch:{
     "data.value":{
       handler(v){
-        console.log('change',v)
         this.$forceUpdate()
       },
       deep:true,
@@ -29,7 +28,7 @@ export default {
   },
   methods:{
     handleChange(e){
-      this.$emit('event',e)
+      this.$emit('event',{type:'switch',value:e})
     }
   }
 }

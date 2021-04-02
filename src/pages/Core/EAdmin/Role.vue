@@ -59,6 +59,15 @@
      background:rgb(192, 232, 236);
     transition: all 0.3s;
 }
+
+.l-tool-active{
+    i{
+        color:#3af;
+    }
+    .label{
+        color:#3af;
+    }
+}
 </style>
 <template>
  <div class="hs-conatiner hs-conatiner-scrollable" style='background:#dfdfdf;'>
@@ -174,14 +183,21 @@
     
     <Modal v-model="showModalConfig" icon="md-person" :title="`配置角色`" footer-hide fullscreen>
      <div class="l-toolbox l-list" style='background:#23334c;padding:0;height:60px;'>
-         <div class="l-tool" style="width:195px;height:100%;border-right:1px solid #555;font-size:14px;display:flex;justify-content:space-between;align-items:center;color:#fff;padding:0 15px;margin-left:0;">
+         <Dropdown transfer trigger="click" @on-click="handleChangeRole" style="height:100%;position:relative;">
+         <div class="l-tool" style="width:220px;height:60px;border-right:1px solid #555;font-size:14px;display:flex;justify-content:space-between;align-items:center;color:#fff;padding:0 15px;margin-left:0;">
              <div class="flex-wrap" style='min-width:150px;'>
              <Icon :type='role.icon' size="30" style="margin-right:10px;border:1px solid #aaa;" />
              <div>{{role.name}}<div style='font-size:10px;color:#aaa;text-align:left;'>{{getTypeById(role.type_id).name}}</div></div>
              </div>
              <Icon type='md-arrow-dropdown' size="25" />
              </div>
-                <div class="l-tool" @click="onSavePermission">
+             <DropdownMenu slot="list">
+                 <template v-for="r in roles">
+                      <DropdownItem :name='r.id' :key='r.id' :selected="r.id == current_role">{{r.name}}</DropdownItem>
+                 </template>
+        </DropdownMenu>
+             </Dropdown>
+                <div class="l-tool" @click="onSavePermission" :class="{'l-tool-active':Object.values(updated_acl).filter(v=>v!=undefined).length}">
                     <Icon type="md-document" size="25" />
                     <div class="label">保存</div>
                     </div>
@@ -197,14 +213,18 @@
                     <Icon type="md-lock" size="25" />
                     <div class="label">全部禁用</div>
                     </div>
+                     <div class="l-tool" @click="onGoBackPermission">
+                    <Icon type="md-arrow-back" size="25" />
+                    <div class="label">恢复默认</div>
+                    </div>
         </div>
     <Layout style='flex-direction:row;overflow:hidden;'>
        
-         <hs-menu style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #dfdfdf;background:#eee;'  :data="filteredMenus"  @on-select='onClickMenu' :current="menuIndex" />
+         <hs-menu ref='menu' style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #dfdfdf;background:#eee;'  :data="filteredMenus"  @on-select='onClickMenu' :current="menuIndex" />
         
         <Content style="background:#fff;position:relative;">
-            
-            <keep-alive><hs-list ref="list" :selectable="false" :data="ValuedPermissions" :option="{tmpl:'BasePermission'}" style="border:none;height:calc(100% - 100px);" /></keep-alive>
+            <Alert show-icon closable type="success" v-if='Object.values(updated_acl).filter(v=>v!=undefined).length' style="margin:10px;margin-bottom:0;">已修改 {{Object.values(updated_acl).filter(v=>v!=undefined).length}}项，注意保存</Alert>
+            <keep-alive><hs-list ref="list" :selectable="false" :data="ValuedPermissions" :option="{tmpl:'BasePermission'}" style="border:none;height:calc(100% - 100px);" @event="onListEvent" /></keep-alive>
             
         </Content>  
         </Layout>  
@@ -224,7 +244,7 @@ export default {
     data(){
         return {
             menuIndex:"module",
-            acl:{},
+            acl:{"ad584593-3b83-11eb-8e1e-h15d5c7db744":false},
             tabIndex:'basic',
             loading:false,
             showModal:false,
@@ -233,8 +253,8 @@ export default {
             selected:null,
             role:{},
             type_id:11,
-           selection:[],
-           
+            selection:[],
+            updated_acl:{},
             depPermissions:[{name:'mod1'}],
             projectPermissions:[{name:'mod2'}],
             archivePermissions:[{name:"mod3"}],
@@ -253,9 +273,10 @@ export default {
             return this.GetPermissionList(this.menuIndex).map(v=>{
                 return {
                     id:v.id,
+                    key:v.key,
                     name:v.name,
                     desc:v.desc,
-                    value:this.acl[v.id]
+                    value:this.updated_acl[v.id]!=undefined ?this.updated_acl[v.id]:(this.acl[v.id]!=undefined?this.acl[v.id]:v.value)
                 }
             })
         },
@@ -270,6 +291,25 @@ export default {
             return tableDef.form
         },
          menus(){
+           
+            let resources = ['enabled_modules','deps','projects','rss']
+            let counts = {}
+            resources.forEach(res=>{
+                counts[res] = 0
+            })
+            resources.forEach(res=>{
+                if(Array.isArray(this[res]))
+                    this[res].forEach(v=>{
+                        if(this.acl[v.id] == undefined && false != this.acl[v.id] || this.acl[v.id])
+                            counts[res]++
+
+                    })
+            })
+            resources.forEach(res=>{
+                if(this[res].length > 0)
+                    counts[res] = (counts[res] * 100/this[res].length).toFixed() + '%'
+            })
+              console.log('recaculate-menu:',counts)
             return [{
                 name:"资源权限",
                 icon:'apps',
@@ -278,49 +318,51 @@ export default {
                 name:'模块',
                 icon:"user",
                 path:'module',
-                count:"50%"
+                count:counts.enabled_modules
                 },{
                     name:'项目',
                     icon:"organization",
                     path:'project',
-                    count:this.deps.length
+                    count:counts.projects
                 },{
                     name:'部门',
                     icon:"organization",
                     path:'dep',
-                    count:this.deps.length
+                    count:counts.deps
                 },{
                     name:'信息',
                     icon:"organization",
                     path:'rss',
-                    count:this.deps.length
+                    count:counts.rss
                 }]
-            },{
-                name:"对象详情",
-                icon:'apps',
-                is_group:true,
-                subs:[{
-                    name:'项目',
-                    icon:"organization",
-                    path:'/core/eadmin/dep',
-                    count:this.deps.length
-                },{
-                    name:'部门',
-                    icon:"organization",
-                    path:'/core/eadmin/dep',
-                    count:this.deps.length
-                },{
-                    name:'员工',
-                    icon:"organization",
-                    path:'/core/eadmin/dep',
-                    count:this.deps.length
-                },{
-                    name:'后台管理',
-                    icon:"organization",
-                    path:'/core/eadmin/dep',
-                    count:this.deps.length
-                }]
-            },{
+            },
+            //   {
+            //     name:"对象详情",
+            //     icon:'apps',
+            //     is_group:true,
+            //     subs:[{
+            //         name:'项目',
+            //         icon:"organization",
+            //         path:'/core/eadmin/dep',
+            //         count:this.deps.length
+            //     },{
+            //         name:'部门',
+            //         icon:"organization",
+            //         path:'/core/eadmin/dep',
+            //         count:this.deps.length
+            //     },{
+            //         name:'员工',
+            //         icon:"organization",
+            //         path:'/core/eadmin/dep',
+            //         count:this.deps.length
+            //     },{
+            //         name:'后台管理',
+            //         icon:"organization",
+            //         path:'/core/eadmin/dep',
+            //         count:this.deps.length
+            //     }]
+            // },
+            {
                 name:"业务模块",
                 icon:'apps',
                 is_group:true,
@@ -376,15 +418,36 @@ export default {
         this.$store.dispatch('entadmin/GetRoles')
     },
     methods:{
+        GetRole(role){
+            if(this.loading)
+                return
+            this.loading = true
+            if(!role || !role.id)
+                return
+            this.api.entadmin.GET_ROLES({param:{id:role.id}}).then(res=>{
+                let acls = res.data.data
+                let acl = {}
+                this.updated_acl = {}
+                acls.forEach(v=>{
+                    acl[v.key] = parseInt(v.value)==0?false:true
+                })
+                console.log("ACL:",this.acl)
+                this.$set(this,'acl',acl)
+                this.$set(this,'updated_acl',{})
+                this.$forceUpdate()
+            }).finally(e=>{
+                this.loading = false
+            })
+        },  
         GetPermissionList(key){
              if(this.menuIndex == 'module'){
-                return this.enabled_modules
+                return this.enabled_modules.map(v=>Object.assign({},v,{value:true}))
             }else if(this.menuIndex == 'dep'){
-                return this.deps
+                return this.deps.map(v=>Object.assign({},v,{value:true}))
             }else if(this.menuIndex == 'project'){
-                return this.projects
+                return this.projects.map(v=>Object.assign({},v,{value:true}))
             }else if(this.menuIndex == 'rss'){
-                return this.rss
+                return this.rss.map(v=>Object.assign({},v,{value:true}))
             }
             return []
         },
@@ -414,14 +477,16 @@ export default {
         },
         Edit(r){
             this.role = r
+           
+          
             this.showModal = true
         },
         Config(r){
             this.role = r
+              this.GetRole(r)
             this.showModalConfig = true
         },
         Patch(e){
-            console.log('patch:',e)
             if(Object.keys(e).length <= 1){
                 this.showModal = false
                 return
@@ -453,24 +518,81 @@ export default {
             })
             })
         },
+        handleChangeRole(e){
+          
+            let role = this.roles.find(v=>v.id == e)
+              this.Config(role)
+        },
         onSavePermission(){
+            let data = Object.keys(this.updated_acl).map(v=>({
+                key: v,
+                value: this.updated_acl[v]
+            }))
 
+            if(data.length == 0){
+                this.showModalConfig = false
+                return
+            }
+
+
+            this.Confirm('确定保存修改?',()=>{
+                this.api.entadmin.PATCH_ROLES(data,{param:{id:this.role.id},query:{q:'acl'}}).then(res=>{
+                    this.$set(this,'acl',Object.assign({},this.acl,this.updated_acl))
+                    this.$set(this,'updated_acl',{})
+                    this.$forceUpdate()
+                    this.Success('保存成功')
+                }).catch(e=>{
+                    this.Error('保存失败:'+e)
+                })
+                
+            })
         },
         onCancelPermission(){
-
+            this.showModalConfig = false
+        },
+        onListEvent(e){
+            console.log(e)
+            if(e.event && e.event.type == 'switch'){
+                if(this.acl[e.param.id] != undefined)
+                    if(e.event.value != this.acl[e.param.id])
+                        this.$set(this.updated_acl,e.param.id,e.event.value)
+                    else
+                        this.$set(this.updated_acl,e.param.id,undefined)
+                else{
+                     if(e.event.value != e.param.value)
+                        this.$set(this.updated_acl,e.param.id,e.event.value)
+                    else
+                        this.$set(this.updated_acl,e.param.id,undefined)
+                }
+            }
+            this.$forceUpdate()
         },
         onEnableAllPermission(){
-            console.log('enable all')
             this.ValuedPermissions.forEach(v=>{
-                v.value = true
+                if(this.acl[v.id]==undefined || this.acl[v.id] == true)
+                    this.$delete(this.updated_acl,v.id)
+                else
+                    this.$set(this.updated_acl,v.id,true)
             })
-            this.$refs.list.$forceUpdate()
+            console.log(this.updated_acl)
+            this.$forceUpdate()
         },
         onDisabledAllPermission(){
-            console.log('disabled all')
              this.ValuedPermissions.forEach(v=>{
-                v.value = false
+                if(this.acl[v.id] != false)
+                     this.$set(this.updated_acl,v.id,false)
+                else
+                    this.$delete(this.updated_acl,v.id)
             })
+              console.log(this.updated_acl)
+             this.$forceUpdate()
+        },
+        onGoBackPermission(){
+            this.ValuedPermissions.forEach(v=>{
+                 this.$delete(this.updated_acl,v.id)
+            })
+              console.log(this.updated_acl)
+            this.$forceUpdate()
         }
     }
 }
