@@ -38,7 +38,7 @@
         
 
         
-        <Card style='position:absolute;left:500px;top:10px;bottom:10px;right:10px;overflow:hidden;' class='full-card' padding ='10'>
+        <Card style='position:absolute;left:500px;top:10px;bottom:10px;right:10px;overflow-y:auto;' class='full-card' padding ='10'>
           <Row :gutter="12">
             <Col :span='12'>
               <Input search v-model="search_text_attr" size="small" style='margin-bottom:10px' />

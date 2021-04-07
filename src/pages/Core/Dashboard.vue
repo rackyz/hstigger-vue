@@ -13,14 +13,14 @@
         :md='12'
         :lg="5"
       >
-      <Card
+      <!-- <Card
         class="panel"
         style='width:100%;border:none;background:#23334c;color:#fff;border-radius:0;filter:drop-shadow(1px 1px 1px 2px #333);'
         padding='5'
       >
         <BaseWeather />
 
-      </Card>
+      </Card> -->
       <Card
         class="panel"
         style='width:100%;border:none;border-radius:0'
