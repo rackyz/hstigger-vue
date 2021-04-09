@@ -213,7 +213,7 @@ const getters = {
         return state.types.map(v=>v.key)
     },
   getRoles: state => type_id => {
-    return state.roles.filter(v => v.type_id == type_id)
+    return state.session.roles.filter(v => v.type_id == type_id)
   },
   getDep:state=>id=>{
     return state.deps.find(v=>v.id) || {}

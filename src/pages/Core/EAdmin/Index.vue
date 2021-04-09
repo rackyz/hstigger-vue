@@ -47,7 +47,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',['current_ent']),
-    ...mapGetters('entadmin',['users','deps','roles','modules']),
+    ...mapGetters('entadmin',['users','deps','roles','modules','rss']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -77,15 +77,10 @@ export default {
         count:this.deps.length
       }
       ,{
-        name:'角色管理',
+        name:'角色权限',
         icon:"quanxianliebiao",
         path:'/core/eadmin/role',
         count:this.roles.length
-      },{
-        name:'模块管理',
-        path:'/core/eadmin/module',
-        icon:'apps',
-        count:this.modules.length
       },
       ]
         },
@@ -115,14 +110,22 @@ export default {
       //   icon:'jiludanzilishijilu'
       // }]
       // }
+      
       ,{
           name:"应用管理",
           is_group:true,
           subs:[
+            {
+        name:'模块管理',
+        path:'/core/eadmin/module',
+        icon:'apps',
+        count:this.modules.length
+      },
           {
         name:'订阅管理',
-        path:'/core/eadmin/project',
-        icon:'xiangmu'
+        path:'/core/eadmin/rss',
+        icon:'xiangmu',
+        count:this.rss.length
       },{
         name:'流程模板',
         path:'/core/eadmin/flow',

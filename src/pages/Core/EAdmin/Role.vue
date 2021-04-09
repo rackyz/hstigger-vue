@@ -71,14 +71,20 @@
 </style>
 <template>
  <div class="hs-conatiner hs-conatiner-scrollable" style='background:#dfdfdf;'>
+
+      <Spin fix v-if='loading'>
+			 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+		</Spin>
+
      <Card style="margin:10px;font-size:25px;">
-        角色管理
+        角色权限
         <div style="font-size:14px;color:#888;">配置角色、部门的权限，为用户分配角色</div>
       </Card>
        <Row :gutter="10" style="margin:5px;">
           <Col :span='24'>
           <Tabs type="card" :value="type_id" :animated="false" @on-click='type_id=$event' >
-                <TabPane :label="`基本角色(${getRoles(11).length})`" :name="11" style="background:#fff;padding:10px;">
+                <TabPane :label="`企业岗位(${getRoles(11).length})`" :name="11" style="background:#fff;padding:10px;">
                     <Alert  show-icon closable>
         系统通用权限的角色划分，标识用户对于各模块的访问和操作权限
     </Alert>
@@ -87,7 +93,7 @@
                         <div class="l-list-item-card" :class="{'l-list-item-card-selected':selected == r}" :key="r.id">
                             <Icon :type="r.icon" size='45' :color="r.color" />
                             <div class="lr-name">{{r.name}}</div>
-                            <div style="text-align:center"><a @click="Config(r)">配置</a> | <a @click="Edit(r)">修改</a><template v-if="r.id>1000"> | <a @click="Delete(r)">删除</a></template></div>
+                            <div style="text-align:center"><a @click="Config(r)">配置</a> | <a @click="Edit(r)">修改</a><template> | <a @click="Delete(r)">删除</a></template> | <a @click="Arrange(r)">分配</a></div>
                             <div style="text-align:center;font-size:12px;color:#aaa">{{r.desc}}</div>
                         </div>
                         </template>
@@ -102,7 +108,7 @@
                    
 
                 </TabPane>
-                <TabPane :label="`项目角色(${getRoles(12).length})`" :name="12"  style="background:#fff;padding:10px;">
+                <TabPane :label="`项目岗位(${getRoles(12).length})`" :name="12"  style="background:#fff;padding:10px;">
                      <Alert   show-icon closable>
         项目权限划分，对应项目岗位角色分配
     </Alert>
@@ -148,12 +154,34 @@
                     </div>
 
                 </TabPane>
-                 <TabPane :label="`部门角色(${getRoles(13).length})`" :name="13"  style="background:#fff;padding:10px;">
+                 <TabPane :label="`部门岗位(${getRoles(13).length})`" :name="13"  style="background:#fff;padding:10px;">
                      <Alert  show-icon closable>
         部门权限划分，对应部门岗位角色分配
     </Alert>
                     <div class="l-list" style="margin:20px;margin-top:10px;">
                         <template v-for="r in getRoles(13)">
+                        <div class="l-list-item-card" :class="{'l-list-item-card-selected':selected == r}" :key="r.id">
+                            <Icon :type="r.icon" size='45' :color="r.color" />
+                            <div class="lr-name">{{r.name}}</div>
+                            <div style="text-align:center"><a @click="Config(r)">配置</a> | <a @click="Edit(r)">修改</a><template v-if="r.id>1000"> | <a @click="Delete(r)">删除</a></template></div>
+                            <div style="text-align:center;font-size:12px;color:#aaa">{{r.desc}}</div>
+                        </div>
+                        </template>
+                         
+                        <div class="l-list-item-card" style="border:3px dashed #dfdfdf !important;" @click="Add">
+                            <Icon type="ios-add" size='80' color="#aaa" style="border:none" />
+                             <div class="lr-name" style='margin-top:0px;text-align:center;color:#aaa !important;'>添加角色</div> 
+                        </div>
+                         
+                    </div>
+
+                </TabPane>
+                 <TabPane :label="`外部岗位(${getRoles(14).length})`" :name="14"  style="background:#fff;padding:10px;">
+                     <Alert  show-icon closable>
+        客户或者其他合作方角色
+    </Alert>
+                    <div class="l-list" style="margin:20px;margin-top:10px;">
+                        <template v-for="r in getRoles(14)">
                         <div class="l-list-item-card" :class="{'l-list-item-card-selected':selected == r}" :key="r.id">
                             <Icon :type="r.icon" size='45' :color="r.color" />
                             <div class="lr-name">{{r.name}}</div>
@@ -233,6 +261,21 @@
      <Modal v-model="showModal" :title="!role.id?'新建角色':'编辑角色'"  footer-hide>
      <hs-form style="margin:10px;" editable ref="form" :form="roleForm" :data="role" @on-submit="Patch" @on-cancel="showModal = false" />
      </Modal>
+
+     <Modal v-model="showUserConfig" :title="`分配角色 - ${role.name}`" width="470" footer-hide>
+          <Transfer
+          style="margin:20px;"
+        :data="tranferDataUsers"
+        :target-keys="roleUsers"
+        :titles="['用户列表','已分配']"
+        filterable
+        :filter-method="filterMethod"
+        @on-change="handleChange2"></Transfer>
+        <div class="flex-wrap" style="justify-content:flex-end;padding:20px;padding-top:5px;">
+             <Button @click="SaveUser">保存</Button>
+        </div>
+       
+     </Modal>
   </div>
 </template>
 
@@ -243,6 +286,8 @@ export default {
     
     data(){
         return {
+            roleUsers:[],
+            showUserConfig:false,
             menuIndex:"module",
             acl:{"ad584593-3b83-11eb-8e1e-h15d5c7db744":false},
             tabIndex:'basic',
@@ -263,6 +308,14 @@ export default {
     computed:{
         ...mapGetters("core",['types','getTypes','getTypeById']),
         ...mapGetters("entadmin",['users','roles','deps','projects','enabled_modules','rss']),
+        tranferDataUsers(){
+            return this.users.map(v=>{
+                return {
+                    key:v.id,
+                    label:v.name
+                }
+            })
+        },
         tableDef(){
             return tableDef
         },
@@ -418,7 +471,33 @@ export default {
         this.$store.dispatch('entadmin/GetRoles')
     },
     methods:{
-        GetRole(role){
+            handleChange2 (users) {
+                this.roleUsers = users;
+            },
+            filterMethod (data, query) {
+                return data.label.indexOf(query) > -1;
+            },
+        SaveUser(){
+            // this.role
+            // this.roleUsers
+            this.api.entadmin.PATCH_ROLES(this.roleUsers,{param:{id:this.role.id},query:{q:'users'}}).then(res=>{
+                this.Success("保存成功")
+                this.showUserConfig = false
+            }).catch(e=>{
+                this.Error("保存失败:"+e)
+            })
+        },
+        GetRoleUsers(role){
+             if(!role || !role.id)
+                return
+            this.api.entadmin.GET_ROLES({param:{id:role.id},query:{q:'users'}}).then(res=>{
+                let users = res.data.data
+                this.roleUsers = users
+            }).finally(e=>{
+                this.loading = false
+            })
+        },
+        GetRoleACL(role){
             if(this.loading)
                 return
             this.loading = true
@@ -432,6 +511,7 @@ export default {
                     acl[v.key] = parseInt(v.value)==0?false:true
                 })
                 console.log("ACL:",this.acl)
+               
                 this.$set(this,'acl',acl)
                 this.$set(this,'updated_acl',{})
                 this.$forceUpdate()
@@ -483,8 +563,13 @@ export default {
         },
         Config(r){
             this.role = r
-              this.GetRole(r)
+              this.GetRoleACL(r)
             this.showModalConfig = true
+        },
+        Arrange(r){
+            this.role = r
+            this.GetRoleUsers(r)
+            this.showUserConfig = true
         },
         Patch(e){
             if(Object.keys(e).length <= 1){

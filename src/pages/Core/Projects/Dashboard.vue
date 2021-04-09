@@ -10,6 +10,11 @@
         </p><p>
         参建单位 <b>江北慈城开发投资有限责任公司</b>
         </p>
+      </Card>
+      
+      <Card style='margin-top:10px;'  title="合同概况">
+
+        业主单位，金额，收费条款，其他重要事项，调整与变更
       </Card></Col>
       <Col :span='18'><Row :gutter="20">
      
@@ -30,8 +35,19 @@
       <Col :span='24'>
       <Card style='height:200px;' title="进度安排">
           <Steps :current="1">
-        <Step title="已完成" content="这里是该步骤的描述信息"></Step>
-        <Step title="进行中" content="这里是该步骤的描述信息"></Step>
+        <Step title="前期准备">
+          <div slot='content'>
+            253 / 245 
+            <div>
+              ...
+            </div>
+            <div>
+              <Icon type='md-checkmark' /> 现场踏勘
+            </div>
+          </div>
+
+        </Step>
+        <Step title="桩基" content="这里是该步骤的描述信息"></Step>
         <Step title="待进行" content="这里是该步骤的描述信息"></Step>
         <Step title="待进行" content="这里是该步骤的描述信息"></Step>
          <Step title="待进行" content="这里是该步骤的描述信息"></Step>
@@ -43,7 +59,9 @@
     </Row>
     <Row :gutter="20" style='margin-top:20px;margin-bottom:20px;'>
       <Col :span='6'>
-      <Card style='height:300px;' title="项目人员"></Card>
+      <Card style='height:300px;' title="项目人员" padding="5">
+         <hs-list style="position:relative;border:none;"  :data="employees" :option="{tmpl:'BaseEmployeeDetail'}" />
+      </Card>
       </Col>
       <Col :span='6'>
       <Card style='height:300px;' title="最新资料"></Card>
@@ -65,7 +83,7 @@ import { mapGetters } from 'vuex'
 export default {
   data(){
     return {
-      project:{}
+
     }
   },
   metaInfo:{
@@ -73,18 +91,46 @@ export default {
      route:"/:id"
   },
   computed:{
-    ...mapGetters('core',['get_project']),
+    ...mapGetters('project',['get']),
     id(){
       return this.$route.params.id
     },
-  },
-  mounted(){
-    this.api.enterprise.GET_PROJECTS({param:{id:this.id}}).then(res=>{
-      let data = res.data.data
-      this.project = data
-    })
-  }
+    project(){
+      return this.get(this.id) || {}
+    },
+     employees(){
+       let employee = {}
+       let items = this.project.records || []
+       items.forEach(v=>{
+         if(employee[v.employee_id]){
+           employee[v.employee_id].hr += v.hr = this.calcHr(v)
+           if(moment(employee[v.employee_id].inDate).isBefore(moment(v.inDate))){
+             employee[v.employee_id].inDate = v.inDate
+             
+             employee[v.employee_id].outDate = v.outDate
+             employee[v.employee_id].factor = v.factor
+             employee[v.employee_id].position_id = v.position_id 
+           }
+         }else{
+            employee[v.employee_id] = {}
+            employee[v.employee_id].employee_id = v.employee_id
+            employee[v.employee_id].hr = v.hr = this.calcHr(v)
+             employee[v.employee_id].factor = v.factor
+            employee[v.employee_id].inDate = v.inDate
+            employee[v.employee_id].outDate = v.outDate
+            employee[v.employee_id].position_id = v.position_id 
+         }
+       })
 
+       return Object.values(employee).filter(v=>!v.outDate)
+     },
+  }
+  ,methods:{
+    calcHr(data){
+        let duration = moment.duration((data.outDate?moment(data.outDate):moment()) - moment(data.inDate)).as('month')
+        return duration * data.factor
+     },
+  }
 }
 </script>
 

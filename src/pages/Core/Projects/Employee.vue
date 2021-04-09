@@ -1,5 +1,5 @@
 <template>
-  <Employee :filter="{f_project_id:id}" />
+  <Employee :filter="{project_id:id}" />
 </template>
 
 <script>

@@ -2,7 +2,7 @@
   <div class="l-permission">
     <div class='l-perm-info'>
       <div class='l-perm-info-name'>
-        {{data.name}}  <span style='color:#bbb;font-size:10px;font-weight:normal;'>{{data.key}} {{data.id}} {{data.value}}</span>
+        {{data.name}}  <span style='color:#bbb;font-size:10px;font-weight:normal;'>{{data.key}} </span>
       </div>
        <div class='l-perm-info-desc'>
          {{data.desc}}
@@ -36,13 +36,13 @@ export default {
 
 <style lang="less">
   .l-permission{
-    width:100%;
-    height:50px;
+    width:300px;
+    height:80px;
     border:1px solid #dfdfdf;
     padding:10px;
     border-radius:10px;
     display:flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
 
     .l-perm-info-name{

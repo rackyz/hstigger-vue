@@ -20,7 +20,7 @@
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
-         <hs-menu style='min-width:150px;width:150px;padding:5px 0;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
+         <hs-menu style='min-width:150px;width:150px;padding:5px 0;border-right:1px solid #dfdfdf;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
         
         <div class='l-menu'>
@@ -65,6 +65,7 @@ export default {
           icon:'xiangmu1',
           key:'dashboard'
         },
+        
         // {
         //   name:'数据分析',
         //   icon:'bar-chart',
@@ -73,6 +74,17 @@ export default {
         ]
 
       },{
+        name:'项目信息',
+        is_group:true,
+        subs:[{
+          name:'项目合同',
+          icon:'bar-chart',
+          key:'partners'
+        },{
+          name:'签约计划',
+          icon:'bar-chart',
+          key:'contractplan'
+        }]},{
         name:'通用模块',
         is_group:true,
         subs:[ {
@@ -107,16 +119,26 @@ export default {
           name:'造价管理',
           icon:'workflowdesign',
           key:'costestimate'
+        },
+        {
+          name:'审计管理',
+          icon:'workflowdesign',
+          key:'audit'
         }]},{
         name:'系统配置',
         is_group:true,subs:[
-        //   {
-        //   name:'项目角色',
-        //   icon:'role',
-        //   key:'role'
-        // },
+           {
+          name:'模块启用',
+          icon:'config',
+          key:'config'
+        },
+          {
+          name:'项目角色',
+          icon:'role',
+          key:'role'
+        },
         {
-          name:'项目配置',
+          name:'基础配置',
           icon:'config',
           key:'config'
         }]
@@ -137,7 +159,8 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['projects','users','getTypes']),
+    ...mapGetters('core',['users','getTypes']),
+    ...mapGetters('project',['get']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -160,7 +183,7 @@ export default {
       return this.$route.params.id
     },
     project(){
-      return this.$store.getters['core/get_project'](this.id)
+      return this.get(this.id)
     },
     RouteMenu(){
       return this.menus.map(v=>{

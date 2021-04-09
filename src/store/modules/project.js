@@ -8,7 +8,7 @@ var SERVER = HSAPI.GetServerAPI()
 console.log("SERVER:",SERVER)
 const state = {
     list: [],
-    
+    project:{}
 }
 
 const getters = {
@@ -22,6 +22,9 @@ const getters = {
     },
     get:(state)=>(id)=>{
         return state[id] || {}
+    },
+    project:(state)=>{
+        return state.project || {}
     },
     getByIds:(state)=>(ids=[])=>{
         return state.list.filter(v=>ids.includes(v.id))
@@ -285,6 +288,8 @@ const mutations = {
             Vue.set(state, item.id, fullItem)
         else
             Vue.set(state, item.id, fullItem)
+        
+        state.project = state[item.id]
     }
 }
 export default {

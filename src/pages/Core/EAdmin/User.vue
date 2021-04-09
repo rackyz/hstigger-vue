@@ -6,6 +6,10 @@
 </style>
 <template>
 	<div class="hs-conatiner hs-conatiner-scrollable" style='background:#aaa;'>
+		<Spin fix v-if='loading'>
+			 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+		</Spin>
     <!-- tool bar -->
 		<hs-toolbar
 			style="background: #fff"
@@ -624,8 +628,6 @@ export default {
      * @description our old friend get data from remote server
      */
 		getData() {
-			if(this.users.length > 0)
-				return
 			this.loading = true;
 		
 			this.$store.dispatch('entadmin/GetUsers').then(()=>{}).finally(e=>{
@@ -639,6 +641,7 @@ export default {
       var that = this;
 			let selected_id = this.selected
 			let selected = null
+			console.log(e)
 			if(selected_id){
 			selected =
 				(this.multiple
@@ -666,6 +669,7 @@ export default {
 					this.current_roles = selected.roles
 				this.showModalRole = true
 			}else if (e == "refresh") {
+
 				this.getData();
 			} else if (e == "lock") {
 				this.$store.dispatch("entadmin/LockAccounts", selected_id).then(()=>{

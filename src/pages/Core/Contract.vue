@@ -3,7 +3,7 @@
    
     <Content style="padding:5px;">
        <hs-toolbar
-        style="background: #fff;border:1px solid #dfdfdf;"
+        style="background: #fff;border:1px solid #dfdfdf;border-left:none;"
         :data="tools"
         @event="onToolEvent"
         :disabled="toolDisabled"
@@ -38,11 +38,6 @@
     </div>
     <div class="filter-box">
     </div>
-     <Tabs type="card" @on-click="handleTabChanged" v-if="!filteredByProject">
-        <TabPane label="付款合同" name="partA"></TabPane>
-        <TabPane label="收款合同" name="partB"></TabPane>
-        <TabPane label="第三方合同" name="third"></TabPane>
-    </Tabs>
     <div style="height:calc(100% - 200px);position:relative;">
       <hs-table ref="table" full  :columns="filtredColumns" bordered :data="filteredItems" @event="onTableEvent" selectable="single" :option="{summary:true}" />
     </div>

@@ -213,6 +213,25 @@ const actions = {
       })
     })
   },
+  ToggleRssEnabled({commit},id){
+    return new Promise((resolve, reject) => {
+      console.log(SERVER.entadmin)
+      SERVER.entadmin.PATCH_RSS({}, {
+        param: {
+          id
+        }
+      }).then(res => {
+        let disabled = res.data.data
+        commit('SaveRss', [{
+          id,
+          disabled
+        }])
+        resolve()
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
   ToggleModuleEnabled({commit},id){
      return new Promise((resolve, reject) => {
        SERVER.entadmin.PATCH_MODULES({}, {
