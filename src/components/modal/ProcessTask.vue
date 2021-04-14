@@ -2,21 +2,27 @@
   <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;">
     <div  style="padding:10px;">
       <div class="flex-wrap flex-between">
-      <div class="flex-wrap">
-       
-        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
-        <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',focused.state).color};`">{{getTypeByValue('TASK_STATE',focused.state).name}}</h2>
-        <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
+        <div style="height:60px;width:60px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;cursor:pointer;" class="hover" @click="handleBackward" v-if="backwards.length > 0">
+        <h2 style='font-size:15px;font-weight:bold;'><Icon type="md-arrow-back" /></h2>
+        <p style='font-size:10px;color:#aaa;'>返回</p>
       </div>
-      <div style="height:60px;width:650px;padding:10px;border:1px solid #dfdfdf;border-radius:5px;margin-left:5px;">
+
+      <div style="height:60px;width:590px;padding:10px;border:1px solid #dfdfdf;border-radius:5px;margin-left:5px;">
         <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',focused.base_type).color};`">{{getTypeByValue('TASK_TYPE',focused.base_type).name}}</span>  <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).name}}</span></div>
         <h2 style='font-size:18px;'>{{focused.name || '无标题'}}</h2>
       </div>
 
       
-        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;margin-left:10px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;">
+        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;margin-left:10px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;margin-right:5px;">
         <h2 style='font-size:15px;font-weight:bold;'>胡佳翰</h2>
         <p style='font-size:10px;color:#aaa;'>负责人</p>
+      </div>
+
+       <div class="flex-wrap">
+       
+        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
+        <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',focused.state).color};`">{{getTypeByValue('TASK_STATE',focused.state).name}}</h2>
+        <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
       </div>
       </div>
       </div>
@@ -40,13 +46,46 @@
               <BaseFiles  :files="task.files || ''" />
               </Col>
               </Row>
+              <Row>
+                <Col>
+                 操作记录
+                 <div>
+                 3小时前 胡佳翰创建了任务
+                 </div>
+                </Col>
+              </Row>
             </div>
           
         </TabPane>
          <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
- 
+           
              <div style="height:calc(100% - 170px);position:relative;">
-        <hs-list  :data="focused.children" selectable draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
+              <div style='border-bottom:1px solid #dfdfdf;padding:10px;width:100%;'>
+                <div class='flex-wrap flex-between' style='width:100%;margin-bottom:10px;'>
+                <Input size="small" search style='width:200px' />
+                <ButtonGroup>
+                  <Button size="small">全部 {{focused.children.length}}</Button>
+                   <Button size="small">准备中 {{focused.children.filter(v=>v.state==0).length}}</Button>
+                  <Button size="small">进行中 {{focused.children.filter(v=>v.state==1).length}}</Button>
+                  <Button size="small">已完成 {{focused.children.filter(v=>v.state==2).length}}</Button>
+                  <Button size="small">已关闭 {{focused.children.filter(v=>v.state==3).length}}</Button>
+               </ButtonGroup></div>
+               <div class="flex-wrap" style='width:100%;'>
+               <template v-for="t in focused.children">
+                 <div class="state-block" :key='t.id' :style="`background:${getTypeByValue('TASK_STATE',t.state).color};color:#fff;`">
+
+                 </div>
+               </template>
+               </div>
+              </div>
+
+             <hs-toolbar
+        style="background: #fff;border:none;border-bottom:1px solid #dfdfdf;padding:5px 0;"
+        :data="tools"
+        @event="onToolEvent"
+        :disabled="toolDisabled"
+      />
+        <hs-list  :data="focused.children" selectable="multiple" draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
       </div>
         </TabPane>
         <TabPane name="process" v-if="focused.state != 0" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
@@ -56,16 +95,9 @@
          
         </TabPane>
         
-         <TabPane name="history" label="操作记录" icon="md-code" v-if="false">
-             3小时前 胡佳翰创建了任务
-             
-        </TabPane>
      
     </Tabs>
-     <div style="height:60px;width:100%;padding:10px;border:1px solid #aaa;margin-top:10px;" v-if="tabIndex=='split'">
-       工作量：工作量总和未达到/超过100%，建议进行调整 <br />
-       计划时间：计划时间总额超过总任务时间，建议进行调整
-      </div>
+     
 
     
    </div>
@@ -102,6 +134,22 @@
     <Modal title="任务处理" v-model="modalFormProcess" footer-hide>
 
     </Modal>
+     <hs-modal-form
+			ref="form"
+			:title="model.id?'修改任务':'新增任务'"
+			v-model="modalCreate"
+			:width="620"
+      :env="{upload}"
+			style="margin: 10px"
+			footer-hide
+			:form="Form('task',init_form)"
+			:data="model"
+      :initData="filterInitData"
+			editable
+			@on-submit="handlePatchArchive"
+			@on-event="handleEvent"
+		/>
+
   </Modal>
 </template>
 
@@ -135,57 +183,41 @@ export default {
   mounted(){
     if(this.task && this.task.id){
        this.focused = this.task
-    if(this.task.sub_task_count > 0)
+    if(this.task.children && this.task.children.length > 0)
       this.focused.splited = true
     }
+     this.autoChangeTab(this.task)
    
   },
   data(){
     return {
+      backwards:[],
+      modalCreate:false,
+      model:{},
       focused:{},
       splited:false,
       tabIndex:"content",
         stacks:[],
       	tools: [{
+					key: "add",
+					name: "新增",
+					icon: "md-add",
+				},{
 					key: "resetpwd",
-					name: "完成",
+					name: "模板管理",
 					icon: "md-key",
 				},
+			
 				{
 					key: "resetpwdto",
-					name: "中止",
+					name: "启用工作量",
 					icon: "ios-key",
-        }],
-        edit_tools:[	{
-					key: "add",
-					name: "拆分",
-					icon: "md-add",
-				},
+        },
 				{
-					key: "edit",
-					name: "编辑",
-					icon: "md-create",
-				},
-				{
-					key: "delete",
-					name: "删除",
-					icon: "md-trash",
-        },],
-        edit_tools:[	{
-					key: "add",
-					name: "拆分",
-					icon: "md-add",
-				},
-				{
-					key: "edit",
-					name: "编辑",
-					icon: "md-create",
-				},
-				{
-					key: "delete",
-					name: "删除",
-					icon: "md-trash",
-				},]
+					key: "resetpwdto",
+					name: "启用工期",
+					icon: "ios-key",
+        }]
     }
   },
   computed:{
@@ -193,6 +225,12 @@ export default {
      ...mapGetters('file',['files','uploadingFiles','makeURL']),
     dep(){
       return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
+    },
+    toolDisabled(){
+      return {}
+    },
+    filterInitData(){
+      return {}
     },
     project(){
       return this.$store.getters["core/projects"].find(v=>v.id == this.task.project_id) || {}
@@ -342,23 +380,56 @@ export default {
       this.$emit('input',false)
     },
     onToolEvent(e) {
-
+      if(e == 'add'){
+        this.modalCreate = true
+      }
+    },
+    autoChangeTab(task){
+      if(task.state == 0){
+        this.tabIndex = 'content'
+      }else if(task.splited){
+        this.tabIndex = 'split'
+      }else{
+        this.tabIndex = 'process'
+      }
     },
     handlePreProcess(){
       this.modalFormProcess = true
     },
     onListEvent(e){
-
+      if(e.event && e.event.type == 'in'){
+        let task = e.event.data
+        if(task.id)
+           this.api.enterprise.GET_TASKS({param:{id:task.id}}).then(res=>{
+            let model = res.data.data
+            if(Array.isArray(model.children) && model.children.length > 0){
+              model.splited = true
+              model.children.forEach((v,i)=>{
+                v.index = i+1
+              })
+            }
+            this.backwards.push(this.focused)
+            this.focused = model
+            this.autoChangeTab(model)
+          }).catch(e=>{
+            this.Error('任务读取错误:',e)
+          })
+      }
+    },
+    handleBackward(e){
+      this.focused = this.backwards[this.backwards.length - 1]
+      
+      this.backwards.splice(this.backwards.length - 1,1)
+      this.autoChangeTab(this.focused)
     },
     handleChangeState(state){
       
       let data = {state}
       let id = this.focused.id
       this.api.enterprise.PATCH_TASKS(data,{param:{id}}).then(res=>{
-        if(state != 0){
-          this.tabIndex = 'process'
-        }
+      
         this.$set(this.focused,'state',state)
+           this.autoChangeTab(this.focused)
         this.$forceUpdate()
         this.$emit('update',data)
       })
@@ -381,6 +452,13 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 
+.state-block{
+  width:15px;
+  height:15px;
+  border-radius: 3px;
+  border:1px solid #dfdfdf;
+
+}
 </style>

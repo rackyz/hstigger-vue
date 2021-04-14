@@ -43,7 +43,7 @@
           <!-- authed.ArchiveCategoryManage -->
             <Button @click="handlePreCreate()" type="primary" icon="md-add">新建任务</Button>
             <Button @click="modalCreateTeml = true" type="primary" icon="md-add" style="margin-left:5px;">由模板创建</Button>
-        <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
+            <Button @click="modalCreate=true" icon="md-build" style="margin-left:5px;" v-show="false">分类管理</Button>
         </div>
       </div>
       <div class="filter-box">
@@ -490,6 +490,12 @@ export default {
     },ProcessTask(item){
        this.api.enterprise.GET_TASKS({param:{id:item.id}}).then(res=>{
         let model = res.data.data
+        if(Array.isArray(model.children)){
+          model.splited = true
+          model.children.forEach((v,i)=>{
+            v.index = i+1
+          })
+        }
          this.current = model
      
          this.modalProcess = true
