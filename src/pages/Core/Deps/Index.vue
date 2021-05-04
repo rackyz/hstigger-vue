@@ -58,10 +58,10 @@ export default {
     return {
       showProjects:false,
        menus:[{
-        name:'项目总览',
+        name:'部门总览',
         is_group:true,
         subs:[{
-          name:'项目总览',
+          name:'部门总览',
           icon:'xiangmu1',
           key:'dashboard'
         },
@@ -133,7 +133,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['projects','users','getTypes']),
+    ...mapGetters('core',['projects','users','getTypes','getDep']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -177,7 +177,7 @@ export default {
   },
   methods:{
     getData(){
-      this.$store.dispatch('getDep',this.id)
+     // this.$store.dispatch('getDep',this.id)
     },
     RouteMenu(){
       

@@ -1,26 +1,31 @@
 <template>
-  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;">
-    <div  style="padding:10px;">
+  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;" :fullscreen="fullscreen">
+    <div class='modal-close' slot="close" style='display:flex;color:#aaa;align-items:center;height:30px;'>
+       <Icon :type="fullscreen?'md-contract':'md-expand'" size="18" style='color:#ddd;z-index:200p' @click.stop="fullscreen=!fullscreen;" />
+      <Icon type="md-close" size="18" style='color:#ddd;z-index:200p' @click="this.close()" />
+    </div>
+   
+    <div  style="padding:10px;background:#eee;">
       <div class="flex-wrap flex-between">
-        <div style="height:60px;width:60px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;cursor:pointer;" class="hover" @click="handleBackward" v-if="backwards.length > 0">
+        <div style="height:60px;width:60px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;cursor:pointer;margin-right:5px;" class="hover" @click="handleBackward" v-if="backwards.length > 0">
         <h2 style='font-size:15px;font-weight:bold;'><Icon type="md-arrow-back" /></h2>
         <p style='font-size:10px;color:#aaa;'>返回</p>
       </div>
 
-      <div style="height:60px;width:590px;padding:10px;border:1px solid #dfdfdf;border-radius:5px;margin-left:5px;">
+      <div style="height:60px;min-width:590px;padding:5px 10px;border-radius:5px;background:#fff;border:1px solid #aaa;">
         <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',focused.base_type).color};`">{{getTypeByValue('TASK_TYPE',focused.base_type).name}}</span>  <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).name}}</span></div>
         <h2 style='font-size:18px;'>{{focused.name || '无标题'}}</h2>
       </div>
 
-      
-        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;margin-left:10px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;margin-right:5px;">
+        
+       
+
+       <div class="flex-wrap">
+        <div style="height:60px;width:100px;border-radius:5px;margin-left:10px;display:flex;align-items:center;border:1px solid #aaa;justify-content:center;color:#3af;flex-direction:column;margin-right:5px;background:#fff;border:1px solid #aaa;">
         <h2 style='font-size:15px;font-weight:bold;'>胡佳翰</h2>
         <p style='font-size:10px;color:#aaa;'>负责人</p>
       </div>
-
-       <div class="flex-wrap">
-       
-        <div style="height:60px;width:100px;border:1px solid #dfdfdf;border-radius:5px;display:flex;align-items:center;justify-content:center;color:darkred;flex-direction:column;">
+        <div style="height:60px;width:100px;border-radius:5px;display:flex;align-items:center;background:#fff;justify-content:center;color:darkred;flex-direction:column;border:1px solid #aaa;">
         <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',focused.state).color};`">{{getTypeByValue('TASK_STATE',focused.state).name}}</h2>
         <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
       </div>
@@ -32,7 +37,7 @@
        <Tabs type="card" style="margin-top:10px;" :animated="false" v-model="tabIndex">
         <TabPane name="content" label="任务内容" icon="md-list">
             
-            <div style="padding:20px;">
+            <div style="padding:20px;background:#fff;">
               <Row>
                 <Col :span='12'> 所属部门 <BaseLink style="padding:5px 20px;" :item="dep" to="/core/deps" /> 
               所属项目 <BaseLink style="padding:5px 20px;"  :item="project" to="/core/projects" /> 
@@ -59,36 +64,34 @@
         </TabPane>
          <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
            
-             <div style="height:calc(100% - 170px);position:relative;">
-              <div style='border-bottom:1px solid #dfdfdf;padding:10px;width:100%;'>
-                <div class='flex-wrap flex-between' style='width:100%;margin-bottom:10px;'>
-                <Input size="small" search style='width:200px' />
+             <div style="height:calc(100% - 170px);position:relative;;background:#fff;">
+              <div style='padding:10px;width:100%;'>
+                <div class='flex-wrap flex-between' style='width:100%;'>
+                <Input size="small" v-model="filterText" search style='width:200px' clearable />
                 <ButtonGroup>
-                  <Button size="small">全部 {{focused.children.length}}</Button>
-                   <Button size="small">准备中 {{focused.children.filter(v=>v.state==0).length}}</Button>
-                  <Button size="small">进行中 {{focused.children.filter(v=>v.state==1).length}}</Button>
-                  <Button size="small">已完成 {{focused.children.filter(v=>v.state==2).length}}</Button>
-                  <Button size="small">已关闭 {{focused.children.filter(v=>v.state==3).length}}</Button>
+                  <Button :type="filterState==undefined?'primary':''" size="small" @click="filterState=undefined">全部 {{focused.children.length}}</Button>
+                   <Button :type="filterState==0?'primary':''" size="small" @click="filterState=0">准备中 {{focused.children.filter(v=>v.state==0).length}}</Button>
+                  <Button :type="filterState==1?'primary':''" size="small" @click="filterState=1">进行中 {{focused.children.filter(v=>v.state==1).length}}</Button>
+                  <Button :type="filterState==2?'primary':''" size="small" @click="filterState=2">已完成 {{focused.children.filter(v=>v.state==2).length}}</Button>
+                  <Button :type="filterState==3?'primary':''" size="small" @click="filterState=3">已关闭 {{focused.children.filter(v=>v.state==3).length}}</Button>
                </ButtonGroup></div>
-               <div class="flex-wrap" style='width:100%;'>
-               <template v-for="t in focused.children">
-                 <div class="state-block" :key='t.id' :style="`background:${getTypeByValue('TASK_STATE',t.state).color};color:#fff;`">
-
-                 </div>
-               </template>
-               </div>
+               
               </div>
 
-             <hs-toolbar
-        style="background: #fff;border:none;border-bottom:1px solid #dfdfdf;padding:5px 0;"
+      <!-- <hs-toolbar
+        style="background: #fff;border:none;padding:5px 0;"
         :data="tools"
         @event="onToolEvent"
         :disabled="toolDisabled"
-      />
-        <hs-list  :data="focused.children" selectable="multiple" draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' />
+      /> -->
+     
+        <!-- <hs-list  :data="focused.children" selectable="multiple" draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' /> -->
+       <div style='padding:0 10px;padding-bottom:10px;'>
+     <BaseGantt v-if="tabIndex=='split'" :tasks="filterTasks" :enable_percent="focused.enabled_percent" :ref='gt' :style="fullscreen?'600px':'400px'" />
+   </div>
       </div>
         </TabPane>
-        <TabPane name="process" v-if="focused.state != 0" label="任务处理" icon="md-checkbox-outline" style="padding:20px;">
+        <TabPane name="process" v-if="focused.state != 0" label="任务处理" icon="md-checkbox-outline" style="padding:20px;background:#fff;">
           <template>
             <hs-form :form="Form('task_simple')" :data="focused.state==1?{}:focused"  :editable='focused.state == 1' @on-submit="handleProcess" :env="{upload}" />
           </template>
@@ -101,32 +104,34 @@
 
     
    </div>
-    <div style="margin:10px;margin-top:0;display:flex;height:30px;" class="flex-between">
+   
+    
+    <div style="padding:10px;display:flex;align-items:center;" class="flex-between">
         <div class="flex-wrap">
-        <Button icon='md-arrow-back' class="flex-wrap" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
+        <Button icon='md-arrow-back' size="small" class="flex-wrap" style="border:1px solid #aaa;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
           返回 {{stacks[stacks.length-1].name}}
         </Button>
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;color:green;margin-right:5px;" v-if="!focused.state || focused.state == 0" @click="handleChangeState(1)">
+        <Button class="flex-wrap" size="small"  icon="md-play" style="border:1px solid #aaa;color:green;margin-right:5px;" v-if="!focused.state || focused.state == 0" @click="handleChangeState(1)">
           开始
         </Button>
         <!-- <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 1" @click="handleChangeState(4)">
            暂停
         </Button> -->
-        <Button class="flex-wrap" icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4" @click="handleChangeState(1)">
+        <Button class="flex-wrap" size="small"  icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4" @click="handleChangeState(1)">
           继续
         </Button>
-         <Button class="flex-wrap" icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="canUndo" @click="handleCancel()">
+         <Button class="flex-wrap" size="small"  icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="canUndo" @click="handleCancel()">
           撤回
         </Button>
         
-         <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
+         <Button class="flex-wrap" size="small"  icon='md-code' style="border:1px solid #aaa;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
           分解
         </Button>
-        <Button class="flex-wrap" icon='md-code' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;" v-if="focused.splited" @click="focused.splited=null;tabIndex='content';">
+        <Button class="flex-wrap" size="small"  icon='md-code' style="border:1px solid #aaa;margin-left:5px;" v-if="focused.splited" @click="focused.splited=null;tabIndex='content';">
           取消分解
         </Button>
 </div><div class="flex-wrap">
-         <Button class="flex-wrap" icon='md-close' style="border:1px solid #aaa;padding:0 10px;margin-left:5px;color:red;" @click="handleChangeState(3)">
+         <Button class="flex-wrap" size="small"  icon='md-close' style="border:1px solid #aaa;margin-left:5px;color:red;" @click="handleChangeState(3)">
           退回/中止
         </Button>
       </div>
@@ -192,6 +197,10 @@ export default {
   data(){
     return {
       backwards:[],
+      filterText:"",
+      filterState:undefined,
+      fullscreen:false,
+      enabled_percent:false,
       modalCreate:false,
       model:{},
       focused:{},
@@ -209,13 +218,13 @@ export default {
 				},
 			
 				{
-					key: "resetpwdto",
+					key: "percent",
 					name: "启用工作量",
 					icon: "ios-key",
         },
 				{
-					key: "resetpwdto",
-					name: "启用工期",
+					key: "dis_percent",
+					name: "禁用工作量",
 					icon: "ios-key",
         }]
     }
@@ -227,7 +236,23 @@ export default {
       return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
     },
     toolDisabled(){
-      return {}
+      return {
+        percent:this.focused.enabled_percent,
+        dis_percent:!this.focused.enabled_percent
+      }
+    },
+    filterTasks(){
+      if(this.focused && this.focused.children){
+        return this.focused.children.filter(v=>{
+          if(this.filterText && !v.name.includes(this.filterText))
+            return false
+          if(this.filterState != undefined && v.state != this.filterState)
+            return false
+          return true
+        })
+      }
+
+      return []
     },
     filterInitData(){
       return {}
@@ -337,7 +362,7 @@ export default {
     },
     timeStateColor(){
       if(!this.task.plan_duration){
-        return "#dfdfdf"
+        return "#aaa"
       }else{
         if(!this.task.start_at){
           return "orange"
@@ -382,6 +407,12 @@ export default {
     onToolEvent(e) {
       if(e == 'add'){
         this.modalCreate = true
+      }else if(e == 'percent'){
+        this.enabled_percent = true
+        this.$set(this.focused,'enabled_percent',true)
+      }else if(e == 'dis_percent'){
+        this.enabled_percent = false
+        this.$set(this.focused,'enabled_percent',false)
       }
     },
     autoChangeTab(task){
@@ -460,5 +491,16 @@ export default {
   border-radius: 3px;
   border:1px solid #dfdfdf;
 
+}
+
+.modal-close{
+  .ivu-icon{
+    padding:2px;
+    color:#fff;
+  }
+
+  .ivu-icon:hover{
+    color:#3af;
+  }
 }
 </style>

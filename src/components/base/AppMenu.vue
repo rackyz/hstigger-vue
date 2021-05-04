@@ -58,7 +58,7 @@
 
         <div class="l-list-wrap">
            <Input :autofocus='true' style='margin:20px 0' class="l-menu-input" clearable v-model="filterMenu" search placeholder="输入模块关键字搜索" />
-           <hs-columnlist :data="app_groups" tmpl="BaseTmplMenuGroup" :filter="filterMenu" />
+           <hs-columnlist :data="app_groups" tmpl="BaseTmplMenuGroup" :filter="filterMenu" @on-event="open=false" />
         </div>
     </div>
      </transition>
