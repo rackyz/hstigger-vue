@@ -47,7 +47,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',['current_ent']),
-    ...mapGetters('entadmin',['users','deps','roles','modules','rss']),
+    ...mapGetters('entadmin',['users','deps','roles','modules','rss','projects']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -88,11 +88,8 @@ export default {
       //     name:"数据管理",
       //     is_group:true,
       //     subs:[
-      //     {
-      //   name:'项目管理',
-      //   path:'/core/eadmin/project',
-      //   icon:'xiangmu'
-      // },{
+         
+      //,{
       //   name:'档案资料',
       //   path:'/core/eadmin/archive',
       //   icon:'xiangmu2'
@@ -120,6 +117,11 @@ export default {
         path:'/core/eadmin/module',
         icon:'apps',
         count:this.modules.length
+      }, {
+        name:'项目管理',
+        path:'/core/eadmin/project',
+        icon:'xiangmu',
+        count:this.projects.length
       },
           {
         name:'订阅管理',

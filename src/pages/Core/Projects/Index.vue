@@ -57,6 +57,7 @@ export default {
   data(){
     return {
       showProjects:false,
+     
        menus:[{
         name:'项目总览',
         is_group:true,
@@ -79,7 +80,7 @@ export default {
         subs:[{
           name:'项目合同',
           icon:'bar-chart',
-          key:'partners'
+          key:'contractentity'
         },{
           name:'签约计划',
           icon:'bar-chart',

@@ -80,21 +80,13 @@ export default {
         }
       },{
         type:"type",
-        title:"项目类型",
-        width:120,
-        key:"project_type",
-        option:{
-          
-          getters:'core/types'
-        }
-      },{
-        type:"type",
         title:"服务类型",
         width:120,
-        key:"service_type",
+        key:"business_type",
         option:{
-          
-          getters:'core/types'
+          	getters_key:"P_ARCH_TYPE",
+							labelKey:"value",
+          getters:'core/getTypes'
         }
       },{
         type:"text",
@@ -128,20 +120,10 @@ export default {
 
     tools: [
 				{
-					key: "add",
-					name: "新增",
-					icon: "md-add",
-				},
-				{
-					key: "edit",
-					name: "编辑",
-					icon: "md-create",
-				},
-				{
-					key: "delete",
-					name: "删除",
-					icon: "md-trash",
-				},
+					key: "sync",
+					name: "同步",
+					icon: "md-plane",
+				}
 				
       ],
       form:FormDef_ProjectCreate
@@ -150,11 +132,11 @@ export default {
     
   },
   mounted(){
-    this.$store.dispatch('project/getList')
+    this.$store.dispatch('entadmin/GetProjects')
   },
   computed:{
-    ...mapGetters("project",{
-      "projects":"list"}),
+    ...mapGetters("entadmin",['projects']),
+    ...mapGetters("core",['getTypes']),
     filteredUsers(){
         if(this.currentDep)
             return this.users.find(v=>v.deps.include(this.currentDep))
@@ -180,9 +162,8 @@ export default {
     },
     onToolEvent(e){
       console.log(e)
-      if(e == 'add'){
-        this.showModalCreate = true
-        this.editingItem = {}
+      if(e == 'sync'){
+        this.$store.dispatch('entadmin/sychronize_projects')
       }
     },
     toolEnabled() {

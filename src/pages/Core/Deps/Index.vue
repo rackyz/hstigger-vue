@@ -93,16 +93,6 @@ export default {
           name:'合同管理',
           icon:'iconset0118',
           key:'contract'
-        },
-        {
-          name:'招标管理',
-          icon:'bid',
-          key:'cob'
-        },
-        {
-          name:'造价管理',
-          icon:'workflowdesign',
-          key:'costestimate'
         }]},{
         name:'系统配置',
         is_group:true,subs:[
@@ -112,7 +102,7 @@ export default {
         //   key:'role'
         // },
         {
-          name:'项目配置',
+          name:'部门配置',
           icon:'config',
           key:'config'
         }]

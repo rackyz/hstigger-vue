@@ -64,6 +64,16 @@ const actions = {
       }).catch(reject)
     })
   },
+  sychronize_projects({commit}){
+    
+    return new Promise((resolve, reject) => {
+      SERVER.entadmin.SYNC_PROJECTS().then(res => {
+        let items = res.data.data
+        commit('SaveProjects', items)
+        resolve(items)
+      }).catch(reject)
+    })
+  },
   GetModules({commit}){
     return new Promise((resolve,reject)=>{
       SERVER.entadmin.LIST_MODULES().then(res=>{

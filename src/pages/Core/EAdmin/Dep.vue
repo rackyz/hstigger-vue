@@ -40,14 +40,15 @@
   
     
      <Modal v-model="showUserConfig" :title="`分配角色 - ${currentDep?currentDep.name:''}`" width="470" footer-hide>
-          <Transfer
+        <Transfer
           style="margin:20px;"
-        :data="tranferDataUsers"
-        :target-keys="depUsers"
-        :titles="['用户列表','已分配']"
-        filterable
-        :filter-method="filterMethod"
-        @on-change="handleChange2"></Transfer>
+          :data="tranferDataUsers"
+          :target-keys="depUsers"
+          :titles="['用户列表','已分配']"
+          filterable
+          :filter-method="filterMethod"
+          @on-change="handleChange2">
+        </Transfer>
         <div class="flex-wrap" style="justify-content:flex-end;padding:20px;padding-top:5px;">
              <Button @click="SaveUser">保存</Button>
         </div>
