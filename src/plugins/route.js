@@ -150,7 +150,7 @@ core.children.push({
   path:'/app/:appkey'
 })
 
-
+console.log("ROUTES:",APP_ROUTES)
 
 
 

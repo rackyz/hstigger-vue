@@ -25,47 +25,18 @@
 }
 </style>
 <template>
-  <Layout>
-    <Sider width='300' style='background:#fff;filter:drop-shadow(0 2px 16px #dfdfdf)top:44px;
-    bottom:0;'>
-      <div class='l-title'><Icon custom='gzicon gzi-mail'></Icon> 系统消息</div>
-       <List style='background:#aaa;position:relative;height:calc(100% - 70px);overflow-y:auto;' :loading="loading" >
-        <template v-for='item in items'>
-          <a  @click='selected=item' :key='item.id'>
-        <ListItem :key='item.id' style='padding:10px;'  class='l-msg-item' :class="{'l-msg-item-active':selected==item,'l-msg-item-readed':item.readtime}">
-            <ListItemMeta  avatar="https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/avatars/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20191105133509.jpg" :title="item.created_at" :description="item.content"   />
-        </ListItem></a>
-        
-         </template>
-        
-    </List>
-     <div class='l-footer'>{{items.length}}条消息, {{items.filter(v=>!v.readtime).length}}条未读</div>
-    </Sider>
-    <Content>
-        <Card class='hs-doc' v-if='selected' style='margin:10px;min-height:900px;' shadow>
-
-        <div class="header" style='text-align:center;border-bottom:2px dashed #ddd;color:#aaa;'>
-            <h4>系统消息</h4>
-            <div class='info' style='font-size:12px;margin:10px 0;'>
-              <div>发布人 管理员</div>
-              <div>发布时间 2020年3月8日</div>
-            </div>
-        
-        </div>
-        <transition name='fade'>
-          <div class="content" style='padding:20px;font-size:16px;color:#aaa;'>
-            {{selected.content}}
-          </div>
-          <div class='footer'>
-            已阅读:342
-          </div>
-        </transition>
-      </Card>
-        <div class="no-content" v-else>
-          无内容
-        </div>
+  <div class="hs-full-container">
+    <hs-menu style="width:180px;"></hs-menu>
+    
+    <Content style='padding-left:180px;'>
+      <div class='l-title'><Icon custom='gzicon gzi-mail'></Icon> 系统消息
+       <div>{{items.length}}条消息, {{items.filter(v=>!v.readtime).length}}条未读</div></div>
+       <div class="l-tool-wrap" style='margin:10px 0;'>
+        <Button>删除</Button>
+        </div> 
+       <hs-table />  
     </Content>
-  </Layout>
+  </div>
 </template>
 
 <script>

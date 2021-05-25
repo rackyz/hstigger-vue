@@ -94,66 +94,60 @@
         <div class="rect5"></div>
       </div>
 
-      <div
+    
+     
+      <Badge
+        :count='session.task_count'
+        type='error'
+        style='margin-right:25px;'
+        
+      >
+        <div
+          class='text-btn'
+          @click="showTaskList=!showTaskList;showMessageList=false"
+        >
+          <Icon
+            custom='gzicon gzi-eventavailable'
+            size="18"
+             :color="showTaskList?'yellowgreen':''"
+          />
+          
+        </div>
+      </Badge>
+
+ <!-- Message -->
+      <Badge
+        :count='session.unread_msg_count || 0'
+        type='primary'
+        style="margin-right:25px;"
+      >
+        <div
+          class='text-btn'
+          @click="showMessageList=!showMessageList;showTaskList=false"
+        >
+          <Icon
+            custom="gzicon gzi-mail"
+             :color="showMessageList?'yellowgreen':''"
+            size="18"
+          />
+
+        </div>
+      </Badge>
+
+
+  <div
         class='text-btn'
         @click="RouteTo('/core/debug')"
         style='margin-right:15px;'
       >
         <Icon
           custom="gzicon gzi-bug"
-          size="18"
-          :color="showDebug?'yellowgreen':''"
+          size="15"
+          :color="showDebug?'yellowgreen':'#af6'"
         />
       </div>
-      <Badge
-        :count='session.flow_count'
-        type='error'
-        style='margin-right:20px;'
-        v-if="false"
-      >
-        <div
-          class='text-btn'
-          @click="RouteTo('/core/flow')"
-        >
-          <Icon
-            custom='gzicon gzi-lianjieliu'
-            size="18"
-          />
-        </div>
-      </Badge>
-      <Badge
-        :count='session.task_count'
-        type='warning'
-        style='margin-right:20px;'
-        v-if="false"
-      >
-        <div
-          class='text-btn'
-          @click="RouteTo('/core/task')"
-        >
-          <Icon
-            custom='gzicon gzi-eventavailable'
-            size="18"
-          />
-        </div>
-      </Badge>
 
-      <!-- Message -->
-      <Badge
-        :count='session.unread_msg_count'
-        type='primary'
-        style="margin-right:20px;"
-      >
-        <div
-          class='text-btn'
-          @click="RouteTo('/core/message')"
-        >
-          <Icon
-            custom="gzicon gzi-mail"
-            size="18"
-          />
-        </div>
-      </Badge>
+     
 
       <!-- User -->
       <Dropdown
@@ -222,6 +216,32 @@
 
     </div>
 
+    <div class="drawer-wrapper" v-show="showMessageList || showTaskList">
+      <Drawer v-model="showMessageList" title="消息列表"  inner :transfer="false" :closable="false" width="350">
+        <div slot="header" class="flex-wrap flex-between" style="font-size:14px;">
+          <div class="flex-wrap"> 消息列表 ({{session.unread_msg_count}})</div>
+          <a style="color:#3af" @click="RouteTo('/core/notices');showMessageList=false">MORE</a>
+        </div>
+        <div style="left:0;right:0;top:0;bottom:0;position:absolute;">
+          <hs-list style="padding:0;height:100%;" :data="session.messages" :option="{tmpl:'HsxMessageListItem'}" />
+        </div>
+      </Drawer>
+
+      <Drawer v-model="showTaskList" title="任务列表" :width="300"  inner :transfer="false" :closable="false">
+        <div slot="header" class="flex-wrap flex-between" style="font-size:14px;">
+          <div class="flex-wrap"> <Icon
+            custom='gzicon gzi-eventavailable'
+              style='margin-right:5px;'
+              size="20"
+            /> 待处理</div>
+          <a style="color:#3af" @click="RouteTo('/core/tasks');showTaskList=false">MORE</a>
+        </div>
+        <div class="list">
+
+        </div>
+      </Drawer>
+    </div>
+
   </div>
 </template>
 
@@ -231,14 +251,17 @@ import Login from "@pages/Login.vue"
 export default {
   data() {
     return {
+      showTaskList:false,
+      showMessageList:false,
       showEnterpriseMenu: false,
       open_selector: false,
       showUserMenu: false,
       showDebug: false,
       isInit: false,
       loading: false,
-      model: {}
-
+      model: {},
+      messages:[     
+      ]
     }
 
   },
@@ -262,9 +285,17 @@ export default {
   mounted() {
     if (!this.session.id) {
       this.getSession()
+      
     }
 
-
+  },
+  watch:{
+    $route:{
+      handler(e){
+        this.showTaskList = false
+        this.showMessageList = false
+      }
+    }
   },
   methods: {
     getSession(e) {
@@ -277,6 +308,21 @@ export default {
           this.loading = false
         }, 500);
 
+      })
+    },
+    getMessageData(){
+       let queryParam = {
+          query:{q:'mine'}
+      }
+       this.loading = true
+      this.api.enterprise.LIST_MESSAGES(queryParam).then(res=>{
+        let messages = res.data.data
+        this.messages = messages
+        alert(messages.length)
+      }).catch(e=>{
+        this.Error("数据加载错误:"+e)
+      }).finally(e=>{
+        this.loading = false
       })
     },
     onSelectEnterprise(e) {
@@ -355,5 +401,15 @@ export default {
     margin-right: 3px;
     width: 2px;
   }
+}
+
+.drawer-wrapper{
+  position: fixed;
+  right:0;
+  top:44px;
+  bottom:0;
+  width:100%;
+  overflow: visible;
+  z-index: inherit;
 }
 </style>

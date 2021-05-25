@@ -2,7 +2,7 @@
   <Layout style='flex-direction:row;overflow:hidden;'>
     
      <hs-menu style='min-width:220px;width:220px;padding-bottom:60px;padding:0;border-right:1px solid #333;'  :data="menus"  @on-select='onClickMenu' :current="ActivePath" >
-    
+       
      </hs-menu>
       <Content>
         <keep-alive>

@@ -180,6 +180,15 @@ const getters = {
       //装修： 竺家君
       //行政： 詹红岩
   },
+  getSource:(state)=>{
+    return [...state.users.map(v=>({...v,group:'员工'})),
+     ...state.deps.map(v=>({...v,group:'部门'})),
+    // ...state.projects.map(v => ({
+    //       ...v,
+    //       group: '部门'
+    //     })),
+   ]
+  },
   getTypes:(state)=>key=>{
     if(!state.types && !state.ent_types)
       return []

@@ -161,7 +161,6 @@ export default {
         this.RouteTo('/core/projects/'+e.data.id,true)
     },
     onToolEvent(e){
-      console.log(e)
       if(e == 'sync'){
         this.$store.dispatch('entadmin/sychronize_projects')
       }

@@ -6,9 +6,11 @@
         <div class="flex-wrap" style='width:650px;position:relative;bottom:-20px;' > 高专企业云</div>
         <BaseNow /></div>
     </transition>
+  
     <div style='margin-top:44px;height:100%;width:100%;position:relative;' v-if='session.token'>
        <BaseLoadingBar v-show='loading' />
       <router-view></router-view>
+      
     </div>
     
   </Layout>
