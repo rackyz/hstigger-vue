@@ -38,6 +38,23 @@
 
       </Card>
 
+       <Card
+        class="panel"
+        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
+        padding='0'
+      >
+        <div class='card-title'>
+          <Icon
+            custom='gzicon gzi-depart'
+            size='19'
+          /> 我的部门 <span style='float:right;'><a
+              href='#'
+              style='font-size:12px;'
+            ></a><a href='#'></a></span>
+        </div>
+        <BaseDepList />
+      </Card>
+
       <Card
         class="panel"
         style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
@@ -91,7 +108,7 @@
                 <span
                   class='card-more'
                   style='float:right'
-                  @click="RouteTo(r.link,true)"
+                  @click="RouteTo(r.link)"
                 >MORE</span>
               </div>
               <component
@@ -116,8 +133,23 @@
         :md='24'
         :lg="6"
       >
+
+ <Card
+        class="panel"
+        style='width:100%;border:none;border-radius:0;'
+        padding="0"
+      >
+        <div class='card-title'>
+          <Icon
+            custom='gzicon gzi-lianjieliu'
+            size='19'
+          /> 快捷操作 <span style='float:right;font-size:12px;'>MORE</span>
+        </div>
+        <BaseUserFlowPanel />
+      </Card>
+
       <Card
-        style='width:100%;border:none;border-radius:0'
+        style='width:100%;border:none;border-radius:0;margin-top:10px;'
         padding="0"
       >
         <div class='card-title'>
@@ -139,21 +171,9 @@
           />
         </div>
         <BaseCalender style='border-bottom:1px solid #dfdfdf' />
-
+         <BaseActivityList />
       </Card>
-      <Card
-        class="panel"
-        style='width:100%;border:none;border-radius:0;margin-top:10px;'
-        padding="0"
-      >
-        <div class='card-title'>
-          <Icon
-            custom='gzicon gzi-lianjieliu'
-            size='19'
-          /> 快捷操作 <span style='float:right;font-size:12px;'>MORE</span>
-        </div>
-        <BaseUserFlowPanel />
-      </Card>
+     
       <Card
         class="panel"
         style='width:100%;border:none;border-radius:0;margin-top:10px;'

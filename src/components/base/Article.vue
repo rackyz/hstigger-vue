@@ -8,19 +8,14 @@
       <div class="l-art-title" @click="RouteTo(`/core/articles/${data.id}`,true)">{{data.title}}
         </div>
         <div class="flex-wrap" v-if="data.files" style='margin-left:5px;padding:5px;border:1px solid #dfdfdf;font-size:12px;border-radius:3px;color:#333;'> <Icon type="md-attach"  style='' />附件 </div>
-      <div class="flex-wrap" style='margin-left:5px;padding:5px;border:1px solid #dfdfdf;font-size:12px;border-radius:3px;color:#333;'>
-        created by 
-        <hs-avatar :userinfo="getUser(data.created_by)" size="20" style="margin:0 5px" /> {{getUser(data.created_by).name}}
-      </div>
+     
         
     </div>
     <div class="flex-wrap">
    
-      <div class="flex-wrap" style='margin-left:60px;'>
-        <Button type="info" style='margin-right:10px;' v-if="session.user_id == getUser(data.created_by).id">编辑</Button>
-        <Button type="warning" style='margin-right:10px;' v-if="data.state == 2">撤销发布</Button>
-        <Button type="success" style='margin-right:10px;' v-if="data.state == 1">发布</Button>
-        <Button type="error" @click="$emit('delete',data.id)">删除</Button>
+      <div class="flex-wrap" style='margin-left:5px;padding:5px;border:1px solid #dfdfdf;font-size:12px;border-radius:3px;color:#333;'>
+        created by 
+        <hs-avatar :userinfo="getUser(data.created_by)" size="20" style="margin:0 5px" /> {{getUser(data.created_by).name}}
       </div>
     </div>
     
@@ -41,6 +36,7 @@ export default {
   width:100%;
   padding:10px;
   margin:0;
+  background:#fff;
 }
 .l-article-list-item:last-child{
   border:none;
@@ -56,6 +52,7 @@ export default {
   background:#36a;
   padding: 10px;
   font-size:15px;
+  margin-right:10px;
   color:#fff;
   font-family: 微软雅黑;
 

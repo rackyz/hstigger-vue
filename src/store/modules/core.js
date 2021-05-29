@@ -103,6 +103,22 @@ const getters = {
   session(state){
     return state.session
   },
+  my_activities(){
+    return [{
+      id:1,
+      type:'class',
+      name:"员工入职培训",
+      started_at:moment().format(),
+      duration:3,
+      charger:'NBGZ',
+    }, {
+      id: 2,
+      name: "4月重庆游",
+      started_at: moment("2021/4/16").format(),
+      duration: 5,
+      charger: 'NBGZ',
+    }]
+  },
   projects(state){
     return state.projects
   },
@@ -110,7 +126,7 @@ const getters = {
     return state.user_rss
   },
   my_rss(state){
-    return state.rss.filter(v=>state.user_rss.includes(v.id))
+    return state.rss
     //return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v)
   },
   rss(state){

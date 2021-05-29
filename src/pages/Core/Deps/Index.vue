@@ -2,16 +2,16 @@
   <Layout style='overflow:hidden;position:relative;'>
       <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:75px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
-        <div class="project-code">编号 <span>{{project.code}}</span> 类型 <span>信息系统研发项目</span></div> 
-        <div class="project-name">{{project.name}}
-          <Button type='primary' size='small' style='width:50px;height:20px;text-align:center;' @click="showProjects = !showProjects">切换</Button>
+      
+        <div class="project-name">{{dep.name}}
+          <Button type='primary' size='small' style='width:50px;height:20px;text-align:center;margin-left:20px;' @click="showDrawer = !showDrawer">切换</Button>
         </div>
         <div class='progress-bar'>
           <div class='progress-inner'></div>
         </div>
         </div>
         <div class='right'>
-          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:-5px;margin-bottom:3px;margin-right:5px;'>状态 <span style='color:yellowgreen;'>{{getTypes('TASK_STATE').find(v=>v.value==project.state).name}}</span> 负责人 <hs-avatar :userinfo="users.find(v=>v.id == project.charger)" style="margin:0 5px;"></hs-avatar> {{users.find(v=>v.id == project.charger).name}} </div> 
+          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:-5px;margin-bottom:3px;margin-right:5px;'>部门主管 <hs-avatar :userinfo="charger" style="margin:0 5px;"></hs-avatar> {{charger.name}} </div> 
           <div class="project-dynamic">
             <div class='project-state'>任务<br /><span class='count'>315<span class='unit'>条</span></span></div>
             <div class='project-state'>已服务<br /><span class='count'>52<span class='unit'>天</span></span></div>
@@ -20,20 +20,17 @@
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
-         <hs-menu style='min-width:150px;width:150px;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
+         <hs-menu style='min-width:150px;width:150px;padding:0;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
-        
-        <div class='l-menu'>
-
-        </div>
    
      
       <transition name='fadeIn'>
+        
         <Content >
           <router-view></router-view>
-           <Drawer :closable="false" v-model="showProjects" placement="left" inner :transfer="false" styles='padding:0'>
-             <template v-for='p in projects'>
-               <BaseProject :data="p"  :key='p.id' v-if="id != p.id" />
+           <Drawer :closable="false" v-model="showDrawer" placement="left" inner :transfer="false" styles='padding:0'>
+             <template v-for='d in my_deps'>
+               <BaseDepListItem :data="d" :key='d' v-if="id != d" />
              </template>
              
           </Drawer>
@@ -56,7 +53,7 @@ import { mapGetters } from 'vuex'
 export default {
   data(){
     return {
-      showProjects:false,
+      showDrawer:false,
        menus:[{
         name:'部门总览',
         is_group:true,
@@ -75,11 +72,13 @@ export default {
       },{
         name:'通用模块',
         is_group:true,
-        subs:[{
+        subs:[
+          {
           name:'任务管理',
           icon:'xiangmu',
           key:'task'
-        },{name:'人员管理',
+        },
+        {name:'人员管理',
         icon:'user',
         key:'employee'}
         ,{
@@ -88,19 +87,9 @@ export default {
           key:'archive',
         }]
       },{
-        name:'业务模块',
-        is_group:true,subs:[{
-          name:'合同管理',
-          icon:'iconset0118',
-          key:'contract'
-        }]},{
         name:'系统配置',
-        is_group:true,subs:[
-        //   {
-        //   name:'项目角色',
-        //   icon:'role',
-        //   key:'role'
-        // },
+        is_group:true,
+      subs:[
         {
           name:'部门配置',
           icon:'config',
@@ -117,13 +106,13 @@ export default {
   watch:{
     id:{
       handler(v){
-        this.showProjects = false
+        this.showDrawer = false
       },
       immediate:true
     }
   },
   computed:{
-    ...mapGetters('core',['projects','users','getTypes','getDep']),
+    ...mapGetters('core',['deps','my_deps','users','getUser','getTypes','getDep']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -136,6 +125,12 @@ export default {
       })
       return map
     },
+    my_dep_items(){
+      return this.my_deps.filter(v=>this.deps.find(d=>d.id == v))
+    },
+    charger(){
+      return this.getUser(this.dep.charger) || {}
+    },
     ActiveMenu(){
       return this.MenuMap[this.ActivePath]
     },
@@ -145,16 +140,14 @@ export default {
     id(){
       return this.$route.params.id
     },
-    project(){
-      return this.$store.getters['core/get_project'](this.id)
+    dep(){
+      return this.$store.getters['core/deps'].find(v=>v.id == this.id)
     },
     RouteMenu(){
       return this.menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{
-            b.path = '/core/projects/'+this.id+'/'+b.key
-
-            console.log(b)
+            b.path = '/core/deps/'+this.id+'/'+b.key
           })
         }
         return v
