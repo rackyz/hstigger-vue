@@ -5,8 +5,9 @@
         <Col :span='19'>
         <div style="padding:0 20px;">
 
-         <a style="color:#3af;" @click="RouteTo('/core/training')"><Icon type="md-arrow-back" /> 返回列表</a> <h1>{{item.name}}</h1>
-      <p style="font-size:14px;margin:20px 0;">{{item.content}}</p>
+         <a style="color:#3af;" @click="RouteTo('/core/training')"><Icon type="md-arrow-back" /> 返回列表</a> <h1>{{item.name || '培训名称'}}</h1>
+      <p style="font-size:14px;margin:20px 0;">{{item.desc || '培训描述'}}</p>
+      <p style="font-size:14px;margin:20px 0;">培训地点 <br /> <span style="color:#3af">{{item.address || '未指定'}}</span></p>
 
       <div style="margin-top:20px;">
         <template v-for="(p,i) in item.plans">
@@ -21,54 +22,45 @@
           <p style="font-size:14px;color:#3af;">2课时</p>
           </div>
         </template>
-        
+        <template v-if="!item.plans || item.plans.length == 0">
+          无课程计划
+        </template>
       </div>
         </div>
         
         </Col>
         <Col :span='5'>
         <div style="width:100%;display:flex;align-items:center;flex-direction:column;font-size:18px;">
-        <hs-avatar size="80" :userinfo="teacher" style="margin-bottom:10px" />
-        {{teacher.name}}
+        <hs-avatar size="80" :userinfo="charger" style="margin-bottom:10px" />
+        {{charger.name}}
         <div style="font-size:14px;">部门</div>
         
         </div>
         <div style="margin-top:10px;display:flex;align-items:center;flex-direction:column;width:100%;padding:10px;border-top:1px solid #dfdfdf;font-size:14px;">
           <div class="flex-wrap flex-between" style="width:100%;">
-            <div>阶段 PHASES</div>
-            <div>5次</div>
+            <div>课程计划</div>
+            <div>{{item.plans?item.plans.length:'-'}}</div>
           </div>
           <div class="flex-wrap flex-between" style="width:100%;">
-            <div>时长 DURATION</div>
-            <div>20学时</div>
-          </div>
-          <div class="flex-wrap flex-between" style="width:100%;">
-            <div>成果 CERTIFICATION</div>
-            <div>测试</div>
+            <div>开始时间</div>
+            <div>{{FormatDate(item.started_at)}}</div>
           </div>
 
-           <div class="flex-wrap flex-between" style="width:100%;margin-top:10px;">
-            <div>开始时间</div>
-            <div>2021/5/27 15:00:00</div>
-          </div>
-           <div class="flex-wrap flex-between" style="width:100%;">
-            <div>当前阶段</div>
-            <div>5</div>
+           <div class="flex-wrap flex-between" style="width:100%">
+            <div>预计结束</div>
+            <div>{{FormatDate(item.finished_at)}}</div>
           </div>
            <div class="flex-wrap flex-between" style="width:100%;">
             <div>已报名</div>
-            <div>133人</div>
-          </div>
-
-          <div class="flex-wrap flex-between" style="width:100%;margin-top:10px;">
-            <div>下一阶段</div>
-            <div>2021/5/27 15:00:00</div>
+            <div>{{item.users ?item.users.length:0}}</div>
           </div>
            <div class="flex-wrap flex-between" style="width:100%;">
-            <div>培训地点</div>
-            <div>14楼大会议室</div>
+            <div>状态</div>
+            <div :style="{color:getTypeByValue('TASK_STATE',item.state || 0).color || 'orange'}">{{getTypeByValue('TASK_STATE',item.state || 0).name}}</div>
           </div>
-          <Button type="primary" v-if="!joined" style="width:80%;height:50px;margin-top:20px;" :disabled="false" @click="Join">我要报名<p style='font-size:10px;'>报名已结束</p></Button>
+
+         
+          <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?'火热进行中':'报名已关闭'}}</p></Button>
           <Button type="success" v-else style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
         </div>
         </Col>
@@ -81,6 +73,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import moment from 'moment'
 export default {
   metaInfo:{
     title:"培训",
@@ -88,57 +81,35 @@ export default {
   },
   data(){
     return {
-      joined:false,
       item:{
-        id:1,
-        name:"PPT基础培训",
-        avatar:"https://img2.baidu.com/it/u=2464969734,440435060&fm=26&fmt=auto&gp=0.jpg",
-        teacher:"NBGZ",
-        content:"培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介",
-        plans:[{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT安装与插件介绍",
-          finished:true
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT设计理念",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"模板化技术",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT美化案例介绍",
-
-        },{
-          started_at:"2020/5/15 23:00:00",
-          duration:60,
-          title:"分类总结",
-
-        },
-        
-        ]
+        users:[]
       }
     }
   },
   computed:{
-    ...mapGetters('core',['getUser']),
-    teacher(){
-      return this.getUser(this.item.teacher)
+    ...mapGetters('core',['getUser','getTypeByValue','uid']),
+    charger(){
+      return this.getUser(this.item.charger) || {}
+    },
+    id(){
+      return this.$route.params.id
+    },
+    isMember(){
+      return this.item.users.find(v=>v.id == this.uid)
     }
   },
   mounted(){
-
+    this.getData()
   },
   methods:{
+    FormatDate(e){
+      return e?moment(e).format('L'):'-'
+    },
     getData(){
-
+      this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
+        let item = res.data.data
+        this.item = item
+      })
     },
     Join(){
       // ... join

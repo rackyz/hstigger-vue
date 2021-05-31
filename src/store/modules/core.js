@@ -43,7 +43,9 @@ const getters = {
   isLogin(state){
     return state.isLogin
   },
-
+  getEntUsers(state){
+    return state.employees
+  },
   contracts(state){
     return state.contracts
   },
