@@ -4,7 +4,7 @@
     <!-- <div class="caption">企业信息平台</div>  -->
     <div class="caption">企业信息平台</div>
     <div class="version">
-     NINGBO GAOZHUAN EIP PLATFORM <span style='color:gold'>v1.0</span>
+     NINGBO GAOZHUAN EIP PLATFORM <span style='color:gold'>v{{$store.getters['core/version']}}</span>
     </div>
   </div>
 </template>

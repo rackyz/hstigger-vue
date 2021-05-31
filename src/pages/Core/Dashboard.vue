@@ -1,5 +1,5 @@
 <template>
-  <Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 40px);overflow-y:auto;'>
+  <Layout style='width:100%;overflow:hidden;position:relative;height:calc(100% - 40px);overflow-y:auto;padding-bottom:10px;'>
 
     <Row
       :key='i'
@@ -66,8 +66,8 @@
             size='19'
           /> 我的项目 <span style='float:right;'><a
               href='#'
-              style='font-size:12px;'
-            >MORE</a><a href='#'></a></span>
+              style="color:#3af;font-size:12px;" @click="RouteTo('/core/self/project')"
+            >MORE</a></span>
         </div>
         <BaseProjectList />
       </Card>
@@ -107,7 +107,7 @@
                 </span>
                 <span
                   class='card-more'
-                  style='float:right'
+                  style='float:right;'
                   @click="RouteTo(r.link)"
                 >MORE</span>
               </div>
@@ -185,13 +185,13 @@
           <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 待处理 {{state_categoried_tasks[1].length?`(${state_categoried_tasks[1].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==0?'tab-actived':''" @click="taskStateFilter=0"> <Icon
+          /> 待处理 {{(state_categoried_tasks[1].length + categriedFlowInstances[1].length)?`(${(state_categoried_tasks[1].length + categriedFlowInstances[1].length)})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==0?'tab-actived':''" @click="taskStateFilter=0"> <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 准备中 {{state_categoried_tasks[0].length?`(${state_categoried_tasks[0].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==2?'tab-actived':''" @click="taskStateFilter=2"> <Icon
+          /> 准备中 {{(state_categoried_tasks[0].length + categriedFlowInstances[0].length)?`(${state_categoried_tasks[0].length + categriedFlowInstances[0].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==2?'tab-actived':''" @click="taskStateFilter=2"> <Icon
             custom='gzicon gzi-event'
             size='17'
-          /> 已处理 {{state_categoried_tasks[2].length?`(${state_categoried_tasks[2].length})`:''}}</span> <span style='float:right;font-size:12px;'>MORE</span>
+          /> 已处理 {{(state_categoried_tasks[2].length + categriedFlowInstances[2].length)?`(${(state_categoried_tasks[2].length + categriedFlowInstances[2].length)})`:''}}</span> <span style='float:right;font-size:12px;'>MORE</span>
         </div>
         
         <template v-for="(fi) in state_categoried_tasks[taskStateFilter].slice(0,10)">
@@ -215,10 +215,10 @@
             </div>
           </div>
         </template>
-        <BaseEmpty v-if='!state_categoried_tasks[taskStateFilter] || state_categoried_tasks[taskStateFilter].length == 0' />
+        <BaseEmpty v-if='(!state_categoried_tasks[taskStateFilter] || state_categoried_tasks[taskStateFilter].length == 0) && (!categriedFlowInstances[taskStateFilter] || categriedFlowInstances[taskStateFilter].length == 0)' />
         </div>
 
-        <template v-for="(fi,i) in flowInstances">
+        <template v-for="(fi,i) in categriedFlowInstances[taskStateFilter].slice(0,5)">
           <div
             class='fi-item'
             :key='fi.id'
@@ -309,6 +309,9 @@ export default {
   },
   computed: {
     ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypeByValue','getTypes','getTypesByKey','get_project','getDep']),
+    categriedFlowInstances(){
+      return [this.flowInstances.filter(v=>v.state == 0),this.flowInstances.filter(v=>v.state == 1 || v.state == 4),this.flowInstances.filter(v=>v.state == 2 || v.state == 3 || v.state == 5)]
+    },
     draggableRss: {
       set(e) {
         if (e) {

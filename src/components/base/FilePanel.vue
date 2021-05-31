@@ -1,7 +1,7 @@
 
 <template>
   <Card class="panel" padding='0' style='margin-top:10px;'>
-       <div class='card-title'><Icon type='md-folder-open' size='19' /> 临时文件  {{loading?' - 读取中...':''}} <span style='float:right;' class='card-more' @click='RouteTo("/core/self/file")'>MORE</span></div>
+       <div class='card-title'><Icon type='md-folder-open' size='19' /> 临时文件  {{loading?' - 读取中...':''}} <span style='float:right;color:#3af;' class='card-more' @click='RouteTo("/core/self/file")'>MORE</span></div>
         <Upload
         multiple
         style="margin:5px;"

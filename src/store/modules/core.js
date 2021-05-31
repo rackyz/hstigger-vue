@@ -34,6 +34,9 @@ const state = {
 
 
 const getters = {
+  version(){
+    return "1.0.2"
+  },
   loading(state){
     return state.loading
   },
@@ -111,13 +114,16 @@ const getters = {
       started_at:moment().format(),
       duration:3,
       charger:'NBGZ',
-    }, {
-      id: 2,
-      name: "4月重庆游",
-      started_at: moment("2021/4/16").format(),
-      duration: 5,
-      charger: 'NBGZ',
-    }]
+    },
+    
+    // {
+    //   id: 2,
+    //   name: "4月重庆游",
+    //   started_at: moment("2021/4/16").format(),
+    //   duration: 5,
+    //   charger: 'NBGZ',
+    // }
+  ]
   },
   projects(state){
     return state.projects

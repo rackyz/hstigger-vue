@@ -61,22 +61,17 @@ export default {
         name:'我的项目',
         icon:"xiangmu2",
         count:4,
-        path:'/core/admin/user'
+        path:'/core/self/project'
       },{
         name:'我的任务',
         count:4,
         icon:"eventnote",
-        path:'/core/admin/dep'
+        path:'/core/self/task'
       },{
-        name:'我的流程',
-        icon:"lianjieliu",
-        count:34,
-        path:'/core/admin/role'
-      },{
-        name:'我的资料',
+        name:'临时文件',
         icon:"file",
         count:12,
-        path:'/core/admin/role'
+        path:'/core/self/file'
       }]},
       {
         name:"账号与安全",

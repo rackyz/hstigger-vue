@@ -1,7 +1,7 @@
 
 <template>
   <Card class="panel" padding='0' style='margin-top:10px;'>
-       <div class='card-title'><Icon type='md-folder-open' size='19' /> 常用软件  {{loading?' - 读取中...':''}} <span style='float:right;' class='card-more' @click='RouteTo("/core/self/file")'>MORE</span></div>
+       <div class='card-title'><Icon type='md-folder-open' size='19' /> 常用软件  {{loading?' - 读取中...':''}} <span style='float:right;' class='card-more'></span></div>
       
    
       <div class="content">

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Archive from '../ArchiveManagement'
+import Archive from '../../App/Netdisk/Index.vue'
 export default {
   components:{
     Archive

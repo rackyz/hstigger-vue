@@ -48,7 +48,7 @@
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
-         <hs-menu style='min-width:150px;width:150px;padding:0;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
+         <hs-menu style='min-width:150px;width:150px;padding:0;border-right:1px solid #dfdfdf;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
    
      

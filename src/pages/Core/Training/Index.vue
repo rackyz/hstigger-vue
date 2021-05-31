@@ -3,12 +3,15 @@
     <Header style='background:#fff;border-bottom:1px solid #dfdfdf;height:100px;width:100%;position:relative;display:flex;align-items:center;'>
       <div style="display:flex;flex-direction:column;justify-content:flex-start;">
         <div style="font-size:10px;color:#aaa;line-height:10px;">宁波高专</div>
-        <div style="font-size:24px;line-height:40px;">培训中心</div>
-      </div>
+        <div style="font-size:24px;line-height:40px;" @click="RouteTo('/core/training/admin')">培训中心</div>
+              </div>
       
 
-      <a style="position:absolute;right:20px;bottom:0px;color:#3af;">
-        讲师入口 >>
+      <a style="position:absolute;right:20px;bottom:0px;color:#3af;" @click="RouteTo('/core/training/admin')" v-if="isAdmin && !isAdminPage">
+        后台管理 >>
+      </a>
+      <a style="position:absolute;right:20px;bottom:0px;color:#3af;" @click="RouteTo('/core/training/dashboard')" v-if="isAdmin && isAdminPage">
+        返回 培训列表 >>
       </a>
     </Header>
     <Content>
@@ -20,7 +23,17 @@
 
 <script>
 export default {
-
+  computed:{
+    isAdmin(){
+      return this.$store.getters['core/session'].my_deps.includes(69071263)
+    },
+    path(){
+      return this.$route.path
+    },
+    isAdminPage(){
+      return this.path == '/core/training/admin'
+    }
+  }
 }
 </script>
 
