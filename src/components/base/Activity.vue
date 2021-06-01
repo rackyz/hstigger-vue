@@ -1,14 +1,16 @@
 <template>
-  <div class="project-item" @click.stop='onClick' :style='`background:#444 url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
+  <div class="project-item" @click.stop='onClick' :style='`padding-left:15px;background:#444 url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
   <div class='pi-code'>{{type_name}} </div>
   <div class='pi-name'>{{data.name}}</div>
-  <div style='font-size:10px;'><span class='pi-type'>{{started_at}} - {{finished_at}}</span> <span class='pi-type' style="color:#aaa;margin-left:10px;">{{from_now}}</span></div>
+  <div style='font-size:10px;'><span class='pi-type'>{{duration}}</span> <span class='pi-type' style="color:#aaa;margin-left:10px;">{{from_now}}</span>
+  <span style="margin-left:10px">已报名 {{data.count}}人</span></div>
     
    
     <div class='pi-progress'>
       进行中
-      <div class='pi-position'> {{charger.name}}</div>
+      <div class='pi-position' style="width:100px"> <span style='color:#aaa;'>主讲</span> {{charger.name}} <span v-if="data.charger==uid" style='color:yellow;'>(我)</span> </div>
     </div>
+
   </div>
 </template>
 
@@ -17,13 +19,9 @@ import { mapGetters } from 'vuex'
 export default {
   props:['data'],
   computed:{
-    ...mapGetters('core',['getUser']),
+    ...mapGetters('core',['getUser','uid']),
     type_name(){
-      if(this.data.type == 'class'){
-        return "培训"
-      }else{
-        return "旅游"
-      }
+      return "培训"
     },
     charger(){
       return this.getUser(this.data.charger) || {}
@@ -38,14 +36,19 @@ export default {
     },
     finished_at(){
       return moment(this.data.started_at).add('min',this.data.duration).format("L")
+    },
+    duration(){
+      if(this.data.started_at || this.data.finished_at)
+        return started_at +' - ' + finished_at
+      else
+        return '未指定时间'
     }
   },
   methods:{
     onClick(e){
-      if(this.data.type == 'class')
+    
         this.RouteTo('/core/classes/'+this.data.id+'/dashboard')
-      else
-        this.RouteTo('/core/activities/'+this.data.id+'/dashboard')
+     
     }
   }
 }
@@ -66,7 +69,7 @@ export default {
     color:#ff3;
     position:absolute;
     top:13px;
-    left:20px;
+    left:15px;
   }
 
   .pi-name{
@@ -86,7 +89,10 @@ export default {
 
   .pi-position{
     font-size:10px;
-    color:#aaa;
+    color:#fff;
+    position:absolute;
+    right:0px;
+    bottom:-30px;
   }
 
   .pi-progress{

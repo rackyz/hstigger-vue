@@ -60,8 +60,9 @@
           </div>
 
          
-          <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?'火热进行中':'报名已关闭'}}</p></Button>
+          <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
           <Button type="success" v-else style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
+          <a style="color:red;margin-top:10px;" @click="Join" v-if="isMember">取消报名</a>
         </div>
         </Col>
       </Row>
@@ -95,7 +96,7 @@ export default {
       return this.$route.params.id
     },
     isMember(){
-      return this.item.users.find(v=>v.id == this.uid)
+      return this.item.users.find(v=>v.user_id == this.uid)
     }
   },
   mounted(){
@@ -112,9 +113,12 @@ export default {
       })
     },
     Join(){
-      // ... join
-      this.joined = true
-      this.Success("报名成功")
+      this.api.enterprise.PATCH_TRAININGS(null,{query:{q:this.isMember?'unjoin':'join'},param:{id:this.id}}).then(res=>{
+       
+        this.Success(this.isMember?"取消成功":"报名成功")
+        this.getData()
+      })
+      
     }
   }
 }

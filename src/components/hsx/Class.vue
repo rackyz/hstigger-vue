@@ -7,13 +7,13 @@
       
         <div class='l-name'>  {{data.name}}
         </div>
-        <div class='l-teacher flex-wrap'>
-         <hs-avatar :userinfo="getUser(data.teacher)" size="18" style="margin-right:5px;background:#fff;"/> {{getUser(data.teacher).name}}
+        <div class='l-charger flex-wrap'>
+         <hs-avatar :userinfo="getUser(data.charger)" size="18" style="margin-right:5px;background:#fff;"/> {{getUser(data.charger).name}}
         </div>
        
          </div>
           <div class="l-time">
-          进行中
+          {{getTypeByValue('TASK_STATE',data.state || 0).name}}
         </div>
     </div>
     
@@ -24,7 +24,7 @@ import { mapGetters } from 'vuex'
 export default {
   props:['data'],
   computed:{
-    ...mapGetters('core',['getUser'])
+    ...mapGetters('core',['getUser','getTypeByValue'])
   },
   methods:{
     getType(e){
@@ -62,7 +62,7 @@ export default {
     margin-bottom:3px;
   }
 
-  .l-teacher{
+  .l-charger{
     color:#eee;
   }
 

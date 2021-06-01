@@ -3,9 +3,9 @@
    <div class="l-panel" style="height:100%;overflow-y:auto;padding:20px;padding-top:10px; ">
         <h3 style="color:#346;">课程管理</h3>
         
-        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:rgb(35, 51, 76);color:#ddd;" />
+        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" />
         <div style="height:calc(100% - 150px);position:relative">
-           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" /></hs-table>
+          <hs-list :data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable="single" />
         </div>
        
       </div>
@@ -19,6 +19,7 @@ export default {
     return {
       items:[{
         id:1,
+        index:1,
         name:"PPT基础培训考核1",
         desc:"请上传第一次作业",
         deadline:"2020/6/31",

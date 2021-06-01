@@ -108,24 +108,8 @@ const getters = {
   session(state){
     return state.session
   },
-  my_activities(){
-    return [{
-      id:1,
-      type:'class',
-      name:"员工入职培训",
-      started_at:moment().format(),
-      duration:3,
-      charger:'NBGZ',
-    },
-    
-    // {
-    //   id: 2,
-    //   name: "4月重庆游",
-    //   started_at: moment("2021/4/16").format(),
-    //   duration: 5,
-    //   charger: 'NBGZ',
-    // }
-  ]
+  my_activities(state){
+    return state.session.my_trainings
   },
   projects(state){
     return state.projects

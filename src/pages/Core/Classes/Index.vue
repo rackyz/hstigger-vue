@@ -41,7 +41,7 @@
         
         </div>
         <div class='right'>
-          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-bottom:3px;margin-right:5px;'><hs-avatar :userinfo="teacher" style="margin:0 5px;"></hs-avatar> {{teacher.name}} </div> 
+          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-bottom:3px;margin-right:5px;'><hs-avatar :userinfo="charger" style="margin:0 5px;"></hs-avatar> {{charger.name}} </div> 
           <div class="project-dynamic">
             {{item.started_at}} - {{item.finished_at}}
           </div>
@@ -85,46 +85,10 @@ export default {
   },
   data(){
     return {
-      items:[],
       selected:null,
       showDrawer:false,
       loading:false,
-      item:{
-        id:1,
-        name:"PPT基础培训",
-        avatar:"https://img2.baidu.com/it/u=2464969734,440435060&fm=26&fmt=auto&gp=0.jpg",
-        teacher:"NBGZ",
-        content:"培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介",
-        plans:[{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT安装与插件介绍",
-          finished:true
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT设计理念",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"模板化技术",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT美化案例介绍",
-
-        },{
-          started_at:"2020/5/15 23:00:00",
-          duration:60,
-          title:"分类总结",
-
-        },
-        
-        ]
-      },
+      item:{},
        menus:[
          {name:'学员端',
           icon:'user',
@@ -155,6 +119,11 @@ export default {
           icon:'user',
           is_group:true,
           subs:[
+             {
+              name:'总览',
+              icon:"xiangmu1",
+              key:'dashboard',
+            },
             {
               name:'通知管理',
               icon:"contract",
@@ -194,9 +163,10 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['getUser']),
+    ...mapGetters('core',['getUser','uid']),
     MenuMap(){
       let map = {}
+     
       this.menus.forEach(v=>{
         map[v.path] = v
         if(Array.isArray(v.subs)){
@@ -210,8 +180,8 @@ export default {
     id(){
       return this.$route.params.id
     },
-    teacher(){
-      return this.getUser(this.item.teacher)
+    charger(){
+      return this.getUser(this.item.charger)
     },
     ActiveMenu(){
       return this.MenuMap[this.ActivePath]
@@ -219,7 +189,12 @@ export default {
     ActivePath(){
       return this.$route.path
     }, RouteMenu(){
-      return this.menus.map(v=>{
+      let menus = []
+       if(this.item.charger != this.uid)
+        menus = this.menus.slice(0,1)
+      else
+        menus = this.menus.slice(1,2)
+      return menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{
             b.path = '/core/classes/'+this.id+'/'+b.key
@@ -238,13 +213,11 @@ export default {
     this.getData()
   },
   methods:{
-    getData(){
-      // this.loading = true
-      // this.api.enterprise.LIST_MESSAGES().then(res=>{
-      //   this.items = res.data.data
-      // }).finally(e=>{
-      //   this.loading = false
-      // })
+     getData(){
+      this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
+        let item = res.data.data
+        this.item = item
+      })
     },
     
     onClickMenu(e){

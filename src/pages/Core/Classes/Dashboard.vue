@@ -7,6 +7,10 @@
       </div>
       <div style="margin-bottom:10px;background:rgb(40, 55, 80);color:#dfdfdf;border:none;padding:20px;padding-top:0;font-size:12px;"> 
         {{item.desc}}
+
+        <div style="margin-top:10px">
+          培训地址 {{item.address || '未指定'}}
+        </div>
       </div>
        <div class="l-caption" style="margin-top:10px;">
             课程安排
@@ -103,48 +107,30 @@
 export default {
   data(){
     return {
-       item:{
-        id:1,
-        name:"PPT基础培训",
-        avatar:"https://img2.baidu.com/it/u=2464969734,440435060&fm=26&fmt=auto&gp=0.jpg",
-        teacher:"NBGZ",
-        desc:"培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介培训简介",
-        plans:[{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT安装与插件介绍",
-          finished:true
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT设计理念",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"模板化技术",
-
-        },{
-          started_at:"2020/5/12 23:00:00",
-          duration:60,
-          title:"PPT美化案例介绍",
-
-        },{
-          started_at:"2020/5/15 23:00:00",
-          duration:60,
-          title:"分类总结",
-
-        },
-        
-        ]
+      item:{
       },
     }
   },
+  mounted(){
+    this.getData()
+  },
+  computed:{
+    id(){
+      return this.$route.params.id
+    }
+  },  
 metaInfo:{
    title:"培训课程", 
     route:'/:id'
   },
+methods:{
+   getData(){
+      this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
+        let item = res.data.data
+        this.item = item
+      })
+    },
+}
 }
 </script>
 <style lang="less">
