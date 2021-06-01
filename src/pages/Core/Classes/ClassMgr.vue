@@ -5,7 +5,7 @@
         
         <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" />
         <div style="height:calc(100% - 150px);position:relative">
-          <hs-list :data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable="single" />
+          <hs-list style="background:#eee;":data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable="single" />
         </div>
        
       </div>
@@ -18,6 +18,24 @@ export default {
   data(){
     return {
       items:[{
+        id:1,
+        index:1,
+        name:"PPT基础培训考核1",
+        desc:"请上传第一次作业",
+        deadline:"2020/6/31",
+        charger:'NBGZ',
+        created_at:moment(),
+        created_by:'NBGZ'
+      },{
+        id:1,
+        index:1,
+        name:"PPT基础培训考核1",
+        desc:"请上传第一次作业",
+        deadline:"2020/6/31",
+        charger:'NBGZ',
+        created_at:moment(),
+        created_by:'NBGZ'
+      },{
         id:1,
         index:1,
         name:"PPT基础培训考核1",
