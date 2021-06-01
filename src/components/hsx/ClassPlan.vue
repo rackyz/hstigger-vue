@@ -5,7 +5,11 @@
         {{data.index}}
       </Col>
       <Col :span="11">
-        {{data.name}}
+      <div class="text-panel">
+        <div class="text-title">{{data.name}}</div> 
+        <div class="text-desc">{{data.desc}}</div>
+      </div>
+       
       </Col>
       <Col :span="4">
         {{data.started_at || '开始时间'}}
@@ -30,5 +34,15 @@ export default {
 .l-class-plan{
   width:100%;
   height:60px;
+
+  .text-panel{
+    .text-title{
+      font-size:15px;
+      font-weight: bold;
+    }
+    .text-desc{
+      margin-top:2px;
+    }
+  }
 }
 </style>
