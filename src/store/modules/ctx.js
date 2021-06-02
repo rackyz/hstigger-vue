@@ -30,14 +30,16 @@ const getters = {
 
 const actions = {
   Init:({commit,rootState},vue)=>{
-    commit('StartLoading')
-    return new Promise((resolve)=>{
-      API.initAPI(vue).then(() => {
+    commit('StartLoading',vue)
+    return new Promise((resolve,reject)=>{
+      API.initAPI(vue).then(server => {
          commit('SaveDevice')
         window.onresize = () => {
           commit('SaveDevice')
         }
-        resolve()
+        rootState.API = server
+        console.log(rootState)
+        resolve(server)
       }).catch(e=>{
         reject('API加载失败:'+e)
       }).finally(e=>{

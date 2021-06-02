@@ -8,7 +8,7 @@
           <Input search style="width:200px" v-model='search_text' clearable /> 
         </div>
         <div style="height:calc(100% - 150px);position:relative">
-           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" :data="filteredUsers" />
+           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" :data="filteredUsers" @event="handleTableEvent" />
         </div>
        
       </div>  
@@ -18,15 +18,15 @@
            <Input search v-model="filterUsernameText" clearable style="margin-bottom:10px;" />
            <template v-for="u in filteredEmployees">
           <div class="l-user-item" :key="u.id">
-            <Checkbox :value="selected_map[u.id]" @on-change="$set(selected_map,'u.id',$event)" :disabled="u.score>0">{{u.name}}</Checkbox>
+            <Checkbox :value="selected_map[u.id]" @on-change="$set(selected_map,u.id,$event)" :disabled="u.score>0">{{u.name}}</Checkbox>
           </div>
         </template>
         
         </div>
         <div class="flex-wrap flex-end" style="border-top:1px solid #aaa;padding:10px;">
-              <span style="margin-right:20px;">已选 {{selectedCount || 0}} / {{employees.length}}</span>
+              <span style="margin-right:20px;">已选 {{selectedCount || 0}} / {{filteredEmployees.length}}</span>
              <Button type='primary' style="margin-right:10px;" @click="handleSubmitUsers">提交</Button>
-              <Button @click="showUserSelectorModal=false;ResetUserMap(this.item)">取消</Button>
+              <Button @click="showUserSelectorModal=false;">取消</Button>
         </div>
       
       </Modal>
@@ -39,19 +39,28 @@ import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
+      selected:{},
       search_text:"",
+      filterUsernameText:"",
       selected_map:{},
       showUserSelectorModal:false,
-      item:{
-        users:[]
-      },
+      items:[],
       	tools: [
         
 				{
 					key: "add",
-					name: "修改人员",
-					icon: "md-person",
+					name: "添加人员",
+					icon: "md-add",
 				},{
+          key:'remove',
+          name:"移除人员",
+          icon:'md-remove'
+          },
+          {
+            key:'edit',
+          name:"填写结果",
+          icon:'md-create'
+            },{
           key:'enable_join',
           name:"开启报名",
           icon:'md-checkmark'
@@ -71,19 +80,22 @@ metaInfo:{
   },
   computed:{
     ...mapGetters('core',['employees']),
+    ...mapGetters('training',['item']),
     filteredEmployees(){
       
         if(this.filterUsernameText){
-          return this.employees.filter(v=>v.name.includes(this.filteredEmployees))
+          return this.employees.filter(v=>!this.items.find(u=>u.user_id == v.id)).filter(v=>v.name.includes(this.filterUsernameText))
         }else{
-          return this.employees
+          return this.employees.filter(v=>!this.items.find(u=>u.user_id == v.id))
         }
       
     },
     disabled(){
       return {
          enable_join:!this.item.enable_join,
-         disabled_join:this.item.enable_join
+         disabled_join:this.item.enable_join,
+         edit:!this.selected.id,
+         remove:!this.selected.id
       }
      
     },
@@ -96,9 +108,9 @@ metaInfo:{
     filteredUsers(){
       
       if(this.search_text){
-        return this.item.users.filter(v=>this.users.find(u=>u.id == v.user_id).name.includes(this.search_text))
+        return this.items.filter(v=>this.employees.find(u=>u.id == v.user_id).name.includes(this.search_text))
       }else{
-        return this.item.users
+        return this.items
       }
     },
     columns(){
@@ -150,6 +162,17 @@ metaInfo:{
          type:'time',
          width:250,
          title:"报名时间"
+      }, {
+         key:"joined_type",
+         type:'type',
+         width:100,
+         title:"报名方式",
+         option:{
+           getters:"core/getTypes",
+           getters_key:"TRAIN_JOIN_TYPE",
+           idKey:'value',
+           labelKey:'name'
+         }
       },{
          key:'score',
          type:'number',
@@ -166,44 +189,43 @@ metaInfo:{
     handleToolEvent(e){
       if(e == 'add'){
         this.showUserSelectorModal = true
+      }else if(e == 'remove'){
+        this.handleRemove(this.selected)
       }
     },
-    ResetUserMap(item){
-       let selected_map = {}
-       if(Array.isArray(item.users)){
-          item.users.forEach(v=>{
-          selected_map[v.user_id] = true
-        })
-       }
-       
-        this.$set(this,'selected_map',selected_map)
-        console.log(selected_map)
-    },
     getData(){
-      this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
-        let item = res.data.data
-        item.plans.forEach(v=>{
-          let e = this.employees.find(u=>u.id == v.user_id)
-          if(e)
-          {
-            v.name = e.name
-            v.deps = e.deps
-          }
-        })
-        this.ResetUserMap(item)
-        this.item = item
-
+      this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'users'}}).then(res=>{
+        let items = res.data.data
+        this.items = items
       })
     },
     handleSubmitUsers(){
-      this.api.enterprise.PATCH_TRAININGS(this.selected_map,{query:{q:'joinlist'},param:{id:this.id}}).then(res=>{
-        this.Success('修改成功')
+      let user_id_list = Object.keys(this.selected_map).filter(id=>this.selected_map[id])
+      this.api.enterprise.PATCH_TRAININGS(user_id_list,{query:{q:'addusers'},param:{id:this.id}}).then(res=>{
+         this.Success('修改成功')
          this.showUserSelectorModal = false
          this.getData()
       }).catch(e=>{
         this.Error("修改失败")
       })
      
+    },
+    handleRemove(e){
+      let user = this.employees.find(v=>v.id == e.user_id) || {}
+      this.Confirm(`确定删除<span style='margin:0 5px;color:red;font-weight:bold'>${user.name || '未知人员'}</span>（所有相关信息, 不可恢复)?`,s=>{
+         this.api.enterprise.DELRELATED_TRAININGS({param:{id:this.id,related:'users',relatedId:e.id}}).then(res=>{
+        this.Success("操作成功")
+        let index = this.items.findIndex(v=>v.id == e.id)
+        this.items.splice(index,1)
+      })
+      })
+     
+    },
+    handleTableEvent(e){
+      if(e.type == 'select'){
+        let id = e.data
+        this.selected = this.items.find(v=>v.id == id) || {}
+      }
     }
   }
 }

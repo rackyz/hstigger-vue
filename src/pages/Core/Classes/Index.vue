@@ -88,7 +88,6 @@ export default {
       selected:null,
       showDrawer:false,
       loading:false,
-      item:{},
        menus:[
          {name:'学员端',
           icon:'user',
@@ -164,6 +163,7 @@ export default {
   },
   computed:{
     ...mapGetters('core',['getUser','uid']),
+    ...mapGetters('training',['item']),
     MenuMap(){
       let map = {}
      
@@ -214,10 +214,7 @@ export default {
   },
   methods:{
      getData(){
-      this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
-        let item = res.data.data
-        this.item = item
-      })
+      this.$store.dispatch('training/get_data',this.id)
     },
     
     onClickMenu(e){

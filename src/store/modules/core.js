@@ -244,10 +244,8 @@ const getters = {
 }
 
 const actions = {
-  init({commit}){
-    return new Promise((resolve,reject)=>{
-      commit('init')
-    })
+  init({commit,rootState},api){
+    rootState.api = api
   },
   update_tasks({commit},data){
     return new Promise((resolve,reject)=>{

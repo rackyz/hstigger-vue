@@ -171,13 +171,14 @@ o.initAPI = async (vue) => {
           }
         }
         console.log("API inited:", o.SERVER, vue.prototype.Request)
-        resolve(o.API)
+        resolve(o.SERVER)
        
       }).catch(e => {
         console.error(e)
         reject("API Loading Failed:"+e)
       })
     }else{
+      console.log('GET inited API:',o.SERVER)
       resolve(o.SERVER)
     }
   })

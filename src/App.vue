@@ -49,9 +49,9 @@ import api from './plugins/api'
       if(api && api.inited)
         return
       this.initing = true
-      api.initAPI(Vue).then(res=>{
+      this.$store.dispatch('ctx/Init',Vue).then(res=>{
         this.initing = false
-        this.$store.dispatch('ctx/Init')
+        
       }).catch(e=>{
         this.error = e
       })
