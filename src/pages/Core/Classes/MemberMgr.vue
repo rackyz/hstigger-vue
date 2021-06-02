@@ -13,15 +13,18 @@
        
       </div>  
       <Modal v-model="showUserSelectorModal" title="添加培训人员" footer-hide>
+       
         <div style="padding:20px;height:600px;overflow-y:auto">
-           <template v-for="u in $store.getters['core/employees']">
+           <Input search v-model="filterUsernameText" clearable style="margin-bottom:10px;" />
+           <template v-for="u in filteredEmployees">
           <div class="l-user-item" :key="u.id">
-            <Checkbox :value="selected_map[u.id]" @on-change="selected_map[u.id]=$event" :disabled="u.score>0">{{u.name}}</Checkbox>
+            <Checkbox :value="selected_map[u.id]" @on-change="$set(selected_map,'u.id',$event)" :disabled="u.score>0">{{u.name}}</Checkbox>
           </div>
         </template>
         
         </div>
         <div class="flex-wrap flex-end" style="border-top:1px solid #aaa;padding:10px;">
+              <span style="margin-right:20px;">已选 {{selectedCount || 0}} / {{employees.length}}</span>
              <Button type='primary' style="margin-right:10px;" @click="handleSubmitUsers">提交</Button>
               <Button @click="showUserSelectorModal=false;ResetUserMap(this.item)">取消</Button>
         </div>
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   data(){
     return {
@@ -66,6 +70,16 @@ metaInfo:{
     this.getData()
   },
   computed:{
+    ...mapGetters('core',['employees']),
+    filteredEmployees(){
+      
+        if(this.filterUsernameText){
+          return this.employees.filter(v=>v.name.includes(this.filteredEmployees))
+        }else{
+          return this.employees
+        }
+      
+    },
     disabled(){
       return {
          enable_join:!this.item.enable_join,
@@ -75,6 +89,9 @@ metaInfo:{
     },
     id(){
       return this.$route.params.id
+    },
+    selectedCount(){
+      return Object.keys(this.selected_map).filter(v=>this.selected_map[v]).length
     },
     filteredUsers(){
       
