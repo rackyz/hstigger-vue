@@ -1,11 +1,11 @@
 <template>
-  <div class="l-class-plan">
+  <div class="l-class-plan" :class="isFinished?'l-finished':''">
     <Row :gutter="20" style="width:100%;">
       <Col :span="12" style="font-size:15px;text-align:center;">
       <div class="flex-wrap">
       <div class="text-index">
 
-        {{data.index}}
+        {{('00' + data.index).slice(-2)}}
       </div>
       <div class="text-panel">
         <div class="text-title">{{data.name}}</div> 
@@ -14,10 +14,10 @@
       </div>
       </Col>
       <Col :span="6" style="font-size:15px;line-height:40px;">
-        {{data.started_at || '起止时间'}}
+        {{data.started_at?(moment(data.started_at).format("L , ")+(data.duration?data.duration+'小时':'')):'时间未设置'}}
       </Col>
-       <Col :span="6" style="font-size:15px;line-height:40px;">
-        {{data.state || '进行中'}}
+       <Col :span="6" style="font-size:15px;line-height:40px;" :style="{color:getState(data.state).color}">
+        {{getState(data.state).name}}
       </Col>
     </Row>
 
@@ -26,10 +26,22 @@
 
 <script>
 export default {
-  props:['data']
+  props:['data'],
+  computed:{
+    isFinished(){
+      return this.data.started_at && moment().subtract('day',1).isAfter(moment(this.data.started_at))
+    }
+  },
+  methods:{
+    getState(e){
+      return this.$store.getters['core/getTypeByValue']("TASK_STATE",e) || {}
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
+
+
 .l-class-plan{
   width:100%;
   height:55px;
@@ -66,5 +78,11 @@ export default {
       text-overflow: ellipsis;
     }
   }
+}
+
+
+.l-finished{
+  background:#dfdfdf;
+  filter:grayscale(1);
 }
 </style>

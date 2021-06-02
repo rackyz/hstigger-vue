@@ -1,10 +1,14 @@
+import moment from 'moment'
 export default {
   layout:`<div>
   
-  <Row  :gutter="10"><Col :span="18">{{name}}</Col><Col :span="6">{{charger}}</Col></Row>
+  <Row  :gutter="10"><Col :span="24">{{name}}</Col></Row>
+  
+  <Row :gutter="10" style="margin-top:10px">
+  <Col :span="12">{{started_at}}</Col><Col :span="6">{{duration}}</Col><Col :span="6">{{state}}</Col></Row>
   <Row  :gutter="10" style="margin-top:10px"><Col :span="24">{{address}}</Col></Row>
-  <Row :gutter="10" style="margin-top:10px"><Col :span="8" style="height:150px">{{avatar}}</Col>
-  <Col :span="16">{{desc}}</Col></Row>
+  <Row :gutter="10" style="margin-top:10px">
+  <Col :span="24">{{desc}}</Col></Row>
   
   </div>`,
   def: {
@@ -14,11 +18,12 @@ export default {
       control: "input",
       option: {
         maxlen: 64,
-        required: true
+        required: true,
+        placeholder:"填写课程名称"
       }
     },
     address: {
-      label: "培训地点",
+      label: "培训地点(和主地点无变更可不填)",
       control: "input",
       option: {
         maxlen: 128,
@@ -33,11 +38,19 @@ export default {
         height:150
       }
     },
-    duration:{
-      label:"培训时段",
+    started_at:{
+      label:"培训时间",
       control:"time",
       option:{
-        type:"duration"
+        defaultValue:moment().format("L")
+      }
+    },
+    duration:{
+      label:"时长(小时)",
+      control:"input",
+      option:{
+        type:"number",
+        defaultValue:3
       }
     },
     state:{
@@ -45,8 +58,10 @@ export default {
       control:"select",
       option:{
         getters:"core/getTypes",
-        getters_key:"TASK_STATE",
-        idKey:'value'
+        key:"TASK_STATE",
+        idKey:'value',
+        labelKey:'name',
+        defaultValue:0
       }
     }
 

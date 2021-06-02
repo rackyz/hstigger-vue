@@ -1,15 +1,17 @@
 <template>
-  <div class="hs-container" style="padding:10px 10px;position:relative;height:100%;overflow:hidden;">
+  <div class="hs-container" style="padding:50px 80px;background:#fff;position:relative;height:100%;overflow:hidden;">
    <div class="l-panel" style="height:100%;overflow-y:auto;padding:20px;padding-top:10px; ">
-        <h3 style="color:#346;">课程管理</h3>
+        <h3 style="color:#346;font-weight:bold;margin-bottom:10px;">课程管理</h3>
         
-        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" />
-        <div style="height:calc(100% - 150px);position:relative">
-          <hs-list style="background:#eee;":data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable="single" />
+        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" @event="handleToolEvent" />
+        <div style="height:calc(100% - 120px);position:relative">
+          <hs-list style="background:#eee;height:100%;" :data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable />
         </div>
        
       </div>
-
+      
+      
+     <hs-modal-form v-model="showModalCreate" title="创建课程计划" :form="Form('classplan')" :data="model" @on-submit="handleSubmit" width="600" />
   </div>
 </template>
 
@@ -17,34 +19,9 @@
 export default {
   data(){
     return {
-      items:[{
-        id:1,
-        index:1,
-        name:"PPT基础培训考核1",
-        desc:"请上传第一次作业",
-        deadline:"2020/6/31",
-        charger:'NBGZ',
-        created_at:moment(),
-        created_by:'NBGZ'
-      },{
-        id:1,
-        index:1,
-        name:"PPT基础培训考核1",
-        desc:"请上传第一次作业",
-        deadline:"2020/6/31",
-        charger:'NBGZ',
-        created_at:moment(),
-        created_by:'NBGZ'
-      },{
-        id:1,
-        index:1,
-        name:"PPT基础培训考核1",
-        desc:"请上传第一次作业",
-        deadline:"2020/6/31",
-        charger:'NBGZ',
-        created_at:moment(),
-        created_by:'NBGZ'
-      }],
+      showModalCreate:false,
+      model:{},
+      items:[],
       columns:[{
         title:"序号",
         type:"index",
@@ -98,6 +75,50 @@ metaInfo:{
    title:"培训课程", 
     route:'/:id'
   },
+  computed:{
+    id(){
+      return this.$route.params.id
+    }
+  },
+  mounted(){
+    this.getData()
+  },
+  methods:{
+    getData(){
+      this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'plans'}}).then(res=>{
+        let items = res.data.data
+        items.sort((a,b)=>{!a.started_at || (b.started_at && moment(a.started_at)).isBefore(b.started_at)?1:-1})
+        items.forEach((v,i)=>v.index = i+1)
+        this.items = items
+      })
+    },
+    handleSubmit(e){
+      console.log(e)
+      this.api.enterprise.ADDRELATED_TRAININGS(e,{param:{id:this.id,related:'plans'}}).then(res=>{
+        let item = res.data.data
+        item = Object.assign({},e,item)
+        this.items.push(item)
+        this.Success("添加成功")
+        this.showModalCreate = false
+        this.model = {}
+      }).catch(e=>{
+        this.Error('错误:'+e)
+      })
+    },
+    handleToolEvent(e){
+      if(e == 'add'){
+        this.showModalCreate = true
+      }
+    },
+    handleListEvent(e){
+      console.log(e)
+    },
+    handleDelete(e){
+      this.Confirm('确认删除该课程计划',e=>{
+
+      })
+    }
+  }
 }
 </script>
 

@@ -17,18 +17,18 @@
           </div>
       <div  style="border-left:1px solid #eee;border-top:1px solid #eee;border-right:1px solid #eee;width:100%;">
         <template v-for="(p,i) in item.plans">
-          <div class="flex-wrap flex-between" :key="i" style="background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0 10px;">
+          <div class="flex-wrap flex-between" :key="i" style="background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0px 10px;">
             <div class="flex-wrap flex-between">
             <div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #dfdfdf;border-radius:3px;color:#aaa;font-weight:bold;">
               {{i+1}} 
             </div>
            <div style="padding:10px">
-             <div style="font-size:14px;font-weight:bold;"> {{p.title}}</div>
-             <div style="font-size:10px;color:#aaa;">{{p.started_at}}, {{p.duration}} min</div>
+             <div style="font-size:14px;font-weight:bold;"> {{p.name}}</div>
+             <div style="font-size:10px;color:#aaa;">{{moment(p.started_at).format('LL')}}, {{p.duration}} h</div>
            </div>
            </div>
-           <div>
-             已结束
+           <div :style="{color:getState(p.state).color}">
+             {{getState(p.state).name}}
            </div>
         </div>
       </template>
@@ -42,9 +42,9 @@
       </div>
       </Col>
       <Col :span='16'>
-      <Row :gutter="20">
+      <Row :gutter="20"  v-if='false'  >
           <Col :span='12'>
-          <div class="l-caption">
+          <div    class="l-caption">
             通知
           </div>
           
@@ -129,7 +129,9 @@ methods:{
         let item = res.data.data
         this.item = item
       })
-    },
+    }, getState(e){
+      return this.$store.getters['core/getTypeByValue']("TASK_STATE",e) || {}
+    }
 }
 }
 </script>

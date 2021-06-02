@@ -18,8 +18,9 @@
           
         </div>
         <a class="l-hover" style="position:absolute;right:10px;bottom:80px;background:#ffffff66;color:red;padding:3px 10px;border-radius:3px;font-size:10px;" @click.stop="handleDelete(data.id)"><Icon type="md-trash" /> 删除</a>
+
+        
     </div>
-    
 </template>
 
 <script>

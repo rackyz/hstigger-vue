@@ -3,7 +3,7 @@
    <div class="l-panel" style="height:100%;overflow-y:auto;padding:20px;padding-top:10px; ">
         <h3 style="color:#346;">学员管理 {{search_text}}</h3>
         
-        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;color:#346;border:1px solid #ddd;" @event="handleToolEvent" />
+        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;color:#346;border:1px solid #ddd;" @event="handleToolEvent" :disabled="disabled" />
         <div class="l-filter" style="margin-bottom:10px;">
           <Input search style="width:200px" v-model='search_text' clearable /> 
         </div>
@@ -45,7 +45,15 @@ export default {
 					key: "add",
 					name: "修改人员",
 					icon: "md-person",
-				}]
+				},{
+          key:'enable_join',
+          name:"开启报名",
+          icon:'md-checkmark'
+        },{
+          key:'disabled_join',
+          name:"关闭报名",
+          icon:"ios-remove-circle"
+        }]
     }
   },
 metaInfo:{
@@ -56,6 +64,13 @@ metaInfo:{
     this.getData()
   },
   computed:{
+    disabled(){
+      return {
+         enable_join:!this.item.enable_join,
+         disabled_join:this.item.enable_join
+      }
+     
+    },
     id(){
       return this.$route.params.id
     },
