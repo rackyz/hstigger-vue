@@ -1,14 +1,14 @@
 <template>
-  <div class="hs-container" style="padding:10px 10px;position:relative;height:100%;overflow:hidden;">
-   <div class="l-panel" style="height:100%;overflow-y:auto;padding:20px;padding-top:10px; ">
-        <h3 style="color:#346;">学员管理 {{search_text}}</h3>
+  <div class="hs-container" style="position:relative;height:100%;overflow:hidden;">
+   <div class="l-panel" style="height:100%;overflow-y:auto;padding:60px 100px;">
+        <h3 style="color:#346;font-weight:bold;">学员管理</h3>
         
         <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;color:#346;border:1px solid #ddd;" @event="handleToolEvent" :disabled="disabled" />
         <div class="l-filter" style="margin-bottom:10px;">
           <Input search style="width:200px" v-model='search_text' clearable /> 
         </div>
         <div style="height:calc(100% - 150px);position:relative">
-           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" :data="filteredUsers" /></hs-table>
+           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" :data="filteredUsers" />
         </div>
        
       </div>  
@@ -38,7 +38,9 @@ export default {
       search_text:"",
       selected_map:{},
       showUserSelectorModal:false,
-      item:{},
+      item:{
+        users:[]
+      },
       	tools: [
         
 				{
@@ -75,6 +77,7 @@ metaInfo:{
       return this.$route.params.id
     },
     filteredUsers(){
+      
       if(this.search_text){
         return this.item.users.filter(v=>this.users.find(u=>u.id == v.user_id).name.includes(this.search_text))
       }else{
@@ -109,7 +112,7 @@ metaInfo:{
             return h('span','该人员非本企业人员')
           let dep_list = employee.deps
           let doms = ['-']
-          if(Array.isArray(dep_list) && dep_list.length > 0){
+          if(Array.isArray(deps) && Array.isArray(dep_list) && dep_list.length > 0){
             let dep = deps.find(d=>d.id == dep_list[0])
             if(dep)
               doms[0] = dep.name

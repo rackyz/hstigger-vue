@@ -3,15 +3,15 @@
    <div class="l-panel" style="height:100%;overflow-y:auto;padding:20px;padding-top:10px; ">
         <h3 style="color:#346;font-weight:bold;margin-bottom:10px;">课程管理</h3>
         
-        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" @event="handleToolEvent" />
+        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" @event="handleToolEvent" :disabled="disabled" />
         <div style="height:calc(100% - 120px);position:relative">
-          <hs-list style="background:#eee;height:100%;" :data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" selectable />
+          <hs-list style="background:#eee;height:100%;" :data="items" :option="{tmpl:'HsxClassPlan'}" @event="handleListEvent" />
         </div>
        
       </div>
       
       
-     <hs-modal-form v-model="showModalCreate" title="创建课程计划" :form="Form('classplan')" :data="model" @on-submit="handleSubmit" width="600" />
+     <hs-modal-form v-model="showModalCreate" :title="!model.id?'创建课程计划':'修改课程计划'" :form="Form('classplan')" :data="model" @on-submit="handleSubmit" width="600" />
   </div>
 </template>
 
@@ -20,6 +20,7 @@ export default {
   data(){
     return {
       showModalCreate:false,
+      selected:{},
       model:{},
       items:[],
       columns:[{
@@ -49,25 +50,21 @@ export default {
       }],
       	tools: [
           
-				{
-					key: 'config',
-					name: "配置",
-					icon: "md-settings",
-				},
+			
 				{
 					key: "add",
 					name: "新增",
 					icon: "md-add",
+        },
+        	{
+					key: 'config',
+					name: "配置",
+					icon: "md-create",
 				},
 				{
 					key: "delete",
 					name: "移除",
 					icon: "md-remove",
-				},
-				{
-					key: "export",
-					name: "导出",
-					icon: "md-download",
 				}]
     }
   },
@@ -78,6 +75,12 @@ metaInfo:{
   computed:{
     id(){
       return this.$route.params.id
+    },
+    disabled(){
+      return {
+        config:!this.selected.id,
+        delete:!this.selected.id
+      }
     }
   },
   mounted(){
@@ -87,35 +90,71 @@ metaInfo:{
     getData(){
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'plans'}}).then(res=>{
         let items = res.data.data
-        items.sort((a,b)=>{!a.started_at || (b.started_at && moment(a.started_at)).isBefore(b.started_at)?1:-1})
+        items = items.sort((a,b)=>!a.started_at || (b.started_at && moment(a.started_at)).isBefore(moment(b.started_at))?-1:1)
         items.forEach((v,i)=>v.index = i+1)
+         console.log(items)
         this.items = items
       })
     },
     handleSubmit(e){
-      console.log(e)
-      this.api.enterprise.ADDRELATED_TRAININGS(e,{param:{id:this.id,related:'plans'}}).then(res=>{
+      if(e.id){
+        this.api.enterprise.PATCHRELATED_TRAININGS(e,{param:{id:this.id,related:'plans',relatedId:e.id}}).then(res=>{
+      
+        this.Success("修改成功")
+        this.getData()
+        this.showModalCreate = false
+        this.model = {}
+      }).catch(e=>{
+        this.Error('错误:'+e)
+      })
+      }else{
+        this.api.enterprise.ADDRELATED_TRAININGS(e,{param:{id:this.id,related:'plans'}}).then(res=>{
         let item = res.data.data
         item = Object.assign({},e,item)
         this.items.push(item)
+        let items = this.items
+        items =  items.sort((a,b)=>!a.started_at || (b.started_at && moment(a.started_at)).isBefore(moment(b.started_at))?1:-1)
+        items.forEach((v,i)=>v.index = i+1)
+       
+        this.items = items
         this.Success("添加成功")
         this.showModalCreate = false
         this.model = {}
       }).catch(e=>{
         this.Error('错误:'+e)
       })
+      }
+      
     },
     handleToolEvent(e){
       if(e == 'add'){
+        this.model = {}
+        this.showModalCreate = true
+      }else if(e == 'delete'){
+        this.handleDelete(this.selected)
+        
+      }else if(e == 'config'){
+        this.model = this.selected
         this.showModalCreate = true
       }
     },
-    handleListEvent(e){
-      console.log(e)
+    handleListEvent(e = {}){
+     if(e.type == 'select'){
+       
+       this.selected = this.items.find(v=>v.id == e.param) || {}
+     }
     },
     handleDelete(e){
-      this.Confirm('确认删除该课程计划',e=>{
-
+      if(!e.id)
+        this.Error("该计划无法删除")
+      var that = this
+      this.Confirm('确认删除该课程计划',_=>{
+        this.api.enterprise.DELRELATED_TRAININGS({param:{id:that.id,relatedId:e.id,related:'plans'}}).then(res=>{
+          this.Success("删除成功")
+          this.getData()
+        }).catch(e=>{
+          this.Error("错误:"+e)
+        })
       })
     }
   }
