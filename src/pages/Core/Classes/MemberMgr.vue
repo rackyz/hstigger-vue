@@ -1,7 +1,7 @@
 <template>
   <div class="hs-container" style="position:relative;height:100%;overflow:hidden;">
    <div class="l-panel" style="height:100%;overflow-y:auto;padding:60px 100px;">
-        <h3 style="color:#346;font-weight:bold;">学员管理</h3>
+        <h3 style="color:#346;font-weight:bold;">培训管理</h3>
         
         <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;color:#346;border:1px solid #ddd;" @event="handleToolEvent" :disabled="disabled" />
         <div class="l-filter" style="margin-bottom:10px;">
@@ -30,6 +30,10 @@
         </div>
       
       </Modal>
+
+      <Modal title="结果评价" v-model="showModalEval" footer-hide width="800">
+
+      </Modal>
   </div>
   
 </template>
@@ -41,8 +45,35 @@ export default {
     return {
       selected:{},
       search_text:"",
+      showModalEval:false,
       filterUsernameText:"",
       selected_map:{},
+      formResult:{
+        layout:``,
+        def:{
+          comment:{
+            type:"input",
+            label:"考核结果和评价",
+            option:{
+              type:"textarea",
+              height:200
+            }
+          },
+          score:{
+            type:"input",
+            label:"考核评分",
+            option:{
+              type:'number'
+            }
+          },passed:{
+            type:"select",
+            label:"考核结果",
+            option:{
+              states:['合格','不合格']
+            }
+          }
+        }
+      },
       showUserSelectorModal:false,
       items:[],
       	tools: [
@@ -57,18 +88,18 @@ export default {
           icon:'md-remove'
           },
           {
-            key:'edit',
-          name:"填写结果",
-          icon:'md-create'
-            },{
           key:'enable_join',
           name:"开启报名",
-          icon:'md-checkmark'
+          icon:'ios-add-circle'
         },{
-          key:'disabled_join',
+          key:'disable_join',
           name:"关闭报名",
           icon:"ios-remove-circle"
-        }]
+        },{
+            key:'eval',
+          name:"结果评价",
+          icon:'md-create'
+            }]
     }
   },
 metaInfo:{
@@ -92,9 +123,9 @@ metaInfo:{
     },
     disabled(){
       return {
-         enable_join:!this.item.enable_join,
-         disabled_join:this.item.enable_join,
-         edit:!this.selected.id,
+         enable_join:this.item.enable_join,
+         disable_join:!this.item.enable_join,
+         
          remove:!this.selected.id
       }
      
@@ -176,6 +207,11 @@ metaInfo:{
       },{
          key:'score',
          type:'number',
+        title:"考核得分",
+        width:100
+      },{
+         key:'result',
+         type:'title',
         title:"考核结果",
         width:100
       },{
@@ -191,11 +227,37 @@ metaInfo:{
         this.showUserSelectorModal = true
       }else if(e == 'remove'){
         this.handleRemove(this.selected)
+      }else if(e == 'eval'){
+        this.showModalEval = true
+      }else if(e == 'enable_join'){
+        this.$store.dispatch('training/enable_join',this.id).then(res=>{
+           this.Success('已开启用户报名')
+        })
+        
+      }else if(e == 'disable_join'){
+       this.$store.dispatch('training/disable_join',this.id).then(res=>{
+           this.Success('已关闭用户报名')
+        })
       }
     },
     getData(){
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'users'}}).then(res=>{
         let items = res.data.data
+        items.forEach(v=>{
+          if(!v.evaluated_at){
+            v.result = "未评价"
+          }else{
+            if(v.score < 60){
+              v.result = "不合格"
+            }else if(v.score < 75){
+              v.result = "合格"
+            }else if(v.score < 90){
+              v.result = "良好"
+            }else if(v.score < 100){
+              v.result = "优秀"
+            }
+          }
+        })
         this.items = items
       })
     },

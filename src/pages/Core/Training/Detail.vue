@@ -18,8 +18,8 @@
             <div style="position:absolute;left:20px;top:20px;background:#3af;color:#fff;width:40px;height:40px;justify-content:center;display:flex;align-items:center;">{{i+1}}</div>
 
             <div style="position:absolute;right:20px;top:20px;background:orange;color:#fff;width:80px;height:40px;justify-content:center;display:flex;align-items:center;font-size:16px;">{{p.finished?'已结束':'进行中'}}</div>
-          <h2 style="font-size:18px;">{{p.title}}</h2>
-          <p style="font-size:14px;color:#3af;">2课时</p>
+          <h2 style="font-size:18px;">{{p.name}}</h2>
+          <p style="font-size:14px;color:#3af;">{{FormatDate(p.started_at)}} , 2课时</p>
           </div>
         </template>
         <template v-if="!item.plans || item.plans.length == 0">
@@ -109,6 +109,11 @@ export default {
     getData(){
       this.api.enterprise.GET_TRAININGS({param:{id:this.id}}).then(res=>{
         let item = res.data.data
+        if(item.plans && item.plans.length > 0){
+           item.started_at = item.plans[0].started_at
+          item.finished_at = item.plans[item.plans.length-1].started_at
+        }
+       
         this.item = item
       })
     },
