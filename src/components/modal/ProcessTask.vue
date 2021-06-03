@@ -1,113 +1,53 @@
 <template>
-  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="900" styles="padding:20px;" :fullscreen="fullscreen">
-    <div class='modal-close' slot="close" style='display:flex;color:#aaa;align-items:center;height:30px;'>
+  <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="400" styles="padding:20px;" :fullscreen="fullscreen">
+    <!-- <div class='modal-close' slot="close" style='display:flex;color:#aaa;align-items:center;height:30px;'>
        <Icon :type="fullscreen?'md-contract':'md-expand'" size="18" style='color:#ddd;z-index:200p' @click.stop="fullscreen=!fullscreen;" />
       <Icon type="md-close" size="18" style='color:#ddd;z-index:200p' @click="this.close()" />
-    </div>
+    </div> -->
    
-    <div  style="padding:10px;background:#eee;">
-      <div class="flex-wrap flex-between">
-        <div style="height:60px;width:60px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#3af;flex-direction:column;cursor:pointer;margin-right:5px;" class="hover" @click="handleBackward" v-if="backwards.length > 0">
-        <h2 style='font-size:15px;font-weight:bold;'><Icon type="md-arrow-back" /></h2>
-        <p style='font-size:10px;color:#aaa;'>返回</p>
-      </div>
+    <div  style="padding:10px;background:#567;">
+     
 
-      <div style="height:60px;min-width:590px;padding:5px 10px;border-radius:5px;background:#fff;border:1px solid #aaa;">
+      <div style="height:60px;min-width:590px;padding:5px 10px;color:#fff;filter:brightness(10);" :style="backwards.length == 0?'min-width:655px':''">
         <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',focused.base_type).color};`">{{getTypeByValue('TASK_TYPE',focused.base_type).name}}</span>  <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).name}}</span></div>
         <h2 style='font-size:18px;'>{{focused.name || '无标题'}}</h2>
       </div>
 
         
-       
+      </div>
+      </div>
+      </div>
+     
+      <div style="min-height:100px;background:#456;padding:20px;color:#ddd;">
+        <div style="font-weight:bold;margin-bottom:5px;color:fff;">任务详情</div>
+        <div style="padding:10px;">{{focused.content || '本节课我们学习PPT基础操作，运用课程内容所述，制作一个PPT文件并上传'}}</div>
 
-       <div class="flex-wrap">
-        <div style="height:60px;width:100px;border-radius:5px;margin-left:10px;display:flex;align-items:center;border:1px solid #aaa;justify-content:center;color:#3af;flex-direction:column;margin-right:5px;background:#fff;border:1px solid #aaa;">
-        <h2 style='font-size:15px;font-weight:bold;'>胡佳翰</h2>
-        <p style='font-size:10px;color:#aaa;'>负责人</p>
-      </div>
-        <div style="height:60px;width:100px;border-radius:5px;display:flex;align-items:center;background:#fff;justify-content:center;color:darkred;flex-direction:column;border:1px solid #aaa;">
-        <h2 style='font-size:15px;font-weight:bold;' :style="`color:${getTypeByValue('TASK_STATE',focused.state).color};`">{{getTypeByValue('TASK_STATE',focused.state).name}}</h2>
-        <p :style="`font-size:10px;color:${timeStateColor};`">{{timeStateMsg}}</p>
-      </div>
-      </div>
-      </div>
-     
-     
-      
-       <Tabs type="card" style="margin-top:10px;" :animated="false" v-model="tabIndex">
-        <TabPane name="content" label="任务内容" icon="md-list">
-            
-            <div style="padding:20px;background:#fff;">
-              <Row>
-                <Col :span='12'> 所属部门 <BaseLink style="padding:5px 20px;" :item="dep" to="/core/deps" /> 
-              所属项目 <BaseLink style="padding:5px 20px;"  :item="project" to="/core/projects" /> 
-               <div>开始时间 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
-               <div> 计划完成 <div style='padding:5px 20px;color:#000;'>{{task.start_at?moment(task.start_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
-                <div>实际完成 <div style='padding:5px 20px;color:#000;'>{{task.finished_at?moment(task.finished_at).format("YYYY-MM-DD HH:mm:ss"):'无'}}</div></div>
-              </Col>
-                <Col :span='12'> 任务描述 
-              <pre style="padding:5px 20px;font-family:PingFang-SC;font-size:12px;width:100%;height:auto;overflow:hidden;white-space:pre-wrap;">{{task.desc || '无描述'}}</pre>
-              任务附件 
-              <BaseFiles  :files="task.files || ''" />
-              </Col>
-              </Row>
-              <Row>
-                <Col>
-                 操作记录
-                 <div>
-                 3小时前 胡佳翰创建了任务
-                 </div>
-                </Col>
-              </Row>
-            </div>
-          
-        </TabPane>
-         <TabPane name="split" label="任务分解" icon="md-code" v-if="focused.splited">
-           
-             <div style="height:calc(100% - 170px);position:relative;;background:#fff;">
-              <div style='padding:10px;width:100%;'>
-                <div class='flex-wrap flex-between' style='width:100%;'>
-                <Input size="small" v-model="filterText" search style='width:200px' clearable />
-                <ButtonGroup>
-                  <Button :type="filterState==undefined?'primary':''" size="small" @click="filterState=undefined">全部 {{focused.children.length}}</Button>
-                   <Button :type="filterState==0?'primary':''" size="small" @click="filterState=0">准备中 {{focused.children.filter(v=>v.state==0).length}}</Button>
-                  <Button :type="filterState==1?'primary':''" size="small" @click="filterState=1">进行中 {{focused.children.filter(v=>v.state==1).length}}</Button>
-                  <Button :type="filterState==2?'primary':''" size="small" @click="filterState=2">已完成 {{focused.children.filter(v=>v.state==2).length}}</Button>
-                  <Button :type="filterState==3?'primary':''" size="small" @click="filterState=3">已关闭 {{focused.children.filter(v=>v.state==3).length}}</Button>
-               </ButtonGroup></div>
-               
-              </div>
+        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:orange;">时间期限</div>
+        <div style="padding:10px;"><Icon type="md-clock" size="16" style="margin-right:5px;"></Icon> {{focused.content || '2021/6/15日前, 还剩 15 天'}}</div>
 
-      <!-- <hs-toolbar
-        style="background: #fff;border:none;padding:5px 0;"
-        :data="tools"
-        @event="onToolEvent"
-        :disabled="toolDisabled"
-      /> -->
-     
-        <!-- <hs-list  :data="focused.children" selectable="multiple" draggable @event="onListEvent" :option='{tmpl:"hsx-task"}' style='border:none;height:400px;overflow-y:auto;' /> -->
-       <div style='padding:0 10px;padding-bottom:10px;'>
-     <BaseGantt v-if="tabIndex=='split'" :tasks="filterTasks" :enable_percent="focused.enabled_percent" :ref='gt' :style="fullscreen?'600px':'400px'" />
-   </div>
-      </div>
-        </TabPane>
-        <TabPane name="process" v-if="focused.state != 0" label="任务处理" icon="md-checkbox-outline" style="padding:20px;background:#fff;">
-          <template>
-            <hs-form :form="Form('task_simple')" :data="focused.state==1?{}:focused"  :editable='focused.state == 1' @on-submit="handleProcess" :env="{upload}" />
-          </template>
+        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">附件</div>
+        <div style="padding:10px;">
+          <a style="color:#3af"><Icon type="md-document" size="16" style="margin-right:5px;"></Icon> PPT参考样例</a>
+        </div>
+
+         <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">任务目标</div>
          
-        </TabPane>
-        
-     
-    </Tabs>
-     
-
+         <div  style="padding:10px;">
+           <Steps :current="0" direction="vertical" size="small" class="transparent-steps">
+        <Step title="上传文件"> <div slot='content' style="margin-top:5px;" ><a style="color:#3af;text-decoration:underline;">上传课件 ( 0/1 )</a> <a style='margin-left:10px;'>重传</a></div>
+        <div><a style="color:#3af;text-decoration:underline;">上传课件 ( 0/1 )</a> <a style='margin-left:10px;'>重传</a></div></Step>
+        <Step title="审核评分" content="由审核人进行处理"></Step>
+        <Step title="考核完成" content="考核结果可在个人信息中查阅"></Step>
+    </Steps>
+       
+        </div>
+      </div>
     
    </div>
    
     
-    <div style="padding:10px;display:flex;align-items:center;" class="flex-between">
-        <div class="flex-wrap">
+    <div style="padding:10px;display:flex;align-items:center;background:#567;" class="flex-between">
+        <div class="flex-wrap flex-center">
         <Button icon='md-arrow-back' size="small" class="flex-wrap" style="border:1px solid #aaa;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
           返回 {{stacks[stacks.length-1].name}}
         </Button>
@@ -124,15 +64,17 @@
           撤回
         </Button>
         
-         <Button class="flex-wrap" size="small"  icon='md-code' style="border:1px solid #aaa;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
-          分解
+        
+        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="focused.splited=null;tabIndex='content';" disabled>
+          提交
         </Button>
-        <Button class="flex-wrap" size="small"  icon='md-code' style="border:1px solid #aaa;margin-left:5px;" v-if="focused.splited" @click="focused.splited=null;tabIndex='content';">
-          取消分解
-        </Button>
+        <span style='color:#ddd;margin-left:10px;font-size:10px;'><Icon type="ios-warning" color="gold" size="16"></Icon> 您没有相关操作权限</span>
 </div><div class="flex-wrap">
-         <Button class="flex-wrap" size="small"  icon='md-close' style="border:1px solid #aaa;margin-left:5px;color:red;" @click="handleChangeState(3)">
-          退回/中止
+   <Button size="small"  icon='md-code' style="border:none;background:none;color:#fff;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
+          
+        </Button>
+         <Button  size="small"  icon='md-alert' style="border:none;margin-left:5px;color:red;background:none;color:#fff;" @click="handleChangeState(3)">
+          
         </Button>
       </div>
       </div>

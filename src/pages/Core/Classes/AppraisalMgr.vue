@@ -13,7 +13,7 @@
            <Button icon="md-trash" style="width:33px;margin-left:5px;" @click="handleRemoveAppraisal" v-if="selected && selected.id"></Button>
            </div>
         </div>
-        <hs-list style="height:calc(100% - 125px);background:#eee;" :data="filteredList" selectable="single" :option="{tmpl:'HsxAppraisalPlan'}" @event="handleListEvent" />
+        <hs-list ref="list" style="height:calc(100% - 125px);background:#eee;" :data="filteredList" selectable="single" :option="{tmpl:'HsxAppraisalPlan'}" @event="handleListEvent" />
       </div>
       </Col>
       <Col :span="20" style="height:100%;">
@@ -23,24 +23,24 @@
            <h3>{{selected.name || '未选择'}}</h3>
            <span>{{selected.desc || '请选择一个考核'}}</span>
            </div>
-           <div class="number-panel " v-if="selected.count">
+           <div class="number-panel " v-if="selected.users">
           已提交
           <div class="number">
-            {{selected.submitted || 0}} / {{selected.count}}
+            {{selected.users.count || 0}} / {{selected.users.count}}
           </div>
         </div>
         <div class="number-panel" style='margin-left:10px;' v-if="selected.count">
           已通过
           <div class="number">
-            {{selected.passed || 0}} / {{selected.count}}
+            {{selected.passed || 0}} / {{selected.users.count}}
           </div>
         </div>
         
         </div>
         
-        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" @event="handleToolEvent"  />
+        <hs-toolbar :data="tools" style="border:none;margin-top:10px;margin-bottom:10px;border-radius:5px;background:#eee;border:1px solid #ddd;color:#346;" @event="handleToolEvent" :disabled="disabled" />
         <div style="height:calc(100% - 150px);position:relative">
-           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" /></hs-table>
+           <hs-table class="hs-table-plus" fulltable :columns="columns" style="height:100%;margin-top:5px;" :data="filteredUsers" /></hs-table>
         </div>
        
       </div>
@@ -49,6 +49,8 @@
       
     </Row>
     <hs-modal-form v-model="showModalCreate" :title="model.id?'修改考核':'新建考核'" :form="Form('appraisal_plan')" :data="model" @on-submit="handleSubmit" width="600" /> 
+
+    <ModalProcessTask v-model="showModalTask" :task="current_task" @update="handleUpdateTask" />
   </div>
 </template>
 
@@ -57,35 +59,13 @@ export default {
   data(){
     return {
       listSearchText:"",
+      userSearchText:"",
+      showModalTask:false,
+      current_task:null,
       showModalCreate:false,
       model:{},
       selected:{},
       items:[],
-      columns:[{
-        title:"序号",
-        type:"index",
-        width:80
-      },{
-        key:'name',
-        title:"姓名",
-        minWidth:200
-      },{
-         key:'name',
-        title:"考核结果",
-        minWidth:200
-      },
-      {
-         key:'name',
-        title:"考核备注",
-        minWidth:200
-      },{
-         key:"name",
-         title:"提交时间"
-      },{
-         key:"name",
-         title:"操作",
-         sortable:false
-      }],
       tools: [
         
       {
@@ -94,15 +74,20 @@ export default {
         icon: "md-settings",
       },
       {
-        key: "add",
-        name: "新增",
-        icon: "md-add",
+        key: "refresh",
+        name: "刷新",
+        icon: "md-refresh",
       },
-      {
-        key: "delete",
-        name: "移除",
-        icon: "md-remove",
-      },
+      // {
+      //   key: "add",
+      //   name: "新增",
+      //   icon: "md-add",
+      // },
+      // {
+      //   key: "delete",
+      //   name: "移除",
+      //   icon: "md-remove",
+      // },
       {
         key: "export",
         name: "导出",
@@ -123,20 +108,104 @@ export default {
         return this.items.filter(v=>v.name.includes(this.listSearchText))
       else
         return this.items
+    },
+    filteredUsers(){
+      if(!this.selected || !this.selected.users)
+        return []
+      if(this.userSearchText)
+        return this.selected.users.filter(v=>v.name.includes(this.listSearchText))
+      else
+        return this.selected.users
+      
+    },
+    disabled(){
+      return {
+        refresh:!this.selected || !this.selected.id
+      }
+    },
+    columns(){
+      var that= this
+      return [{
+        title:"序号",
+        type:"index",
+        width:80
+      },{
+        key:'user_id',
+        type:'user',
+        title:"姓名",
+        width:120,
+        option:{
+          getters:"core/users",
+          labelKey:'name',
+          idKey:'id'
+        }
+      },{
+         key:"task_id",
+        title:"考核任务",
+        width:120,
+        render(h,param){
+          return h('Button',{props:{size:'small'},on:{click:()=>{
+           that.showTask(param.row)
+          }}},'考核任务')
+        }
+      },{
+         key:'score',
+        title:"考核得分",
+        width:120
+      },{
+         key:'result',
+        title:"考核结果",
+        width:120
+      },
+      {
+         key:'name',
+        title:"考核备注",
+        minWidth:200
+      },{
+         key:"evaluted_at",
+         title:"考评时间",
+         type:'time'
+      },{
+        key:"state",
+        title:"状态",
+        width:120,
+        type:'state',
+        option:{
+          states:['未开始','进行中','已提交','已完成']
+        }
+      }]
     }
   },
   mounted(){
     this.getData()
   },
   methods:{
+    showTask(item){
+     
+      this.api.enterprise.GET_TASKS({param:{id:item.task_id}}).then(res=>{
+        this.current_task = res.data.data
+        this.showModalTask = true
+      })
+    },
     getData(){
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'appraisals'}}).then(res=>{
         let items = res.data.data
-        this.items = items
+         this.items = items
+        if(Array.isArray(items) && items.length > 0){
+          this.$refs.list.onSelect(items[0])
+        }
+       
+       
       })
     },
-    getAppraisalData(item){
-
+    getAppraisalData(item = {}){
+      if(item.id)
+        this.api.enterprise.GET_APPRAISALS({param:{id:item.id}}).then(res=>{
+          this.$set(this,'selected',res.data.data)
+        })
+    },
+    handleUpdateTask(e){
+      // updatae task
     },
     handleSubmit(e){
       if(e.id){
@@ -163,6 +232,7 @@ export default {
       this.Confirm("确定删除该考核（包括所有的考核信息，无法恢复）？",d=>{
           this.api.enterprise.DELRELATED_TRAININGS(e,{param:{id:this.id,related:'appraisals',relatedId:e.id}}).then(res=>{
           this.Success("删除完成")
+          this.selected = {}
           this.getData()
           }).catch(e=>{
             this.Error("错误"+e)
@@ -181,6 +251,9 @@ export default {
         
       }else if(e == 'export'){
 
+      }else if(e =='refresh'){
+        if(this.selected && this.selected.id)
+          this.getAppraisalData(this.selected)
       }
     },
      handleListEvent(e){
