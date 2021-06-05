@@ -39,7 +39,7 @@ export default {
     },
     duration(){
       if(this.data.started_at || this.data.finished_at)
-        return started_at +' - ' + finished_at
+        return (this.data.started_at?moment(this.data.started_at).format("YYYY-MM-DD"):'' ) +' - ' + this.data.finished_at?moment(this.data.finished_at).format("YYYY-MM-DD"):''
       else
         return '未指定时间'
     }

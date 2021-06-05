@@ -1,20 +1,31 @@
 <template>
-  <div class="project-item" @click.stop='onClick' :style='`background:#444 url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
+  <div class="project-item" :class="data.state>2?'project-item-finished':''" @click.stop='onClick' :style='`background:#aaa url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
+  <div class="project-item-mask">
+
+  
   <div class='pi-code'>{{data.code}} </div>
   <div class='pi-name'>{{data.name}}</div>
-  <div style='font-size:10px;'><span class='pi-type'>市政监理</span> <span class='pi-type'>慈城</span> <span class='pi-type'>CBD</span></div>
+  <div style='font-size:10px;'>
+      {{data.dep}} {{data.type}} <span style="color:#3af" v-if='data.amount'>{{hs.formatSalary(data.amount)}}</span>
+  </div>
     
    
     <div class='pi-progress'>
-      34 %
-      <div class='pi-position'>{{data.myposition || '项目经理'}}</div>
+      <span :style="{color:stateColor}">{{data.stateText || '进行中'}}</span>
+      <div class='pi-position'>{{data.position || '项目经理'}}</div>
     </div>
+  </div>
   </div>
 </template>
 
 <script>
 export default {
   props:['data'],
+  computed:{
+    stateColor(){
+      return ['#aaa','orange','yellowgreen','green','red','#aaa'][this.data.state || 0]
+    }
+  },
   methods:{
     onClick(e){
       this.RouteTo('/core/projects/'+this.data.id+'/dashboard')
@@ -26,12 +37,19 @@ export default {
 .project-item{
   width:100%;
   height:100px;
-  background-position:0% 50%;
+  background-position:10% 30% !important;
    background-blend-mode:multiply;
    color:#ddd;
-  padding:20px;
+ 
   display: flex;
   flex-direction:column;
+
+  .project-item-mask{
+    background:#00000055;
+    height:100%;
+    width:100%;
+     padding:20px;
+  }
 
   .pi-code{
     font-size:10px;
@@ -42,10 +60,10 @@ export default {
   }
 
   .pi-name{
-    margin-top:5px;
     font-size:20px;
+    margin-top:8px;
     text-overflow: ellipsis;
-    max-width:260px;
+    max-width:230px;
     overflow:hidden;
     height:35px;
     white-space: nowrap;
@@ -61,15 +79,19 @@ export default {
 
   .pi-position{
     font-size:10px;
-    color:#af3;
+    color:#3af;
+    text-align: right;
+    line-height:16px;
+    margin-top:5px;
   }
 
   .pi-progress{
-    font-family:"Impact";
-    font-size:30px;
+    top:30px;
+    font-size:20px;
     line-height:30px;
-
+    text-align: right;
     position:absolute;
+    text-shadow: 1px 1px 1px #000;
   right:16px;
   color:#ff6;
   }
@@ -77,14 +99,20 @@ export default {
 
 .project-item:hover{
   transition:all 0s;
-  background-blend-mode:color-dodge;
-  color:#333;
+  filter:brightness(1.1);
 
   .pi-name{
-    font-weight:bold;
+    color:#3af;
   }
-  .pi-progress{
-    color:#660;
+}
+
+.project-item-finished{
+  filter:grayscale(1);
+}
+
+.project-item-finished:hover{
+  .pi-name{
+    color:#379
   }
 }
 

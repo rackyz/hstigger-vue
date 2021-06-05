@@ -70,7 +70,7 @@ const getters = {
     return state.my_enterprises
   },
   my_projects(state) {
-    return state.projects.filter(v=>v.charger == state.session.id)
+    return state.session.my_projects
   },
   current_enterprise(state){
     return state.current_enterprise

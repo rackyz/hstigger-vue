@@ -83,16 +83,7 @@
       <BaseAppMenu v-model="open_selector" />
     </div>
     <div class="l-right">
-      <div
-        class='spinner'
-        v-if='loading'
-      >
-        <div class="rect1"></div>
-        <div class="rect2"></div>
-        <div class="rect3"></div>
-        <div class="rect4"></div>
-        <div class="rect5"></div>
-      </div>
+      <BaseLoading v-if="loading" />
 
     
      
@@ -188,7 +179,7 @@
 
     <div
       class='l-login-mask'
-      v-if="!isLogin"
+      v-if="!isLogin && !loading"
     >
        <div class="login" style='margin:10% 5%;'>
       <div class='flex-wrap login-wrap'>
@@ -203,15 +194,21 @@
     </div>
     </div>
     <div
-      v-if='loading'
+    v-if="loading"
       style='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(33,33,33,0.6)'
     >
-      <div style='margin:300px auto!important;width:200px;height:200px;border-radius:50%;overflow:hidden;color:#fff;'>
-        <img
+      <div style='margin:500px auto!important;width:300px;height:200px;border-radius:50%;overflow:hidden;color:#fff;font-size:10px;'>
+        <!-- <img
           src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg'
           style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'
-        />
-
+        /> -->
+        <div style="color:#aef;position:absolute;z-index:2;bottom:410px;text-align:center;width:300px;font-size:15px;font-weight:bold;text-shadow:1px 1px 1px #444;font-family:consolas;font-size:10px;">
+        数据加载中 <BaseLoading
+        class='spinner' style="display:inline-block;position:relative;bottom:-3px;left:-10px;"
+       />
+</span>
+       
+        </div>
       </div>
 
     </div>
@@ -393,15 +390,6 @@ export default {
   border: 1px solid #aaa;
 }
 
-.spinner {
-  height: 15px;
-
-  div {
-    background: yellowgreen;
-    margin-right: 3px;
-    width: 2px;
-  }
-}
 
 .drawer-wrapper{
   position: fixed;

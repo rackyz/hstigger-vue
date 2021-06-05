@@ -14,8 +14,8 @@
           <div class="l-week" :key='w.id'>
             <div class='l-week-item-wrap ' style='overflow:visible;'>{{w.isFirst?monthnames[w.month]:""}}</div>
             <template v-for="d in w.days">
-            <Tooltip placement='top' class="l-week-item-wrap l-day" :key='d.date' :content="d.date">
-            <div class="l-week-item" :style="`background:${mapActiveColor(plans[d.date],!d.isPast)}`">
+            <Tooltip placement='top' class="l-week-item-wrap l-day" :key='d.date' :content="`${d.date},有${d.count}个活动`">
+            <div class="l-week-item" :style="`background:${mapActiveColor(d.count,!d.isPast)}`">
 
             </div>
             
@@ -46,21 +46,19 @@ export default {
       date:[0,1,23,4,5,6],
       weeknames:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
       monthnames:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-      plans:{
-        '20210312':5,
-        '20201220':8,
-         '20201225':50,
-         '20201221':81,
-      },
       gradients:['#dff9ba','#cbfa89','#b6fa57','#7ccb1e'],
       gradients2:['#f7f5c8','#fae04f','#faa12e','#cb471e'],
     }
   },
   computed:{
+    activities(){
+      return this.$store.getters['core/my_activities'] || []
+    },
     weeks(){
       let offset = 11
       let mom = moment()
       let weeks = []
+      let alldays = []
       for(let i=-offset;i<=offset;i++){
         let m = mom.clone().startOf('week').add('week',i)
         let offday = moment.duration(m - m.clone().startOf('month')).as('days')
@@ -70,25 +68,42 @@ export default {
           month:m.month(),
           off:offday,
           isFirst:offday >= 0 && offday < 7,
-          
         }
         
         let days = []
         for(let i=0;i<7;i++){
           let d = m.clone().add('day',i)
-          days.push({
+          let day = {
             date:d.format('YYYYMMDD'),
             day:d.day(),
             month:d.month(),
             isPast:d.isBefore(mom.clone().startOf('day')),
-            year:d.year()
-          })
+            year:d.year(),
+            count:0
+          }
+          day.count = 0
+          days.push(day)
+          alldays.push(day)
         }
         w.days = days
         
+        this.activities.forEach(v=>{
+          if(v.started_at){
+            let started_at = moment(v.started_at)
+            let finished_at = moment(v.started_at).clone().add('day',1)
+            if(v.finished_at){
+              finished_at = moment(v.finished_at)
+            }
+            alldays.forEach(d=>{
+              if(moment(d.date,'YYYYMMDD').isBetween(started_at,finished_at))
+                d.count++
+            })
+          }
+        })
+
         weeks.push(w)
       }
-      console.log('weeks:',weeks)
+
       return weeks
     }
    
