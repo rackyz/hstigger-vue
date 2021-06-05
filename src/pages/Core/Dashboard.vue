@@ -170,7 +170,23 @@
             style='margin-right:10px;'
           />
         </div>
-        <BaseCalender style='border-bottom:1px solid #dfdfdf' />
+        <BaseCalender />
+         <div class='card-title'>
+          <span class='tab' :class="taskStateFilter==1?'tab-actived':''" @click="taskStateFilter=1">
+          <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 会议 {{(state_categoried_tasks[1].length + categriedFlowInstances[1].length)?`(${(state_categoried_tasks[1].length + categriedFlowInstances[1].length)})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==0?'tab-actived':''" @click="taskStateFilter=0"> <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 培训 {{(state_categoried_tasks[0].length + categriedFlowInstances[0].length)?`(${state_categoried_tasks[0].length + categriedFlowInstances[0].length})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==2?'tab-actived':''" @click="taskStateFilter=2"> <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 旅游 {{(state_categoried_tasks[2].length + categriedFlowInstances[2].length)?`(${(state_categoried_tasks[2].length + categriedFlowInstances[2].length)})`:''}}</span> <span class='seperator' style='border-color:#dfdfdf;border-left:none;margin:0 5px;margin-right:10px;' /> <span class='tab' :class="taskStateFilter==2?'tab-actived':''" @click="taskStateFilter=2"> <Icon
+            custom='gzicon gzi-event'
+            size='17'
+          /> 其他</span> <span style='float:right;font-size:12px;'>MORE</span>
+        </div>
          <BaseActivityList />
       </Card>
      
