@@ -1,7 +1,7 @@
 <template>
   <div class="news-item">
-    <a href='#' @click.prevent='onClick'>{{data.title}}</a>
-    <div class='date'>{{data.date}}</div>
+    <a style="color:#3af;" @click.prevent='onClick'> - {{data.title}} <span class="l-hurry" v-if="data.hurry">紧急</span></a>
+    <div class='date'>{{data.date}} </div>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   props:['data'],
   methods:{
     onClick(e){
-      
+      this.RouteTo("/public/notices/"+this.data.id)
     }
   }
 }
@@ -35,6 +35,13 @@ export default {
     white-space:nowrap;
     text-overflow:ellipsis;
     overflow:hidden;
+  }
+
+  .l-hurry{
+    padding:2px 5px;
+    color:red;
+    font-family: consolas;
+    
   }
 }
 </style>

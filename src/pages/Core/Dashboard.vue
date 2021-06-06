@@ -37,7 +37,7 @@
         </div>
 
       </Card>
-
+<!-- 
        <Card
         class="panel"
         style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
@@ -70,8 +70,8 @@
             >MORE</a></span>
         </div>
         <BaseProjectList />
-      </Card>
-      <BaseFilePanel />
+      </Card> -->
+      <!-- <BaseFilePanel /> -->
       <BaseLinkPanel />
       <BaseDownloadPanel />
       </Col>
@@ -103,7 +103,7 @@
                 style='padding:3px 8px;background:#23334c;color:#fff;'
                 v-if="r.media_type != 1"
               ><span>
-                  <Icon type="logo-rss" /> {{r.name}}
+                  <Icon :type="r.source_type==2?'md-list':'logo-rss'" /> {{r.name}}
                 </span>
                 <span
                   class='card-more'
