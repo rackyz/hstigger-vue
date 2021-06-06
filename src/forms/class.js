@@ -21,7 +21,7 @@ export default {
       label: "负责人",
       control: "select",
       option: {
-        getters:"core/getEntUsers",
+        getters:"core/users",
         labelKey:"name",
         idKey:"id",
         filterable:true

@@ -17,11 +17,7 @@ const state = {
   rss:[],
   isLogin:false,
   roles:[],
-  my_projects:[{
-    id:"123",
-    code:"N2020931",
-    name:"慈城高中"
-  }],
+  my_projects:[],
   
   current_enterprise:null,
   my_enterprises:[],
