@@ -1,10 +1,17 @@
 <template>
-  <div>资料集合</div>
+  <BaseConfig />
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
-metaInfo:{
+  computed:{
+     ...mapGetters('training',['item']),
+    config:{
+
+    }
+  },
+  metaInfo:{
    title:"培训课程", 
     route:'/:id'
   },

@@ -12,9 +12,10 @@
         </div>
        
          </div>
-          <div class="l-time">
-          {{getTypeByValue('TASK_STATE',data.state || 0).name}}
+          <div class="l-time" :style="`color:${data.stateColor}`">
+          {{data.stateText}}
         </div>
+          <span style="position:absolute;left:10px;top:10px;color:#fff;font-size:12px;">{{data.started_at?'开始于 '+smartTime(data.started_at):""}}</span>
     </div>
     
 </template>
@@ -70,17 +71,19 @@ export default {
   }
  
   .l-time{
-    color:rgb(175, 255, 144);
+    color:rgb(243, 215, 0);
       position: absolute;
     right:10px;
     top:10px;
+    font-size:10px;
+    font-weight: bold;
   }
   
   img{
     position: relative;
     width:100%;
     height:100%;
-    filter:brightness(0.8);
+    filter:brightness(0.6);
   }
 }
 

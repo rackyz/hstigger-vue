@@ -13,11 +13,19 @@
       </div>
       </div>
       </Col>
-      <Col :span="6" style="font-size:15px;line-height:40px;">
-        {{data.started_at?(moment(data.started_at).format("L , ")+(data.duration?data.duration+'小时':'')):'时间未设置'}}
+      <Col :span="6" style="font-size:15px;text-align:center;">
+        <div style="font-size:10px;text-align:left;">培训地点</div>
+        <div style="color:#3af;text-align:left;">{{data.address || item.address}}</div>
       </Col>
-       <Col :span="6" style="font-size:15px;line-height:40px;" :style="{color:getState(data.state).color}">
-        {{getState(data.state).name}}
+      <Col :span="3" style="font-size:15px;">
+        {{data.started_at?(moment(data.started_at).format("L , ")+(data.duration?data.duration+'小时':'')):'时间未设置'}}
+        <div style="color:#aaa;font-size:10px;">{{data.started_at?moment(data.started_at).fromNow():''}}</div>
+      </Col>
+       <Col :span="3" style="font-size:15px;line-height:40px;" >
+        <div class="l-time" style="text-align:right;" :style="`color:${getState(data).color || '#333'}`">
+          {{getState(data).name || '准备中'}}
+          
+          </div>
       </Col>
     </Row>
 
@@ -25,16 +33,18 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   props:['data'],
   computed:{
+    ...mapGetters('training',['item']),
     isFinished(){
       return this.data.started_at && moment().subtract('day',1).isAfter(moment(this.data.started_at))
     }
   },
   methods:{
     getState(e){
-      return this.$store.getters['core/getTypeByValue']("TASK_STATE",e) || {}
+      return e.state ? this.$store.getters['core/getTypeByValue']("TASK_STATE",e.state) : {name:e.stateText,color:e.stateColor}
     }
   }
 }
@@ -66,6 +76,7 @@ export default {
       font-size:15px;
       font-weight: bold;
       color:#333;
+      text-align: left;
     }
     .text-desc{
       margin-top:2px;
@@ -74,6 +85,7 @@ export default {
       font-size:10px;
       text-align: left;
       max-width: 300px;
+      white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
     }

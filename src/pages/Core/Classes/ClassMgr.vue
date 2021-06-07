@@ -16,6 +16,38 @@
 </template>
 
 <script>
+
+const SetTrainingStateFromDuratin = (item={})=>{
+  let now = moment()
+  if(item.started_at){
+    if (now.isAfter(moment(item.started_at))) {
+      if(item.duration){
+        item.finished_at = moment().add('hours',item.duration).format()
+      }
+      if(item.finished_at){
+        if (now.isAfter(moment(item.finished_at))){
+          item.stateText = '已结束'
+          item.stateColor = 'red'
+          return
+        }  
+      }
+      item.stateText = '疯狂进行中'
+      item.stateColor = 'orange'
+      
+    }else{
+      item.stateText = '积极筹备中'
+      item.stateColor = 'green'
+    }
+  }else{
+    item.stateText = '讲师未到'
+    item.stateColor = '#333'
+  }
+
+  return item
+
+}
+
+
 export default {
   data(){
     return {
@@ -91,8 +123,12 @@ metaInfo:{
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'plans'}}).then(res=>{
         let items = res.data.data
         items = items.sort((a,b)=>!a.started_at || (b.started_at && moment(a.started_at)).isBefore(moment(b.started_at))?-1:1)
-        items.forEach((v,i)=>v.index = i+1)
-         console.log(items)
+        items.forEach((v,i,a)=>{
+          
+         a[i] = SetTrainingStateFromDuratin(v)
+         v.index = i+1
+        })
+        
         this.items = items
       })
     },

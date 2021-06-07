@@ -17,8 +17,9 @@
            <br />
           
         </div>
-        <a class="l-hover" style="position:absolute;right:10px;bottom:80px;background:#ffffff66;color:red;padding:3px 10px;border-radius:3px;font-size:10px;" @click.stop="handleDelete(data.id)"><Icon type="md-trash" /> 删除</a>
-
+        <span style="position:absolute;left:10px;bottom:80px;color:#fff;font-size:12px;">{{data.started_at?'开始于 '+smartTime(data.started_at):""}}</span>
+        <a class="l-hover" style="position:absolute;right:42px;bottom:80px;background:#ffffffaa;color:#333;padding:3px 5px;border-radius:3px;font-size:10px;" @click.stop="$emit('event','edit')"><Icon type="md-create"  size="18" /> </a>
+        <a class="l-hover" style="position:absolute;right:10px;bottom:80px;background:#ffffffaa;color:#f33;padding:3px 5px;border-radius:3px;font-size:10px;" @click.stop="handleDelete(data.id)"><Icon type="md-trash" size="18" /> </a>
         
     </div>
 </template>

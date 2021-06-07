@@ -15,7 +15,7 @@
         <Page  :total="total" :page-size="12" show-total @change="getData"/>
         </div>
 
-    <hs-modal-form v-model="modalCreate" title="创建培训项目" :form="Form('class')" :data="model" @on-submit="handleSubmit" width="600" />
+    <hs-modal-form v-model="modalCreate" :title="model.id?'编辑项目':'创建项目'" :form="Form('class')" :data="model" @on-submit="handleSubmit" width="600" />
   </div>
 </template>
 
@@ -61,19 +61,39 @@ export default {
       console.log(e)
       if(e.event == 'delete'){
         this.handleDelete(e.param.id)
+      }else if(e.event == 'edit'){
+        this.handleEdit(e.param)
       }
     },
+    handleEdit(e){
+      this.model = e
+      this.modalCreate = true
+    },
     handleSubmit(e){
-      console.log(e)
-      this.api.enterprise.POST_TRAININGS(e).then(res=>{
-        let updateInfo = res.data.data
-        let item = Object.assign({},e,updateInfo)
-        this.items.push(item)
-        this.modalCreate = false
-        this.model = {}
-      }).catch(e=>{
-        this.Error('创建失败')
-      })
+      if(!this.model.id) {
+        this.api.enterprise.POST_TRAININGS(e).then(res=>{
+          let updateInfo = res.data.data
+          let item = Object.assign({},e,updateInfo)
+          this.items.push(item)
+           this.Sucess("创建完成")
+          this.modalCreate = false
+          this.model = {}
+        }).catch(e=>{
+          this.Error('创建失败')
+        })
+      }else{
+         this.api.enterprise.PATCH_TRAININGS(e,{param:{id:this.model.id}}).then(res=>{
+          let item = Object.assign({},this.model,e)
+          this.Success("修改成功")
+          let index = this.items.findIndex(v=>v.id == this.model.id)
+          this.items.splice(index,1,item)
+          this.modalCreate = false
+          this.model = {}
+        }).catch(e=>{
+          this.Error('修改失败')
+        })
+      }
+     
     },
     handleDelete(id){
       this.Confirm("确定删除该培训项目(所有相关资料均会被删除)?",

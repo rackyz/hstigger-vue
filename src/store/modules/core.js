@@ -40,7 +40,32 @@ const getters = {
     return state.isLogin
   },
   getEntUsers(state){
-    return state.employees
+    let items = []
+    state.employees.forEach(v=>{
+      let {name,avatar,id} = v
+      if(v.deps && v.deps.length){
+        v.deps.forEach(s=>{
+             let dep = state.session.deps.find(d => d.id == s)
+        
+             if (dep)
+               items.push(Object.assign({group:dep.name,
+              name,avatar,id}))
+        })
+        if (!v.deps || v.deps.length == 0) {
+           items.push(Object.assign({
+             group:'暂无部门'
+           }, v))
+        }
+      }
+    })
+    let {name,avatar,id} = Object.assign({
+    }, state.employees.find(v => v.id == state.session.id)
+    )
+    let me = {name,avatar,id}
+    me.name = me.name + '(我)'
+    me.group = "快捷"
+    items.splice(0,0,me)
+    return items
   },
   contracts(state){
     return state.contracts

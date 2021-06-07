@@ -1,13 +1,17 @@
 <template>
   <div style="padding:20px;">
     <div style="margin:0 auto;width:1200px;font-size:20px;">
-      <Row :gutter="20">
-        <Col :span='19'>
+      <Row :gutter="20" >
+        <Col :span='17'>
         <div style="padding:0 20px;">
 
          <a style="color:#3af;" @click="RouteTo('/core/training')"><Icon type="md-arrow-back" /> 返回列表</a> <h1>{{item.name || '培训名称'}}</h1>
-      <p style="font-size:14px;margin:20px 0;">{{item.desc || '培训描述'}}</p>
-      <p style="font-size:14px;margin:20px 0;">培训地点 <br /> <span style="color:#3af">{{item.address || '未指定'}}</span></p>
+         
+         <div style="position:relative;">
+          
+         <p style="font-size:14px;margin:20px 0;margin-bottom:0;font-weight:bold;" v-if="item.desc">培训内容 </p>
+      <pre style="font-size:14px;">{{item.desc || '培训内容'}}</pre>
+      <p style="font-size:14px;margin:20px 0;font-weight:bold;" v-if="item.address">培训地点 <br /> <span style="color:#3af">{{item.address || '未指定'}}</span></p>
 
       <div style="margin-top:20px;">
         <template v-for="(p,i) in item.plans">
@@ -19,50 +23,54 @@
 
             <div style="position:absolute;right:20px;top:20px;background:orange;color:#fff;width:80px;height:40px;justify-content:center;display:flex;align-items:center;font-size:16px;">{{p.finished?'已结束':'进行中'}}</div>
           <h2 style="font-size:18px;">{{p.name}}</h2>
-          <p style="font-size:14px;color:#3af;">{{FormatDate(p.started_at)}} , 2课时</p>
+          <p style="font-size:14px;color:#3af;">{{FormatDate(p.started_at)}} , {{p.duration || '时间待定'}}</p>
           </div>
-        </template>
-        <template v-if="!item.plans || item.plans.length == 0">
-          无课程计划
         </template>
       </div>
         </div>
-        
-        </Col>
-        <Col :span='5'>
-        <div style="width:100%;display:flex;align-items:center;flex-direction:column;font-size:18px;">
-        <hs-avatar size="80" :userinfo="charger" style="margin-bottom:10px" />
-        {{charger.name}}
-        <div style="font-size:14px;">部门</div>
-        
         </div>
-        <div style="margin-top:10px;display:flex;align-items:center;flex-direction:column;width:100%;padding:10px;border-top:1px solid #dfdfdf;font-size:14px;">
+        </Col>
+        <Col :span='7'>
+         <img :src="item.avatar || 'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/assets/misc/px.jpg'" style="width:100%;height:210px;border:1px solid #aaa;margin-bottom:20px;" />
+        <div style="width:100%;display:flex;align-items:center;flex-direction:row;justify-content:space-between;font-size:18px;padding:0 10px;">
+        <hs-avatar size="40" :userinfo="charger"  />
+        <div style="margin-left:20px;">
+        {{charger.name}}
+        </div>
+        </div>
+        <div style="margin-top:20px;display:flex;align-items:center;flex-direction:column;width:100%;padding:10px;border-top:1px solid #dfdfdf;font-size:14px;">
+          <div class="flex-wrap flex-between" style="width:100%;align-items:flex-start;">
+            <div>培训地点</div>
+            <div style="text-align:right;color:#3af;max-width:200px;">{{item.address}}</div>
+          </div>
           <div class="flex-wrap flex-between" style="width:100%;">
             <div>课程计划</div>
-            <div>{{item.plans?item.plans.length:'-'}}</div>
+            <div style="text-align:right;color:#3af;">{{item.plans?item.plans.length:'-'}}</div>
           </div>
           <div class="flex-wrap flex-between" style="width:100%;">
             <div>开始时间</div>
-            <div>{{FormatDate(item.started_at)}}</div>
+            <div style="text-align:right;color:#3af;">{{FormatDate(item.started_at)}}</div>
           </div>
 
            <div class="flex-wrap flex-between" style="width:100%">
             <div>预计结束</div>
-            <div>{{FormatDate(item.finished_at)}}</div>
+            <div style="text-align:right;color:#3af;">{{FormatDate(item.finished_at)}}</div>
           </div>
            <div class="flex-wrap flex-between" style="width:100%;">
             <div>已报名</div>
-            <div>{{item.users ?item.users.length:0}}</div>
+            <div style="text-align:right;color:#3af;">{{item.users ?item.users.length:0}}</div>
           </div>
            <div class="flex-wrap flex-between" style="width:100%;">
             <div>状态</div>
-            <div :style="{color:getTypeByValue('TASK_STATE',item.state || 0).color || 'orange'}">{{getTypeByValue('TASK_STATE',item.state || 0).name}}</div>
+            <div style="text-align:right;color:#3af;" :style="{color:getTypeByValue('TASK_STATE',item.state || 0).color || 'orange'}">{{getTypeByValue('TASK_STATE',item.state || 0).name}}</div>
           </div>
 
-         
-          <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
+         <Button type="warning" v-if="isCharger" style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">管理后台<p style='font-size:10px;color:#fff;'>已报 {{item.count || 0}}</p></Button>
+          <Button type="primary" v-else-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
+          
           <Button type="success" v-else style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
           <a style="color:red;margin-top:10px;" @click="Join" v-if="isMember">取消报名</a>
+          
         </div>
         </Col>
       </Row>
@@ -97,6 +105,9 @@ export default {
     },
     isMember(){
       return this.item.users.find(v=>v.user_id == this.uid)
+    },
+    isCharger(){
+      return this.item.charger == this.uid
     }
   },
   mounted(){
