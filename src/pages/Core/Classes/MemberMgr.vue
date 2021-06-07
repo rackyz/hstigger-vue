@@ -18,15 +18,21 @@
            <Input search v-model="filterUsernameText" clearable style="margin-bottom:10px;" />
            <template v-for="u in filteredEmployees">
           <div class="l-user-item" :key="u.id">
-            <Checkbox :value="selected_map[u.id]" @on-change="$set(selected_map,u.id,$event)" :disabled="u.score>0">{{u.name}}</Checkbox>
+            <Checkbox ref="checkbox" :value="selected_map[u.id]" @on-change="$set(selected_map,u.id,$event)" :disabled="u.score>0">{{u.name}}</Checkbox>
           </div>
         </template>
         
         </div>
-        <div class="flex-wrap flex-end" style="border-top:1px solid #aaa;padding:10px;">
+        <div class="flex-wrap flex-between" style="border-top:1px solid #aaa;padding:10px;">
+          <div class="flex-wrap">
+            <Button @click="handleSelectAll">全选</Button>
+            <Button @click="handleunSelectAll" style="margin-left:10px;">取消全选</Button>
+          </div>
+          <div class="flex-wrap">
               <span style="margin-right:20px;">已选 {{selectedCount || 0}} / {{filteredEmployees.length}}</span>
              <Button type='primary' style="margin-right:10px;" @click="handleSubmitUsers">提交</Button>
               <Button @click="showUserSelectorModal=false;">取消</Button>
+              </div>
         </div>
       
       </Modal>
@@ -113,11 +119,11 @@ metaInfo:{
     ...mapGetters('core',['employees']),
     ...mapGetters('training',['item']),
     filteredEmployees(){
-      
+        let filtered = this.employees.filter(v=>!this.items.find(u=>u.user_id == v.id) && this.item.charger != v.id)
         if(this.filterUsernameText){
-          return this.employees.filter(v=>!this.items.find(u=>u.user_id == v.id)).filter(v=>v.name.includes(this.filterUsernameText))
+          return filtered.filter(v=>v.name.includes(this.filterUsernameText))
         }else{
-          return this.employees.filter(v=>!this.items.find(u=>u.user_id == v.id))
+          return filtered
         }
       
     },
@@ -271,6 +277,18 @@ metaInfo:{
         this.Error("修改失败")
       })
      
+    },
+    handleSelectAll(){
+      let map = {}
+      this.filteredEmployees.forEach(v=>{
+        this.$set(this.selected_map,v.id,true)
+        map[v.id] = true
+      
+      })
+      this.selected_map = map
+    },
+    handleunSelectAll(){
+      this.$set(this,'selected_map',{})
     },
     handleRemove(e){
       let user = this.employees.find(v=>v.id == e.user_id) || {}

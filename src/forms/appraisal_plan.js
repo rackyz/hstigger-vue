@@ -8,14 +8,16 @@ export default {
   <Col :span="12">{{started_at}}</Col><Col :span="12">{{deadline}}</Col>
   </Row>
  
-  <Row :gutter="10" style="margin-top:10px">
+  <Row :gutter="10" style="margin-top:5px">
   <Col :span="24">{{desc}}</Col>
   </Row>
-  
+  <Row :gutter="10" style="margin-top:10px">
+  <Col :span="24">{{files}}</Col>
+  </Row>
   </div>`,
   def: {
     name: {
-      label: "考核名称",
+      label: "任务名称",
       control: "input",
       option: {
         maxlen: 64,
@@ -24,7 +26,7 @@ export default {
       }
     },
     desc: {
-      label: "考核内容",
+      label: "任务描述",
       control: "input",
       option: {
         type: "textarea",
@@ -37,6 +39,13 @@ export default {
       control: "time",
       option: {
         defaultValue: moment().format("L")
+      }
+    },
+    files:{
+      label:"附件",
+      control:'files',
+      option:{
+        uploader:"file/uploader"
       }
     },
      deadline: {

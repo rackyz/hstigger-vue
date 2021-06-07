@@ -5,7 +5,7 @@
       <Col :span="4" style="height:100%;border-right:1px solid #ddd;">
       
       <div class="l-panel" style="height:100%;padding:20px;">
-        <h3 style="color:#346;margin:0;font-weight:bold;">考核管理</h3>
+        <h3 style="color:#346;margin:0;font-weight:bold;">任务管理</h3>
         <div class="l-filter flex-wrap flex-between" style="padding:15px 0;">
           <Input search style="width:140px;" v-model="listSearchText" clearable />
           <div class="flex-wrap">

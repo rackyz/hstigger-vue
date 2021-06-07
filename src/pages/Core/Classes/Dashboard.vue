@@ -22,7 +22,7 @@
         2020/12/2 讲义课件
       </div>
       </Col>
-      <Col :span='12'>
+      <!-- <Col :span='12'>
       <Row :gutter="20"  v-if='false'  >
           <Col :span='12'>
           <div    class="l-caption">
@@ -69,7 +69,7 @@
       </div>
 
       
-      </Col>
+      </Col> -->
       <Col :span='6'>
       <div class="l-caption" style="margin-top:10px;">
             课程安排

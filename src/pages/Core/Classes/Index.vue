@@ -103,15 +103,15 @@ export default {
               icon:"xiangmu2",
               key:'archive'
             },{
+              name:'我的任务',
+              icon:"examinereport2",
+              key:'appraisaltask'
+            },{
               name:'讨论区',
               icon:"wechat",
               key:'discuss',
               disabled:true
-            },{
-              name:'考核',
-              icon:"examinereport2",
-              key:'appraisaltask'
-            }
+            },
           ]
          },
          {name:'管理端',
@@ -138,7 +138,7 @@ export default {
               icon:"xiangmu2",
               key:'classmgr'
             },{
-              name:'考核管理',
+              name:'任务管理',
               icon:"examinereport2",
               key:'appraisalmgr'
             },{
