@@ -6,8 +6,8 @@
       <Input style="width:300px;" class="l-path" placeholder="搜索" >
          <Icon type="md-search" slot="prefix" style="margin-left:5px;" />
       </Input>
-      <Button icon="md-create" style="margin-left:5px;" v-if="current.id" @click="model=current;modal=true" />
-      <Button icon="md-trash" style="margin-left:5px;" v-if="current.id" 
+      <Button icon="md-create" style="margin-left:5px;" v-if="selected.id" @click="model=current;modal=true" />
+      <Button icon="md-trash" style="margin-left:5px;" v-if="selected.id" 
       @click="handleDelete"/>
     </div>
     <div class="flex-wrap">
@@ -29,6 +29,7 @@ export default {
   data(){
     return {
       current:{},
+      selected:{},
       model:{},
       modalUpload:false,
       folder:{
@@ -75,9 +76,9 @@ export default {
     },
     handleListEvent(e){
       console.log(e)
-      if(e.event.type == 'select'){
-        let item = e.param
-        this.current = item
+      if(e.type == 'select'){
+        this.selected = this.folder.files.find(v=>v.id == e.param) || {}
+        console.log(this.current)
       }
     },
     handleBack(){
@@ -96,9 +97,9 @@ export default {
     },
     handleDelete(){
       this.Confirm("确认删除改文件?",e=>{
-        this.api.enterprise.DEL_ARCHIVES({param:{id:this.current.id}}).then(res=>{
+        this.api.enterprise.DELETE_ARCHIVES({param:{id:this.selected.id}}).then(res=>{
           this.Success("删除成功")
-          this.folder.files.splice(this.folder.files.findIndex(v=>v.id == this.current.id),1)
+          this.current.files.splice(this.folder.files.findIndex(v=>v.id == this.selected.id),1)
         })
       })
     }

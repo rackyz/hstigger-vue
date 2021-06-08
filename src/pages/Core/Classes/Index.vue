@@ -95,11 +95,12 @@ export default {
               icon:"xiangmu1",
               key:'dashboard',
             },
+            // {
+            //   name:'培训资料',
+            //   icon:"xiangmu2",
+            //   key:'archive'
+            // },
             {
-              name:'培训资料',
-              icon:"xiangmu2",
-              key:'archive'
-            },{
               name:'我的任务',
               icon:"examinereport2",
               key:'appraisaltask'
