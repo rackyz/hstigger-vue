@@ -22,9 +22,17 @@
         <div style="color:#aaa;font-size:10px;">{{data.started_at?moment(data.started_at).fromNow():''}}</div>
       </Col>
        <Col :span="3" style="font-size:15px;line-height:40px;" >
-        <div class="l-time" style="text-align:right;" :style="`color:${getState(data).color || '#333'}`">
+       <div style="text-align:right;">
+        <div class="l-time" style="flex-direction:column;line-height:25px;"  :style="`color:${getState(data).color || '#333'}`">
           {{getState(data).name || '准备中'}}
-          
+           <div style="font-size:10px;line-height:15px;color:#3af;" v-if="data.video_url" @click="$emit('event','video')">
+            <Icon type="md-videocam" /> 视频回放
+          </div>
+          <div style="font-size:10px;line-height:15px;color:red;" v-else>
+            未上传回放视频
+          </div>
+          </div>
+         
           </div>
       </Col>
     </Row>

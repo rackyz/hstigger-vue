@@ -28,7 +28,10 @@ export default {
   },
   methods:{
     onClick(e){
-      this.RouteTo('/core/projects/'+this.data.id+'/dashboard')
+      if(this.data.type == '培训')
+        this.RouteTo('/core/classes/'+this.data.id+'/dashboard')
+      else
+        this.RouteTo('/core/projects/'+this.data.id+'/dashboard')
     }
   }
 }

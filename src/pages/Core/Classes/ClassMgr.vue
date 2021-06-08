@@ -12,6 +12,10 @@
       
       
      <hs-modal-form v-model="showModalCreate" :title="!model.id?'创建课程计划':'修改课程计划'" :form="Form('classplan')" :data="model" @on-submit="handleSubmit" width="600" />
+
+     <Modal hide-footer title="上传视频" v-model="showFileUploaderModal">
+       {{complete}} %
+     </Modal>
   </div>
 </template>
 
@@ -97,7 +101,13 @@ export default {
 					key: "delete",
 					name: "移除",
 					icon: "md-remove",
-				}]
+				},{
+          key:"upload",
+          name:"上传视频",
+          icon:"md-videocam"
+        }],
+        showFileUploaderModal:false,
+        complete:0
     }
   },
 metaInfo:{
@@ -111,7 +121,8 @@ metaInfo:{
     disabled(){
       return {
         config:!this.selected.id,
-        delete:!this.selected.id
+        delete:!this.selected.id,
+        upload:!this.selected.id,
       }
     }
   },
@@ -172,7 +183,64 @@ metaInfo:{
       }else if(e == 'config'){
         this.model = this.selected
         this.showModalCreate = true
+      }else if(e == 'upload'){
+        this.handleUploadVideo(e)
       }
+    },
+    	onUploadProgressList(progressEvent,index) {
+            
+            var complete = ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+            
+            this.$set(this.files[this.baseIndex+index],'percent',complete + "%");
+            
+        },
+    handleUploadVideo(e){
+     
+        var inputObj=document.createElement('input')
+        inputObj.setAttribute('id','file');
+        inputObj.setAttribute('type','file');
+        inputObj.setAttribute('name','file');
+        inputObj.setAttribute("style",'visibility:hidden');
+        document.body.appendChild(inputObj);
+        inputObj.value;
+        inputObj.click();
+    	let files = inputObj.files;
+            if (!files) return;
+              this.baseIndex = this.files.length
+			let fileObjects = Object.values(files).map((f) => ({
+				name: f.name,
+				size: f.size,
+                ext: that.getFileExt(f.name),
+                url:this.getObjectURL(f),
+                loading:true,
+				vdisk: this.option.vdisk || "ref",
+            }));
+            this.files = this.files.concat(fileObjects)
+            this.showFileUploaderModal = true
+            this.complete = 0
+    this.$store.dispatch('file/upload',{files:Object.values(files),onProgress:this.onUploadProgressList}).then(res=>{
+						if(!Array.isArray(res))
+							throw("文件上传失败")
+						files.forEach((v,i)=>{
+							fileObjects[i].url = res[i].url
+						})
+						let values = this.files.map((v, i) => [v.name,v.url,v.ext]).join(';');
+						this.$emit("change", values);
+					})
+
+        // var formdata = new FormData($("#file")[0]);
+        // $.ajax({
+        //     url:"http://localhost:8080/file/upload.action",
+        //     type:"POST",
+        //     data:formdata,
+        //     enctype:"multipart/form-data",
+        //     contentType:false,
+        //     processData:false,
+        //     success:function (data) {
+        //         console.log(data)
+        //     }
+        // })
+    
     },
     handleListEvent(e = {}){
      if(e.type == 'select'){

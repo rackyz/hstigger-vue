@@ -72,6 +72,7 @@
         <BaseProjectList />
       </Card> -->
       <!-- <BaseFilePanel /> -->
+      <BaseProjectList />
       <BaseLinkPanel />
       <BaseDownloadPanel />
       </Col>
@@ -234,31 +235,7 @@
         <BaseEmpty v-if='(!state_categoried_tasks[taskStateFilter] || state_categoried_tasks[taskStateFilter].length == 0) && (!categriedFlowInstances[taskStateFilter] || categriedFlowInstances[taskStateFilter].length == 0)' />
         </div>
 
-        <template v-for="(fi,i) in categriedFlowInstances[taskStateFilter].slice(0,5)">
-          <div
-            class='fi-item'
-            :key='fi.id'
-            @click='OpenWorkflow(fi)'
-          >
-            <Icon
-              :custom='`gzicon gzi-${fi.icon}`'
-              size='25'
-            />
-            <div class='fi-info'>
-              <div class='fi-flowinfo'>
-                [{{fi.name}}]<span style='color:#333;margin-left:2px;font-weight:bold;'>{{fi.node_name}}</span>
-              </div>
-              <div class='fi-desc'>
-                {{fi.desc}}
-              </div>
-            </div>
-            <div class='fi-date'>
-              <div class='fi-deadline'>{{getTimeString(fi.date,fi.deadline)}}</div>
-              <div class='fi-executor'>{{fi.executor}}</div>
-            </div>
-          </div>
-        </template>
-        
+       
 
       </Card>
 

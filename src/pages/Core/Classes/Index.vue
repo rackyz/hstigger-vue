@@ -26,25 +26,22 @@
 </style>
 <template>
     <Layout style='overflow:hidden;position:relative;'>
-      <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:100px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
+      <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:80px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
-      
-        <div class="project-name">
+      <div class="flex-wrap" style='margin-top:0px;font-size:10px;line-height:20px;'>
+          <a type='text' size='small' style='text-align:center;color:#ddd;' icon="md-arrow-back" @click="RouteTo('/core')"><Icon type="md-arrow-back" /> 返回</a>
+          <a type='text' size='small' style='text-align:center;margin-left:10px;color:#ddd;' @click="showDrawer = !showDrawer">切换其他项目</a>
+          <a type='text' size='small' style='text-align:center;margin-left:10px;color:orange;' @click="RouteTo('/core/training')" icon="md-add"><Icon type="md-more" color="#aaa" /> 更多课程   </a>
+        </div>
+        <div class="project-name" style="margin-bottom:0;padding-bottom:0;margin-top:3px;">
           {{item.name}}
           
         </div>
-        <div class="flex-wrap" style='margin-top:10px;'>
-          <Button type='primary' size='small' style='height:25px;text-align:center;' icon="md-arrow-back" @click="RouteTo('/core')">返回</Button>
-          <Button type='primary' size='small' style='width:50px;height:25px;text-align:center;margin-left:10px;' @click="showDrawer = !showDrawer">切换</Button>
-          <Button type='warning' size='small' style='height:25px;text-align:center;margin-left:10px;' @click="RouteTo('/core/training')" icon="md-add">更多课程</Button>
-        </div>
+        
         
         </div>
         <div class='right'>
-          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-bottom:3px;margin-right:5px;'><hs-avatar :userinfo="charger" style="margin:0 5px;"></hs-avatar> {{charger.name}} </div> 
-          <div class="project-dynamic">
-            {{item.started_at}} - {{item.finished_at}}
-          </div>
+         
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>

@@ -1,29 +1,26 @@
 <template>
   <div class="hs-container" style="padding:10px;position:relative;height:100%;">
     <div class="flex-wrap flex-between">
-    <div class="flex-wrap">
+    <div class="flex-wrap" style="width:800px;">
       <Button icon="md-arrow-back" style="margin-right:0px;border-right:none;border-radius:0;" v-if="current.parent">返回</Button>
-      <div class="l-path">
-        <Icon type="md-folder" size="18" style="margin-right:10px" /> 
-        <template v-for="d in dirs">
-          <span :key="d.id"> <a style="color:#346;margin-left:10px;font-weight:bold;" @click="Open(d)">{{d.name}}</a> \ </span>
-        </template>
-       
-        <span style="">{{current.name}}</span>
-      </div>
-      <Input search style="width:200px;margin-left:10px;" />
+      <Input style="width:300px;" class="l-path" placeholder="搜索" >
+         <Icon type="md-search" slot="prefix" style="margin-left:5px;" />
+      </Input>
+      <Button icon="md-create" style="margin-left:5px;" v-if="current.id" @click="model=current;modal=true" />
+      <Button icon="md-trash" style="margin-left:5px;" v-if="current.id" 
+      @click="handleDelete"/>
     </div>
     <div class="flex-wrap">
-      <Button type="primary" icon="md-cloud" style="border-radius:0;">上传</Button>
+     <Button  icon="ios-cloud-upload" @click="modalUpload=true">上传</Button>
     </div></div>
     
     <div class="l-list-wrap" style="height:calc(100% - 80px)">
-      <hs-list :data="current.files" style="margin-top:10px;border-color:#eee;height:100%;" :option="{tmpl:'HsxFileIcon'}" selectable="single" @event='handleListEvent' />
+      <hs-list :data="current.files" style="margin-top:5px;border-color:#ddd;height:100%;" :option="{tmpl:'HsxFileIcon'}" selectable="single" @event='handleListEvent' />
     </div>
     <div class="flex-wrap flex-center" style="margin-top:5px;justify-content:center;">
       <Page :count="100"></Page>
     </div>
-    
+    <hs-modal-form title="上传资料" v-model="modalUpload" :form="Form('simple_archive')" :data='model' @on-submit="handleUpload" />
   </div>
 </template>
 
@@ -32,42 +29,18 @@ export default {
   data(){
     return {
       current:{},
-      document1:{
+      model:{},
+      modalUpload:false,
+      folder:{
         name:'PPT基础培训',
-         files:[{
-        id:1,
-        name:"胡佳翰的什么文件胡佳翰的什么文件",
-        ext:null,
-        
-         files:[{
-        id:1,
-        name:"胡佳翰的什么文件胡佳翰的什么文件",
-        ext:null,
-      },
-      {
-        id:2,
-        name:"胡佳翰的什么资料2",
-        ext:'jpg'
-      }]
-      },
-      {
-        id:2,
-        name:"胡佳翰的什么资料2",
-        ext:'jpg'
-      },
-      {
-        id:2,
-        name:"测试",
-        ext:'jpg'
-      }],
+        files:[]
       }
     }
    
   },
   mounted(){
-    
-    this.mapParent(this.document1)
-    this.current = this.document1
+    this.current = this.folder
+    this.getData()
   },
   computed:{
     dirs(){
@@ -79,11 +52,16 @@ export default {
       }
       dirs.reverse()
       return dirs
+    },
+    id(){
+      return this.$route.params.id
     }
   },
   methods:{
     getData(root){
-
+      this.api.enterprise.LIST_ARCHIVES({project_id:this.id}).then(res=>{
+        this.folder.files = res.data.data
+      })
     },
     mapParent(dir){
       if(dir.files){
@@ -97,13 +75,32 @@ export default {
     },
     handleListEvent(e){
       console.log(e)
-      if(e.event.type == 'click'){
+      if(e.event.type == 'select'){
         let item = e.param
         this.current = item
       }
     },
     handleBack(){
       this.current = this.current.parent
+    },
+    handleUpload(e){
+      this.$store.state.API.enterprise.POST_ARCHIVES(e).then(res=>{
+        this.Success('上传成功')
+        this.modalUpload =false
+        let updateInfo = res.data.data
+        this.model = {}
+        this.folder.files.push(Object.assign({},updateInfo,e))
+      }).catch(e=>{
+        this.Error(e)
+      })
+    },
+    handleDelete(){
+      this.Confirm("确认删除改文件?",e=>{
+        this.api.enterprise.DEL_ARCHIVES({param:{id:this.current.id}}).then(res=>{
+          this.Success("删除成功")
+          this.folder.files.splice(this.folder.files.findIndex(v=>v.id == this.current.id),1)
+        })
+      })
     }
   },
   props:{
@@ -119,10 +116,17 @@ export default {
 
 <style lang="less">
 .l-path{
-  background:#fff;
-  padding:5px 10px;
+   min-width: 300px;
+  input{
+     background:#fff;
+  padding:5px 20px;
+  padding-left:33px;
+ 
   border:1px solid #dfdfdf;
   height:32px;
+  border-radius: 30px;;
+  }
+ 
 }
 
 </style>

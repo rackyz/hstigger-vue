@@ -29,7 +29,7 @@
       <Col :span='12'>
       <div class="l-config-wrap" style="width:800px;padding-bottom:50px;">
        <p class="l-config-caption"><Icon type="md-list" /> 学员风采 </p>
-      <hs-form  :form="Form('imagelist')" :data="item" @on-submit="handleSubmit" :editable="editable" />
+      
       </div>
       </Col>
     </Row>

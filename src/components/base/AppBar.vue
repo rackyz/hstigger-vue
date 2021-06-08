@@ -202,7 +202,7 @@
           src='https://file-1301671707.cos.ap-chengdu.myqcloud.com/static/loading02.jpg'
           style='opacity:0.3;filter:drop-shadow(1px 1px 1px #aaa);width:600px;height:500px;position:relative;left:-200px;top:-150px;'
         /> -->
-        <div style="color:#23334c;position:absolute;z-index:2;bottom:410px;text-align:center;width:300px;font-size:15px;font-weight:bold;font-family:consolas;font-size:10px;">
+        <div style="color:#adf;position:absolute;z-index:2;bottom:410px;text-align:center;width:300px;font-size:15px;font-weight:bold;font-family:consolas;font-size:10px;">
         数据加载中 <BaseLoading
         class='spinner' style="display:inline-block;position:relative;bottom:-3px;left:-10px;"
        />

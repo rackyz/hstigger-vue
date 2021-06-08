@@ -1,7 +1,7 @@
 <template>
-  <div class="l-file-icon" @click="$emit('event',{type:'click'})">
+  <div class="l-file-icon"  @click.stop="$emit('event',{type:'select'})">
     <div>
-    <Icon :type="!data.ext?'ios-folder':'ios-document'" color="#346" size="40">
+    <Icon :type="'ios-document'" color="#346" size="40">
     </Icon>
     </div>
     <div class="l-file-name">{{data.name}}
@@ -23,7 +23,7 @@ export default {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  overflow: visible;
+  
 }
 
 .l-file-name{
