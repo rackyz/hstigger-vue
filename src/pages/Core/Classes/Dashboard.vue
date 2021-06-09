@@ -16,13 +16,18 @@
 
         <div style="margin-top:10px">
           培训时间
-          <p style="color:yellow">{{item.address || '未指定'}}</p>
+          <p style="color:yellow">  {{item.started_at?moment(item.started_at).format("L"):"--"}} 至 {{item.deadline?moment(item.deadline).format("L"):"--"}}</p>
         </div>
       </div>
       <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;color:#eee;font-weight:normal;padding-left:15px;">
              <Icon type="md-clock" size="16" style="margin-right:5px;" /> 课程安排
           </div>
       <div  style="border-left:1px solid #eee;border-right:1px solid #eee;width:100%;">
+         <BaseEmpty v-if="!item.plans || item.plans.length == 0">
+               <div style="">
+                  讲师还没有安排课程
+                  </div>
+              </BaseEmpty>
         <template v-for="(p,i) in item.plans">
           <div class="flex-wrap flex-between" :key="i" style="background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0px 10px;">
             <div class="flex-wrap flex-between">
@@ -60,6 +65,11 @@
             <Icon type="md-cloud-download" size="16" style="margin-right:5px;" /> 资料下载
           </div>
       <div  style="background:#fff;border:1px solid #eee;"> 
+          <BaseEmpty v-if="!item.files || item.files.length == 0">
+               <div style="">
+                  讲师还没有没上传学习资料
+                  </div>
+              </BaseEmpty>
         <template v-for="(p,i) in item.files">
           <div class="flex-wrap flex-between" :key="i" style="background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0px 10px;">
             <div class="flex-wrap flex-between">
@@ -239,7 +249,7 @@ methods:{
         }
         this.item = item
          this.initPlayer()
-        this.api.enterprise.LIST_ARCHIVES({project_id:this.id}).then(res=>{
+        this.api.enterprise.LIST_ARCHIVES({query:{project_id:this.id}}).then(res=>{
           this.$set(this.item,'files',res.data.data)
         })
       })

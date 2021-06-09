@@ -241,13 +241,13 @@
 
       </Col>
     </Row>
-
+<!-- 
     <BaseFlow
       :id='current_flow.flow_id'
       :inst_id="current_flow.id"
       v-model="showFlow"
       @update='getWorkflows'
-    />
+    /> -->
 
     
     <ModalProcessTask v-model="modalProcessTask" :task="current_flow" @update="handleUpdateTask" />

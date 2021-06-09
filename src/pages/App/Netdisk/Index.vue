@@ -60,7 +60,7 @@ export default {
   },
   methods:{
     getData(root){
-      this.api.enterprise.LIST_ARCHIVES({project_id:this.id}).then(res=>{
+      this.api.enterprise.LIST_ARCHIVES({query:{project_id:this.id}}).then(res=>{
         this.folder.files = res.data.data
       })
     },
@@ -85,7 +85,9 @@ export default {
       this.current = this.current.parent
     },
     handleUpload(e){
+      e.project_id = this.id
       this.$store.state.API.enterprise.POST_ARCHIVES(e).then(res=>{
+        
         this.Success('上传成功')
         this.modalUpload =false
         let updateInfo = res.data.data

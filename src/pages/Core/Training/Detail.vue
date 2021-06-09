@@ -75,8 +75,11 @@
         </Col>
       </Row>
       
+
     </div>
     
+    <hs-modal-form v-model="modalJoin" :form="Form('train_extra_info')" :data="session" @on-submit="handleJoinSubmit" width="400" title="报名信息补充" />
+
   </div>
 </template>
 
@@ -92,11 +95,12 @@ export default {
     return {
       item:{
         users:[]
-      }
+      },
+      modalJoin:false
     }
   },
   computed:{
-    ...mapGetters('core',['getUser','getTypeByValue','uid']),
+    ...mapGetters('core',['getUser','getTypeByValue','uid','session']),
     charger(){
       return this.getUser(this.item.charger) || {}
     },
@@ -129,12 +133,22 @@ export default {
       })
     },
     Join(){
-      this.api.enterprise.PATCH_TRAININGS(null,{query:{q:this.isMember?'unjoin':'join'},param:{id:this.id}}).then(res=>{
+      this.modalJoin = true 
+    },
+    handleJoinSubmit(e){
+      this.api.enterprise.PATCH_TRAININGS(e,{query:{q:'join'},param:{id:this.id}}).then(res=>{
        
+        this.Success(this.isMember?"取消成功":"报名成功")
+        this.modalJoin = false
+        this.getData()
+      })
+    },
+    unjoin(){
+        this.api.enterprise.PATCH_TRAININGS(null,{query:{q:'unjoin'},param:{id:this.id}}).then(res=>{
+        
         this.Success(this.isMember?"取消成功":"报名成功")
         this.getData()
       })
-      
     }
   }
 }

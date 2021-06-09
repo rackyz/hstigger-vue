@@ -7,9 +7,8 @@
    
     <div  style="padding:10px;background:#567;">
      
-
       <div style="height:60px;min-width:590px;padding:5px 10px;color:#fff;filter:brightness(10);" :style="backwards.length == 0?'min-width:655px':''">
-        <div><span :style="`font-size:10px;color:${getTypeByValue('TASK_TYPE',focused.base_type).color};`">{{getTypeByValue('TASK_TYPE',focused.base_type).name}}</span>  <span :style="`font-size:10px;color:${getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).color};`">{{getTypeByValue('ARCHIVE_WORKTYPE',focused.business_type).name}}</span></div>
+        <div><span :style="`font-size:10px;color:yellow`">考核任务</span></div>
         <h2 style='font-size:18px;'>{{focused.name || '无标题'}}</h2>
       </div>
 
@@ -20,24 +19,24 @@
      
       <div style="min-height:100px;background:#456;padding:20px;color:#ddd;">
         <div style="font-weight:bold;margin-bottom:5px;color:fff;">任务详情</div>
-        <div style="padding:10px;">{{focused.content || '本节课我们学习PPT基础操作，运用课程内容所述，制作一个PPT文件并上传'}}</div>
+        <div style="padding:10px;">{{focused.desc || '本节课我们学习PPT基础操作，运用课程内容所述，制作一个PPT文件并上传'}}</div>
 
-        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:orange;">时间期限</div>
-        <div style="padding:10px;"><Icon type="md-clock" size="16" style="margin-right:5px;"></Icon> {{focused.content || '2021/6/15日前, 还剩 15 天'}}</div>
+        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;" v-if="focused.deadline">时间期限</div>
+        <div style="padding:10px;color:yellow;" v-if="focused.deadline"><Icon type="md-clock" size="16" style="margin-right:5px;"></Icon> 截止 {{moment(focused.deadline).format("L") || '2021/6/15日前, 还剩 15 天'}}</div>
 
-        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">附件</div>
-        <div style="padding:10px;">
+        <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;" v-if="focused.files">附件</div>
+        <div style="padding:10px;"  v-if="focused.files">
           <a style="color:#3af"><Icon type="md-document" size="16" style="margin-right:5px;"></Icon> PPT参考样例</a>
         </div>
 
          <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">任务目标</div>
          
          <div  style="padding:10px;">
-           <Steps :current="0" direction="vertical" size="small" class="transparent-steps">
-        <Step title="上传文件"> <div slot='content' style="margin-top:5px;" ><a style="color:#3af;text-decoration:underline;">上传课件 ( 0/1 )</a> <a style='margin-left:10px;'>重传</a></div>
+           <Steps :current="focused.state" direction="vertical" size="small" class="transparent-steps">
+        <Step title="上传文件"> <div slot='content' style="margin-top:5px;" ><a style="color:#3af;" @click="focused.result?Download(focused.result):handleUpload()">上传作业 ( {{focused.result?1:0}} / 1 )</a> <a style='margin-left:10px;'>重传</a></div>
         <div><a style="color:#3af;text-decoration:underline;">上传课件 ( 0/1 )</a> <a style='margin-left:10px;'>重传</a></div></Step>
-        <Step title="审核评分" content="由审核人进行处理"></Step>
-        <Step title="考核完成" content="考核结果可在个人信息中查阅"></Step>
+        <Step title="审核评分" content="由审核人批改作业提交成绩"></Step>
+        <Step title="任务完成"></Step>
     </Steps>
        
         </div>
@@ -48,27 +47,16 @@
     
     <div style="padding:10px;display:flex;align-items:center;background:#567;" class="flex-between">
         <div class="flex-wrap flex-center">
-        <Button icon='md-arrow-back' size="small" class="flex-wrap" style="border:1px solid #aaa;margin-right:5px;" v-if="stacks.length > 0" @click="focused = stacks[stacks.length-1];">
-          返回 {{stacks[stacks.length-1].name}}
-        </Button>
-        <Button class="flex-wrap" size="small"  icon="md-play" style="border:1px solid #aaa;color:green;margin-right:5px;" v-if="!focused.state || focused.state == 0" @click="handleChangeState(1)">
-          开始
-        </Button>
-        <!-- <Button class="flex-wrap" icon="md-pause" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 1" @click="handleChangeState(4)">
-           暂停
-        </Button> -->
-        <Button class="flex-wrap" size="small"  icon="md-play" style="border:1px solid #aaa;padding:0 10px;" v-if="focused.state == 4" @click="handleChangeState(1)">
-          继续
-        </Button>
-         <Button class="flex-wrap" size="small"  icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="canUndo" @click="handleCancel()">
+       
+         <Button class="flex-wrap" size="small"  icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="focused.state==2" @click="handleCancel()">
           撤回
         </Button>
         
         
-        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="focused.splited=null;tabIndex='content';" disabled>
+        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="SubmitTask" v-if="focused.state==1" :disabled="focused.result">
           提交
         </Button>
-        <span style='color:#ddd;margin-left:10px;font-size:10px;'><Icon type="ios-warning" color="gold" size="16"></Icon> 您没有相关操作权限</span>
+        <span style='color:#ddd;margin-left:10px;font-size:10px;' v-if="state>2"><Icon type="ios-warning" color="gold" size="16"></Icon> 您没有相关操作权限</span>
 </div><div class="flex-wrap">
    <Button size="small"  icon='md-code' style="border:none;background:none;color:#fff;"  v-if="!focused.splited" @click="focused.splited=1;tabIndex='split';">
           
@@ -130,10 +118,9 @@ export default {
   mounted(){
     if(this.task && this.task.id){
        this.focused = this.task
-    if(this.task.children && this.task.children.length > 0)
-      this.focused.splited = true
+    // if(this.task.children && this.task.children.length > 0)
+    //   this.focused.splited = true
     }
-     this.autoChangeTab(this.task)
    
   },
   data(){
@@ -419,6 +406,66 @@ export default {
       }).catch(e=>{
         this.Error("处理失败:",)
       })
+
+    },
+    SubmitTask(){
+      if(!this.focused.result)
+        this.Error("请先完成任务目标再提交任务")
+      this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
+        let updateInfo = res.data.data
+          this.$set(this,'focused',updateInfo)
+          this.$emit('update',updateInfo)
+          this.Success('处理成功')
+      }).catch(e=>{
+        this.Error("处理失败:",)
+      })
+    },
+    onUploadProgressList(){
+
+    },
+    
+    handleUpload(){
+      var that =this
+        var inputObj=document.createElement('input')
+        inputObj.setAttribute('id','file');
+        inputObj.setAttribute('type','file');
+        inputObj.setAttribute('name','file');
+        inputObj.setAttribute("style",'visibility:hidden');
+        document.body.appendChild(inputObj);
+        inputObj.value;
+        inputObj.click();
+    	let files = inputObj.files;
+            if (!files) return;
+              this.baseIndex = this.files.length
+			let fileObjects = Object.values(files).map((f) => ({
+				name: f.name,
+				size: f.size,
+                ext: that.getFileExt(f.name),
+               
+                loading:true,
+				vdisk: this.option.vdisk || "ref",
+            }));
+            this.files = this.files.concat(fileObjects)
+            this.showFileUploaderModal = true
+            this.complete = 0
+    this.$store.dispatch('file/upload',{files:Object.values(files),onProgress:this.onUploadProgressList}).then(res=>{
+						if(!Array.isArray(res))
+							throw("文件上传失败")
+						files.forEach((v,i)=>{
+							fileObjects[i].url = res[i].url
+						})
+            this.focused.result = this.files.map((v, i) => v.url).join(',');
+            this.Success(上传挖鼻)
+					})
+
+    },
+       getFileExt(url) {
+			if (url) {
+				let ext = url.substring(url.lastIndexOf(".") + 1);
+				return ext;
+			}
+		},
+    Cancel(){
 
     }
   }
