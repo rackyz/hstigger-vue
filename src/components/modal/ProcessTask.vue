@@ -33,11 +33,15 @@
          
          <div  style="padding:10px;">
            <Steps :current="focused.state" direction="vertical" size="small" class="transparent-steps">
-        <Step title="上传文件"> <div slot='content' style="margin-top:5px;" ><a style="color:#3af;" @click="focused.result?Download(focused.result):handleUpload()">上传作业 ( {{focused.result?1:0}} / 1 )</a> <a style='margin-left:10px;'>重传</a></div>
-        <div><a style="color:#3af;text-decoration:underline;">上传课件 ( 0/1 )</a> <a style='margin-left:10px;'>重传</a></div></Step>
-        <Step title="审核评分" content="由审核人批改作业提交成绩"></Step>
-        <Step title="任务完成"></Step>
-    </Steps>
+            <Step title="上传文件"> 
+            <div slot='content' style="margin-top:5px;" >
+              <HsxFileUpload :value="focused.result" @change="handleChangeFile">上传作业 ( {{focused.result?1:0}} / 1 )</HsxFileUpload>
+            </div>
+
+            </Step>
+            <Step title="审核评分" content="由审核人批改作业提交成绩"></Step>
+            <Step title="任务完成"></Step>
+          </Steps>
        
         </div>
       </div>
@@ -53,7 +57,7 @@
         </Button>
         
         
-        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="SubmitTask" v-if="focused.state==1" :disabled="focused.result">
+        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="SubmitTask" v-if="focused.state==1" :disabled="!focused.result">
           提交
         </Button>
         <span style='color:#ddd;margin-left:10px;font-size:10px;' v-if="state>2"><Icon type="ios-warning" color="gold" size="16"></Icon> 您没有相关操作权限</span>
@@ -420,45 +424,9 @@ export default {
         this.Error("处理失败:",)
       })
     },
-    onUploadProgressList(){
-
-    },
-    
-    handleUpload(){
-      var that =this
-        var inputObj=document.createElement('input')
-        inputObj.setAttribute('id','file');
-        inputObj.setAttribute('type','file');
-        inputObj.setAttribute('name','file');
-        inputObj.setAttribute("style",'visibility:hidden');
-        document.body.appendChild(inputObj);
-        inputObj.value;
-        inputObj.click();
-    	let files = inputObj.files;
-            if (!files) return;
-              this.baseIndex = this.files.length
-			let fileObjects = Object.values(files).map((f) => ({
-				name: f.name,
-				size: f.size,
-                ext: that.getFileExt(f.name),
-               
-                loading:true,
-				vdisk: this.option.vdisk || "ref",
-            }));
-            this.files = this.files.concat(fileObjects)
-            this.showFileUploaderModal = true
-            this.complete = 0
-    this.$store.dispatch('file/upload',{files:Object.values(files),onProgress:this.onUploadProgressList}).then(res=>{
-						if(!Array.isArray(res))
-							throw("文件上传失败")
-						files.forEach((v,i)=>{
-							fileObjects[i].url = res[i].url
-						})
-            this.focused.result = this.files.map((v, i) => v.url).join(',');
-            this.Success(上传挖鼻)
-					})
-
-    },
+      handleChangeFile(url){
+        this.focused.result = url
+      },
        getFileExt(url) {
 			if (url) {
 				let ext = url.substring(url.lastIndexOf(".") + 1);
