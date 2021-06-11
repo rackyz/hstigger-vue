@@ -1,9 +1,9 @@
 <template>
-  <a @click="onClickSlot" style="color:#3af;">
+  <a @click.self="onClickSlot" style="color:yellow;">
       
       <slot></slot>
       <input type="file" ref='file' style="visibility:hidden;position:absolute;"  @change="handleUpload" :accept="accept" :multiple="multiple" /> 
-      <a v-if="value" style="margin-left:10px;color:yellow;" @click.stop="onSelectFile">重传</a>
+      <a v-if="value && editable" style="margin-left:10px;color:yellow;" @click.prevent="onSelectFile">重传</a>
       <br />
       <span style='color:#aaa'>{{value}}</span>
   </a>
@@ -16,16 +16,16 @@ export default {
       file:{}
     }
   },
-  props:['value','accept','multiple'],
+  props:['value','accept','multiple','editable'],
   methods:{
-    onClickSlot(){
-      if(this.value)
+    onClickSlot(e){
+      if(this.value || !this.editable)
         this.DownloadWithName(this.value,'作业')
       else
-        this.onSelectFile()
+        this.onSelectFile(e)
       
     },
-    onSelectFile(){
+    onSelectFile(e){
       this.$refs.file.click()
     },
     getFileExt(url) {

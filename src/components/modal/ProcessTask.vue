@@ -23,19 +23,17 @@
 
         <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;" v-if="focused.deadline">时间期限</div>
         <div style="padding:10px;color:yellow;" v-if="focused.deadline"><Icon type="md-clock" size="16" style="margin-right:5px;"></Icon> 截止 {{moment(focused.deadline).format("L") || '2021/6/15日前, 还剩 15 天'}}</div>
-
+          
         <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;" v-if="focused.files">附件</div>
         <div style="padding:10px;"  v-if="focused.files">
           <a style="color:#3af"><Icon type="md-document" size="16" style="margin-right:5px;"></Icon> PPT参考样例</a>
         </div>
-
          <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">任务目标</div>
-         
          <div  style="padding:10px;">
-           <Steps :current="focused.state" direction="vertical" size="small" class="transparent-steps">
+           <Steps :current="focused.state - 1" direction="vertical" size="small" class="transparent-steps">
             <Step title="上传文件"> 
             <div slot='content' style="margin-top:5px;" >
-              <HsxFileUpload :value="focused.result" @change="handleChangeFile">上传作业 ( {{focused.result?1:0}} / 1 )</HsxFileUpload>
+              <HsxFileUpload :value="focused.file" @change="handleChangeFile" :editable="focused.state == 1 || focused.state == 3">上传作业 ( {{focused.file?1:0}} / 1 )</HsxFileUpload>
             </div>
 
             </Step>
@@ -47,17 +45,16 @@
       </div>
     
    </div>
-   
     
     <div style="padding:10px;display:flex;align-items:center;background:#567;" class="flex-between">
         <div class="flex-wrap flex-center">
        
-         <Button class="flex-wrap" size="small"  icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="focused.state==2" @click="handleCancel()">
+         <Button class="flex-wrap" size="small"  icon="md-undo" style="border:1px solid #aaa;padding:0 10px;margin-right:5px;color:red;" v-if="focused.state==2" @click="CancelTask()">
           撤回
         </Button>
         
         
-        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="SubmitTask" v-if="focused.state==1" :disabled="!focused.result">
+        <Button class="flex-wrap" size="small" type="success" icon='md-checkmark' style="border:none;margin-left:5px;" @click="SubmitTask" v-if="focused.state==1" :disabled="!focused.file">
           提交
         </Button>
         <span style='color:#ddd;margin-left:10px;font-size:10px;' v-if="state>2"><Icon type="ios-warning" color="gold" size="16"></Icon> 您没有相关操作权限</span>
@@ -403,29 +400,43 @@ export default {
       if(!id)
         return
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
-        let updateInfo = res.data.data
-          this.$set(this,'focused',updateInfo)
-          this.$emit('update',updateInfo)
+          let updateInfo = res.data.data
+          this.$set(this,'focused',Object.assign(this.focused,updateInfo))
           this.Success('处理成功')
       }).catch(e=>{
         this.Error("处理失败:",)
       })
 
     },
+    CancelTask(){
+       let id = this.focused.id
+      if(!id)
+        return
+      this.api.enterprise.PATCH_TASKS({},{param:{id},query:{q:'cancel'}}.then(res=>{
+        let updateInfo = res.data.data
+      this.$set(this,'focused',Object.assign(this.focused,updateInfo))
+          this.Success('撤回成功')
+      }))
+    },
     SubmitTask(){
-      if(!this.focused.result)
+      let id = this.focused.id
+      if(!this.focused.file)
         this.Error("请先完成任务目标再提交任务")
+      let data = {
+        file:this.focused.file
+      }
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
         let updateInfo = res.data.data
           this.$set(this,'focused',updateInfo)
-          this.$emit('update',updateInfo)
+         this.$set(this,'focused',Object.assign(this.focused,updateInfo))
           this.Success('处理成功')
       }).catch(e=>{
         this.Error("处理失败:",)
       })
     },
       handleChangeFile(url){
-        this.focused.result = url
+        console.log(url)
+        this.$set(this.focused,'file',url)
       },
        getFileExt(url) {
 			if (url) {

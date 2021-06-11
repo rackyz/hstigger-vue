@@ -51,16 +51,52 @@
     <hs-modal-form v-model="showModalCreate" :title="model.id?'修改考核':'新建考核'" :form="Form('appraisal_plan')" :data="model" @on-submit="handleSubmit" width="600" /> 
 
     <ModalProcessTask v-model="showModalTask" :task="current_task" @update="handleUpdateTask" />
+
+    <Modal title="开始评分" v-model="modalEval" fullscreen footer-hide>
+        <Layout>
+          <Sider style="background:#333;width:600px;" width="300">
+            <div style="padding:10px;color:yellow">
+              请为本名培训成员进行评分
+            </div>
+            
+            <div style="display:flex;width:100%;align-items:center;justify-contetn:center;padding:20px;background:#333;padding-top:0px;" >
+              
+              <hs-avatar :userinfo="selected_user" size="80" />
+              <div style="margin-left:15px;color:#fff;height:80px;display:flex;algin-items:flex-begin;justify-content:center;flex-direction:column;">
+                <div style="font-size:25px;">{{selected_user.name}}</div>
+                <div style="color:#dda;">{{selected_user.phone}}</div>
+              </div>
+            </div>
+            <div style="width:300px;padding:10px;background:#ddd;">
+              <hs-form :form="Form('classeval')" editable="" :data="selected" @submit="handleSubmit" />
+            </div>
+            <div class="flex-wrap flex-between" style="margin-top:30px;padding:10px;">
+               <Button icon="md-arrow-back" :disabled="!PrevUser || !PrevUser.id" @click="selectedUser=PrevUser">{{'前一位'}}</Button>
+               <Button type="primary">上传</Button>
+             <Button icon="md-arrow-forward" :disabled="!NextUser || !NextUser.id" @click="selectedUser=NextUser;">{{'后一位'}}</Button>
+            </div>
+            
+          </Sider>
+          <Content>
+            <BasePreview v-if="selectedUser.file" :url="selectedUser.file" />
+            <div v-else style="padding:20px;">文件未上传</div>
+          </Content>
+        </Layout>
+    </Modal>
   </div>
 </template>
 
 <script>
+import Preview from '../../../components/base/Preview.vue'
 export default {
+  components: { Preview },
   data(){
     return {
       listSearchText:"",
       userSearchText:"",
       showModalTask:false,
+      modalEval:false,
+      selectedUser:{},
       current_task:null,
       showModalCreate:false,
       model:{},
@@ -100,6 +136,11 @@ export default {
     route:'/:id'
   },
   computed:{
+    selected_user(){
+      if(!this.selectedUser || !this.selectedUser.id)
+        return {}
+      return this.$store.getters['core/employees'].find(v=>v.id == this.selectedUser.user_id) || {}
+    },
     id(){
       return this.$route.params.id
     },
@@ -123,6 +164,24 @@ export default {
         refresh:!this.selected || !this.selected.id
       }
     },
+    PrevUser(){
+        if(!this.selected || !this.selected.users)
+        return {}
+      let index =  this.selected.users.findIndex(v=>v.id == this.selectedUser.id)
+      if(index != 0 || index != -1)
+        return this.selected.users[index-1]
+      else
+        return {}
+    },
+    NextUser(){
+      if(!this.selected|| !this.selected.users)
+        return {}
+  let index =  this.selected.users.findIndex(v=>v.id == this.selectedUser.id)
+      if(index != this.selected.users.length-1 || index != -1)
+        return this.selected.users[index+1]
+      else
+        return {}
+    },
     columns(){
       var that= this
       return [{
@@ -140,31 +199,46 @@ export default {
           idKey:'id'
         }
       },{
-         key:"task_id",
-        title:"考核任务",
+         key:"file",
+        title:"文件",
         width:120,
         render(h,param){
-          return h('Button',{props:{size:'small'},on:{click:()=>{
-           that.showTask(param.row)
-          }}},'考核任务')
+          if(param.row.file){
+            let user =that.$store.getters["core/users"].find(v=>v.id == param.row.user_id)
+            return h('Button',{props:{size:'small'},on:{click:()=>{
+            that.DownloadWithName(param.row.file,user?user.name:'作业')
+            }}},'下载')
+          }
+          else 
+            return h("span",{style:{color:"red"}},"还未上传")
         }
-      },{
-         key:'score',
-        title:"考核得分",
-        width:120
       },{
          key:'result',
         title:"考核结果",
-        width:120
+        width:120,
+         render(h,param){
+          if(param.row.result == null){
+            return h('Button',{props:{size:'small'},on:{click:()=>{
+            that.selectedUser = param.row
+            that.modalEval = true
+            }}},'评分')
+            }else{
+              return h('span',['不合格','合格','良好','优秀'][param.row.result])
+            }
+          }
+        
+      },{
+         key:'score',
+        title:"考核得分",
+        width:120,
+        render(h,param){
+          return h('span',{},param.row.score || '-')
+        }
       },
       {
-         key:'name',
+         key:'comment',
         title:"考核备注",
         minWidth:200
-      },{
-         key:"evaluted_at",
-         title:"考评时间",
-         type:'time'
       },{
         key:"state",
         title:"状态",
@@ -173,7 +247,12 @@ export default {
         option:{
           states:['未开始','进行中','已提交','已完成']
         }
-      }]
+      },{
+         key:"evaluted_at",
+         width:200,
+         title:"考评时间",
+         type:'time'
+      },]
     }
   },
   mounted(){

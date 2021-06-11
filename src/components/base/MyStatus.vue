@@ -17,7 +17,7 @@
   </div>
 <div class='status'>
            
-            {{session.statusDesc || '目前主要在做高专企业信息平台的任务模块以及合约管理系统的迁移工作'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
+            {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
             
           </div>
 
@@ -36,14 +36,15 @@ export default {
   data(){
     return {
       modalEditDesc:false,
-      loading:false
+      loading:false,
+      desc:""
     }
   },
   computed:{
     ...mapGetters('core',['session']),
     desc:{
       get(){
-        return this.session.statusDesc
+        return this.session.saysth
       },
       set(v){
         // update v
@@ -51,10 +52,10 @@ export default {
       }
     },
     statusColors(){
-      return ['red','orange','blue','green']
+      return ['green','blue','orange','red']
     },
     status(){
-      return ['繁忙','忙','普通','空闲']
+      return ['空闲','普通','忙','繁忙']
     },
     statusDesc(){
       return ['超级忙,还是别打扰我了','比较忙,几乎没有空闲时间','正常接受业务安排','比较闲，目前手头没什么活']
@@ -65,11 +66,12 @@ export default {
   },
   methods:{
     handleSaveWorking(s){
-      let e = {working:s}
+      console.log("save:",s)
+      let e = {saysth:s}
        this.loading = true
-       this.CORE.SELF_CHANGE_INFO(e).then(res=>{
+       this.api.enterprise.PATCH_EMPLOYEES(e).then(res=>{
          this.modalEditDesc = false
-        this.Success('修改成功')
+       
         
         this.$store.commit('core/saveUserinfo',e)
       }).catch(e=>{
@@ -80,9 +82,8 @@ export default {
     },
     handleSaveStatus(s){
       let e = {status:s}
-       this.CORE.SELF_CHANGE_INFO(e).then(res=>{
-          this.modalEditDesc = false
-        this.Success('修改成功')
+       this.api.enterprise.PATCH_EMPLOYEES(e).then(res=>{
+         
        
         this.$store.commit('core/saveUserinfo',e)
       }).catch(e=>{
