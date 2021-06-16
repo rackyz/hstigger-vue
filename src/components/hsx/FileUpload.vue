@@ -19,9 +19,11 @@ export default {
   props:['value','accept','multiple','editable'],
   methods:{
     onClickSlot(e){
-      if(this.value || !this.editable)
-        this.DownloadWithName(this.value,'作业')
-      else
+      if(!this.editable || this.value)
+      {
+        if(this.value)
+          this.DownloadWithName(this.value,'作业')
+      }else
         this.onSelectFile(e)
       
     },
@@ -49,7 +51,7 @@ export default {
         vdisk:  "ref",
             };
       this.file = fileObject
-      this.$store.dispatch('file/upload',{files:[fileObject],onProgress:this.onUploadProgressList}).then(res=>{
+      this.$store.dispatch('file/upload',{files:[file],onProgress:this.onUploadProgressList}).then(res=>{
         
               if(!Array.isArray(res))
                 throw("文件上传失败")

@@ -87,7 +87,7 @@
 
     
      
-      <Badge
+      <!-- <Badge
         :count='session.task_count'
         type='error'
         style='margin-right:25px;'
@@ -104,7 +104,7 @@
           />
           
         </div>
-      </Badge>
+      </Badge> -->
 
  <!-- Message -->
       <Badge
@@ -125,7 +125,7 @@
         </div>
       </Badge>
 
-
+<!-- 
   <div
         class='text-btn'
         @click="RouteTo('/core/debug')"
@@ -136,7 +136,7 @@
           size="15"
           :color="showDebug?'yellowgreen':'#af6'"
         />
-      </div>
+      </div> -->
 
      
 

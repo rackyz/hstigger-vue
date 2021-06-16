@@ -5,7 +5,7 @@
         <Col :span='17'>
         <div style="padding:0 20px;">
 
-         <a style="color:#3af;" @click="RouteTo('/core/training')"><Icon type="md-arrow-back" /> 返回列表</a> <h1>{{item.name || '培训名称'}}</h1>
+         <a style="color:#3af;" @click="RouteTo('/core/training/dashboard')"><Icon type="md-arrow-back" /> 返回列表</a> <h1>{{item.name || '培训名称'}}</h1>
          
          <div style="position:relative;">
           

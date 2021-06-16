@@ -307,7 +307,7 @@ export default {
     },
     computed:{
         ...mapGetters("core",['types','getTypes','getTypeById']),
-        ...mapGetters("entadmin",['users','roles','deps','projects','enabled_modules','rss']),
+        ...mapGetters("entadmin",['users','roles','deps','projects','modules','rss']),
         tranferDataUsers(){
             return this.users.map(v=>{
                 return {
@@ -345,7 +345,7 @@ export default {
         },
          menus(){
            
-            let resources = ['enabled_modules','deps','projects','rss']
+            let resources = ['modules','deps','projects','rss']
             let counts = {}
             resources.forEach(res=>{
                 counts[res] = 0
@@ -371,7 +371,7 @@ export default {
                 name:'模块',
                 icon:"user",
                 path:'module',
-                count:counts.enabled_modules
+                count:counts.modules
                 },{
                     name:'项目',
                     icon:"organization",
@@ -521,7 +521,7 @@ export default {
         },  
         GetPermissionList(key){
              if(this.menuIndex == 'module'){
-                return this.enabled_modules.map(v=>Object.assign({},v,{value:true}))
+                return this.modules.map(v=>Object.assign({},v,{value:true}))
             }else if(this.menuIndex == 'dep'){
                 return this.deps.map(v=>Object.assign({},v,{value:true}))
             }else if(this.menuIndex == 'project'){

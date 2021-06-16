@@ -560,7 +560,7 @@ const mutations = {
     state.session = session
      state.types = session.types //SaveTypes(session.types)
     state.users = session.users
-    state.modules = session.modules
+    state.modules = session.modules.filter(v=>v.state > 0)
     state.employees = session.employees
     state.projects = session.projects
     state.contracts = session.contracts

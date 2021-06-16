@@ -54,27 +54,35 @@
 
     <Modal title="开始评分" v-model="modalEval" fullscreen footer-hide>
         <Layout>
-          <Sider style="background:#333;width:600px;" width="300">
-            <div style="padding:10px;color:yellow">
-              请为本名培训成员进行评分
-            </div>
+         
+          <Sider style="background:#234;width:300px;" width="200">
             
-            <div style="display:flex;width:100%;align-items:center;justify-contetn:center;padding:20px;background:#333;padding-top:0px;" >
+            <template v-for="e in filteredUsers">
+              <div :key='e.id' class="flex-wrap flex-between" style="padding:10px;color:#ddd;border-bottom:1px solid #111;" :style="selected_user.id == e.user_id?'filter:brightness(1.2);background:orange;color:#000;':''" @click="selectedUser = e">
+                 <div style="">{{getUser(e.user_id).name}}</div>
+                 <div style="font-size:10px;" :style="{color:getEvalColor(e.result)}">
+                   {{getEval(e.result) || '-'}} <span style='color:#aaa'>/ {{e.score || '-'}}</span>
+                 </div>
+              </div>
+             
+            </template>
+             <Button style="width:100%;height:40px;border-radius:0;" type="error" @click="modalEval=false" icon="md-arrow-back">退出</Button>
+          </Sider>
+          <Sider style="background:#345;width:600px;" width="300">
+            
+            
+            <div style="display:flex;width:100%;align-items:center;justify-contetn:center;padding:20px;background:#345;" >
               
-              <hs-avatar :userinfo="selected_user" size="80" />
-              <div style="margin-left:15px;color:#fff;height:80px;display:flex;algin-items:flex-begin;justify-content:center;flex-direction:column;">
-                <div style="font-size:25px;">{{selected_user.name}}</div>
+              <hs-avatar :userinfo="selected_user" size="40" />
+              <div style="margin-left:15px;color:#fff;height:40px;display:flex;algin-items:flex-begin;justify-content:center;flex-direction:column;">
+                <div style="font-size:19px;">{{selected_user.name}}</div>
                 <div style="color:#dda;">{{selected_user.phone}}</div>
               </div>
             </div>
             <div style="width:300px;padding:10px;background:#ddd;">
-              <hs-form :form="Form('classeval')" editable="" :data="selected" @submit="handleSubmit" />
+              <hs-form ref="form" :form="Form('classeval')" editable="true" :data="selectedUser" @submit="handleSubmitUser" />
             </div>
-            <div class="flex-wrap flex-between" style="margin-top:30px;padding:10px;">
-               <Button icon="md-arrow-back" :disabled="!PrevUser || !PrevUser.id" @click="selectedUser=PrevUser">{{'前一位'}}</Button>
-               <Button type="primary">上传</Button>
-             <Button icon="md-arrow-forward" :disabled="!NextUser || !NextUser.id" @click="selectedUser=NextUser;">{{'后一位'}}</Button>
-            </div>
+          
             
           </Sider>
           <Content>
@@ -87,6 +95,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Preview from '../../../components/base/Preview.vue'
 export default {
   components: { Preview },
@@ -136,6 +145,7 @@ export default {
     route:'/:id'
   },
   computed:{
+    ...mapGetters('core',['getUser']),
     selected_user(){
       if(!this.selectedUser || !this.selectedUser.id)
         return {}
@@ -199,6 +209,21 @@ export default {
           idKey:'id'
         }
       },{
+        key:'raw_dep',
+        type:'text',
+        title:"部门",
+        width:120
+      },{
+        key:'raw_project',
+        type:'text',
+        title:"项目部",
+        width:120
+      },{
+        key:'raw_leader',
+        type:'text',
+        title:"领导",
+        width:120
+      },{
          key:"file",
         title:"文件",
         width:120,
@@ -223,7 +248,10 @@ export default {
             that.modalEval = true
             }}},'评分')
             }else{
-              return h('span',['不合格','合格','良好','优秀'][param.row.result])
+              return h('Button',{style:{color:that.getEvalColor(param.row.result),background:"#333"},props:{size:'small'},on:{click:()=>{
+            that.selectedUser = param.row
+            that.modalEval = true
+            }}},['不合格','合格','良好','优秀'][param.row.result])
             }
           }
         
@@ -259,6 +287,9 @@ export default {
     this.getData()
   },
   methods:{
+    PatchUserRecord(){
+      this.$refs.form.submit()
+    },
     showTask(item){
      
       this.api.enterprise.GET_TASKS({param:{id:item.task_id}}).then(res=>{
@@ -269,6 +300,8 @@ export default {
     getData(){
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'appraisals'}}).then(res=>{
         let items = res.data.data
+       
+       
          this.items = items
         if(Array.isArray(items) && items.length > 0){
           this.$refs.list.onSelect(items[0])
@@ -280,7 +313,18 @@ export default {
     getAppraisalData(item = {}){
       if(item.id)
         this.api.enterprise.GET_APPRAISALS({param:{id:item.id}}).then(res=>{
-          this.$set(this,'selected',res.data.data)
+          let item = res.data.data
+           let employees = this.$store.getters['core/employees']
+          item.users.forEach(u=>{
+            let employee = employees.find(e=>e.id == u.user_id)
+             if(employee){
+               u.raw_dep = employee.raw_dep
+               u.raw_project = employee.raw_project
+               u.raw_leader = employee.raw_leader
+             }
+          })
+          
+          this.$set(this,'selected',item)
         })
     },
     handleUpdateTask(e){
@@ -306,6 +350,12 @@ export default {
       })
       }
       
+    },
+    getEvalColor(e=0){
+      return ['#faa','orange','yellow','#afa'][e]
+    },
+    getEval(e = 0){
+      return ['不合格','合格','良好','优秀'][e]
     },
     handleDelete(e){
       this.Confirm("确定删除该考核（包括所有的考核信息，无法恢复）？",d=>{
@@ -343,6 +393,16 @@ export default {
     },
     handleTableEvent(e){
       
+    },
+    handleSubmitUser(e){
+      console.log(e)
+      delete e.id
+      this.api.enterprise.PATCHRELATED_TRAININGS(e,{param:{id:this.id,related:'task',relatedId:this.selectedUser.id}}).then(res=>{
+        this.Success("保存成功")
+        let users = this.selected.users
+        users.splice(users.findIndex(v=>v.id == this.selectedUser.id),1,Object.assign({},this.selectedUser,e))
+        this.$set(this.selected,'users',users)
+      })
     },
     handleRemoveAppraisal(){
       let id = this.selected.id

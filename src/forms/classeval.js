@@ -8,7 +8,7 @@ export default {
     <Col :span='12'>{{score}}</Col>
   </Row>
   <Row :gutter='10' style='margin-top:10px'>
-    <Col :span='24'>{{content}}</Col>
+    <Col :span='24'>{{comment}}</Col>
   </Row>
   
   </div>
@@ -26,16 +26,16 @@ export default {
       label: "得分",
       control: 'input',
       option: {
-      
+        max:100,
         type:"number"
       }
     },
-    content: {
+    comment: {
       label: "评语/备注",
       control: "input",
       option: {
         type: "textarea",
-        
+        maxlen:512,
         height: 300
       }
     }
@@ -44,7 +44,6 @@ export default {
   option: {
     editable: true,
     hideCancel:true,
-    hideSubmit:true,
     hideReset:true
   }
 }
