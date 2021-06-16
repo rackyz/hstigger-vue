@@ -172,7 +172,7 @@
           />
         </div>
         <BaseCalender />
-         <div class='card-title' v-if="session.my_activities && session.my_activities.length > 0">
+         <div class='card-title' v-if="session.my_trainings && session.my_trainings.length > 0">
           <!-- <span class='tab' :class="taskStateFilter==1?'tab-actived':''" @click="taskStateFilter=1">
           <Icon
             custom='gzicon gzi-event'
@@ -196,7 +196,7 @@
           /> 其他</span> -->
            <span style='float:right;font-size:12px;'>MORE</span>
         </div>
-         <BaseActivityList  v-if="session.my_activities && session.my_activities.length > 0" />
+         <BaseActivityList  v-if="session.my_trainings && session.my_trainings.length > 0" />
       </Card>
      
       <Card

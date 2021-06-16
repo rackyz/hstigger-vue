@@ -1,9 +1,9 @@
 <template>
     <div class="wrap" style="padding:10px;position:relative;height:100%;">
       <Alert>请按要求完成培训任务 {{items.length}}</Alert>
-     
-        
+    
         <BaseEmpty v-if="items.length==0" msg="讲师还为发布任何任务哦" />
+      
         <hs-list style="background:#eee;height:calc(100% - 50px);" v-else :data="items" :option="{tmpl:'BaseTaskBar'}" @event="handleListEvent"></hs-list>
        <ModalProcessTask v-model="modalProcessTask" :task="current_flow" @update="handleUpdateTask" />
     </div>
@@ -45,6 +45,7 @@ metaInfo:{
     },OpenTask(id){
       this.api.enterprise.GET_TASKS({param:{id}}).then(res=>{
         let model = res.data.data
+
          this.current_flow = model
      
          this.modalProcessTask = true
@@ -54,7 +55,7 @@ metaInfo:{
     },handleUpdateTask(data){
       data.id = this.current_flow.id
       this.$store.dispatch('core/update_tasks',data)
-    },
+    }
   }
 }
 </script>

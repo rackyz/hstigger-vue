@@ -30,7 +30,7 @@
         </div>
          <div style="font-weight:bold;margin-top:15px;margin-bottom:5px;color:lightred;color:fff;">任务目标</div>
          <div  style="padding:10px;">
-           <Steps :current="focused.state - 1" direction="vertical" size="small" class="transparent-steps">
+           <Steps :current="focused && focused.state?(focused.state - 1):0" direction="vertical" size="small" class="transparent-steps">
             <Step title="上传文件"> 
             <div slot='content' style="margin-top:5px;" >
               <HsxFileUpload :value="focused.file" @change="handleChangeFile" :editable="focused.state == 1 || focused.state == 3">上传作业 ( {{focused.file?1:0}} / 1 )</HsxFileUpload>
@@ -43,7 +43,6 @@
        
         </div>
       </div>
-    
    </div>
     
     <div style="padding:10px;display:flex;align-items:center;background:#567;" class="flex-between">
@@ -104,7 +103,8 @@ export default {
   },
   watch:{
     task:{
-      handler(v){
+      handler(v = {}){
+        v.state = v.task_state
         this.focused = v
         if(v.state == 0){
           this.tabIndex = 'content'
@@ -401,7 +401,7 @@ export default {
         return
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
-          this.$set(this,'focused',Object.assign(this.focused,updateInfo))
+          this.$set(this,'focused',Object.assign({},this.focused,updateInfo))
           this.Success('处理成功')
       }).catch(e=>{
         this.Error("处理失败:",)
@@ -412,11 +412,11 @@ export default {
        let id = this.focused.id
       if(!id)
         return
-      this.api.enterprise.PATCH_TASKS({},{param:{id},query:{q:'cancel'}}.then(res=>{
-        let updateInfo = res.data.data
-      this.$set(this,'focused',Object.assign(this.focused,updateInfo))
+      this.api.enterprise.PATCH_TASKS({},{param:{id},query:{q:'cancel'}}).then(res=>{
+          let updateInfo = res.data.data || {}
+          this.$set(this,'focused',Object.assign({},this.focused,updateInfo,{state:1}))
           this.Success('撤回成功')
-      }))
+      })
     },
     SubmitTask(){
       let id = this.focused.id

@@ -1,18 +1,19 @@
 <template>
-  <div style='width:250px;height:180px;font-size:10px;background:#fff;display:block;padding:10px 15px;' @click="$emit('event','open')">
+  <div style='width:250px;min-height:180px;font-size:10px;background:#fff;display:block;padding:10px 15px;' @click="$emit('event','open')">
     
   
      <div   style="border:1px solid #fff;font-size:16px;font-weight:bold;width:100%;" @click="handleEnterTask">
       {{data.name}} 
     </div>
 
-      <div :style="`color:${getTypeByValue('TASK_STATE',data.state).color};`">
-      {{getTypeByValue('TASK_STATE',data.state).name}}
+      <div :style="`color:${getTypeByValue('TASK_STATE',data.task_state).color};`">
+      {{getTypeByValue('TASK_STATE',data.task_state).name}}
     </div>
 
     <pre style="padding:5px;font-size:10px;color:#aaa;">
       {{data.desc}}
     </pre>
+    
   </div>
 </template>
 
