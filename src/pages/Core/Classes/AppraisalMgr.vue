@@ -397,7 +397,7 @@ export default {
     handleSubmitUser(e){
       console.log(e)
       delete e.id
-      this.api.enterprise.PATCHRELATED_TRAININGS(e,{param:{id:this.id,related:'task',relatedId:this.selectedUser.id}}).then(res=>{
+      this.api.enterprise.PATCHRELATED_TRAININGS(e,{param:{id:this.id,related:'eval',relatedId:this.selectedUser.id}}).then(res=>{
         this.Success("保存成功")
         let users = this.selected.users
         users.splice(users.findIndex(v=>v.id == this.selectedUser.id),1,Object.assign({},this.selectedUser,e))

@@ -181,7 +181,9 @@ export default {
                 this.loginData = model
                 this.isVerificationShow = true
             }else{
-                this.submitForm(model)
+                this.loading = true
+               this.submitForm(model)
+               
             }
             
         },
@@ -207,48 +209,59 @@ export default {
             })
         },
         submitForm(model) {
+            
+            
             this.forgetFormData = {account:model.user}
             if(!model.user){
                 this.Error("请输入用户名")
+                this.loading = false
                 return
             }
             
             
             if(!model.password){
                 this.Error("请输入密码")
+                this.loading = false
                 return
             }
 
-            this.loading = true
-            this.$store.dispatch('ctx/Login',model).then(session=>{
-                console.log('session:',session)
-            }).finally(()=>{
-                this.loading = false
-            })
-            this.$store.dispatch('core/login',model).then(session=>{
-                if(!session.lastlogin_at)
-                    this.routeTo = '/core/welcome'
-                if(this.routeTo){
-                    let path = "/core/dashboard"
-                    if(session.type == 3)
-                     path =  "/core/admin/dashboard"
-                    else if(session.type == 2)
-                        path ="/core/eadmin/dashboard"
-                    this.RouteTo(path)
-                }else{
-                    window.location.reload()
-                }
+            var that = this
+            this.$store.dispatch('ctx/Login',model).then(_=>{
+                   
             }).catch(e=>{
-                if(e == "tokenoutofdate"){
-                    this.Error('密码错误')
-                    this.isVerifyMode = true
-                    return
-                }else{
-                    this.Error(e)
-                }
-            }).finally(e=>{
+                console.log(e)
                 this.loading = false
             })
+
+             that.$store.dispatch('core/login',model).then(session=>{
+                        setTimeout(e=>{
+                            if(!session.lastlogin_at)
+                            that.routeTo = '/core/welcome'
+                        if(this.routeTo){
+                            let path = "/core/dashboard"
+                            if(session.type == 3)
+                            path =  "/core/admin/dashboard"
+                            else if(session.type == 2)
+                                path ="/core/eadmin/dashboard"
+                            that.RouteTo(path)
+                        }else{
+                            window.location.reload()
+                        }
+                        },1000)
+                        
+                    }).catch(e=>{
+                        if(e == "tokenoutofdate"){
+                            that.Error('密码错误')
+                            that.isVerifyMode = true
+                            return
+                        }else{
+                            that.Error(e)
+                        }
+                    }).finally(e=>{
+                        that.loading = false
+                    })
+
+            
         }
     }
 }

@@ -10,7 +10,7 @@ export default {
   props:['data'],
   methods:{
     onClick(e){
-      this.RouteTo("/public/notices/"+this.data.id)
+      this.RouteTo("/public/notices/"+this.data.id,true)
     }
   }
 }

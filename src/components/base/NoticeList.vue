@@ -1,7 +1,6 @@
 <template>
   <div style='wdith:100%;display:flex;align-items:center;flex-direction:column;position:relative;height:100%;' >
     <template v-if="items.length">
-      123
     <hs-list :data="items" :option="{tmpl:'BaseNotice',offset:1}" selectable='false' style='border:none;padding:5px;' />
     </template>
     <template v-else>

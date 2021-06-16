@@ -1,26 +1,26 @@
 <template>
   <div class="l-wrapper">
-    <div class="title flex-wrap flex-between" style="height:30px;background:#fff;padding:0 10px;border-bottom:1px solid #dfdfdf;">
-     
-      4123
-       <div class="flex-wrap" style="color:#3af;">
-        <Button style="margin-right:5px" :disabled="!item.prev" size="small" icon="md-arrow-back" @click="RouteTo(`/core/notices/${item.prev}/detail`)">上一封</Button>
-         <Button :disabled="!item.next"  @click="RouteTo(`/core/notices/${item.next}/detail`)" size="small" icon="md-arrow-forward">下一封</Button>
-
-
-        <a @click="handleDelete(item)" style="color:#aaa;margin-left:15px;"><Icon type="md-trash" /> 删除</a>
-      </div>
-      </div>
+    
     <div class="l-page">
+      <Row :gutter="20">
+        <Col :span="18">
+        <div style="padding:20px 60px;">
+         <h1 style="font-weight:bold;font-size:25px;padding-bottom:10px;">{{item.title}}</h1>
+          <Breadcrumb>
+        <BreadcrumbItem to="/public">首页</BreadcrumbItem>
+        <BreadcrumbItem to="/public/notices">通知公告</BreadcrumbItem>
+        <BreadcrumbItem>详情</BreadcrumbItem>
+    </Breadcrumb>
+      </div>
       
        <Row  :gutter="20">
       <Col :span='24'>
-        <article style="background:#fff;padding:80px 100px;">
-          <h1 style="font-weight:bold;font-size:20px;border-bottom:2px solid #dfdfdf;padding-bottom:10px;">{{item.title}}</h1>
+        <article style="background:#fff;padding:0 40px;"  class="hs-md">
+         
          
           <hs-markdown style="min-height:500px;" :data="item.content">
           </hs-markdown>
-          <div style="color:#aaa;font-size:12px;padding-top:10px;border-top:1px dashed #aaa;">
+          <div style="color:#aaa;font-size:12px;padding-top:10px;border-top:1px dashed #aaa;padding-bottom:100px;">
             <div class="flex-wrap">
               发布人  
               <!-- <div class="flex-wrap" style="margin-left:20px;">
@@ -40,6 +40,12 @@
       </Col>
      
     </Row>
+        </Col>
+        <Col :span='6'>
+           相关列表
+        </Col>
+      </Row>
+      
     </div>
    
     
@@ -90,12 +96,17 @@ export default {
 <style lang="less" scoped>
 .l-wrapper{
   width:100%;
-  background:#eee;
+ 
   height:100%;
+  position: relative;
+  overflow: hidden;
 }
 .l-page{
   margin:0 auto;
   padding:10px;
-  width:800px;
+  width:1200px;
+  min-height:800px;
+  padding-bottom:100px;
+   overflow: hidden;
 }
 </style>

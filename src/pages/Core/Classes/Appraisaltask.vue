@@ -1,6 +1,6 @@
 <template>
     <div class="wrap" style="padding:10px;position:relative;height:100%;">
-      <Alert>请按要求完成培训任务 {{items.length}}</Alert>
+      <Alert v-if="items.filter(v=>v.task_state == 1).length">您还有 {{items.filter(v=>v.task_state == 1).length}} 个作业需要提交</Alert>
     
         <BaseEmpty v-if="items.length==0" msg="讲师还为发布任何任务哦" />
       
@@ -19,7 +19,7 @@ metaInfo:{
   data(){
     return {
       items:[],
-      modalProcessTask:{},
+      modalProcessTask:false,
       current_flow:null
     }
   },
@@ -34,7 +34,9 @@ metaInfo:{
   methods:{
     getData(){
       this.api.enterprise.RELATED_TRAININGS({param:{id:this.id,related:'mytasks'}}).then(res=>{
-        this.items = res.data.data
+        let items = res.data.data
+        items.sort((a,b)=>a.task_state > b.task_state?1:-1)
+        this.items = items
       })
     },
     handleListEvent(e){

@@ -5,7 +5,7 @@
         {{moment(data.created_at).format("MM/DD")}}
       </div>
       
-      <div class="l-art-title" @click="RouteTo(`/core/articles/${data.id}`,true)">{{data.title}}
+      <div class="l-art-title" @click="RouteTo(`/public/notices/${data.id}`)">{{data.title}}
         </div>
         <div class="flex-wrap" v-if="data.files" style='margin-left:5px;padding:5px;border:1px solid #dfdfdf;font-size:12px;border-radius:3px;color:#333;'> <Icon type="md-attach"  style='' />附件 </div>
      
