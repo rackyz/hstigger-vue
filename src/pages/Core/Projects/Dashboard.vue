@@ -3,7 +3,7 @@
     <Row :gutter='20'>
       <Col :span='6'> <Card style='min-height:600px;'  title="项目概况">
 
-        <img :src="project.avatar || ''" style="width:100%;margin-bottom:10px;" />
+        <img :src="project.avatar || 'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/timg.jpg'" style="width:100%;margin-bottom:10px;" />
         {{project.desc}}
         <p style='margin-top:10px;'>
         技术服务 <b>宁波高专建设监理有限公司</b>
