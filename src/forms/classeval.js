@@ -7,6 +7,9 @@ export default {
     <Col :span='12'>{{result}}</Col>
     <Col :span='12'>{{score}}</Col>
   </Row>
+  <Row :gutter='10' style="margin-top:10px">
+    <Col :span='24'>{{recommend}}</Col>
+  </Row>
   <Row :gutter='10' style='margin-top:10px'>
     <Col :span='24'>{{comment}}</Col>
   </Row>
@@ -20,6 +23,14 @@ export default {
       option: {
        options:['不合格','合格','良好','优秀'],
        defaultValue:1
+      }
+    },
+    recommend:{
+      label:"推荐",
+      control:"select",
+      option:{
+        options:['无','推荐'],
+        defaultValue:0
       }
     },
     score: {

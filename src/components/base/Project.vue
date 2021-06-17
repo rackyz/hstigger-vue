@@ -1,8 +1,6 @@
 <template>
   <div class="project-item" :class="data.state>2?'project-item-finished':''" @click.stop='onClick' :style='`background:#aaa url(${data.avatar||"http://zzlatm.gicp.net:10000/public/upload/20200227/20200227_5e57200164ee7.png"})`'>
   <div class="project-item-mask">
-
-  
   <div class='pi-code'>{{data.code}} </div>
   <div class='pi-name'>{{data.name}}</div>
   <div style='font-size:10px;'>
@@ -30,6 +28,8 @@ export default {
     onClick(e){
       if(this.data.type == '培训')
         this.RouteTo('/core/classes/'+this.data.id+'/dashboard')
+      else if(this.data.id.indexOf("CT") == 0)
+        this.RouteTo('/core/cm/'+this.data.id+'/dashboard')
       else
         this.RouteTo('/core/projects/'+this.data.id+'/dashboard')
     }

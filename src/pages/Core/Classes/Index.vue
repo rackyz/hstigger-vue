@@ -30,7 +30,7 @@
         <div class='left'>
       <div class="flex-wrap" style='margin-top:0px;font-size:10px;line-height:20px;'>
           <a type='text' size='small' style='text-align:center;color:#ddd;' icon="md-arrow-back" @click="RouteTo('/core')"><Icon type="md-arrow-back" /> 返回</a>
-          <a type='text' size='small' style='text-align:center;margin-left:10px;color:#ddd;' @click="showDrawer = !showDrawer">切换其他项目</a>
+          <a type='text' size='small' style='text-align:center;margin-left:10px;color:#ddd;' @click="showProjects = !showProjects">切换其他项目</a>
           <a type='text' size='small' style='text-align:center;margin-left:10px;color:orange;' @click="RouteTo('/core/training')" icon="md-add"><Icon type="md-more" color="#aaa" /> 更多课程   </a>
         </div>
         <div class="project-name" style="margin-bottom:0;padding-bottom:0;margin-top:3px;">
@@ -53,10 +53,10 @@
         
         <Content >
           <router-view></router-view>
-           <Drawer :closable="false" v-model="showDrawer" placement="left" inner :transfer="false" styles='padding:0'>
-             <!-- <template v-for='d in my_classes'>
-               <BaseDepListItem :data="d" :key='d' v-if="id != d" />
-             </template> -->
+           <Drawer :closable="false" v-model="showProjects" placement="left" inner :transfer="false" styles='padding:0'>
+             <template v-for='p in projects'>
+               <BaseProject :data="p"  :key='p.id' v-if="id != p.id" />
+             </template>
              
           </Drawer>
         </Content>
@@ -83,7 +83,7 @@ export default {
   data(){
     return {
       selected:null,
-      showDrawer:false,
+      showProjects:false,
       loading:false,
        menus:[
          {name:'学员端',
@@ -159,8 +159,15 @@ export default {
          ]
     }
   },
+  watch:{
+    id:{
+      handler(v){
+        this.getData()
+      }
+    }
+  },
   computed:{
-    ...mapGetters('core',['getUser','uid']),
+    ...mapGetters('core',['getUser','uid','my_projects']),
     ...mapGetters('training',['item']),
     MenuMap(){
       let map = {}
@@ -183,6 +190,8 @@ export default {
     },
     ActiveMenu(){
       return this.MenuMap[this.ActivePath]
+    }, projects(){
+      return this.my_projects
     },
     ActivePath(){
       return this.$route.path

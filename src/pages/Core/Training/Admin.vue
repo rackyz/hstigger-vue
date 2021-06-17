@@ -72,14 +72,14 @@ export default {
     handleSubmit(e){
       if(!this.model.id) {
         this.api.enterprise.POST_TRAININGS(e).then(res=>{
-          let updateInfo = res.data.data
+          let updateInfo = res.data.data || {}
           let item = Object.assign({},e,updateInfo)
           this.items.push(item)
-           this.Sucess("创建完成")
+           this.Success("创建完成")
           this.modalCreate = false
           this.model = {}
         }).catch(e=>{
-          this.Error('创建失败')
+          this.Error('创建失败'+e)
         })
       }else{
          this.api.enterprise.PATCH_TRAININGS(e,{param:{id:this.model.id}}).then(res=>{

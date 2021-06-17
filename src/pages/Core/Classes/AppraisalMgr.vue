@@ -276,6 +276,13 @@ export default {
           states:['未开始','进行中','已提交','已完成']
         }
       },{
+         key:'recommend',
+        title:"推荐",
+        width:120,
+        render(h,param){
+          return h('Button',{props:{size:'small',type:param.row.recommend?'warning':''}},param.row.recommend?'已推荐':'推荐')
+        }
+      },{
          key:"evaluted_at",
          width:200,
          title:"考评时间",

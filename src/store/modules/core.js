@@ -31,7 +31,7 @@ const state = {
 
 const getters = {
   version(){
-    return "1.0.2"
+    return "1.0.3"
   },
   loading(state){
     return state.loading
@@ -42,6 +42,7 @@ const getters = {
   getEntUsers(state){
     let items = []
     state.employees.forEach(v=>{
+     
       let {name,avatar,id} = v
       if(v.deps && v.deps.length){
         v.deps.forEach(s=>{
@@ -51,12 +52,14 @@ const getters = {
                items.push(Object.assign({group:dep.name,
               name,avatar,id}))
         })
-        if (!v.deps || v.deps.length == 0) {
-           items.push(Object.assign({
-             group:'暂无部门'
-           }, v))
-        }
+       
       }
+
+       if (!v.deps || v.deps.length == 0) {
+         items.push(Object.assign({
+           group: '暂无部门'
+         }, v))
+       }
     })
     let {name,avatar,id} = Object.assign({
     }, state.employees.find(v => v.id == state.session.id)
