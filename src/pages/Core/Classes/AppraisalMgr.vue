@@ -60,8 +60,8 @@
             <template v-for="e in filteredUsers">
               <div :key='e.id' class="flex-wrap flex-between" style="padding:10px;color:#ddd;border-bottom:1px solid #111;" :style="selected_user.id == e.user_id?'filter:brightness(1.2);background:orange;color:#000;':''" @click="selectedUser = e">
                  <div style="">{{getUser(e.user_id).name}}</div>
-                 <div style="font-size:10px;" :style="{color:getEvalColor(e.result)}">
-                   {{getEval(e.result) || '-'}} <span style='color:#aaa'>/ {{e.score || '-'}}</span>
+                 <div style="font-size:10px;" :style="selected_user.id == e.user_id?'color:#000;':getEvalColor(e.result)">
+                   {{getEval(e.result) || '-'}} <span :style="selected_user.id == e.user_id?'color:#000;':'color:#aaa'">/ {{e.score || '-'}}</span>
                  </div>
               </div>
              

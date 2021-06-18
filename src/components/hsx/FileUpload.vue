@@ -1,11 +1,11 @@
 <template>
-  <a @click.self="onClickSlot" style="color:yellow;">
+  <a @click.self="onClickSlot" style="color:fff;">
       
       <slot></slot>
       <input type="file" ref='file' style="visibility:hidden;position:absolute;"  @change="handleUpload" :accept="accept" :multiple="multiple" /> 
       <a v-if="value && editable" style="margin-left:10px;color:yellow;" @click.prevent="onSelectFile">重传</a>
       <br />
-      <span style='color:#aaa'>{{value}}</span>
+      <span style='color:#aaa'>{{uploading?`(${percent} %)`:""}}</span>
   </a>
 </template>
 
@@ -13,7 +13,9 @@
 export default {
   data(){
     return {
-      file:{}
+      file:{},
+      uploading:false,
+      percent:0
     }
   },
   props:['value','accept','multiple','editable'],
@@ -36,7 +38,8 @@ export default {
 				return ext;
 			}
     },
-    onUploadProgressList(percent){
+    onUploadProgressList(o){
+      let percent = parseInt(o.loaded / o.total)
       this.percent = percent
 
     },
@@ -51,6 +54,8 @@ export default {
         vdisk:  "ref",
             };
       this.file = fileObject
+      this.uploading = true
+      this.percent = 0
       this.$store.dispatch('file/upload',{files:[file],onProgress:this.onUploadProgressList}).then(res=>{
         
               if(!Array.isArray(res))
@@ -58,6 +63,8 @@ export default {
               fileObject.url = res[0].url
               this.value = fileObject.url
               this.$emit('change',fileObject.url)
+            }).finally(e=>{
+              this.uploading = false
             })
 
         

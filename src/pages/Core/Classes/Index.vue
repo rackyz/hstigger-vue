@@ -200,7 +200,7 @@ export default {
        if(this.item.charger != this.uid)
         menus = this.menus.slice(0,1)
       else
-        menus = this.menus.slice(0,2)
+        menus = this.menus.slice(1,2)
       return menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{

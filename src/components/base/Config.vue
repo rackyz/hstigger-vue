@@ -29,7 +29,7 @@
       <Col :span='12'>
       <div class="l-config-wrap" style="width:800px;padding-bottom:50px;">
        <p class="l-config-caption"><Icon type="md-list" /> 学员风采 </p>
-      
+        <hs-form :form="formImages" :data="item" @on-submit="handleSubmit" :editable="editable" />
       </div>
       </Col>
     </Row>
@@ -55,11 +55,30 @@ export default {
       let form = Object.assign({},this.Form("class"))
       form.layout = form.layout.replace("{{charger}}","")
       return form
+    },
+    formImages(){
+      return {
+        def:{
+          images:{
+            control:"images",
+            option:{
+                uploader:"file/upload",
+            }
+          }
+        },
+        layout:`<div>{{images}}</div>`
+        ,
+        option:{
+          hideCancel:true,
+          hideReset:true
+        }
+      }
     }
   },
   methods:{
     handleSubmit(e){
-      this.$store.dispatch('training/patch',{id:this.model.id,data:e}).then(res=>{
+      console.log(e)
+      this.$store.dispatch('training/patch',{id:this.item.id,data:e}).then(res=>{
         this.Success("更新成功")
         this.editable = false
 

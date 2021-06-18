@@ -3,23 +3,24 @@
     <Row :gutter="0" style="margin:20px 20px;">
       <Col :span='6'>
       <img :src="item.avatar || 'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/assets/misc/px.jpg'" style="width:100%;height:210px;border:1px solid #aaa;border-bottom:none;" />
-      <div style="background:rgb(20, 35, 60);color:#fff;border:none;padding:10px;padding-left:20px;"> 
+      <div style="background:rgb(20, 35, 60);color:#fff;border:none;padding:5px;padding-left:10px;"> 
         <Icon type="md-easel" size="16" style="margin-right:5px;" />  {{item.name}}
       </div>
-      <div style="margin-bottom:10px;background:rgb(40, 55, 80);color:#dfdfdf;border:none;padding:20px;font-size:12px;"> 
-        {{item.desc}}
+      <div style="margin-bottom:10px;background:rgb(40, 55, 80);color:#dfdfdf;border:none;padding:10px;font-size:12px;">
+        <div style="color:#aaa;">{{item.desc || '无详细介绍'}}</div> 
+        
 
-        <div style="margin-top:10px">
+        <div style="margin-top:5px">
           培训地点 
-          <p style="color:yellow">{{item.address || '未指定'}}</p>
+          <span style="color:yellow">{{item.address || '未指定'}}</span>
         </div>
 
-        <div style="margin-top:10px">
+        <div style="margin-top:5px">
           培训时间
-          <p style="color:yellow">  {{item.started_at?moment(item.started_at).format("L"):"--"}} 至 {{item.deadline?moment(item.deadline).format("L"):"--"}}</p>
+          <span style="color:yellow">  {{item.started_at?moment(item.started_at).format("L"):"--"}} 至 {{item.deadline?moment(item.deadline).format("L"):"--"}}</span>
         </div>
       </div>
-      <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;color:#eee;font-weight:normal;padding-left:15px;">
+      <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;color:#eee;font-weight:normal;padding-left:15px;">
              <Icon type="md-clock" size="16" style="margin-right:5px;" /> 课程安排
           </div>
       <div  style="border-left:1px solid #eee;border-right:1px solid #eee;width:100%;">
@@ -61,7 +62,7 @@
       </template>
       </div>
       
-      <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;padding-left:15px;color:#eee;font-weight:normal;margin-top:10px;">
+      <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin-top:10px;">
             <Icon type="md-cloud-download" size="16" style="margin-right:5px;" /> 资料下载
           </div>
       <div  style="background:#fff;border:1px solid #eee;"> 
@@ -93,7 +94,7 @@
             
           </div>
       
-      <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;padding-left:15px;color:#eee;font-weight:normal;margin-top:10px;">
+      <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin-top:10px;">
             <Icon type="ios-quote" /> 问题交流
           </div>
           
@@ -109,7 +110,7 @@
       
       </Col> 
       <Col :span='6'>
-       <!-- <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;padding-left:15px;color:#eee;font-weight:normal;margin:0;" >
+       <!-- <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin:0;" >
             <Icon type="ios-notice" /> 
             通知
           </div>
@@ -117,25 +118,44 @@
              <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding:15px;padding-top:0;height:200px;font-size:12px;"> 
                下一节课
       </div> -->
-        <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;padding-left:15px;color:#eee;font-weight:normal;margin:0;">
+        <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin:0;">
             <Icon type="ios-photos" /> 
             培训风采
           </div>
           
-             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding:15px;padding-top:0;height:250px;font-size:12px;"> 
-                <BaseEmpty msg="暂时没有新动态">
+             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding-top:0;height:250px;font-size:12px;"> 
+                <BaseEmpty msg="暂时没有新动态" v-if="!images || images.length == 0">
               
               </BaseEmpty>
+              <Carousel v-model="carouselIndex" autoplay  loop>
+              <template v-for="img in images">
+                 <CarouselItem :key="img.name">
+                   <div style="width:100%;height:250px;position:relative;">
+                  <img :src="img.url" style="width:100%;height:100%" />
+                  </div>
+                </CarouselItem>
+              </template>
+             
+             
+          </Carousel>
       </div>
-         <div class="l-caption" style="background:rgb(20, 35, 60);padding:10px 20px;padding-left:15px;color:#eee;font-weight:normal;margin:0;">
+         <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin:0;">
             <Icon type="ios-quote" /> 
             动态
           </div>
           
-             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding:15px;padding-top:0;height:400px;font-size:12px;"> 
-                <BaseEmpty msg="暂时没有新动态">
+             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;min-height:100px;font-size:12px;"> 
+                <BaseEmpty msg="暂时没有新动态" v-if="!item.dynamics || item.dynamics.length == 0">
               
               </BaseEmpty>
+              <template v-for="d in item.dynamics">
+                <div :key="d.id" class="flex-wrap flex-between" style="font-size:12px;padding:5px 10px;border-bottom:1px solid #eee;width:100%;">
+                 
+                  <div><span style="color:#3af;">{{getUser(d.user_id).name}}</span> {{d.content}}</div>
+                   <div style="min-width:60px;font-size:10px;color:green;text-align:right;">{{moment(d.created_at).fromNow()}}</div>
+                
+                </div>
+              </template>
       </div>
 
      
@@ -148,6 +168,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 let player = null
 const SetTrainingStateFromDuratin = (item={})=>{
   let now = moment()
@@ -182,6 +203,7 @@ export default {
   data(){
     return {
       item:{},
+      carouselIndex:0,
       current_video:"https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/system/PexelsVideos1824697.mp4",
     }
   },
@@ -190,8 +212,16 @@ export default {
    
   },
   computed:{
+    ...mapGetters("core",['getUser']),
     id(){
       return this.$route.params.id
+    },
+    images(){
+      if(this.item.images && this.item.images.includes(','))
+      return this.item.images.split(';').map(v=>{
+        let [name,url] = v.split(',')
+        return {name,url}
+      })
     }
   },  
 metaInfo:{
@@ -251,6 +281,9 @@ methods:{
          this.initPlayer()
         this.api.enterprise.LIST_ARCHIVES({query:{project_id:this.id}}).then(res=>{
           this.$set(this.item,'files',res.data.data)
+        })
+        this.api.enterprise.LIST_DYNAMICS({query:{project_id:this.id}}).then(res=>{
+          this.$set(this.item,'dynamics',res.data.data)
         })
       })
 
