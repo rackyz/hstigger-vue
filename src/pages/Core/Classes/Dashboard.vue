@@ -96,15 +96,19 @@
       
       <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin-top:10px;">
             <Icon type="ios-quote" /> 问题交流
+            <div style="float:right;font-size:10px;line-height:20px;">
+              <a style="color:#3af;margin-right:5px;" @click="modalCreateTopic=true;topic={}"><Icon type="md-add" size="12" style="position:relative;bottom:1px;"  /> 新话题</a> <a style="color:#ddd;">MORE</a>
+            </div>
           </div>
           
-             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding:15px;padding-top:0;min-height:350px;font-size:12px;"> 
-               <BaseEmpty>
+             <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding-top:0;min-height:150px;font-size:12px;"> 
+               <BaseEmpty v-if="topics.length == 0">
                <div style="margin-top:150px;">
                   还没有人发起讨论,
-                  <Button size="small" icon="md-quote" style="margin-left:3px;" @click="handleCreateDiscuss">点击创建</Button> 
+                  <Button size="small" icon="md-quote" style="margin-left:3px;" @click="modalCreateTopic=true;topic={}">点击创建</Button> 
                   </div>
               </BaseEmpty>
+              <hs-list :option="{tmpl:'HsxTopic'}" :data="topics" style="border:none;" @event="handleTopicListEvent" />
       </div>
 
       
@@ -162,7 +166,10 @@
       </Col>
 
     </Row>
-   
+
+    <hs-modal-form title="创建话题" v-model="modalCreateTopic"  @on-submit="handleCreateTopic" :data="topic" width="600" :form="Form('topic')" />
+
+    <ModalTopic v-model="showTopic" :data="topic" />
 
   </div>
 </template>
@@ -203,13 +210,18 @@ export default {
   data(){
     return {
       item:{},
+      modalCreateTopic:false,
+      topics:[],
+      showTopic:false,
+      tipic:{},
       carouselIndex:0,
+      modalTopic:false,
       current_video:"https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/system/PexelsVideos1824697.mp4",
     }
   },
   mounted(){
     this.getData()
-   
+    this.getTopics()
   },
   computed:{
     ...mapGetters("core",['getUser']),
@@ -292,6 +304,30 @@ methods:{
     
     }, getState(e){
       return this.$store.getters['core/getTypeByValue']("TASK_STATE",e) || {}
+    },
+    getTopics(){
+      this.api.enterprise.LIST_TOPICS({query:{project_id:this.id}}).then(res=>{
+        this.topics = res.data.data
+      })
+    },
+    handleCreateTopic(e){
+      e.project_id = this.id
+      this.api.enterprise.POST_TOPICS(e).then(res=>{
+        this.modalCreateTopic = false
+        this.Success("操作成功")
+        this.getTopics()
+      }).catch(e=>{
+        this.Error(e)
+      })
+    },
+    handleTopicListEvent(e){
+      if(e.event == 'open'){
+        this.api.enterprise.GET_TOPICS({param:{id:e.param.id}}).then(res=>{
+          this.topic = res.data.data
+          console.log(this.topic)
+          this.showTopic = true
+        })
+      }
     }
 }
 }
