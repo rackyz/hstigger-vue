@@ -85,7 +85,21 @@
       >
       <template v-if='my_rss && my_rss.length != 0'>
         <Row :gutter="10">
+            <Col
+              :span='12'
+              :xs="24"
+              :md='24'
+              :lg="12"
+            >
+            <Card
+              padding='5'
+              style='height:300px;margin-bottom:10px;border-radius:0;border:none;overflow:hidden;'
+            >
+              <div @click.stop="RouteTo('/core/training/dashboard')" style="width:100%;height:300px;position:relative;background:color:#fff;padding:20px;background:#346 url(https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/assets/misc/px.jpg) 0 0 100% 100%;font-size:25px;">培训报名入口 <Icon type="md-arrow-forward" /></div>
+        
 
+            </Card>
+            </Col>
           <template v-for="r in my_rss">
             <Col
               :span='12'
