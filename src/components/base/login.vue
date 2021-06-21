@@ -210,27 +210,36 @@ export default {
         },
         submitForm(model) {
             
-            
+             this.loading = true
             this.forgetFormData = {account:model.user}
+            var that = this
             if(!model.user){
                 this.Error("请输入用户名")
-                this.loading = false
+                setTimeout(e=>{
+                     that.loading = false
+                },500)
+               
                 return
             }
             
             
             if(!model.password){
                 this.Error("请输入密码")
-                this.loading = false
+                 setTimeout(e=>{
+                     that.loading = false
+                },500)
                 return
             }
 
-            var that = this
+            
+           
             this.$store.dispatch('ctx/Login',model).then(_=>{
                    
             }).catch(e=>{
                 console.log(e)
-                this.loading = false
+                 setTimeout(e=>{
+                     that.loading = false
+                },500)
             })
 
              that.$store.dispatch('core/login',model).then(session=>{
@@ -258,7 +267,9 @@ export default {
                             that.Error(e)
                         }
                     }).finally(e=>{
-                        that.loading = false
+                        setTimeout(e=>{
+                     that.loading = false
+                },500)
                     })
 
             
