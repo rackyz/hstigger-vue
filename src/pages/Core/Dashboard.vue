@@ -85,21 +85,7 @@
       >
       <template v-if='my_rss && my_rss.length != 0'>
         <Row :gutter="10">
-            <Col
-              :span='12'
-              :xs="24"
-              :md='24'
-              :lg="12"
-            >
-            <Card
-              padding='5'
-              style='height:300px;margin-bottom:10px;border-radius:0;border:none;overflow:hidden;'
-            >
-              <div @click.stop="RouteTo('/core/training/dashboard')" style="width:100%;height:300px;position:relative;background:color:#fff;padding:20px;background:#346 url(https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/assets/misc/px.jpg) 0 0 100% 100%;font-size:25px;">培训报名入口 <Icon type="md-arrow-forward" /></div>
-        
-
-            </Card>
-            </Col>
+           
           <template v-for="r in my_rss">
             <Col
               :span='12'
@@ -136,6 +122,49 @@
             </Col>
 
           </template>
+
+           <Col
+              :span='24'
+              :xs="24"
+              :md='24'
+              :lg="12"
+            >
+            <Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+              <div @click.stop="RouteTo('/core/training/dashboard')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>培训中心</span> <br />
+              培训报名入口 <Icon type="md-arrow-forward" />
+              
+              <Icon type="md-easel" color="yellowgreen" size="100" style="position:absolute;right:10px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-film" color="#fff" size="220" style="position:absolute;right:100px;top:-10px;opacity:0.3;"></Icon>
+              </div>
+
+
+            </Card>
+            </Col>
+             <Col
+              :span='24'
+              :xs="24"
+              :md='24'
+              :lg="12"
+            >
+            <Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+              <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>餐厅</span> <br />
+              预约 <Icon type="md-arrow-forward" />
+              
+              <Icon type="md-ice-cream" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-pizza" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
+              </div>
+
+
+            </Card>
+            </Col>
         </Row>
       </template>
 

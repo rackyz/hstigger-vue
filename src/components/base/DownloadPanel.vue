@@ -39,6 +39,10 @@ export default {
 
         icon:'nbgz',
         color:"#1E9FFF"
+      },{ id:1,
+        title:"打印机驱动MX503",
+        avatar:'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/system/chrome.jpg',
+        url:'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/upload/MX-Mono3_PCL_PS_1302a_ChineseS_Win8Server2012.rar'
       }]
     }
   },

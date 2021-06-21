@@ -169,6 +169,9 @@ export default {
   computed:{
     ...mapGetters('core',['getUser','uid','my_projects']),
     ...mapGetters('training',['item']),
+     isAdmin(){
+      return this.$store.getters['core/session'].my_deps.includes(69071263)
+    },
     MenuMap(){
       let map = {}
      
@@ -193,14 +196,19 @@ export default {
     }, projects(){
       return this.my_projects
     },
+     isMember(){
+      return this.item.users.find(v=>v.user_id == this.uid)
+    },
     ActivePath(){
       return this.$route.path
     }, RouteMenu(){
       let menus = []
-       if(this.item.charger != this.uid)
-        menus = this.menus.slice(0,1)
-      else
-        menus = this.menus.slice(1,2)
+        if(this.isMember)
+        menus = menus.concat(this.menus.slice(0,1))
+      if(this.item.charger == this.uid || this.isAdmin)
+        menus = menus.concat(this.menus.slice(1,2))
+      
+    
       return menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{

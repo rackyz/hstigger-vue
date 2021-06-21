@@ -13,11 +13,16 @@
       
      <hs-modal-form v-model="showModalCreate" :title="!model.id?'创建课程计划':'修改课程计划'" :form="Form('classplan')" :data="model" @on-submit="handleSubmit" width="600" />
 
-     <Modal hide-footer title="上传视频" v-model="showFileUploaderModal">
-       {{complete}} %
+     <Modal footer-hide title="上传进度" v-model="uploading">
+       <div style="padding:10px;">
+         <Progress :percent="percent" hide-info/>
+       {{complete}}
+       </div>
+       
      </Modal>
 
        <input type="file" ref='file' style="visibility:hidden;position:absolute;"  @change="handleUpload" accept="*.mp4" :multiple="multiple" /> 
+
   </div>
 </template>
 
@@ -57,6 +62,7 @@ const SetTrainingStateFromDuratin = (item={})=>{
 export default {
   data(){
     return {
+      percent:0,
       showModalCreate:false,
       selected:{},
       model:{},
@@ -109,7 +115,8 @@ export default {
           icon:"md-videocam"
         }],
         showFileUploaderModal:false,
-        complete:0
+        complete:"等待上传",
+        uploading:false
     }
   },
 metaInfo:{
@@ -191,9 +198,8 @@ metaInfo:{
     },
     	onUploadProgressList(progressEvent,index) {
             
-            var complete = ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+          
             
-            this.$set(this.files[this.baseIndex+index],'percent',complete + "%");
             
         },
     handleUploadVideo(e){
@@ -206,8 +212,10 @@ metaInfo:{
 				return ext;
 			}
     },
-    onUploadProgressList(percent){
-      this.percent = percent
+    onUploadProgressList(e){
+        var percent = ((e.loaded / e.total) * 100) | 0;
+        this.percent = percent
+      this.complete = `${e.loaded} / ${e.total} (${percent}%)`
 
     },
      handleUpload(e){
@@ -222,6 +230,9 @@ metaInfo:{
         vdisk:  "ref",
             };
       this.file = fileObject
+      this.uploading = true
+      this.complete = ""
+      this.pecent = 0
       this.$store.dispatch('file/upload',{files:[file],onProgress:this.onUploadProgressList}).then(res=>{
         
               if(!Array.isArray(res))
@@ -231,6 +242,8 @@ metaInfo:{
                 this.Success('上传成功')
                 this.getData()
               })
+            }).finally(e=>{
+               this.uploading = false
             })
 
         
