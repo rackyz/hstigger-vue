@@ -1,9 +1,9 @@
 <template>
 <div>
-  <div class="flex-wrap" style='padding:10px;justify-content:space-between;'>
+  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:#346;'>
       <div class="flex-wrap">
           <hs-avatar :userinfo="session" size="30" style='margin-bottom:2px' />  
-          <div class='name'>早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
+          <div class='name' style="background:#346;color:#fff">早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
         </div> 
         <Dropdown trigger="click" @on-click="handleSaveStatus">
       <div class='status-mark hs-dropdown' :style="`border-radius:5px;color:#fff;background:${statusColors[session.status || 0]};`">{{status[session.status || 0]}} <Icon custom='gzicon gzi-down' style='color:#FFFFFFaa;'></Icon></div>
@@ -15,7 +15,7 @@
       </Dropdown>
           
   </div>
-<div class='status'>
+<div class='status' style="background:#235;color:#fff;padding-top:10px;">
            
             {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
             
@@ -123,7 +123,7 @@ export default {
   cursor: pointer;
   font-size:14px;
   
-  border:1px solid #ddd;
+  border:1px solid #222;
   padding:2px 15px;
   filter:saturate(80%);
 }

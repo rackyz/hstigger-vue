@@ -33,7 +33,7 @@
            <Steps :current="focused && focused.state?(focused.state - 1):0" direction="vertical" size="small" class="transparent-steps">
             <Step title="上传文件"> 
             <div slot='content' style="margin-top:5px;" >
-              <HsxFileUpload :value="focused.file" @change="handleChangeFile" :editable="focused.state == 1 || focused.state == 3">上传作业 ( {{focused.file?1:0}} / 1 )</HsxFileUpload>
+              <HsxFileUpload :value="focused.file" @change="handleChangeFile" :editable="focused.state == 1 || focused.state == 3"><span style="color:#3af;margin-right:10px;">上传作业 ( {{focused.file?1:0}} / 1 )</span> 点击上传</HsxFileUpload>
             </div>
 
             </Step>
@@ -326,7 +326,6 @@ export default {
     async upload(files,onFilesProgress){
      return new Promise((resolve,reject)=>{
        this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
-         console.log(files)
          resolve(files.map(v=>v.url))
        }).catch(reject)
      })
@@ -402,7 +401,7 @@ export default {
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
           this.$set(this,'focused',Object.assign({},this.focused,updateInfo))
-          this.Success('处理成功')
+          this.$emit('change-state',updateInfo.state)
       }).catch(e=>{
         this.Error("处理失败:",)
       })

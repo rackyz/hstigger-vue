@@ -1,6 +1,6 @@
 <template>
   <div class="news-item">
-    <a style="color:#3af;" @click.prevent='onClick'> - {{data.title}} <span class="l-hurry" v-if="data.hurry">紧急</span></a>
+    <a style="color:#3af;" @click.prevent='onClick'> <Icon type="md-notifications" /> {{data.title}} <span class="l-hurry" v-if="data.hurry">紧急</span></a>
     <div class='date'>{{data.date}} </div>
   </div>
 </template>

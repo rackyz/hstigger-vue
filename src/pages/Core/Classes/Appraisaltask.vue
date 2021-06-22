@@ -5,7 +5,7 @@
         <BaseEmpty v-if="items.length==0" msg="讲师还为发布任何任务哦" />
       
         <hs-list style="background:#eee;height:calc(100% - 50px);" v-else :data="items" :option="{tmpl:'BaseTaskBar'}" @event="handleListEvent"></hs-list>
-       <ModalProcessTask v-model="modalProcessTask" :task="current_flow" @update="handleUpdateTask" />
+       <ModalProcessTask v-model="modalProcessTask" :task="current_flow" @update="handleUpdateTask" @change-state="handleChangeState" />
     </div>
   
 </template>
@@ -38,6 +38,9 @@ metaInfo:{
         items.sort((a,b)=>a.task_state > b.task_state?1:-1)
         this.items = items
       })
+    },
+    handleChangeState(e){
+      this.$set(this.current_flow,'state',e)
     },
     handleListEvent(e){
       console.log(e)

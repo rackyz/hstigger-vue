@@ -69,7 +69,7 @@
           <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
           
           <Button type="success" v-else style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
-          <a style="color:red;margin-top:10px;" @click="Join" v-if="isMember">取消报名</a>
+          <a style="color:red;margin-top:10px;" @click="unjoin" v-if="isMember">取消报名</a>
           
         </div>
         </Col>

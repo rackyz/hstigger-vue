@@ -43,7 +43,7 @@ export default {
   background-position:10% 30% !important;
    background-blend-mode:multiply;
    color:#ddd;
- 
+  border:1px solid #666;
   display: flex;
   flex-direction:column;
 
@@ -103,7 +103,7 @@ export default {
 .project-item:hover{
   transition:all 0s;
   filter:brightness(1.1);
-
+  border-color:yellow;
   .pi-name{
     color:#3af;
   }

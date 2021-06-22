@@ -41,8 +41,13 @@ export default {
         color:"#1E9FFF"
       },{ id:1,
         title:"打印机驱动MX503",
-        avatar:'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/system/chrome.jpg',
+        avatar:'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/upload/print.jpg',
         url:'https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/upload/MX-Mono3_PCL_PS_1302a_ChineseS_Win8Server2012.rar'
+      },{
+        id:3,
+        title:"WinRAR",
+        avatar:"https://nbgzfiles-1257839135.cos.ap-shanghai.myqcloud.com/upload/winrar.jpg",
+        url:"http://zzlatm.gicp.net:10000/public/upload/20210622/20210622_60d1957244fcd.exe"
       }]
     }
   },

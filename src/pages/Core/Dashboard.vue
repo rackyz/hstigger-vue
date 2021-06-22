@@ -23,11 +23,21 @@
       </Card> -->
       <Card
         class="panel"
-        style='width:100%;border:none;border-radius:0'
-        padding="5"
+        style='width:100%;border:none;background:#235;overflow:hidden;'
+        padding="0"
       >
+       <div class='card-title' style="background:#246;color:#fff;border-color:#000;display:flex;align-items:center;">
+          <Icon
+            custom='gzicon gzi-star'
+            style="margin-right:5px;"
+            size='13'
+          /> 个人状态 <span style='float:right;'><a
+              href='#'
+              style="color:#3af;font-size:12px;" 
+            ></a></span>
+        </div>
         <BaseMyStatus />
-        <div style='height:25px;width:100%;padding:0 10px;'>
+        <div style='height:25px;width:100%;padding:0 10px;background:#235;'>
           <a
             style='float:right;font-size:12px;color:#3af;'
             @click.stop="RouteTo('/core/self')"
@@ -37,8 +47,7 @@
         </div>
 
       </Card>
-<!-- 
-       <Card
+          <Card
         class="panel"
         style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
         padding='0'
@@ -55,26 +64,28 @@
         <BaseDepList />
       </Card>
 
+
       <Card
         class="panel"
         style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
         padding='0'
       >
-        <div class='card-title'>
+        <div class='card-title' style="background:#246;color:#fff;border-color:#000;">
           <Icon
             custom='gzicon gzi-pm2'
-            size='19'
+            size='15'
+            style="line-height:15px;"
           /> 我的项目 <span style='float:right;'><a
               href='#'
               style="color:#3af;font-size:12px;" @click="RouteTo('/core/self/project')"
             >MORE</a></span>
         </div>
         <BaseProjectList />
-      </Card> -->
-      <!-- <BaseFilePanel /> -->
-      <BaseProjectList />
+      </Card> 
+    
       <BaseLinkPanel />
       <BaseDownloadPanel />
+        <BaseFilePanel />
       </Col>
 
       <Col
@@ -85,7 +96,85 @@
       >
       <template v-if='my_rss && my_rss.length != 0'>
         <Row :gutter="10">
-           
+             <Col
+              :span='12'
+              :xs="12"
+              :md='12'
+              :lg="6"
+            >
+            <Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+              <div @click.stop="RouteTo('/core/training/dashboard')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>培训中心</span> <br />
+              培训报名入口 <Icon type="md-arrow-forward" />
+              
+              <Icon type="md-easel" color="yellowgreen" size="100" style="position:absolute;right:10px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-film" color="#fff" size="220" style="position:absolute;right:100px;top:-10px;opacity:0.3;"></Icon>
+              </div>
+
+
+            </Card>
+            </Col>
+             <Col
+              :span='6'
+              :xs="12"
+              :md='12'
+              :lg="6"
+            >
+            <Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+              <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>餐厅</span> <br />
+              预约 <Icon type="md-arrow-forward" />
+              
+              <Icon type="md-ice-cream" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-pizza" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
+              </div>
+
+
+            </Card>
+            </Col>
+             <Col
+              :span='6'
+              :xs="12"
+              :md='12'
+              :lg="6"
+            >
+            <Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+            <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>项目展示</span> <br />
+              优秀项目 <Icon type="md-arrow-forward" />
+              
+              <Icon custom="gzicon gzi-supervisor" color="#3af" size="90" style="position:absolute;right:10px;top:-5px;opacity:0.3;"></Icon>
+              <Icon type="md-bulb" color="#fff" size="140" style="position:absolute;right:130px;top:10px;opacity:0.3;"></Icon>
+              </div>
+            </Card>
+            </Col>
+             <Col
+              :span='6'
+              :xs="12"
+              :md='12'
+              :lg="6"
+            ><Card
+              padding='0'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+            >
+             <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>讨论区</span> <br />
+              公司论坛 <Icon type="md-arrow-forward" />
+              
+              <Icon type="md-chatboxes" color="#3af" size="100" style="position:absolute;right:10px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-microphone" color="#fff" size="140" style="position:absolute;right:130px;top:10px;opacity:0.3;"></Icon>
+              </div>
+            </Card>
+            </Col>
           <template v-for="r in my_rss">
             <Col
               :span='12'
@@ -123,48 +212,7 @@
 
           </template>
 
-           <Col
-              :span='24'
-              :xs="24"
-              :md='24'
-              :lg="12"
-            >
-            <Card
-              padding='0'
-              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
-            >
-              <div @click.stop="RouteTo('/core/training/dashboard')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
-              <span style='font-size:25px;color:#3af;'>培训中心</span> <br />
-              培训报名入口 <Icon type="md-arrow-forward" />
-              
-              <Icon type="md-easel" color="yellowgreen" size="100" style="position:absolute;right:10px;top:-13px;opacity:0.3;"></Icon>
-              <Icon type="md-film" color="#fff" size="220" style="position:absolute;right:100px;top:-10px;opacity:0.3;"></Icon>
-              </div>
-
-
-            </Card>
-            </Col>
-             <Col
-              :span='24'
-              :xs="24"
-              :md='24'
-              :lg="12"
-            >
-            <Card
-              padding='0'
-              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
-            >
-              <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
-              <span style='font-size:25px;color:#3af;'>餐厅</span> <br />
-              预约 <Icon type="md-arrow-forward" />
-              
-              <Icon type="md-ice-cream" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
-              <Icon type="md-pizza" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
-              </div>
-
-
-            </Card>
-            </Col>
+         
         </Row>
       </template>
 
