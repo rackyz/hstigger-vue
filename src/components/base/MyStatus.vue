@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:linear-gradient(to bottom right,#3af,#234);border-top-left-radius:5px;border-top-right-radius:5px;'>
+  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:linear-gradient(to bottom right,#468,#234);border-top-left-radius:5px;border-top-right-radius:5px;'>
       <div class="flex-wrap">
           <hs-avatar :userinfo="session" size="30" style='margin-bottom:2px' />  
           <div class='name' style="background:#24334c;color:#fff">早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
@@ -15,7 +15,7 @@
       </Dropdown>
           
   </div>
-<div class='status' style="background:#14233c;color:#fff;padding-top:10px;">
+<div class='status' style="background:linear-gradient(to bottom,#14233c,#123);color:#fff;padding-top:10px;min-height:80px;">
            
             {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
             
