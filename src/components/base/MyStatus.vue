@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:linear-gradient(to bottom right,#3af,#234);'>
+  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:linear-gradient(to bottom right,#3af,#234);border-top-left-radius:5px;border-top-right-radius:5px;'>
       <div class="flex-wrap">
           <hs-avatar :userinfo="session" size="30" style='margin-bottom:2px' />  
           <div class='name' style="background:#24334c;color:#fff">早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>

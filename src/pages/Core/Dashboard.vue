@@ -27,8 +27,8 @@
         padding="0"
       >
       
-        <BaseMyStatus />
-        <div style='height:25px;width:100%;padding:0 10px;background:#14233c;'>
+        <BaseMyStatus  />
+        <div style='height:25px;width:100%;padding:0 10px;background:#14233c;border-bottom-left-radius:5px;border-bottom-right-radius:5px;'>
           <a
             style='float:right;font-size:12px;color:#3af;'
             @click.stop="RouteTo('/core/self')"
