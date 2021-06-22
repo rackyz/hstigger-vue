@@ -23,21 +23,12 @@
       </Card> -->
       <Card
         class="panel"
-        style='width:100%;border:none;background:#235;overflow:hidden;'
+        style='width:100%;border:none;background:#235;'
         padding="0"
       >
-       <div class='card-title' style="background:#246;color:#fff;border-color:#000;display:flex;align-items:center;">
-          <Icon
-            custom='gzicon gzi-star'
-            style="margin-right:5px;"
-            size='13'
-          /> 个人状态 <span style='float:right;'><a
-              href='#'
-              style="color:#3af;font-size:12px;" 
-            ></a></span>
-        </div>
+      
         <BaseMyStatus />
-        <div style='height:25px;width:100%;padding:0 10px;background:#235;'>
+        <div style='height:25px;width:100%;padding:0 10px;background:#14233c;'>
           <a
             style='float:right;font-size:12px;color:#3af;'
             @click.stop="RouteTo('/core/self')"
@@ -49,7 +40,7 @@
       </Card>
           <Card
         class="panel"
-        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
+        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;border:1px solid #dfdfdf;"
         padding='0'
       >
         <div class='card-title'>
@@ -67,10 +58,10 @@
 
       <Card
         class="panel"
-        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;"
+        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;border:1px solid #dfdfdf;"
         padding='0'
       >
-        <div class='card-title' style="background:#246;color:#fff;border-color:#000;">
+        <div class='card-title' style="background:#14233c;color:#fff;border-color:#000;">
           <Icon
             custom='gzicon gzi-pm2'
             size='15'
@@ -186,7 +177,7 @@
             <Card
               padding='5'
               :key='r.id'
-              style='height:300px;margin-bottom:10px;border-radius:0;border:none;overflow:hidden;'
+              style='height:300px;margin-bottom:10px;border-radius:0;border:none;overflow:hidden;border:1px solid #dfdfdf;'
             >
               <div
                 class="flex-wrap flex-between"
@@ -241,7 +232,7 @@
       </Card> -->
 
       <Card
-        style='width:100%;border:none;border-radius:0;'
+        style='width:100%;border:none;border-radius:0;border:1px solid #dfdfdf;'
         padding="0"
       >
         <div class='card-title'>
@@ -292,7 +283,7 @@
      
       <Card
         class="panel"
-        style='width:100%;border:none;border-radius:0;margin-top:10px;'
+        style='width:100%;border:none;border-radius:0;margin-top:10px;border:1px solid #dfdfdf;border-bottom:none;'
         padding="0"
       >
 

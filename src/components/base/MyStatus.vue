@@ -1,12 +1,12 @@
 <template>
 <div>
-  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:#346;'>
+  <div class="flex-wrap" style='padding:10px;justify-content:space-between;background:linear-gradient(to bottom right,#3af,#234);'>
       <div class="flex-wrap">
           <hs-avatar :userinfo="session" size="30" style='margin-bottom:2px' />  
-          <div class='name' style="background:#346;color:#fff">早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
+          <div class='name' style="background:#24334c;color:#fff">早上好, <a  @click.stop="RouteTo('/core/self')">{{session.name || session.user}}</a>! </div>
         </div> 
         <Dropdown trigger="click" @on-click="handleSaveStatus">
-      <div class='status-mark hs-dropdown' :style="`border-radius:5px;color:#fff;background:${statusColors[session.status || 0]};`">{{status[session.status || 0]}} <Icon custom='gzicon gzi-down' style='color:#FFFFFFaa;'></Icon></div>
+      <div class='status-mark hs-dropdown' :style="`border-radius:50px;color:#fff;height:30px;line-height:23px;padding-left:20px;background:${statusColors[session.status || 0]};`" transfer>{{status[session.status || 0]}} <Icon custom='gzicon gzi-down' style='color:#FFFFFFaa;'></Icon></div>
         <DropdownList slot='list'>
           <template v-for="(s,si) in status">
           <DropdownItem class='status-item' :key='si' :name='si'><span style='display:inline-block;width:15px;height:15px;border-radius: 50%;' :style='`background:${statusColors[si]};filter:saturate(70%);margin-right:10px;`'></span>{{s}}</DropdownItem>
@@ -15,7 +15,7 @@
       </Dropdown>
           
   </div>
-<div class='status' style="background:#235;color:#fff;padding-top:10px;">
+<div class='status' style="background:#14233c;color:#fff;padding-top:10px;">
            
             {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
             
@@ -52,7 +52,7 @@ export default {
       }
     },
     statusColors(){
-      return ['green','blue','orange','red']
+      return ['yellowgreen','#3af','orange','darkred']
     },
     status(){
       return ['空闲','普通','忙','繁忙']
