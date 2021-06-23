@@ -19,7 +19,7 @@
     </div>
    
     <div class="status" :style="`background:${state_color}`">{{state}}</div>
-    <div class="activity">{{data.personal_focus || '没有动态描述'}}</div>
+    <div class="activity">{{data.saysth || '没有动态描述'}}</div>
   </div>
 </div>
 </template>
@@ -38,7 +38,7 @@ export default {
     },
     state(){
       let types = this.getTypes('PersonalState')
-      let t = types.find(v=>v.value == this.data.personal_state)
+      let t = types.find(v=>v.value == this.data.status || 1)
       if(t)
         return t.name
       else
@@ -46,7 +46,7 @@ export default {
     },
     state_color(){
       let types = this.getTypes('PersonalState')
-      let t = types.find(v=>v.value == this.data.personal_state)
+      let t = types.find(v=>v.value == this.data.status || 1)
       if(t)
         return t.color
       else
@@ -79,7 +79,7 @@ export default {
     },
     
     getRole(roles){
-      let role = '暂无职务'
+      let role = '组员'
       if(Array.isArray(roles)){
         role = roles.map(v=>{
           let d = this.roles.find(d=>d.id == v)
@@ -93,19 +93,22 @@ export default {
     },
     handleClick(){
       this.$emit('event','open')
+      this.RouteTo('/core/users/'+this.data.id)
     }
   }
 }
 </script>
 <style lang="less" scoped>
 .le-employee-wrapper{
-  width:225px;
+  width:245px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 1px 1px 2px #aaa;
+  border:1px solid #333;
   padding:5px;
   border-radius: 10px;
+  background:#345;
 
   .info{
     margin-right:2px;
@@ -115,15 +118,20 @@ export default {
     max-width:120px;
   }
 
+  .role{
+    color:#3ef;
+  }
+
   .dep{
     font-size:14px;
     font-weight: bold;
     text-overflow: ellipsis;
     overflow:hidden;
+    text-shadow:1px 1px 1px #000;
     width:120px;
     position: relative;
     height:20px;
-    color:#333;
+    color:#ddd;
   }
 
   .nodep{
@@ -131,7 +139,7 @@ export default {
   }
 
   .status{
-    background:#24660655;
+    background:#246606aa;
     padding:2px;
     margin:2px 0;
     min-width:40px;
@@ -147,14 +155,14 @@ export default {
     font-size:10px;
     height:50px;
     line-height:16px;
-    width:120px;
+    width:160px;
     margin-left:0px;
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: left;
     color:#333;
-    background:#33333322;
-    color:#dfdfdf;
+    background:#33333333;
+    color:#aaa;
     padding:5px;
   }
 }
@@ -162,13 +170,15 @@ export default {
   border-radius: 10px;
   overflow: hidden;
    width:85px;height:120px;
-   background:#ddd;
+   background:#dddddd33;
+   
    position: relative;
    filter:brightness(1.1);
-   border:2px solid rgb(255, 255, 255);
+   border:2px solid rgba(253, 253, 253, 0.152);
    img{
      height:100%;
      width:100%;
+     background:#33333333;
      
    }
 }
@@ -185,7 +195,7 @@ export default {
 
 .le-employee-wrapper-tmpl:hover{
   transition:all 0.3s;
-  border:1px solid #3af;
+  border-color:#3ef;
 }
 .le-employee-wrapper-tmpl:active{
   transition:all 0.3s;

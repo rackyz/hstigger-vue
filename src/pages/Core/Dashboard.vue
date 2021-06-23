@@ -120,7 +120,7 @@
             >
               <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
               <span style='font-size:25px;color:#3af;'>餐厅</span> <br />
-              预约 <Icon type="md-arrow-forward" />
+              预约明天的中餐 <Icon type="md-arrow-forward" />
               
               <Icon type="md-ice-cream" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
               <Icon type="md-pizza" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
@@ -139,9 +139,9 @@
               padding='0'
               style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
             >
-            <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+            <div @click.stop="" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);filter:grayscale(1);">
               <span style='font-size:25px;color:#3af;'>项目展示</span> <br />
-              优秀项目 <Icon type="md-arrow-forward" />
+              开发中 <Icon type="md-arrow-forward" />
               
               <Icon custom="gzicon gzi-supervisor" color="#3af" size="90" style="position:absolute;right:10px;top:-5px;opacity:0.3;"></Icon>
               <Icon type="md-bulb" color="#fff" size="140" style="position:absolute;right:130px;top:10px;opacity:0.3;"></Icon>
@@ -157,7 +157,7 @@
               padding='0'
               style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
             >
-             <div @click.stop="RouteTo('/core/resturant')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+             <div @click.stop="" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);filter:grayscale(1);">
               <span style='font-size:25px;color:#3af;'>讨论区</span> <br />
               公司论坛 <Icon type="md-arrow-forward" />
               

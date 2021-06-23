@@ -11,11 +11,9 @@
         </div>
         </div>
         <div class='right'>
-          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:-5px;margin-bottom:3px;margin-right:5px;'>部门主管 <hs-avatar :userinfo="charger" style="margin:0 5px;"></hs-avatar> {{charger.name}} </div> 
+          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:5px;margin-bottom:3px;margin-right:5px;'>部门主管 <hs-avatar :userinfo="charger" style="margin:0 5px;"></hs-avatar> {{charger.name}} </div> 
           <div class="project-dynamic">
-            <div class='project-state'>任务<br /><span class='count'>315<span class='unit'>条</span></span></div>
-            <div class='project-state'>已服务<br /><span class='count'>52<span class='unit'>天</span></span></div>
-            <div class='project-state'>动态<br /><span class='count'>425<span class='unit'>条</span></span></div>
+           
           </div>
         </div>
       </Header>
@@ -54,7 +52,7 @@ export default {
   data(){
     return {
       showDrawer:false,
-       menus:[{
+      menus:[{
         name:'部门总览',
         is_group:true,
         subs:[{
@@ -107,12 +105,14 @@ export default {
     id:{
       handler(v){
         this.showDrawer = false
+        this.getData(v)
       },
       immediate:true
     }
   },
   computed:{
     ...mapGetters('core',['deps','my_deps','users','getUser','getTypes','getDep']),
+    ...mapGetters('dep',['dep']),
     MenuMap(){
       let map = {}
       this.menus.forEach(v=>{
@@ -160,10 +160,7 @@ export default {
   },
   methods:{
     getData(){
-     // this.$store.dispatch('getDep',this.id)
-    },
-    RouteMenu(){
-      
+     this.$store.dispatch('dep/getData',this.id)
     },
     onClickMenu(e){
       this.RouteTo(e)

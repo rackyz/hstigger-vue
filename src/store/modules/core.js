@@ -142,7 +142,7 @@ const getters = {
     return state.user_rss
   },
   my_rss(state){
-    return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v)
+    return state.user_rss.map(v=>state.rss.find(r=>r.id == v)).filter(v=>v).sort((a,b)=>a.source_type > b.source_type?-1:1)
   },
   rss(state){
     return state.rss

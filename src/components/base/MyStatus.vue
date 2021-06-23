@@ -15,9 +15,9 @@
       </Dropdown>
           
   </div>
-<div class='status' style="background:linear-gradient(to bottom,#14233c,#123);color:#fff;padding-top:10px;min-height:80px;">
+<div class='status' style="background:linear-gradient(to bottom,#14233c,#123);color:#fff;padding-top:10px;min-height:80px;white-space:pre-wrap;">
            
-            {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button'><Icon type="md-create" @click="modalEditDesc=true" /></span>
+            {{session.saysth || '书写您的签名/工作状态'}} <span class='icon-button' style="font-size:10px;color:#3ef;" @click="modalEditDesc=true;desc=session.saysth"><Icon type="md-create"  /> 编辑</span>
             
           </div>
 

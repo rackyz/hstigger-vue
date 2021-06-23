@@ -24,7 +24,7 @@
 <template>
   <Layout style='background:#dfdfdf;'>
     <Spin fix v-show="loading">加载中...</Spin>
-    <Sider width='255' style="padding:15px;">
+    <Sider width='285' style="padding:15px;">
         <hsx-employee style='margin-right:10px;background:#ffffff55;' :nohover='true' :data="userinfo" size="50"></hsx-employee>
 
         <div class="section">

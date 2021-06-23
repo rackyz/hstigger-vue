@@ -54,6 +54,10 @@ export default {
         icon:'bar-chart',
         path:'/core/self/dashboard'
       },{
+        name:'个人档案',
+        icon:'user',
+        path:'/core/self/profile'
+      },{
         name:"数据信息",
         icon:'apps',
         is_group:true,
