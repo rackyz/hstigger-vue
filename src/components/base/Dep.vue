@@ -1,5 +1,5 @@
 <template>
-  <div class="l-dep-item flex-wrap flex-between" @click="RouteTo(`/core/deps/${dep.id}`)">
+  <div class="l-dep-item flex-wrap flex-between" @click="RouteTo(`/core/deps/${dep.id}/dashboard`)">
     <div class="flex-wrap">
       <Icon type="md-easel" style="margin-right:5px" /> {{dep.name}}
     </div>

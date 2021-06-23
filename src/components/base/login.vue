@@ -217,7 +217,7 @@ export default {
                 this.Error("请输入用户名")
                 setTimeout(e=>{
                      that.loading = false
-                },500)
+                },1500)
                
                 return
             }
@@ -227,7 +227,7 @@ export default {
                 this.Error("请输入密码")
                  setTimeout(e=>{
                      that.loading = false
-                },500)
+                },1500)
                 return
             }
 
@@ -239,7 +239,7 @@ export default {
                 console.log(e)
                  setTimeout(e=>{
                      that.loading = false
-                },500)
+                },1500)
             })
 
              that.$store.dispatch('core/login',model).then(session=>{
@@ -269,7 +269,8 @@ export default {
                     }).finally(e=>{
                         setTimeout(e=>{
                      that.loading = false
-                },500)
+                     alert("ok")
+                },2500)
                     })
 
             
