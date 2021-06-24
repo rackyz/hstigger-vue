@@ -143,7 +143,7 @@ export default {
           label:"部门",
           control:"select",
           option:{
-              getters:"entadmin/deps",
+              getters:"core/deps",
               labelKey:"name",
               multiple:true,
               idKey:'id'
@@ -153,7 +153,7 @@ export default {
           label:"职务",
           control:"select",
           option:{
-              getters:"entadmin/roles",
+              getters:"core/roles",
               labelKey:"name",
               
               multiple:true,
@@ -189,7 +189,10 @@ export default {
                 key:"to",
                 label: "截止时间",
                 control:"time",
-                span:5
+                span:5,
+                option:{
+                  clerable:true
+                }
             },{
                 key:"education_level",
                 label:"学历",
@@ -307,22 +310,15 @@ export default {
     <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">账号信息</div>
     <div class="flex-wrap flex-between" style="width:100%">
         <Row :gutter='10' style="width:calc(100% - 60px)">
-            <Col span='12'>{{user}}</Col>
-            <Col span='12'>{{phone}}</Col>
+            <Col span='6'>{{user}}</Col>
+              <Col span='10'>{{email}}</Col>
+        <Col span='8'>{{qq}}</Col>
         </Row>
         <div style="width:60px">
             {{avatar}}
         </div>
     </div>
-     <Row :gutter='10' style="margin-top:10px">
-        <Col span='8'>{{email}}</Col>
-        <Col span='8'>{{qq}}</Col>
-        <Col span='8'>{{zzl_id}}</Col>
-    </Row>
-     <Row :gutter='10' style="margin-top:10px">
-        <Col span='8'>{{ding_id}}</Col>
-        <Col span='8'>{{wechat_id}}</Col>
-    </Row>
+  
    
     <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">员工信息</div>
     <div class="flex-wrap flex-between" style="width:100%">
@@ -357,10 +353,7 @@ export default {
         <Col span='6'>{{employee_date}}</Col>
         <Col span='6'>{{professor_rank}}</Col>
     </Row>
-     <Row :gutter="10" style="margin-top:10px">
-        <Col span='12'>{{deps}}</Col>
-        <Col span='12'>{{roles}}</Col>
-    </Row>
+   
     <Row :gutter='10' style="margin-top:10px">
         <Col span='24'>{{work_history}}</Col>
     </Row>

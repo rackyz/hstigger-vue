@@ -1,6 +1,6 @@
 <template>
   <Layout style='overflow:hidden;position:relative;'>
-      <Header style='color:#fff;background:#23487c;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
+      <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
         <div class="project-code">编号 <span>{{project.code}}</span> 类型 <span>{{project.type || '-'}}</span></div> 
         <div class="project-name" style="margin-top:5px;font-size:18px;">{{project.name}}
@@ -62,12 +62,8 @@ export default {
         name:'项目总览',
         is_group:true,
         subs:[{
-          name:"项目展示",
-          icon:'xiangmu',
-          key:'public'
-         },{
           name:'项目总览',
-          icon:'pm2',
+          icon:'xiangmu1',
           key:'dashboard'
         },
         
@@ -159,13 +155,12 @@ export default {
     id:{
       handler(v){
         this.showProjects = false
-        this.getData()
       },
       immediate:true
     }
   },
   computed:{
-    ...mapGetters('core',['users','getTypes','my_projects']),
+    ...mapGetters('core',['users','getTypes']),
     ...mapGetters('project',['get']),
     MenuMap(){
       let map = {}
@@ -191,20 +186,14 @@ export default {
     project(){
       return this.get(this.id)
     },
-    projects(){
-      return this.my_projects
-    },
     RouteMenu(){
       return this.menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{
-            b.path = '/core/cm/'+this.id+'/'+b.key
+            b.path = '/core/projects/'+this.id+'/'+b.key
 
             console.log(b)
           })
-        }else{
-          if(v.path)
-            v.path = '/core/cm/'+this.id+'/'+v.key
         }
         return v
         
@@ -217,7 +206,6 @@ export default {
   },
   methods:{
     getData(){
-      
       this.$store.dispatch('project/get',this.id)
     },
     RouteMenu(){

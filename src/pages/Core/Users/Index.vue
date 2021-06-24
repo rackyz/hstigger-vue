@@ -223,11 +223,12 @@ export default {
     title:"用户信息",
     route:"/:id"
   },
+  props:['id'],
   computed:{
     ...mapGetters('core',['session','getTypes','deps','roles']),
    
     user_id(){
-      return this.$route.params.id
+      return this.$route.params.id || this.id
     },
     yearsold(){
       return Math.ceil(moment.duration(moment() - moment(this.userinfo.birthday)).as('years'))

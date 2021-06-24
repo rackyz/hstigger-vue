@@ -13,7 +13,7 @@
             padding:3px;
 
             .label {
-                color: #333;
+                color: #aaa;
                 margin-right:10px;
                 white-space: nowrap;
             }
@@ -64,7 +64,7 @@
 }
 </style>
 <template>
-  <div class="container-page statistic" style="padding:5px;height:100%;">
+  <div class="container-page statistic" style="padding:5px;height:100%;overflow:hidden;background:#346;">
       <div class="filter-box" style="margin-bottom:20px;position:relative;">
         
         <div class='flex-wrap project-tools' style="margin-bottom:10px;">
@@ -73,7 +73,7 @@
                 <Icon type="ios-refresh" v-if="!loading" size="16" style="margin-right:5px" />刷新
             </Button>
             <Dropdown placement="bottom-start">
-            <Button :style="hasFilter(filter)?'background:yellowgreen;color:#fff;':''">
+            <Button :style="hasFilter(filter)?'background:yellowgreen;color:#fff;':'background:#fff;'">
                 <Icon type="ios-funnel" size="16" style="margin-right:5px"  /> 筛选
             </Button>
             <DropdownMenu slot="list" style="padding:10px;">
@@ -174,8 +174,8 @@
             </div>
         </div>
         </div>
-          <div class="table-wrap" style="height:calc(100% - 150px);padding-bottom:30px;margin:10px;position:relative;	overflow: hidden;">
-          <gzTable ref="table" :columns="columns" :data="FilterData(contracts)" :option="options" :pageSize="100" :onEvent="onEvent" />
+          <div class="table-wrap" style="height:calc(100% - 100px);padding-bottom:10px;margin:10px;position:relative;background:#346;color:#fff;	overflow: hidden;">
+          <gzTable ref="table" :columns="columns" :data="FilterData(contracts)" :option="options" :pageSize="100" :onEvent="onEvent" style="color:#333;" />
           </div></div>
     </div>
 </template>
@@ -1545,10 +1545,7 @@ export default {
                
         },
          openProject(id) {
-        let routerUrl = this.$router.resolve({
-            path: `/projects/${id}`
-        });
-         window.open(routerUrl.href, "_blank");
+       this.RouteTo(`/core/cm/${id}/dashboard`)
     },
         exportCSV(){
             const FixData = v=>{
@@ -1762,7 +1759,8 @@ export default {
         if(this.LoadState() == false){
             this.onSelectColumnTemplate(this.columnTemplates[3])
         }
-        this.$store.dispatch('oa/query')
+        if(this.contract.length == 0)
+            this.$store.dispatch('oa/query')
         this.$nextTick(()=>{
           this.$refs.table.calcTableHeight()
         })

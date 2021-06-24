@@ -29,7 +29,7 @@ export default {
       if(this.data.type == '培训')
         this.RouteTo('/core/classes/'+this.data.id+'/dashboard')
       else if(this.data.id.indexOf("CT") == 0)
-        this.RouteTo('/core/cm/'+this.data.id+'/dashboard')
+        this.RouteTo('/core/oaprojects/'+this.data.id+'/dashboard')
       else
         this.RouteTo('/core/projects/'+this.data.id+'/dashboard')
     }

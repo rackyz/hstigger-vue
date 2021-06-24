@@ -142,10 +142,17 @@ const getters = {
 }
 
 const actions = {
-    get:({commit},id)=>{
+    get:({rootState,commit},id)=>{
         return new Promise((resolve,reject)=>{
             console.log(SERVER)
-            SERVER.enterprise.GET_PROJECTS({param:{id},query:{q:"full"}}).then(res=>{
+            rootState.API.enterprise.GET_PROJECTS({
+                param: {
+                  id
+                },
+                query: {
+                  q: "full"
+                }
+              }).then(res => {
                 let item = res.data.data
 
                 item.positions = [{
