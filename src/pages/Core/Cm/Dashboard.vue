@@ -95,7 +95,7 @@
       <Col :span='17'><Row :gutter="20">
      
       <Col :span='14'>
-      <Card style='height:200px;' padding="0">
+      <Card padding="0">
          <Table
                         ref='factorTable'
                         class='gz-small-table'
@@ -113,19 +113,18 @@
                             <tr>
                                 <th class='ivu-table-cell'>签约计划人均产值</th>
                                 <td class='ivu-table-cell'>
-                                  <!-- {{hs.formatSalary(adjustAmount/planHR*12)}} -->
-                          {{hs.formatSalary(adjustAmount)}}
+                                  {{hs.formatSalary(adjustAmount/planHR*12)}}
                                 </td>
                                 <th class='ivu-table-cell '>调整计划人均产值</th>
                                 <td class='ivu-table-cell'>
-                                  <!-- {{actualHR>0?hs.formatSalary(adjustAmount/actualHR*12):'-'}} -->423
+                                  {{actualHR>0?hs.formatSalary(adjustAmount/actualHR*12):'-'}}
                                   </td>
                                 <th class='ivu-table-cell '>当前投入人均产值</th>
                                 <td
                                     class='ivu-table-cell'
                                     style='color:rgb(95, 171, 241);font-weight:bold;'
-                                >423
-                                <!-- {{hs.formatSalary(actualProductionComplete*12/actualHRCompleted)}} -->
+                                >
+                                {{hs.formatSalary(actualProductionComplete*12/actualHRCompleted)}}
                                 </td>
 
                             </tr>
@@ -196,12 +195,118 @@ const moment = require('moment')
 export default {
   data(){
     return {
-
+       rplan: false,
+            modalHrList: false,
+            rawplan1:false,
+            content:null,
+            dynamicMode:'month',
+            selectedTime:moment(),
+            modalInfo:false,
+            //只显示在职员工
+            inPosition: false,
+            rawplan: false,
+            score: 88,
+            scoreColor: '#666',
+            actual_production: 0,
+            hrplan_production: 0,
+            chartMode:'average-human-production',
+            modalBillDetail: false,
+           totolCols: [{
+                key: 'target',
+                title: '指标',
+                width: 80,
+                className: 'l-th',
+                align: 'center'
+            }, {
+                key: 'totalStr',
+                width: 80,
+                title: '总体(签约)',
+                align: 'center',
+                render: (h, params) => {
+                    let renderFunc = renderTarget(params.index)
+                    return h('span', {}, renderFunc(h, params.row.total))
+                }
+            },
+            {
+                key: 'predict',
+                width: 100,
+                title: '总体(预测)',
+                align: 'center',
+                render: (h, params) => {
+                    let renderFunc = renderTarget(params.index)
+                    return h('span', {                        style: {
+                            color: 'rgb(95, 171, 241)',
+                            fontWeight: 'bold'
+                        }                    }, renderFunc(h, params.row.predict))
+                }
+            }, {
+                key: 'plan',
+                width: 100,
+                title: '当前(签约)',
+                align: 'center',
+                render: (h, params) => {
+                    let renderFunc = renderTarget(params.index)
+                    return h('span', {
+                        style: {
+                            color: '#888',
+                            fontWeight: 'bold'
+                        }                    }, renderFunc(h, params.row.plan))
+                }
+            }, {
+                key: 'infactStr',
+                width: 100,
+                title: '当前(实际)',
+                align: 'center',
+                render: (h, params) => {
+                    let renderFunc = renderTarget(params.index)
+                    return h('span', {
+                        style: {
+                            color: 'rgb(95, 171, 241)',
+                            fontWeight: 'bold'
+                        }                    }, renderFunc(h, params.row.infact))
+                }
+            }, {
+                key: 'percent',
+                title: '对比(实际/签约)',
+                width: 120,
+                align: 'center',
+                render: (h, params) => {
+                    let percent = 0
+                    if (params.row.infact && params.row.plan)
+                        percent = (parseFloat(params.row.infact) * 100 / parseFloat(params.row.plan)).toFixed(2)
+                    return this.util.renderCompareProgress(h, percent, params.index > 1 )
+                }
+            },{
+                key: 'percent',
+                title: '进度(实际/总体)',
+                align: 'center',
+                minWidth:80,
+                render: (h, params) => {
+                    let percent = 0
+                    if (params.row.infact && params.row.predict)
+                        percent = (parseFloat(params.row.infact) * 100 / parseFloat(params.row.predict)).toFixed(2)
+                    return this.util.renderProgress(h, percent)
+                }
+            }],
+            totalDataProgress: [],
+            printing:false,
+             totalData: [{
+                target: '劳动力', total: 100, infact: 50
+            }, {
+                target: '进度'
+            }, {
+                target: '产值'
+            }, {
+                target: '收费'
+            }],
     }
   },
   metaInfo:{
     title:'项目概况',
      route:"/:id"
+  },
+  mounted(){
+    this.updateFactor()
   },
   computed:{
     ...mapGetters('project',['get']),
@@ -325,103 +430,103 @@ export default {
        return Object.values(employee).filter(v=>!v.outDate)
      },
 
-      // planHR() {
-      //       let c = 0
-      //       this.vnodes.forEach(v => {
-      //           v.hrplan.forEach(r => {
-      //               if (r)
-      //                   c += parseFloat(r) * parseFloat(v.rplan_duration) / 30.4
-      //           })
-      //       })
+      planHR() {
+            let c = 0
+            this.vnodes.forEach(v => {
+                v.hrplan.forEach(r => {
+                    if (r)
+                        c += parseFloat(r) * parseFloat(v.rplan_duration) / 30.4
+                })
+            })
 
-      //       return c
-      //   },
-      //   planHRCompleted() {
-      //       let c = 0
-      //       let now = this.now
-      //       let startTime = moment(this.startDate)
-      //       this.vnodes.forEach(v => {
-      //           let nodeStartDate = startTime
-      //           let nodeEndDate = startTime.clone().add(v.rplan_duration, 'd')
-      //           startTime = nodeEndDate
+            return c
+        },
+        planHRCompleted() {
+            let c = 0
+            let now = this.now
+            let startTime = moment(this.startDate)
+            this.vnodes.forEach(v => {
+                let nodeStartDate = startTime
+                let nodeEndDate = startTime.clone().add(v.rplan_duration, 'd')
+                startTime = nodeEndDate
                 
-      //           if (nodeEndDate.isBefore(now)) {
-      //               v.hrplan.forEach(r => {
-      //                   if (r)
-      //                       c += parseFloat(r) * parseFloat(v.rplan_duration) / 30.4
-      //               })
-      //           } else if (nodeStartDate.isBefore(now)) {
-      //               v.hrplan.forEach(r => {
-      //                   if (r)
-      //                       c += parseFloat(r) * moment.duration(now - nodeStartDate).as('month')
-      //               })
+                if (nodeEndDate.isBefore(now)) {
+                    v.hrplan.forEach(r => {
+                        if (r)
+                            c += parseFloat(r) * parseFloat(v.rplan_duration) / 30.4
+                    })
+                } else if (nodeStartDate.isBefore(now)) {
+                    v.hrplan.forEach(r => {
+                        if (r)
+                            c += parseFloat(r) * moment.duration(now - nodeStartDate).as('month')
+                    })
 
-      //           }
-      //       })
+                }
+            })
 
-      //       return c
-      //   },
-      //   actualHRCompleted() {
-      //       let c = 0
-      //       let now = moment()
-      //       let startTime = moment(this.startDate)
-      //       // this.vnodes.forEach(v => {
-      //       //     let nodeStartDate = startTime
-      //       //     let nodeEndDate = startTime.clone().add(v.actual_duration, 'd')
-      //       //     startTime = nodeEndDate
+            return c
+        },
+        actualHRCompleted() {
+            let c = 0
+            let now = moment()
+            let startTime = moment(this.startDate)
+            // this.vnodes.forEach(v => {
+            //     let nodeStartDate = startTime
+            //     let nodeEndDate = startTime.clone().add(v.actual_duration, 'd')
+            //     startTime = nodeEndDate
                 
-      //       //     if (nodeEndDate.isBefore(now)) {
-      //       //         v.actual_hrplan.forEach(r => {
-      //       //             if (r)
-      //       //                 c += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
-      //       //         })
-      //       //     } else if (nodeStartDate.isBefore(now)) {
-      //       //         v.actual_hrplan.forEach(r => {
-      //       //             if (r)
-      //       //                 c += parseFloat(r) * moment.duration(now - nodeStartDate).as('month')
-      //       //         })
-      //       //     }
-      //       // })
-      //       this.project.employeesEx.forEach(e=>{
-      //           let filterStart = startTime
-      //           let filterEnd = now.clone()
-      //           let eStart = moment(e.start_date)
-      //           let eEnd = e.end_date?moment(e.end_date):now
-      //           let duration = this.hs.calcInDuration(filterStart,filterEnd,eStart,eEnd)
-      //           c += e.factor * duration
-      //               console.log(e.name,e.factor*duration)
-      //       })
+            //     if (nodeEndDate.isBefore(now)) {
+            //         v.actual_hrplan.forEach(r => {
+            //             if (r)
+            //                 c += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
+            //         })
+            //     } else if (nodeStartDate.isBefore(now)) {
+            //         v.actual_hrplan.forEach(r => {
+            //             if (r)
+            //                 c += parseFloat(r) * moment.duration(now - nodeStartDate).as('month')
+            //         })
+            //     }
+            // })
+            this.project.employeesEx.forEach(e=>{
+                let filterStart = startTime
+                let filterEnd = now.clone()
+                let eStart = moment(e.start_date)
+                let eEnd = e.end_date?moment(e.end_date):now
+                let duration = this.hs.calcInDuration(filterStart,filterEnd,eStart,eEnd)
+                c += e.factor * duration
+                    console.log(e.name,e.factor*duration)
+            })
 
-      //       return c
-      //   },
-      //   parentRefData(){
-      //       return {
-      //           planDuration:this.planDuration,
-      //           actualDuration:this.completeDuration,
-      //           planDurationCompleted:this.planDurationCompleted,
-      //           actualDurationCompleted:this.actualDurationCompleted,
-      //           planHR:this.planHR,
-      //           actualHR:this.actualHR,
-      //           actualProductionComplete:this.actualProductionComplete,
-      //           planProductionComplete:this.planProductionComplete,
-      //            planHRCompleted:this.planHRCompleted,
-      //           actualHRCompleted:this.actualHRCompleted
-      //       }
-      //   },
-      //   aPlanHR() {
-      //       let c = 0
-      //       this.vnodes.forEach(v => {
-      //           let t = 0;
-      //           v.actual_hrplan.forEach(r => {
-      //               if (r){
-      //                  t += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
-      //                  c += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
-      //               }
-      //           })
-      //           v.hr = t
-      //       })
-      //       return c
-      //   },
+            return c
+        },
+        parentRefData(){
+            return {
+                planDuration:this.planDuration,
+                actualDuration:this.completeDuration,
+                planDurationCompleted:this.planDurationCompleted,
+                actualDurationCompleted:this.actualDurationCompleted,
+                planHR:this.planHR,
+                actualHR:this.actualHR,
+                actualProductionComplete:this.actualProductionComplete,
+                planProductionComplete:this.planProductionComplete,
+                 planHRCompleted:this.planHRCompleted,
+                actualHRCompleted:this.actualHRCompleted
+            }
+        },
+        aPlanHR() {
+            let c = 0
+            this.vnodes.forEach(v => {
+                let t = 0;
+                v.actual_hrplan.forEach(r => {
+                    if (r){
+                       t += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
+                       c += parseFloat(r) * parseFloat(v.actual_duration) / 30.4
+                    }
+                })
+                v.hr = t
+            })
+            return c
+        },
         vMonthData() {
             if (this.project.monthData && this.project.monthData.length) {
                 
@@ -591,54 +696,55 @@ export default {
 
             return nodes
         },
-      //   /** actualHR 实际的人力(预测值) */
-      //   actualHR() {
-      //       let c = 0
-      //       this.vnodes.forEach(v => {
-      //           let nodeStart = moment(v.actual_start_time)
-      //           let nodeEnd = moment(v.actual_start_time).add(v.actual_duration, 'd')
+        /** actualHR 实际的人力(预测值) */
+        actualHR() {
+            let c = 0
+            this.vnodes.forEach(v => {
+                let nodeStart = moment(v.actual_start_time)
+                let nodeEnd = moment(v.actual_start_time).add(v.actual_duration, 'd')
                 
-      //           if (nodeEnd.isAfter(this.now)) {
-      //               let duration =  this.now.isBefore(nodeStart)?v.actual_duration/30.4:moment.duration(nodeEnd - this.now).as('months')
-      //               console.log("DU:",v.actual_duration/30.4,duration)
+                if (nodeEnd.isAfter(this.now)) {
+                    let duration =  this.now.isBefore(nodeStart)?v.actual_duration/30.4:moment.duration(nodeEnd - this.now).as('months')
+                    console.log("DU:",v.actual_duration/30.4,duration)
                     
-      //               v.actual_hrplan.forEach(r => {
-      //                   if (r)
-      //                       c += parseFloat(r) * duration
-      //               })
-      //           }
-      //       })
-      //       return this.actualHRCompleted + c
-      //   },
-      //   planDuration() {
-      //       let c = 0
-      //       for (let i = 0; i < this.project.nodes.length; i++) {
-      //           let v = this.project.nodes[i]
-      //           if (v.rplan_duration)
-      //               c += parseFloat(v.rplan_duration) / 30.4
-      //           if (v.complete)
-      //               break
-      //       }
-      //       return c
-      //   },
-      //   completeDuration() {
-      //       let c = 0
-      //       let nodes = this.vnodes
-      //       for (let i = 0; i < nodes.length; i++) {
-      //           let v = nodes[i]
+                    v.actual_hrplan.forEach(r => {
+                        if (r)
+                            c += parseFloat(r) * duration
+                    })
+                }
+            })
+            return this.actualHRCompleted + c
+        },
+        planDuration() {
+            let c = 0
+            for (let i = 0; i < this.project.nodes.length; i++) {
+                let v = this.project.nodes[i]
+                if (v.rplan_duration)
+                    c += parseFloat(v.rplan_duration) / 30.4
+                if (v.complete)
+                    break
+            }
+            return c
+        },
+        completeDuration() {
+            let c = 0
+            let nodes = this.vnodes
+            for (let i = 0; i < nodes.length; i++) {
+                let v = nodes[i]
 
-      //           if (v.actual_duration)
-      //               c += parseFloat(v.actual_duration) / 30.4
-      //           if (v.complete)
-      //               break
-      //       }
-      //       return c
-      //   },
+                if (v.actual_duration)
+                    c += parseFloat(v.actual_duration) / 30.4
+                if (v.complete)
+                    break
+            }
+            return c
+        },
         adjustAmount(){
             this.project.amount_adjust = parseFloat(this.project.amount_adjust || 0)
             return this.project.amount + this.project.amount_adjust
         },
   }
+  
   ,methods:{
     calcHr(data){
         let duration = moment.duration((data.outDate?moment(data.outDate):moment()) - moment(data.inDate)).as('month')
@@ -654,35 +760,35 @@ export default {
 
         },
         
-        // updateFactor(){
-        //     let val = this.project
-        //     let totalData = this.totalData
-        //     if (val) {
-        //         // 人力
-        //         totalData[0].total = this.planHR
-        //         totalData[0].predict = this.aPlanHR
-        //         totalData[0].infact = this.actualHRCompleted
-        //         totalData[0].plan = this.planHRCompleted
-        //         // 工期
-        //         totalData[1].infact = this.actualDurationCompleted
-        //         totalData[1].total = this.planDuration
-        //         totalData[1].plan = this.planDurationCompleted
-        //         totalData[1].predict = this.actualDuration
-        //         // 产值
-        //         totalData[2].total = totalData[2].predict = this.adjustAmount
-        //         totalData[2].plan = this.planProductionComplete
-        //         totalData[2].infact = this.actualProductionComplete
-        //         // 收费
-        //         totalData[3].total = totalData[3].predict = this.adjustAmount
-        //         totalData[3].infact = val.transferredAmount
-        //         totalData[3].plan = this.planBill
-        //         // 人均产值
-        //         this.hrplan_production = this.totalData[3].total / totalData[0].total * 12
-        //         this.actual_production = this.totalData[0].infact ? this.totalData[2].infact / totalData[0].infact * 12 : 0
+        updateFactor(){
+            let val = this.project
+            let totalData = this.totalData
+            if (val) {
+                // 人力
+                totalData[0].total = this.planHR
+                totalData[0].predict = this.aPlanHR
+                totalData[0].infact = this.actualHRCompleted
+                totalData[0].plan = this.planHRCompleted
+                // 工期
+                totalData[1].infact = this.actualDurationCompleted
+                totalData[1].total = this.planDuration
+                totalData[1].plan = this.planDurationCompleted
+                totalData[1].predict = this.actualDuration
+                // 产值
+                totalData[2].total = totalData[2].predict = this.adjustAmount
+                totalData[2].plan = this.planProductionComplete
+                totalData[2].infact = this.actualProductionComplete
+                // 收费
+                totalData[3].total = totalData[3].predict = this.adjustAmount
+                totalData[3].infact = val.transferredAmount
+                totalData[3].plan = this.planBill
+                // 人均产值
+                this.hrplan_production = this.totalData[3].total / totalData[0].total * 12
+                this.actual_production = this.totalData[0].infact ? this.totalData[2].infact / totalData[0].infact * 12 : 0
 
-        //         totalData.splice(0, 1, totalData[0])
-        //     }
-        // }
+                totalData.splice(0, 1, totalData[0])
+            }
+        }
   }
 }
 </script>
