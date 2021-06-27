@@ -266,7 +266,7 @@ const mutations = {
         // preprocesser
         list.forEach(v=>{
             let item = v
-            if (item.images) {
+            if (item.images && typeof item.images == 'string') {
                 item._images = item.images.split(';').map(v => v.split(',')).map(v =>
                     cosService + v[1]
                 )
@@ -277,7 +277,7 @@ const mutations = {
         state.list = list
     },
     save(state,item){
-         if (item.images) {
+        if (item.images && typeof item.images == 'string')  {
              item._images = item.images.split(';').map(v => v.split(',')).map(v => 
                  cosService + v[1]
              )

@@ -567,7 +567,7 @@ export default {
             return [...uniquePosition]
         },
          vnodes() {
-            let date_id = this.now.format('YYYY-MM')
+             console.log('vnodes-start')
             let hrplan = this.vMonthData ? this.vMonthData.data : null
             let employees = this.project.employeesEx
            
@@ -591,23 +591,19 @@ export default {
 
             const getPositionName = (eid)=>this.positionMap[eid]
             
-            if(this.vMonthData){
-                this.vMonthData.data.nodes.forEach(v=>{
-                    let n = nodes.find(n=>n.id == v.id)
-                    if(n){
-                        n.actual_start_time = v.actual_start_time
-                        n.actual_duration = v.actual_duration
-                        n.actual_hrplan = v.actual_hrplan
-                    }
-                })
+            // if(this.vMonthData){
+            //     this.vMonthData.data.nodes.forEach(v=>{
+            //         let n = nodes.find(n=>n.id == v.id)
+            //         if(n){
+            //             n.actual_start_time = v.actual_start_time
+            //             n.actual_duration = v.actual_duration
+            //             n.actual_hrplan = v.actual_hrplan
+            //         }
+            //     })
 
                 
-            }
+            // }
 
-            nodes.forEach(v=>{
-                    if(!v.actual_duration)
-                        v.actual_duration = v.rplan_duration
-                })
 
             let start =  this.startDate
             let startPlan = start
@@ -626,7 +622,7 @@ export default {
                     hrplan: mapHrPlan(v.hrplan,this.planPosMapper),
                     actual_hrplan: (hrplan && hrplan.nodes[i] ?mapHrPlan(hrplan.nodes[i].actual_hrplan,this.actualPosMapper): mapHrPlan(v.hrplan,this.planPosMapper))
                 }
-
+                console.log(this.hs.dateAddDays)
                 startPlan = this.hs.dateAddDays(startPlan, v.rplan_duration).format()
                 startActual = this.hs.dateAddDays(startActual, v.actual_duration).format()
                 return vnode
