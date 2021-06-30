@@ -245,17 +245,13 @@ export default {
              that.$store.dispatch('core/login',model).then(session=>{
                         setTimeout(e=>{
                             if(!session.lastlogin_at)
-                            that.routeTo = '/core/welcome'
-                        if(this.routeTo){
-                            let path = "/core/dashboard"
-                            if(session.type == 3)
-                            path =  "/core/admin/dashboard"
-                            else if(session.type == 2)
-                                path ="/core/eadmin/dashboard"
-                            that.RouteTo(path)
-                        }else{
-                            window.location.reload()
-                        }
+                                that.routeTo = '/core/welcome'
+                            if(this.routeTo){
+                                
+                                that.RouteTo(this.dashboard_path)
+                            }else{
+                                window.location.reload()
+                            }
                         },1000)
                         
                     }).catch(e=>{
@@ -269,7 +265,6 @@ export default {
                     }).finally(e=>{
                         setTimeout(e=>{
                      that.loading = false
-                     alert("ok")
                 },2500)
                     })
 

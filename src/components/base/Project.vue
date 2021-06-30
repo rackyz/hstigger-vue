@@ -17,9 +17,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   props:['data'],
   computed:{
+    ...mapGetters('core',['current_enterprise']),
     stateColor(){
       return ['#aaa','orange','yellowgreen','green','red','#aaa'][this.data.state || 0]
     }
@@ -28,6 +30,8 @@ export default {
     onClick(e){
       if(this.data.type == '培训')
         this.RouteTo('/core/classes/'+this.data.id+'/dashboard')
+      else if(this.current_enterprise == 'aee3eea0-3b83-11eb-8e1e-c15d5c7db744')
+        this.RouteTo('/core/cprojects/'+this.data.id+'/dashboard')
       else if(this.data.id.indexOf("CT") == 0)
         this.RouteTo('/core/cm/'+this.data.id+'/dashboard')
       else

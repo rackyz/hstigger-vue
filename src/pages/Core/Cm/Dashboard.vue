@@ -1,3 +1,10 @@
+<style>
+.l-text:hover {
+    position: relative;
+    z-index: 1000;
+    cursor: pointer;
+}
+</style>
 <template>
   <div class='hs-container hs-container-scroll oaold' style='padding:20px;height:calc(100% - 40px);overflow-y:auto;color:#333;'>
     <Row :gutter='20'>
@@ -6,7 +13,7 @@
         <img :src="project.avatar || 'https://nbgz-pmis-1257839135.cos.ap-shanghai.myqcloud.com/timg.jpg'" style="width:100%;" />
         {{project.desc}}
          <table
-                            class='ivu-table ivu-table-body gz-small-table l-info-table'
+                            class='ivu-table ivu-table-body gz-small-table l-info-table oaold'
                             cellspacing="0"
                             border="0"
                         >
@@ -98,7 +105,7 @@
       <Card padding="0">
          <Table
                         ref='factorTable'
-                        class='gz-small-table'
+                        class='gz-small-table oaold'
                         :columns='totolCols'
                         :data='totalData'
                         :rowClassName='rowClassName'
@@ -134,13 +141,70 @@
       </Card>
       </Col>
       <Col :span='10'>
-      <Card style='height:200px;'  title="项目动态">
-        {{vMonthData}}
+      <Card style='height:300px;'  title="项目动态">
+         <div :style="`position:relative;overflow:visible;height:240px;width:100%;background:#fff;margin-top:80px;`">
+
+        <div
+            class='l-progress-wrapper'
+            v-if="hide"
+            style='left:60px;right:60px;bottom:40px;height:230px;z-index:-1;'
+        >
+            <div
+                key='start'
+                class='l-progress'
+                :style='`background:linear-gradient(to bottom,#fff,#eee);width:${headOffset*100/fullDuration}%;`'
+            >
+
+            </div>
+            <template v-for='(n,i) in renderNodes'>
+                <div
+                    :key='i'
+                    class='l-progress'
+                    :style='`opacity:${i<futureNodeIndex?"0.8":"0.3"};background:linear-gradient(to bottom,#fff,${nodes[i].percent==0?"#e0f0ff":colors[i%2]});width:${n.width}%;`'
+                >
+                    <a
+                        href='#'
+                        class='l-text l-text-duration'
+                        :style='`color:#aaa;position:relative;top:0px;height:${-n.topOffset}px;z-index:101;overflow:hidden;`'
+                    >{{n.name}} <span
+                            style='color:#aaf'
+                            v-if="n.offset"
+                        >{{n.offset>0?'+':'-'}}{{Math.abs(n.offset).toFixed(1)}}</span> </a>
+                    <div
+                        :key='i'
+                        class='l-progress l-progress-offset'
+                        :style='`right:${n.offset>0?0:-Math.abs(n.offset)/n.duration * 100}%;background:linear-gradient(to bottom,#fff,${n.offset>0?"#fff0e8":"#f0ffe0"});width:${Math.abs(n.offset)/n.duration* 100}%;z-index:100;`'
+                    >
+                    </div>
+                </div>
+            </template>
+
+            <div
+                key='end'
+                class='l-progress'
+                :style='`background:linear-gradient(to bottom,#fff,#eee);width:${tailOffset*100/fullDuration}%;`'
+            >
+
+            </div>
+        </div>
+
+        <div
+            ref='myChart'
+            style="width:100%;height:320px;position:absolute;bottom:0px;overflow:visible;"
+        >
+
+        </div>
+    </div>
       </Card>
       </Col>
     </Row>
      <Row :gutter="20" style='margin-top:20px;'>
-      <Col :span='24'>
+        <Col :span='6'>
+      <Card style='height:300px;' title="项目人员" padding="5">
+         <hs-list style="position:relative;border:none;"  :data="employees" :option="{tmpl:'BaseEmployeeDetail'}" />
+      </Card>
+      </Col>
+      <Col :span='18'>
       <Card style='height:200px;' title="进度安排">
           <Steps :current="1">
         <Step title="前期准备">
@@ -166,11 +230,7 @@
       </Col>
     </Row>
     <Row :gutter="20" style='margin-top:20px;margin-bottom:20px;'>
-      <Col :span='6'>
-      <Card style='height:300px;' title="项目人员" padding="5">
-         <hs-list style="position:relative;border:none;"  :data="employees" :option="{tmpl:'BaseEmployeeDetail'}" />
-      </Card>
-      </Col>
+     
       <Col :span='6'>
       <Card style='height:300px;' title="最新资料">
         
@@ -192,19 +252,52 @@
 
 import { mapGetters } from 'vuex'
 const moment = require('moment')
+import cmutil from './cmutil'
+
+let echarts = require('echarts/lib/echarts')
+// 引入柱状图组件
+require('echarts/lib/chart/bar')
+require('echarts/lib/chart/line')
+// 引入提示框和title组件
+require('echarts/lib/component/tooltip')
+
+require('echarts/lib/component/toolbox')
+require('echarts/lib/component/legend')
+
+require('echarts/lib/component/title')
+
+require('echarts/lib/component/dataZoom')
+require('echarts/lib/component/markPoint')
+require('echarts/lib/component/markLine')
+require('echarts/lib/component/grid')
+require('moment')
+const theme = require('./theme')
+ const renderTarget = (index) => {
+            if (index > 1)
+                return (h, d) => cmutil.formatSalary(d)
+            else if (index == 0)
+                return (h, d) => (typeof d != "number" ? '-' : (d.toFixed(2) + ' 人月'))
+            else
+                return (h, d) => (typeof d != "number" ? '-' : (d.toFixed(1) + ' 月'))
+
+        }
 export default {
-  data(){
+
+data(){
     return {
        rplan: false,
             modalHrList: false,
             rawplan1:false,
             content:null,
+                colors: [ '#eee','#fff'],
+            height: 200,
             dynamicMode:'month',
             selectedTime:moment(),
             modalInfo:false,
             //只显示在职员工
             inPosition: false,
             rawplan: false,
+            vnow:null,
             score: 88,
             scoreColor: '#666',
             actual_production: 0,
@@ -274,7 +367,7 @@ export default {
                     let percent = 0
                     if (params.row.infact && params.row.plan)
                         percent = (parseFloat(params.row.infact) * 100 / parseFloat(params.row.plan)).toFixed(2)
-                    return this.util.renderCompareProgress(h, percent, params.index > 1 )
+                    return cmutil.renderCompareProgress(h, percent, params.index > 1 )
                 }
             },{
                 key: 'percent',
@@ -285,7 +378,7 @@ export default {
                     let percent = 0
                     if (params.row.infact && params.row.predict)
                         percent = (parseFloat(params.row.infact) * 100 / parseFloat(params.row.predict)).toFixed(2)
-                    return this.util.renderProgress(h, percent)
+                    return cmutil.renderProgress(h, percent)
                 }
             }],
             totalDataProgress: [],
@@ -306,6 +399,10 @@ export default {
      route:"/:id"
   },
   mounted(){
+     this.vnow = moment().isAfter(moment(this.endDate)) ? moment(this.endDate).endOf('month').add(1, 'month') : (moment().format())
+      this.pastdays = util.offsetMonth(this.startDate, this.vnow) - 1
+      
+
     this.updateFactor()
   },
   computed:{
@@ -313,6 +410,735 @@ export default {
     id(){
       return this.$route.params.id
     },
+     futureNodeIndex(){
+            let start = moment(this.startDate)
+            let passed = true
+            let nodes = this.vnodes
+            for (let i = 0; i < nodes.length; i++) {
+
+                let nodeStart = moment(nodes[i].actual_start_time)
+                let nodeEnd = moment(nodes[i].actual_start_time).add(nodes[i].actual_duration,'days')
+                if(nodeStart.isAfter(this.now)){
+                    return -1
+                }else if(!nodeEnd.isBefore(this.now)) {
+                    return i
+                }
+            }
+
+            return nodes.length
+        },
+        futureMonthIndex() {
+
+            let start = moment(this.startDate)
+            let passed = true
+            for (let i = 0; i < this.fullDuration; i++) {
+
+                let monthStart = start.clone().startOf('month').add(i, 'month')
+                let monthEnd = start.clone().endOf('month').add(i, 'month')
+                if(monthStart.isAfter(this.now)){
+                    return -1
+                }else if(!monthEnd.isBefore(this.now)) {
+                    return i
+                }
+            }
+
+            return this.fullDuration
+        },
+        renderNodes() {
+            let nodes = this.vnodes.map((v, i, a) => ({
+                width: v.actual_duration * 100 / 30.4 / this.fullDuration,
+                offset: (v.actual_duration - v.rplan_duration) / 30.4,
+                name: v.nodeName,
+                duration: (v.actual_duration / 30.4)
+            }))
+
+
+            return nodes
+        },
+        planStartDate() {
+           if(this.vnodes){
+            return this.vnodes.length > 0 && this.vnodes[0] ? moment(this.vnodes[0].plan_start_time) : moment()
+             }
+          else{
+            return moment()
+          }
+        },
+        actualStartDate() {
+          if(this.vnodes){
+            return this.vnodes.length > 0 && this.vnodes[0] ? moment(this.vnodes[0].actual_start_time) : moment()
+          }
+          else{
+            return moment()
+          }
+        },
+        // actual startDate
+        startDate() {
+            return this.actualStartDate
+        },
+        fullDuration() {
+            return cmutil.offsetMonth(this.startDate.format(), this.endDate.format())
+        },
+        // actual duration
+        duration() {
+            let plan_sum = 0
+            let actual_sum = 0
+            this.vnodes.forEach(v => {
+                plan_sum += parseInt(v.rplan_duration)
+                actual_sum += parseInt(v.actual_duration)
+            })
+
+            return plan_sum > actual_sum ? (plan_sum / 30.4) : (actual_sum / 30.4)
+        },
+        // bigger one of plan endDate or actual endDate(predict)
+        endDate() {
+            return this.startDate.clone().add(this.duration, 'month')
+        },
+        headOffset() {
+            return moment.duration(this.startDate - this.startDate.clone().startOf('month')).as('month')
+        },
+        tailOffset() {
+            return moment.duration(this.endDate.clone().endOf('month') - this.endDate).as('month')
+        },
+        now() {
+            return moment(this.vnow)
+        },
+        // offset between planStartDate and actualStartDate
+        hrChartNodeData(){
+            let pPrdtArray = []
+            let aPrdtArray = []
+            let aAvgPrdtArray = []
+            let pAvgPrdtArray = []
+             let aAvgPrd=0
+             let pAvgPrd = 0
+            let totalProduct = 0
+            let xArray = []
+            let offsetDuration = moment.duration(moment(this.startDate) - moment(this.startDate).startOf('month')).as('month')
+            let pDuration = offsetDuration
+            let aDuration = offsetDuration
+            let aHRArray = []
+            let pHRArray = []
+            let aHR = 0
+            let aHRSum = 0
+            let pHR = 0
+            let pHRSum = 0
+            
+            let pPrdt = 0
+            let aPrdt = 0
+
+            let pCompleteDuration = 0
+            let aCompleteDuration = 0
+
+            console.log('[nodes]:',this.vnodes)
+            this.vnodes.forEach((v,i)=>{
+                aAvgPrd=0
+                pAvgPrd = 0
+                aHR = 0
+                pHR = 0
+                if(i==0){
+                    pPrdtArray.push([pDuration ,0])
+                    aPrdtArray.push([aDuration ,0])
+                    xArray.push([pDuration,'起始'])
+                }
+                
+                v.hrplan.forEach(f=>{
+                    if(f){
+                        pHR += parseFloat(f) * parseInt(v.rplan_duration) /30.4
+                    }
+                })
+
+                v.actual_hrplan.forEach(f=>{
+                    if(f){
+                        aHR += parseFloat(f) * parseInt(v.actual_duration) /30.4
+                    }
+                })
+
+                
+
+                pDuration += v.rplan_duration/30.4
+                pPrdt += v.amount
+                pPrdtArray.push([pDuration ,pPrdt])
+                xArray.push([pDuration,'p'+(i+1)])
+                aDuration += v.actual_duration/30.4
+                aPrdt += v.amount
+                aPrdtArray.push([aDuration ,aPrdt])
+                xArray.push([aDuration,'a'+(i+1)])
+                
+                if(v.complete){
+                    pCompleteDuration = pDuration
+                    aCompleteDuration = aDuration
+                }
+
+                aHRSum += aHR
+                pHRSum += pHR
+                pAvgPrd = pHRSum>0?(pPrdt/pHRSum * 12):0
+                aAvgPrd = aHRSum>0?(aPrdt/aHRSum * 12):0
+                aAvgPrdtArray.push(aAvgPrd)
+                pAvgPrdtArray.push(pAvgPrd)
+                aHRArray.push(aHR)
+                pHRArray.push(pHR)
+            })
+
+            return {
+                xAxis:xArray,
+                planProduction:pPrdtArray,
+                actualProduction:aPrdtArray,
+                aAvgPrdt:aAvgPrdtArray,
+                pAvgPrdt:pAvgPrdtArray,
+                xAxisNode:this.vnodes.map(v=>v.nodeName),
+                aCompleteDuration,
+                pCompleteDuration,
+                aHR:aHRArray,
+                pHR:pHRArray
+            }
+        },
+        hrChartData() {
+            let start = moment(this.startDate)
+            let duration = this.fullDuration
+            var planArray = []
+            var actualArray = []
+            var adjustArray = []
+
+            let planHR = 0
+            let actualHR = 0
+            let planHRFactor = 0
+            let aplanHRFactor = 0
+            let aplanHR = 0
+            let planProduction = 0
+            let actualProduction = 0
+            let planProductionArray = []
+            let actualProductionArray = []
+            let planProductionAVG = 0
+            let actualProductionAVG = 0
+            let planHRTotal = 0
+            let actualHRTotal = 0
+            let planProductionAVGArray = []
+            let actualProductionAVGArray = []
+            let planStartOffset = moment.duration(this.planStartDate, this.startDate).as('month')
+            let actualStartOffset = moment.duration(this.actualStartDate, this.startDate).as('month')
+
+            for (let i = 0; i < duration; i++) {
+                planHR = 0
+                planHRFactor = 0
+                aplanHR = 0
+                aplanHRFactor = 0
+                planProductionAVG = 0
+                actualProductionAVG = 0
+
+                let inDuration = 0
+                let inDurationPlan = 0
+                let monthStart = start.clone().startOf('month').add(i, 'month')
+                let monthEnd = start.clone().endOf('month').add(i, 'month')
+
+                let inPlan = false
+                let inActual = false
+                // 之前的应按月份实际投入来算
+
+            
+                this.vnodes.forEach((v, i, a) => {
+                    if (!Array.isArray(v.hrplan) || v.hrplan.length == 0)
+                        return
+                    let amount = v.amount || 0
+                    let nodePlanStart = moment(v.rplan_start_time).add(planStartOffset, 'month')
+                    let nodePlanEnd = nodePlanStart.clone().add(v.rplan_duration, 'days')
+                    let nodeActualStart = moment(v.actual_start_time)
+                    let nodeActualEnd = nodeActualStart.clone().add(v.actual_duration, 'days')
+
+                    inDuration = this.calcInDuration(monthStart, monthEnd, nodePlanStart, nodePlanEnd)
+
+                    if (inDuration) {
+                        inPlan = true
+                        planProductionAVG += amount * inDuration / v.rplan_duration * 30.4
+                        v.hrplan.forEach(f => {
+                            if (f) {
+                                planHR += parseFloat(f) * inDuration
+                                planHRFactor += parseFloat(f)
+                            }
+                        })
+                    }
+
+                    if (!Array.isArray(v.actual_hrplan) || v.actual_hrplan.length == 0)
+                        return
+
+
+                    inDuration = this.calcInDuration(monthStart, monthEnd, nodeActualStart, nodeActualEnd)
+
+                    if (inDuration) {
+                        inActual = true
+                        actualProductionAVG += amount * inDuration / v.actual_duration * 30.4
+                        v.actual_hrplan.forEach(f => {
+                            if (f){
+                                aplanHR += parseFloat(f) * inDuration
+                                aplanHRFactor += parseFloat(f)
+                            }
+                        })
+                    }
+                })
+
+                if(monthEnd.isBefore(this.now)){
+                    aplanHR = 0
+                    aplanHRFactor = 0
+                    let employees  = this.hrdata.employees
+                    let factors = this.hrdata.factors
+                    let inDuration = 0
+                    employees.forEach(e=>{
+                        let inDate = moment(e.inDate)
+                        let outDate = e.outDate ? moment(e.outDate) :this.now
+                         inDuration =  cmutil.calcInDuration(inDate,outDate,monthStart,monthEnd)
+                        if(!factors || factors.length == 0 ){
+                            aplanHR += parseFloat(e.factor) * inDuration
+                            aplanHRFactor += parseFloat(e.factor)
+                            return
+                        }else if(factors[0].id > monthStart.format('YYYY-MM')){
+                            inDuration =  cmutil.calcInDuration(inDate,outDate,factors[0].id,monthEnd)
+                            aplanHR += parseFloat(e.factor) * inDuration
+                            aplanHRFactor += parseFloat(e.factor)
+                        }
+
+                        for(let fi=0;fi<factors.length;fi++){
+                            let fStart = moment(factors[fi].id,'YYYY-MM')
+                            let fEnd = fi==factors.length-1?outDate:moment(factors[fi+1].id,'YYYY-MM')
+                            inDuration = cmutil.calcInDuration(fStart,fEnd,monthStart,monthEnd)
+                            if(inDuration && factors[fi].data && (factors[fi].data[e.name])){
+                                aplanHR += parseFloat(factors[fi].data[e.name]) *inDuration
+                                aplanHRFactor += parseFloat(factors[fi].data[e.name])
+                            }
+                           
+                        }
+                      
+                        
+                    })
+                }
+                
+                planProduction += planProductionAVG
+                actualProduction += actualProductionAVG
+                planHRTotal += planHR
+                actualHRTotal += aplanHR
+                actualProductionAVG = aplanHR ? actualProduction * 12 / planHRTotal : 0
+                planProductionAVG = planHR ? planProduction * 12 / planHRTotal : 0
+                
+                planProductionAVGArray.push(inPlan ? planProductionAVG : '-')
+                planProductionArray.push(inPlan ? planProduction : '-')
+                planArray.push(inPlan ? planHRTotal: '-')
+
+                actualProductionAVGArray.push(inActual ? actualProductionAVG : '-')
+                actualProductionArray.push(inActual ? actualProduction : '-')
+                adjustArray.push(inActual ? actualHRTotal : '-')
+                // end month caculating
+            }
+            let data = {
+                production: planProductionArray,
+                actualProduction: actualProductionArray,
+                plan: planArray,
+                adjust: adjustArray,
+                actualProductionAVG: actualProductionAVGArray,
+                planProductionAVG: planProductionAVGArray
+            }
+
+            return data
+
+        },
+
+    },
+   
+    methods: {
+        formatterAmount(e){
+            return e.toFxied(0) + '万'
+        },
+        // caculater intersection between in and out
+        calcInDuration(inStart, inEnd, outStart, outEnd) {
+            let start, end
+            if (inStart.isBefore(outStart)) {
+                if (inEnd.isBefore(outStart))
+                    return 0
+                else {
+                    start = outStart
+                    end = inEnd.isBefore(outEnd) ? inEnd : outEnd
+                }
+            } else {
+                if (inStart.isAfter(outEnd)) {
+                    return 0
+                } else {
+                    start = inStart
+                    end = inEnd.isBefore(outEnd) ? inEnd : outEnd
+                }
+            }
+
+            return moment.duration(end - start).as('month')
+        },
+        makeAxis(startDate, endDate) {
+            let x = []
+            let duration = this.fullDuration
+            for (let i = 0; i < duration; i++)
+                x.push(startDate.clone().startOf('month').add(i, 'month').format('M月'))
+            return x
+        },
+        initChart(forced) {
+            let that = this
+            let data = this.hrChartData
+            let nodeData = this.hrChartNodeData
+            let xAxis,yAxis,tooltipFormatter,series,color = undefined
+            console.log('[initchart]:',nodeData)
+            const avgThreshold = 0
+            switch(this.mode){
+                case 'average-human-production':
+                    color = ['#8d98b3', '#e5cf0d'],
+                    xAxis = [ {type: 'category',data: nodeData.xAxisNode,axisLabel:{
+                       rotate:15,
+                       margin:20,
+                      axisLine:{
+                          onZero:true
+                      },
+                       align:'center',
+                    }}]
+                
+                    yAxis = [  {
+                        type: 'value',
+                         min:-avgThreshold,
+                        axisLabel: {
+                            formatter(e) {
+                                return ((e+avgThreshold) / 10000).toFixed(0) + '万'
+                            }
+                        }
+                       
+                    },]
+                     tooltipFormatter = (a,b,c)=>{
+                        let ret = ""
+                        a.forEach(v => {
+                            if (typeof v.value != 'number')
+                                return
+                            let valueString = (((v.value+avgThreshold) / 10000).toFixed(1) + ' 万元<br>')
+                            ret += '<i style="display: inline-block;width: 10px;height: 10px;background: ' +
+                                v.color +
+                                ';margin-right: 5px;border-radius: 50%;}"></i><span style="width:140px; display:inline-block;">' +
+                                v.seriesName +
+                                '</span>' + valueString
+                        })
+                        return `<div class="l-showbox">${a[0].axisValue}<br>${ret}</div>`
+                    },
+                    series = [{
+                            name: '人均产值(签约)',
+
+                                        type: 'bar',
+                                        z:11,
+                                        data: nodeData.pAvgPrdt.map(v=>v-avgThreshold) || [],
+                                        itemStyle : { normal: {
+                        
+                            borderRadius: 5
+                        }}
+                                    },
+                                    {
+
+                                        name: '人均产值(调整)',
+                                        type: 'bar',
+                                        z:10,
+                                        data: nodeData.aAvgPrdt.map(v=>v-avgThreshold),
+                                        itemStyle : { normal: {
+                            
+                            borderRadius: 10
+                        }}
+
+                        }]
+                break
+                case 'production':
+                     color = ['#97b552', '#d87a80'],
+                    xAxis = [{
+                        type: 'category',
+                        data: this.makeAxis(this.startDate, this.endDate),
+                        axisLabel:{
+                            margin:8,
+                            rotate:0
+                        }
+                    },{  type: 'value',
+                        min:0,
+                        max:this.fullDuration}]
+                    yAxis = [{ type:'value',  min:0,axisLabel: {
+                            formatter(e) {
+                                return (e / 10000).toFixed(0) + '万'
+                            }}}]
+                    tooltipFormatter = (a,b,c)=>{
+                        let ret = ""
+                        a.forEach((v) => {
+                            
+                            let [x,y] = v.data
+                            if (typeof x != 'number' || typeof y != 'number')
+                                return
+
+                            let valueString =(y / 10000).toFixed(1) + ' 万元<br>'
+                            ret += '<i style="display: inline-block;width: 10px;height: 10px;background: ' +
+                                v.color +
+                                ';margin-right: 5px;border-radius: 50%;}"></i><span style="width:140px; display:inline-block;">' +
+                                v.seriesName +
+                                '</span>' + valueString
+                        })
+                        let index = a[0].dataIndex
+                        let nodeName = index >= this.vnodes.length?'结束':  this.vnodes[index].nodeName
+                       
+                        return `<div class="l-showbox">${that.startDate.clone().add(a[0].data[0],'month') .format('YYYY-MM')} <span style="float:right">${nodeName}</span><br>${ret}</div>`
+                    },
+                    series = [{
+                            name: '总产值(签约计划)',
+                            // yAxisIndex: 3,
+                             xAxisIndex: 1,
+                            z:5,
+                            
+                            type: 'line',
+                            data:nodeData.planProduction,
+                            itemStyle: { normal: {
+                                areaStyle: { type: 'default',color:'#97b55266' },label : {show: true,
+                            distance:20,formatter(e) {
+                                    return (e.data[1] / 10000).toFixed(0) + '万'
+                             
+                            },position:'top',} } },
+                            markLine:{
+                                symbol:'none',
+                                data:[[
+                                {name:'竣工节点',y:80,xAxis:nodeData.pCompleteDuration},{name:'竣工节点',y:290,xAxis:nodeData.pCompleteDuration}
+                            ]]
+                            }
+                           
+                        },
+                         {
+                            name: '总产值(调整计划)',
+                            // yAxisIndex: 3,
+                            xAxisIndex: 1,
+                            z:5,
+                            type: 'line',
+                            data:nodeData.actualProduction,
+                            itemStyle: { normal: { areaStyle: { type: 'default',color:'#d87a8066' },label : {show: true, formatter(e) {
+                                    return (e.data[1] / 10000).toFixed(0) + '万'
+                                
+                            }} } },
+                            markLine:{
+                                symbol:'none',
+                                data:[[
+                                {name:'竣工节点',y:80,xAxis:nodeData.aCompleteDuration},{name:'竣工节点',y:275,xAxis:nodeData.aCompleteDuration}
+                            ]]
+                            }
+                        
+                             }]
+                    
+                break
+                
+
+            }
+
+
+            let option = {
+                
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: tooltipFormatter
+                        //function (a, b, c) {
+                        // console.log(a,b,c)
+                        // let ret = ""
+                        // a.forEach(v => {
+                        //     if (typeof v.value != 'number')
+                        //         return
+                        //     let valueString = (that.mode == 'hr' ? (v.value.toFixed(1) + ' 人月<br>') : ((v.value / 10000).toFixed(1) + ' 万元<br>'))
+                        //     ret += '<i style="display: inline-block;width: 10px;height: 10px;background: ' +
+                        //         v.color +
+                        //         ';margin-right: 5px;border-radius: 50%;}"></i><span style="width:140px; display:inline-block;">' +
+                        //         v.seriesName +
+                        //         '</span>' + valueString
+                        // })
+                        // return `<div class="l-showbox">${a[0].axisValue}<br>${ret}</div>`
+                        //  console.log(a,b,c)
+                        //  let ret = ""
+                        // a.forEach(v => {
+                            
+                        //     let [x,y] = v.data
+                        //     if (typeof x != 'number' || typeof y != 'number')
+                        //         return
+
+                        //     let valueString =(y / 10000).toFixed(1) + ' 万元<br>'
+                        //     ret += '<i style="display: inline-block;width: 10px;height: 10px;background: ' +
+                        //         v.color +
+                        //         ';margin-right: 5px;border-radius: 50%;}"></i><span style="width:140px; display:inline-block;">' +
+                        //         v.seriesName +
+                        //         '</span>' + valueString
+                        // })
+                        // return `<div class="l-showbox">${that.startDate.clone().add(a[0].axisValue,'month') .format('YYYY-MM')} <span style="float:right">${'阶段'}</span><br>${ret}</div>`
+                  //  }
+                },
+                grid: {
+                    show: false,
+                    x: 60,
+                    x2: 60,
+                    y: 80,
+                    y2: 60,
+                    borderWidth: 0
+                },
+                calculable: true,
+
+                xAxis,
+                // [
+                //     {
+                //         type: 'category',
+                //         data: this.makeAxis(this.startDate, this.endDate)
+                //     },
+                //      {
+                //         type: 'value',
+                //         min:0,
+                //         max:this.fullDuration
+                       
+                //     }, {
+                //         type: 'category',
+                //         boundaryGap: false,
+                //         data: this.makeAxis(this.startDate, this.endDate).concat([""]),
+                //         show: false
+                //     },
+                //       {
+                //         type: 'category',
+                //         data:nodeData.xAxisNode
+                       
+                //     }
+                // ],
+                legend: {
+                    zlevel: 100,
+                    z: 100,
+                    top: 0,
+                    right: 30
+                },
+                yAxis,
+                // [
+                //     {
+                //         type: 'value',
+                //         axisLine:{
+
+                //         },
+                //         axisLabel: {
+                //             formatter(e) {
+                //                 return (e / 10000 + 20).toFixed(0) + '万'
+                //             }
+                //         }
+                //     },
+                //     {
+                //         type: 'value',
+                //         axisLabel: {
+                //             formatter(e) {
+                //                 return (e / 10000).toFixed(0) + '万'
+                //             }
+                //         }
+                //     },
+                //     {
+                //         type: 'value',
+                //         axisLabel: {
+                //             formatter(e) {
+                //                 return (e / 10000).toFixed(2)
+                //             }
+                //         }
+                //     },
+                //      {
+                //            type: 'value',
+                //         axisLabel: {
+                //             formatter(e) {
+                //                 return (e / 10000).toFixed(0) + '万'
+                //             }
+                //         }
+                //     }
+                // ],
+                color,
+                series,
+                  
+                    
+            //             {
+            //                 name: '人均产值(签约)',
+
+            //                 type: 'bar',
+            //                 z:11,
+            //                 yAxisIndex:0,
+            //                 zlevel:10, 
+            //                 data: data.planProductionAVG.map(v=>v-200000) || [],
+            //                  itemStyle : { normal: {
+             
+            //     borderRadius: 5,
+            //     label : {
+            //         show: true,
+            //         position: 'top',
+            //         formatter: '{b}'
+            //     }
+            // }}
+            //             },
+            //             {
+
+            //                 name: '人均产值(调整)',
+            //                 type: 'bar',
+            //                 yAxisIndex:0,
+            //                 zlevel:10,
+            //                  z:10,
+            //                 data: data.actualProductionAVG.map(v=>v-200000) || [],
+            //                  itemStyle : { normal: {
+                
+            //     borderRadius: 10
+            // }}
+
+            //             },
+            
+                     
+                //         {
+                //             name: '总产值(签约)',
+                //             yAxisIndex: 1,
+                //             xAxisIndex: 1,
+                //             z:5,
+                            
+                //             type: 'line',
+                //             data: [0].concat(data.production) || [],
+                //             itemStyle: { normal: { areaStyle: { type: 'default' } } },
+                //             markLine:{
+                //                 z:15,
+                //                 data:[
+                //                     [ {xAxis:data.production.length, y:60, itemStyle:{normal:{color:'#dc143c'}}}
+                //                     ,{xAxis:data.production.length,y:280, name: '签约', itemStyle:{normal:{color:'#dc143c'}}}
+                //                     ],
+                                     
+                //                 ]
+                //             }
+                //         },
+                //          {
+                //             yAxisIndex: 1,
+                //             name: '总产值(调整)',
+                //             xAxisIndex: 1,
+                //              z:5,
+                //             type: 'line',
+                //             data: [0].concat(data.actualProduction) || [],
+                //             itemStyle: { normal: { areaStyle: { type: 'default' } } },
+                //              markLine:{
+                //                 z:15,
+                //                 data:[
+                //                     [ {xAxis:data.actualProduction.length-1, y:60, itemStyle:{normal:{color:'#97b552'}}}
+                //                     ,{xAxis:data.actualProduction.length-1,y:280, name: '调整', itemStyle:{normal:{color:'#97b552'}}}
+                //                     ]
+                //                 ]
+                //             }
+                //         },
+                       
+                // //           {
+                // //     name: '累计人力投入(签约)',
+                // //     step:true,
+                // //     type: 'bar',
+                // //      yAxisIndex: 2,
+                // //       z:10,
+                // //     data: data.plan || []
+                // // },
+                // // {
+
+                // //     name: '累计人力投入(调整)',
+                // //     type: 'bar',
+                // //      z:10,
+                // //      yAxisIndex: 2,
+                // //     step:true,
+                // //     data: data.adjust || []
+
+                // // },
+                
+
+                    
+            };
+            let myChart = echarts.init(this.$refs.myChart, theme)
+
+            myChart.setOption(option, forced)
+
+        },
     totolCols: [{
                 key: 'target',
                 title: '指标',
@@ -401,6 +1227,7 @@ export default {
                 target: '收费'
             }],
     project(){
+      console.log('PROJECT:',this.get(this.id))
       return this.get(this.id) || {}
     },
      employees(){
@@ -565,19 +1392,29 @@ export default {
             let combinePositions = [...this.project.positions,...this.project.actualPositions,...Object.values(this.positionMap)]
             let uniquePosition = new Set(combinePositions)
             return [...uniquePosition]
+        }, planPosMapper(){
+            return this.project.positions.map(v=>this.positionsEx.findIndex(p=>p==v))
+        },
+        actualPosMapper(){
+            return this.project.actualPositions.map(v=>this.positionsEx.findIndex(p=>p==v))
+        },now() {
+            return moment().clone()
         },
          vnodes() {
-             console.log('vnodes-start')
+           console.log('start vnodes')
             let hrplan = this.vMonthData ? this.vMonthData.data : null
+            console.log(hrplans)
             let employees = this.project.employeesEx
-           
+             
+
             let positions = this.positionsEx
             if(!this.project.nodes || this.project.nodes.length == 0)
                 return []
-            let nodes = this.project.nodes
+            let nodes = []
+          
 
-            for(let i=0;i<nodes.length;i++){
-                if(nodes[i].rplan_start_time == null || nodes[i].rplan_duration == null)
+            for(let i=0;i<this.project.nodes.length;i++){
+                if(this.project.nodes[i].rplan_start_time == null || this.project.nodes[i].rplan_duration == null)
                     return []
             }
 
@@ -591,18 +1428,21 @@ export default {
 
             const getPositionName = (eid)=>this.positionMap[eid]
             
-            // if(this.vMonthData){
-            //     this.vMonthData.data.nodes.forEach(v=>{
-            //         let n = nodes.find(n=>n.id == v.id)
-            //         if(n){
-            //             n.actual_start_time = v.actual_start_time
-            //             n.actual_duration = v.actual_duration
-            //             n.actual_hrplan = v.actual_hrplan
-            //         }
-            //     })
+            if(this.vMonthData){
+                this.vMonthData.data.nodes.forEach(v=>{
+                    let n = nodes.find(n=>n.id == v.id)
+                    if(n){
+                        n.actual_start_time = v.actual_start_time
+                        n.actual_duration = v.actual_duration
+                        n.actual_hrplan = v.actual_hrplan
+                    }
+                })
 
                 
-            // }
+            }
+
+            if(!this.project.nodes)
+              return []
 
 
             let start =  this.startDate
@@ -738,7 +1578,39 @@ export default {
         adjustAmount(){
             this.project.amount_adjust = parseFloat(this.project.amount_adjust || 0)
             return this.project.amount + this.project.amount_adjust
+        }, planProductionComplete() {
+            let c = 0
+            let startTime = moment(this.startDate)
+            this.vnodes.forEach(v => {
+                let nodeStart = startTime.clone()
+                let nodeEnd = startTime.clone().add(v.rplan_duration,'d')
+                startTime = nodeEnd
+                if (nodeEnd.isBefore(this.now.clone())) {
+                    c += this.adjustAmount * parseFloat(v.percent) / 100
+                } else if (nodeStart.isBefore(this.now.clone())) {
+                    let duration = moment.duration(this.now - nodeStart).as('month')
+                    c += this.adjustAmount * parseFloat(v.percent) * duration * 30.4 / 100 / v.rplan_duration
+                }
+            })
+            return c
+
         },
+        actualProductionComplete() {
+            let c = 0
+             let startTime = moment(this.startDate)
+            this.vnodes.forEach(v => {
+                 let nodeStart = startTime.clone()
+                let nodeEnd = startTime.clone().add(v.actual_duration,'d')
+                startTime = nodeEnd
+                    if (nodeEnd.isBefore(this.now.clone())) {
+                        c += this.adjustAmount * parseFloat(v.percent) / 100
+                    } else if (nodeStart.isBefore(this.now.clone())) {
+                        let duration = moment.duration(this.now - nodeStart).as('month')
+                        c += this.adjustAmount * parseFloat(v.percent) * duration * 30.4 / 100 / v.actual_duration
+                    }
+            })
+            return c
+        }
   }
   
   ,methods:{
@@ -784,15 +1656,92 @@ export default {
 
                 totalData.splice(0, 1, totalData[0])
             }
-        }
-  }
+        },
+         formatProgress(v) {
+            let start = moment(this.startDate)
+            let date = moment(this.startDate).clone().startOf('month').add(v, 'month')
+            return `${date.format('YYYY-MM')}`
+        },
+  },updateSlider(e) {
+            this.pastdays = util.offsetMonth(this.startDate, e + '-1') - 1
+            if (this.pastdays < 0) {
+                this.pastdays = 0
+                this.vnow = this.startDate
+            } else if (this.pastdays >= this.totalPastDays) {
+                this.pastdays = this.totalPastDays
+                this.vnow = this.endDate
+            }
+            this.vnow = e + '-1'
+        },hasPlan(i) {
+            let vnow = moment(this.startDate).clone().startOf('month').add(i, 'month').format('YYYY-MM')
+            if (this.project.monthData) {
+                let f = this.project.monthData.find(v => v.id == vnow)
+                if (f && f.data)
+                    return true
+            }
+        },getCompleteTime() {
+            let complete = null
+            this.project.nodes.forEach(v => {
+                if (v.complete)
+                    complete = moment(v.actual_start_time).add(v.actual_duration, 'd').format()
+            })
+            return complete
+        },
+        getWorkPoint() {
+            let wp = "已竣工"
+            this.project.nodes.forEach(v => {
+                if (moment(v.actual_start_time).isBefore(this.now) && moment(v.actual_start_time).add(v.actual_duration, 'd').isAfter(this.now))
+                    wp = v.nodeName
+            })
+            return wp
+        },
+        getCalc() {
+            return {
+                actual_duration: this.actualDuration,
+                rplan_production: this.hrplan_production,
+                current_workpoint: this.getWorkPoint(),
+                actual_human_complete: this.actualHRCompleted,
+                actual_human_production: this.actual_production,
+                plan_human_complete: this.planHRCompleted,
+                rplan_duration: this.planDuration,
+                rplan_human: this.planHR
+            }
+        },
+        onUploadCalc() {
+            let calcInfo = this.getCalc()
+            let text = '合约数据已提交管理员审核'
+            if(this.isAdmin){
+                calcInfo.state = 2
+                text = '该合约数据已审核完毕，投入生产使用'
+            } 
+            else if(this.isInputor)
+                calcInfo.state = 1
+            this.$patch(`oa/contracts/${this.project.id}`, { calc: calcInfo }).then(res => {
+                this.$Modal.success({
+                    title: '保存成功',
+                    content: text
+                })
+                this.$emit('reload', this.project.id)
+                this.project.state = calcInfo.state
+            }).catch(e=>{
+                console.error(e)
+            })
+        },
+        renderChart() {
+            setTimeout(() => {
+                this.$refs.chart.initChart(true)
+            }, (1000));
+
+        },
 }
 </script>
 
 <style lang="less">
 
 .oaold {
-    
+    .ivu-table-cell{
+      font-size:10px;
+    }
 }
 
 .oaold-head {
@@ -801,7 +1750,7 @@ export default {
 }
 
 .oaold .ivu-form-item-label {
-    font-size: 1rem;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -997,6 +1946,65 @@ sup {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: #bbb;
+}
+
+.l-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.l-progress-wrapper {
+    position: absolute;
+    left: 0;
+    height: 260px;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.l-text-active {
+    font-weight: bold;
+    color: #506780 !important;
+}
+
+.l-text-today {
+    color: red;
+}
+
+.l-progress {
+    position: relative;
+    height: 100%;
+    background: rgb(212, 245, 212);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.l-progress-offset {
+    position: absolute !important;
+}
+
+.l-text-year {
+    font-weight: bold;
+    color: slateblue;
+}
+
+.l-text-duration {
+    border-left: 1px solid #eee;
+    border-top: 1px solid #eee;
+}
+
+.l-progress .l-text {
+    position: absolute;
+    left: 0;
+    top: -20px;
+    font-size: 10px;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
 }
 
 </style>

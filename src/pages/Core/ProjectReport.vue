@@ -1759,7 +1759,7 @@ export default {
         if(this.LoadState() == false){
             this.onSelectColumnTemplate(this.columnTemplates[3])
         }
-        if(this.contract.length == 0)
+        if(!this.contract || this.contract.length == 0)
             this.$store.dispatch('oa/query')
         this.$nextTick(()=>{
           this.$refs.table.calcTableHeight()

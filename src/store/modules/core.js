@@ -81,6 +81,8 @@ const getters = {
       return "/core/admin/dashboard"
     else if(state.session.type == 2)
       return  "/core/eadmin/dashboard"
+    else if (state.current_enterprise == 'aee3eea0-3b83-11eb-8e1e-c15d5c7db744')
+      return "/core/dashboard_kt"
     else
       return "/core/dashboard"
   },

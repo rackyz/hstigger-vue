@@ -1,6 +1,6 @@
 <template>
   <Layout style='overflow:hidden;position:relative;'>
-      <Header style='color:#fff;background:#23487c;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
+      <Header style='color:#fff;background:#111;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
         <div class="project-code">编号 <span>{{project.code}}</span> 类型 <span>{{project.type || '-'}}</span></div> 
         <div class="project-name" style="margin-top:5px;font-size:18px;">{{project.name}}
@@ -62,12 +62,8 @@ export default {
         name:'项目总览',
         is_group:true,
         subs:[{
-          name:"项目展示",
-          icon:'xiangmu',
-          key:'public'
-         },{
           name:'项目总览',
-          icon:'pm2',
+          icon:'xiangmu1',
           key:'dashboard'
         },
         
@@ -79,17 +75,6 @@ export default {
         ]
 
       },{
-        name:'项目信息',
-        is_group:true,
-        subs:[{
-          name:'项目合同',
-          icon:'bar-chart',
-          key:'contractentity'
-        },{
-          name:'签约计划',
-          icon:'bar-chart',
-          key:'contractplan'
-        }]},{
         name:'通用模块',
         is_group:true,
         subs:[ {
@@ -97,7 +82,7 @@ export default {
            icon:'bar-chart',
            key:'notice'
          },{
-          name:'任务管理',
+          name:'工作管理',
           icon:'xiangmu',
           key:'task'
         },{name:'人员管理',
@@ -109,7 +94,20 @@ export default {
           key:'archive',
         }]
       },{
-        name:'业务模块',
+        name:'总师室',
+        is_group:true,subs:[{
+          name:'项目立项',
+          icon:'iconset0118',
+          key:'contract'
+        }]},,{
+        name:'前期部',
+        is_group:true,subs:[{
+          name:'前期工作',
+          icon:'iconset0118',
+          key:'contract'
+        }]},
+        {
+        name:'合约部',
         is_group:true,subs:[{
           name:'合同管理',
           icon:'iconset0118',
@@ -124,11 +122,6 @@ export default {
           name:'造价管理',
           icon:'workflowdesign',
           key:'costestimate'
-        },
-        {
-          name:'审计管理',
-          icon:'workflowdesign',
-          key:'audit'
         }]},{
         name:'系统配置',
         is_group:true,subs:[
@@ -159,13 +152,12 @@ export default {
     id:{
       handler(v){
         this.showProjects = false
-        this.getData()
       },
       immediate:true
     }
   },
   computed:{
-    ...mapGetters('core',['users','getTypes','my_projects']),
+    ...mapGetters('core',['users','getTypes']),
     ...mapGetters('project',['get']),
     MenuMap(){
       let map = {}
@@ -191,18 +183,14 @@ export default {
     project(){
       return this.get(this.id)
     },
-    projects(){
-      return this.my_projects
-    },
     RouteMenu(){
       return this.menus.map(v=>{
         if(v.subs){
           v.subs.forEach(b=>{
-            b.path = '/core/cm/'+this.id+'/'+b.key
+            b.path = '/core/cprojects/'+this.id+'/'+b.key
+
+            console.log(b)
           })
-        }else{
-          if(v.path)
-            v.path = '/core/cm/'+this.id+'/'+v.key
         }
         return v
         
@@ -211,11 +199,10 @@ export default {
   },
   mounted(){
     this.$store.commit('project/init_api',this.api)
-    
+    this.getData()
   },
   methods:{
     getData(){
-      
       this.$store.dispatch('project/get',this.id)
     },
     RouteMenu(){

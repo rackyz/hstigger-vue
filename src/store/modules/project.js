@@ -4,8 +4,6 @@
  */
 import API from '@/plugins/axios'
 import HSAPI from '@/plugins/api'
-var SERVER = HSAPI.GetServerAPI()
-console.log("SERVER:",SERVER)
 const state = {
     list: [],
     project:{}
@@ -144,7 +142,6 @@ const getters = {
 const actions = {
     get:({rootState,commit},id)=>{
         return new Promise((resolve,reject)=>{
-            console.log(SERVER)
             rootState.API.enterprise.GET_PROJECTS({
                 param: {
                   id
@@ -213,9 +210,11 @@ const actions = {
             }).catch(reject)
         })
     },
-    getList({commit}){
+    getList({
+        rootState,commit
+      }) {
         return new Promise((resolve,reject)=>{
-          SERVER.enteprise.LIST_PROJECTS().then(res=>{
+          rootState.API.enteprise.LIST_PROJECTS().then(res => {
                 commit("saveList",res.data.data)
                 resolve(res.data.data)
             }).catch(reject)
@@ -235,7 +234,6 @@ const actions = {
         })
     },
     patch({commit},projectItem){
-        console.log('patch:',projectItem)
         return new Promise((resolve, reject) => {
             if(projectItem.id){
                 API.CORE.PATCH_PROJECT(projectItem,{param:{id:projectItem.id}}).then(res => {
@@ -259,9 +257,6 @@ const actions = {
 }
 
 const mutations = {
-    init_api(state,api){
-        SERVER = api
-    },
     saveList(state,list){
         // preprocesser
         list.forEach(v=>{

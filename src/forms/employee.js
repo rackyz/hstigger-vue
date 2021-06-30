@@ -310,9 +310,10 @@ export default {
     <div style="margin:10px 0;color:#333;border-left:10px solid orange;padding-left:5px;">账号信息</div>
     <div class="flex-wrap flex-between" style="width:100%">
         <Row :gutter='10' style="width:calc(100% - 60px)">
-            <Col span='6'>{{user}}</Col>
-              <Col span='10'>{{email}}</Col>
-        <Col span='8'>{{qq}}</Col>
+            <Col span='5'>{{user}}</Col>
+              <Col span='6'>{{phone}}</Col>
+               <Col span='7'>{{email}}</Col>
+        <Col span='6'>{{qq}}</Col>
         </Row>
         <div style="width:60px">
             {{avatar}}

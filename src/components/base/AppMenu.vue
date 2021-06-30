@@ -102,7 +102,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['apps','app_groups','acc_list','dashboard_path']),
+    ...mapGetters('core',['session','apps','app_groups','acc_list','dashboard_path']),
     acc_apps(){
       if(this.showAppSelector)
         return this.acc_config_list.map(v=>this.apps[v]).filter(v=>v)

@@ -110,7 +110,7 @@
       <Badge
         :count='session.unread_msg_count || 0'
         type='primary'
-        style="margin-right:25px;"
+        style="margin-right:15px;"
       >
         <div
           class='text-btn'
@@ -125,18 +125,18 @@
         </div>
       </Badge>
 
-<!-- 
+
   <div
         class='text-btn'
         @click="RouteTo('/core/debug')"
-        style='margin-right:15px;'
+        style='margin-right:25px;'
       >
         <Icon
           custom="gzicon gzi-bug"
           size="15"
           :color="showDebug?'yellowgreen':'#af6'"
         />
-      </div> -->
+      </div>
 
      
 
@@ -315,7 +315,6 @@ export default {
       this.api.enterprise.LIST_MESSAGES(queryParam).then(res=>{
         let messages = res.data.data
         this.messages = messages
-        alert(messages.length)
       }).catch(e=>{
         this.Error("数据加载错误:"+e)
       }).finally(e=>{

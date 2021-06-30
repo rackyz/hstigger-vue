@@ -119,7 +119,7 @@ Object.keys(fileMap).forEach(k => {
       route.parent = route.parent.slice(0,parentIndex)
       parentRoute = fileMap[route.parent]
       if (!parentRoute){
-        console.log('route.parent:',route)
+        
         return
       }
     }
