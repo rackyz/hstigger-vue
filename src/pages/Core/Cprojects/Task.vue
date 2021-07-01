@@ -27,7 +27,7 @@
             <div style="font-size:10px;"><Icon type="md-add" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>新增工作</div>
             </div>
-            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0"  @click="handleCreateTask">
+            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0"  @click="modalCreateTeml=true">
             <div style="font-size:10px;"><Icon type="md-bookmarks" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>工作集</div>
             </div>
@@ -48,6 +48,42 @@
       <div class='table-wrap'>
         <hs-table ref='table' style="height:100%" full-table :columns="cols" :data="filteredTasks" />
       </div>
+
+
+       <!-- TASK EDITOR -->
+    <hs-modal-form
+			ref="form"
+			:title="model.id?'修改任务':'新增任务'"
+			v-model="modalCreate"
+			:width="620"
+			style="margin: 10px"
+			footer-hide
+			:form="Form('task',init_form)"
+			:data="model"
+      :initData="filterInitData"
+			editable
+			@on-submit="handlePatchArchive"
+			@on-event="handleEvent"
+		/>
+
+   <!-- TEMPLATE SELECTOR -->
+    <Modal v-model="modalCreateTeml" title="选择任务模板" footer-hide width="800">
+      <div style="position:relative;height:440px;">
+        <div class="flex-wrap">
+         <Input search placeholder="输入关键字搜索" style="margin:5px;width:200px" />
+         <!-- <Button icon="md-settings" style='float:right;margin-right:10px;'>任务模板管理</Button> -->
+        </div>
+        <div style="display:flex;position:relative;height:400px;border-top:1px solid #ddd;">
+        <hs-menu :data="tmplClasses" style='width:150px;border-right:1px solid #dfdfdf;height:100%;padding:0;' :current="selectedTmplClass" @on-select="selectedTmplClass=$event"></hs-menu>
+        <div style="width:calc(100% - 150px)">
+         
+          <hs-list :data="filteredTmpls" :option="{tmpl:'BaseTaskTemplate'}" style='height:380px;overflow-y:auto;border:none;' @event="handleTmplEvent" />
+        </div>
+        </div>
+      </div>
+    </Modal>
+
+
   </div>
 </template>
 
@@ -58,8 +94,11 @@ export default {
       phases:['前期准备','前期工作','设计工作','招投标','合同管理','现场管理','其他'],
       selected:-1,
       tasks:[],
+      model:{},
       tmpls:[],
-      loading:false
+      modalCreate:false,
+      loading:false,
+      modalCreateTeml:false
     }
   },
   mounted(){
@@ -86,6 +125,19 @@ export default {
     finished(){
       return this.tasks.filter(v=>v.state == 2)
     },
+     filteredTmpls(){
+        return this.tmpls.filter(v=>v.business_type == this.selectedTmplClass)
+      },
+      filterInitData(){
+        return {
+          project_id:this.id,
+
+          parent_id:this.parent_id,
+          dep_id:this.dep_id,
+          base_type:0,
+          business_type:this.selected == -1?0:this.selected,
+        }
+      },
     types(){
       let types = this.$store.getters['core/getTypes']('ARCHIVE_WORKTYPE')
       let t = types.map(v=>{
@@ -98,6 +150,13 @@ export default {
       })
       return t
     },
+    form_task(){
+        let form = this.Form('task')
+        
+        form.def.parent_id.option.options = this.root_tasks.map(v=>({value:v.id,label:v.name}))
+       
+        return form
+      },
     cols(){
       return [{
         type:'index',
@@ -137,6 +196,12 @@ export default {
           gettesr:"core/users"
         }
       },{
+        
+        width:120,
+        render(h,p){
+          return h('Button',{props:{size:'small'},on:{click:()=>{}}},'处理')
+        }
+      },{
         type:'time',
         title:"完成时间",
         width:120,
@@ -147,9 +212,11 @@ export default {
         title:"附件",
         key:"file"
       },{
-        type:"file",
+        
         title:"操作",
-        key:"file"
+        key:'id',
+          type:'tool',
+        buttons:["edit","delete"]
       }]
     }
   },
@@ -172,8 +239,8 @@ export default {
        })
     },
     handleCreateTask(e){
-      
-    }
+      this.modalCreate = true
+    } 
   },
   metaInfo:{
     title:'项目管理',
