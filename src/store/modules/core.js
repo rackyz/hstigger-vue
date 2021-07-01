@@ -95,6 +95,9 @@ const getters = {
   my_enterprises(state){
     return state.my_enterprises
   },
+  projects(state){
+    return state.projects
+  },
   my_projects(state) {
     return state.session.my_projects
   },
@@ -136,9 +139,6 @@ const getters = {
   },
   my_activities(state){
     return state.session.my_trainings
-  },
-  projects(state){
-    return state.projects
   },
   user_rss(state){
     return state.user_rss

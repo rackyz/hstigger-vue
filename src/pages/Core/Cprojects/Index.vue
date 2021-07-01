@@ -1,6 +1,6 @@
 <template>
   <Layout style='overflow:hidden;position:relative;'>
-      <Header style='color:#fff;background:#111;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
+      <Header style='color:#fff;background:#23334c;border-top:1px solid #222;height:85px;padding:10px;line-height:auto;display:flex;align-item:center;justify-content:space-between;'>
         <div class='left'>
         <div class="project-code">编号 <span>{{project.code}}</span> 类型 <span>{{project.type || '-'}}</span></div> 
         <div class="project-name" style="margin-top:5px;font-size:18px;">{{project.name}}
@@ -11,21 +11,15 @@
         </div>
         </div>
         <div class='right'>
-          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-top:-5px;margin-bottom:3px;margin-right:5px;'>状态 <span style='color:yellowgreen;'>{{getTypes('TASK_STATE').find(v=>v.value==project.state).name}}</span> 负责人 <hs-avatar :userinfo="users.find(v=>v.id == project.charger)" style="margin:0 5px;"></hs-avatar> {{users.find(v=>v.id == project.charger)?users.find(v=>v.id == project.charger).name:""}} </div> 
-          <div class="project-dynamic" style="margin-top:10px;">
-            <div class='project-state'>任务<br /><span class='count'>315<span class='unit'>条</span></span></div>
-            <div class='project-state'>已服务<br /><span class='count'>52<span class='unit'>天</span></span></div>
-            <div class='project-state'>动态<br /><span class='count'>425<span class='unit'>条</span></span></div>
-          </div>
+          <div class="project-code flex-wrap" style='text-align:right;justify-content:flex-end;height:15px;margin-bottom:3px;margin-right:5px;'>状态 <span style='color:yellowgreen;'>{{getTypes('TASK_STATE').find(v=>v.value==project.state).name}}</span> 负责人 <hs-avatar :userinfo="users.find(v=>v.id == project.charger)" style="margin:0 5px;"></hs-avatar> {{users.find(v=>v.id == project.charger)?users.find(v=>v.id == project.charger).name:""}} </div> 
+          
         </div>
       </Header>
       <Layout  style='flex-direction:row;overflow:hidden;position:relative;'>
          <hs-menu style='min-width:150px;width:150px;padding:5px 0;border-right:1px solid #dfdfdf;' :data="RouteMenu" @on-select='onClickMenu' :current="ActivePath" >
         </hs-menu>
         
-        <div class='l-menu'>
-
-        </div>
+      
    
      
       <transition name='fadeIn'>

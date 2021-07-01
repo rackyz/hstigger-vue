@@ -69,14 +69,14 @@
 
         <div class='card-title'>
           <Icon
-            custom='gzicon gzi-depart'
+            custom='gzicon gzi-Building-'
             size='19'
-          /> 项目进度 <span style='float:right;'><a
+          /> 项目关注 <span style='float:right;'><a
               href='#'
               style='font-size:12px;'
             ></a><a href='#'></a></span>
         </div>
-        
+        <BaseProjectDashboard />
       </Card>
 
       </Col>
@@ -160,7 +160,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypeByValue','getTypes','getTypesByKey','get_project','getDep']),
+    ...mapGetters('core', ['session', 'my_rss', 'user_rss', 'rss','my_tasks','getTypeByValue','getTypes','getTypesByKey','get_project','getDep','projects']),
     categriedFlowInstances(){
       return [this.flowInstances.filter(v=>v.state == 0),this.flowInstances.filter(v=>v.state == 1 || v.state == 4),this.flowInstances.filter(v=>v.state == 2 || v.state == 3 || v.state == 5)]
     },
