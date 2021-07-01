@@ -2,6 +2,8 @@
 
 .flex-group{
   margin:0 5px;
+  
+  border-radius:5px;
   >div{
     border-radius:0 !important;
     margin:0!important;
@@ -21,11 +23,11 @@
 <template>
   <div style="background:linear-gradient(to bottom right,#124,#333);height:100%;color:#fff;padding-top:5px;">
      <div class="flex-wrap" style="padding:5px;color:#333;">
-        <div class='l-group l-group-btn' :key="ph" style="width:70px;height:56px;text-align:center;margin:0 5px;padding:5px;border-radius:5px;color:#fff;margin-right:0;border-right:none;border-top-right-radius:0;border-bottom-right-radius:0;"  @click="handleCreateTask">
+        <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin:0 5px;padding:5px;border-radius:5px;color:#fff;margin-right:0;border-right:none;border-top-right-radius:0;border-bottom-right-radius:0;"  @click="handleCreateTask">
             <div style="font-size:10px;"><Icon type="md-add" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>新增工作</div>
             </div>
-            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:56px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0"  @click="handleCreateTask">
+            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0"  @click="handleCreateTask">
             <div style="font-size:10px;"><Icon type="md-bookmarks" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>工作集</div>
             </div>
@@ -192,7 +194,7 @@ export default {
   color:#333;
 }
 .l-group-selected{
-  background:rgb(0, 98, 174);
+  background:linear-gradient(to bottom,rgb(0, 98, 174),rgb(0,96,154));
   color:#fff;
   .ivu-progress-text-inner{
     color:yellow;
