@@ -71,35 +71,28 @@ export default {
       },{
         name:'通用模块',
         is_group:true,
-        subs:[ {
-           name:'通知公告',
-           icon:'bar-chart',
-           key:'notice'
-         },{
+        subs:[ 
+        //   {
+        //    name:'通知公告',
+        //    icon:'bar-chart',
+        //    key:'notice'
+        //  },
+         {
           name:'工作管理',
           icon:'xiangmu',
           key:'task'
-        },{name:'人员管理',
-        icon:'user',
-        key:'employee'}
-        ,{
+        },
+        // {name:'人员管理',
+        // icon:'user',
+        // key:'employee'}
+
+        // ,
+        {
           name:'档案管理',
           icon:'xiangmu2',
           key:'archive',
         }]
-      },{
-        name:'总师室',
-        is_group:true,subs:[{
-          name:'项目立项',
-          icon:'iconset0118',
-          key:'contract'
-        }]},,{
-        name:'前期部',
-        is_group:true,subs:[{
-          name:'前期工作',
-          icon:'iconset0118',
-          key:'contract'
-        }]},
+      },
         {
         name:'合约部',
         is_group:true,subs:[{
@@ -119,19 +112,10 @@ export default {
         }]},{
         name:'系统配置',
         is_group:true,subs:[
-           {
-          name:'模块启用',
-          icon:'config',
-          key:'config'
-        },
-          {
-          name:'项目角色',
-          icon:'role',
-          key:'role'
-        },
+          
         {
-          name:'基础配置',
-          icon:'config',
+          name:'项目配置',
+          icon:'switch',
           key:'config'
         }]
       }]
@@ -192,7 +176,6 @@ export default {
     }
   },
   mounted(){
-    this.$store.commit('project/init_api',this.api)
     this.getData()
   },
   methods:{

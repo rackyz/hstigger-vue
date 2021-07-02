@@ -2,6 +2,7 @@
 
 .flex-group{
   margin:0 5px;
+  flex-wrap:nowrap;
   
   border-radius:5px;
   >div{
@@ -46,7 +47,7 @@
       </div>
       </div>
       <div class='table-wrap'>
-        <hs-table ref='table' style="height:100%" full-table :columns="cols" :data="filteredTasks" />
+        <hs-table ref='table' style="height:100%" full-table :columns="cols" :data="filteredTasks" @event="onTableEvent" />
       </div>
 
 
@@ -62,7 +63,7 @@
 			:data="model"
       :initData="filterInitData"
 			editable
-			@on-submit="handlePatchArchive"
+			@on-submit="handleSubmitTask"
 			@on-event="handleEvent"
 		/>
 
@@ -84,6 +85,27 @@
     </Modal>
 
 
+    <!-- TEMPLATE TASKS SELECTOR -->
+    <Modal v-model="modalInitTmpl" :title="'初始化模板 - '+tmpl.name" footer-hide width="800">
+      <div style="padding:10px;">{{tmpl.desc}}</div>
+      <template v-if="loadingTemplate">
+        读取中
+      </template>
+      <template v-else>
+      <CheckboxGroup v-model="selectedTemplates" style='max-height:400px;overflow-y:auto;border:1px solid #dfdfdf;'>
+          <template v-for="(sub,i) in sub_templates">
+            <Checkbox :label="sub.id" :key="i" style="padding:0 10px;width:90%;display:flex;align-items:center;" :disbaled="existedTemplates.includes(sub.id)">
+              <div style="width:20px;text-align:right;margin-right:5px;">{{i+1}}</div> 任务 {{sub.name}}
+            </Checkbox>
+      </template>
+      </CheckboxGroup>
+      </template>
+      <div class='flex-wrap' style="padding:10px;justify-content:space-between;">
+        <div class='flex-wrap'><Button style='margin-right:10px;' @click="selectedTemplates=sub_templates.map(v=>v.id)">全选</Button><Button @click='selectedTemplates=existedTemplates.map(v=>v)'>取消</Button></div>
+        <div class='flex-wrap'><Button type='primary' style='margin-right:10px;' @click="handleCreateWithTmpl">提交</Button><Button @click='handleCancelTmpl'>取消</Button></div></div>
+    </Modal>
+
+     <ModalProcessNTask v-model="modalProcess" :task="model" />
   </div>
 </template>
 
@@ -98,7 +120,15 @@ export default {
       tmpls:[],
       modalCreate:false,
       loading:false,
-      modalCreateTeml:false
+      modalCreateTeml:false,
+       selectedTmplClass:0,
+        sub_templates:[],
+        selectedTemplates:[],
+      existedTemplates:[],
+        modalCreateTeml:false,
+      modalInitTmpl:false,
+      tmpl:{},
+      modalProcess:false,
     }
   },
   mounted(){
@@ -125,6 +155,17 @@ export default {
     finished(){
       return this.tasks.filter(v=>v.state == 2)
     },
+    tmplClasses(){
+        var that = this
+        return this.$store.getters['core/getTypes']('ARCHIVE_WORKTYPE').map(v=>{
+          return {
+            id:v.value,
+            name:v.name,
+            path:v.value,
+            count:that.tmpls.filter(t=>t.business_type == v.value).length
+          }
+        })
+      },
      filteredTmpls(){
         return this.tmpls.filter(v=>v.business_type == this.selectedTmplClass)
       },
@@ -172,9 +213,24 @@ export default {
             getters_key:"ARCHIVE_WORKTYPE"
           }
         },{
+        title:"模板",
+        type:"text",
+        key:"unique_tmpl_key",
+        sortable:false,
+        width:40,
+        render:(h,param)=>{
+          let tmplkey = param.row.unique_tmpl_key
+          if(tmplkey)
+            return h('Icon',{props:{type:'md-lock',size:15}})
+          else
+            return h('span','-')
+        }
+        
+      },{
         type:"text",
         title:"名称",
         width:400,
+         linkEvent:"open",
         key:"name"
       },{
         title:"任务状态",
@@ -193,37 +249,50 @@ export default {
         key:"charger",
         option:{
           align:"center",
-          gettesr:"core/users"
+          getters:"core/users"
         }
       },{
-        
+        title:"结果",
+        sortable:false,
         width:120,
         render(h,p){
-          return h('Button',{props:{size:'small'},on:{click:()=>{}}},'处理')
+          var that = this
+          let btnProcess = h('Button',{props:{size:'small',type:"primary",icon:"md-create"},on:{click:()=>{this.model = p.row
+            that.modalProcess = true}}},'处理')
+          let btnView = h('Button',{props:{size:'small',type:'success',icon:"md-eye"},on:{click:()=>{
+            this.model = p.row
+            
+            that.modalProcess = true
+          }}},'查阅')
+          return p.row.state < 2 ? btnProcess : btnView
         }
       },{
         type:'time',
         title:"完成时间",
         width:120,
         key:"submitted_at"
-      },{
-        type:"file",
-        width:100,
-        title:"附件",
-        key:"file"
+      },{title:"资料归档",
+      sortable:false},{
+        type:"time",
+        width:80,
+        title:"创建于",
+        key:"created_at"
       },{
         
         title:"操作",
-        key:'id',
+        width:100,
+        sortable:false,
           type:'tool',
-        buttons:["edit","delete"]
-      }]
+        buttons:["delete"],
+        option:{}
+      }
+      ]
     }
   },
   methods:{
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_TASKS().then(res=>{
+       this.api.enterprise.LIST_TASKS({query:{project_id:this.id,parent_id:-1}}).then(res=>{
          this.tasks = res.data.data
        }).finally(e=>{
          this.loading = false
@@ -240,7 +309,111 @@ export default {
     },
     handleCreateTask(e){
       this.modalCreate = true
-    } 
+    },
+    handleSubmitTask(item){
+       if(item.id){
+        let id = item.id
+        delete item.id
+        this.api.enterprise.PATCH_TASKS(item,{param:{id}}).then(res=>{
+          let updateInfo = res.data.data
+         
+          let new_item = Object.assign({},item,updateInfo)
+          let index = this.tasks.findIndex(v=>v.id == id)
+          if(index != -1){
+            new_item = Object.assign({},this.tasks[index],new_item)
+           this.tasks.splice(index,1,new_item)
+          }
+          this.modalCreate = false
+          this.Success('修改成功')
+         
+        }).catch(e=>{
+          this.Error('修改失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })    
+      }else{
+        if(this.parent_id)
+          item.parent_id = this.parent_id
+        this.api.enterprise.POST_TASKS(item).then(res=>{
+          let updateInfo = res.data.data
+          let new_item = Object.assign({},item,updateInfo)
+          this.tasks.splice(0,0,new_item)
+           this.modalCreate = false
+          this.Success('创建成功')
+        }).catch(e=>{
+          this.Error('创建失败:'+e)  
+        }).finally(e=>{
+          this.loading = false
+        })
+      }
+     
+    },handleTmplEvent(e){
+      if(e.event == 'create'){
+        this.modalCreateTeml = false
+        this.api.enterprise.LIST_TASK_TEMPLATES({query:{parent_id:e.param.id}}).then(res=>{
+          let items = res.data.data
+          this.sub_templates = items
+             this.modalInitTmpl = true
+             this.existedTemplates = this.tasks.filter(v=>this.sub_templates.find(t=>t.id == v.unique_tmpl_key))
+             this.selectedTmplates = [...this.existedTemplates]
+            this.tmpl = e.param
+        }).catch(e=>{
+          this.Error('模板读取失败:',e)
+        })
+       
+      }
+    },handleCreateWithTmpl(){
+      let updatedList = _.difference(this.selectedTemplates,this.existedTemplates)
+      this.api.enterprise.POST_TASKS({list:updatedList,...this.filterInitData},{query:{tmpl:this.tmpl.id}}).then(res=>{
+        this.Success("添加完成")
+        this.getData()
+        this.modalInitTmpl = false
+      }).catch(e=>{
+        this.Error("创建失败:"+e)
+      })
+    },handleCancelTmpl(){
+      this.modalInitTmpl = false
+      this.tmpl = {}
+    },handleDelete(model){
+      this.Confirm(`确定删除该任务<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料。${model.unique_tmpl_key?'<br /><span style="color:#3af">(此任务是模板任务,可从对应模板内重新添加)</span>':''}`,()=>{
+        this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
+          let id_list = res.data.data
+          setTimeout(() => {
+            this.Success('删除成功')
+           
+              let index = this.tasks.findIndex(v=>v.id == model.id)
+              if(index != -1)
+                this.tasks.splice(index,1)
+              
+           
+            
+          }, (1000));
+          
+        }).catch(e=>{
+          this.Error('删除失败')
+        })
+      })
+    },
+     onTableEvent(e){
+      if(!e.data)
+        return
+      if(e.type == 'edit'){
+       this.handleBeforeEdit(e.data.id)
+      }else if(e.type == 'delete'){
+        this.handleDelete(e.data)
+      }else if(e.type == 'open'){
+        this.model =e.data
+        this.modalCreate = true
+        
+       
+      }else if(e.type == 'project'){
+        if(e.data.project_id)
+          this.RouteTo('/core/projects/'+e.data.project_id)
+      }else if(e.type == 'dep'){
+        if(e.data.dep_id)
+          this.RouteTo('/core/deps/'+e.data.dep_id)
+      }
+    },
   },
   metaInfo:{
     title:'项目管理',
@@ -257,7 +430,7 @@ export default {
 }
 .l-group:hover{
   transition: all 0.3s;
-  background:rgb(172, 217, 250);
+  background:#eee;
   color:#333;
 }
 .l-group-selected{
@@ -282,8 +455,9 @@ export default {
 }
 
 .l-group-selected:hover{
-  background:rgb(0, 98, 174);
-  color:#fff;
+  background:rgb(0, 98, 174) !important;
+  color:#fff  !important;
+  transition: none !important;
 }
 
 .table-wrap{

@@ -209,10 +209,6 @@ export default {
       })
     }
   },
-  mounted(){
-    this.$store.commit('project/init_api',this.api)
-    
-  },
   methods:{
     getData(){
       
