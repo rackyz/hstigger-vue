@@ -24,6 +24,7 @@
 <template>
   <div style="background:linear-gradient(to bottom right,#124,#333);height:100%;color:#fff;padding-top:5px;">
      <div class="flex-wrap" style="padding:5px;color:#333;">
+       <div class="flex-wrap flex-group">
         <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin:0 5px;padding:5px;border-radius:5px;color:#fff;margin-right:0;border-right:none;border-top-right-radius:0;border-bottom-right-radius:0;"  @click="handleCreateTask">
             <div style="font-size:10px;"><Icon type="md-add" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>新增工作</div>
@@ -31,6 +32,11 @@
             <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0"  @click="modalCreateTeml=true">
             <div style="font-size:10px;"><Icon type="md-bookmarks" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>工作集</div>
+            </div>
+             <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;border-top-left-radius:0;border-bottom-left-radius:0;background:#a22"  @click="handleDeleteSelected" v-if="selectedTasks.length > 1">
+            <div style="font-size:10px;"><Icon type="md-trash" size="20" /></div>
+            <div style='font-size:10px;margin-top:2px;'>删除</div>
+            </div>
             </div>
             <div class="flex-wrap flex-group">
         <div class='l-group ' :key="ph" style="width:120px;height:54px;text-align:center;margin:0 5px;padding:5px;border-radius:5px;" :class="selected == -1?'l-group-selected':''" @click="selected = -1">
@@ -44,10 +50,11 @@
             </div>
           
         </template>
+       
       </div>
       </div>
       <div class='table-wrap'>
-        <hs-table ref='table' style="height:100%" full-table :columns="cols" :data="filteredTasks" @event="onTableEvent" />
+        <hs-table ref='table' style="height:100%" full-table :columns="cols" :data="filteredTasks" @event="onTableEvent" selectable="multiple" />
       </div>
 
 
@@ -94,8 +101,9 @@
       <template v-else>
       <CheckboxGroup v-model="selectedTemplates" style='max-height:400px;overflow-y:auto;border:1px solid #dfdfdf;'>
           <template v-for="(sub,i) in sub_templates">
-            <Checkbox :label="sub.id" :key="i" style="padding:0 10px;width:90%;display:flex;align-items:center;" :disbaled="existedTemplates.includes(sub.id)">
-              <div style="width:20px;text-align:right;margin-right:5px;">{{i+1}}</div> 任务 {{sub.name}}
+            <Checkbox :label="sub.id" :key="i" style="padding:0 10px;width:90%;display:flex;align-items:center;" :disabled="existedTemplates.includes(sub.id)">
+              <div style="width:20px;text-align:right;margin-right:5px;">{{i+1}}</div> <span style="color:#38f;margin-right:5px;">任务</span> {{sub.name}}
+              <span style="color:green;margin-left:5px">{{existedTemplates.includes(sub.id)?'已添加':''}}</span>
             </Checkbox>
       </template>
       </CheckboxGroup>
@@ -115,6 +123,7 @@ export default {
     return {
       phases:['前期准备','前期工作','设计工作','招投标','合同管理','现场管理','其他'],
       selected:-1,
+      selectedTasks:[],
       tasks:[],
       model:{},
       tmpls:[],
@@ -199,10 +208,11 @@ export default {
         return form
       },
     cols(){
+        var that = this
       return [{
         type:'index',
-        title:"序号"
-
+        title:"序号",
+        width:40
       },{
           title:"业务类型", // 流程 任务 审批
           key:"business_type",
@@ -256,13 +266,12 @@ export default {
         sortable:false,
         width:120,
         render(h,p){
-          var that = this
-          let btnProcess = h('Button',{props:{size:'small',type:"primary",icon:"md-create"},on:{click:()=>{this.model = p.row
-            that.modalProcess = true}}},'处理')
-          let btnView = h('Button',{props:{size:'small',type:'success',icon:"md-eye"},on:{click:()=>{
+        
+          let btnProcess = h('Button',{props:{size:'small',type:"primary",icon:"md-create"},on:{click:()=>{
             this.model = p.row
-            
             that.modalProcess = true
+            }}},'处理')
+          let btnView = h('Button',{props:{size:'small',type:'success',icon:"md-eye"},on:{click:()=>{
           }}},'查阅')
           return p.row.state < 2 ? btnProcess : btnView
         }
@@ -354,7 +363,7 @@ export default {
           let items = res.data.data
           this.sub_templates = items
              this.modalInitTmpl = true
-             this.existedTemplates = this.tasks.filter(v=>this.sub_templates.find(t=>t.id == v.unique_tmpl_key))
+             this.existedTemplates = this.tasks.filter(v=>this.sub_templates.find(t=>t.id == v.unique_tmpl_key)).map(v=>v.unique_tmpl_key)
              this.selectedTmplates = [...this.existedTemplates]
             this.tmpl = e.param
         }).catch(e=>{
@@ -375,7 +384,7 @@ export default {
       this.modalInitTmpl = false
       this.tmpl = {}
     },handleDelete(model){
-      this.Confirm(`确定删除该任务<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料。${model.unique_tmpl_key?'<br /><span style="color:#3af">(此任务是模板任务,可从对应模板内重新添加)</span>':''}`,()=>{
+      this.Confirm(`确定删除该任务<b style='color:red;margin:0 2px;'>${model.name}</b>的所有资料。${model.unique_tmpl_key?'<span style="color:#38f;">此任务是模板任务,可从对应模板内重新添加</span>':''}<br /><span style='color:red;font-size:10px'>(删除的任务数据不可恢复，已归档的资料不受影响，请谨慎操作)</span>`,()=>{
         this.api.enterprise.DELETE_TASKS({param:{id:model.id}}).then(res=>{
           let id_list = res.data.data
           setTimeout(() => {
@@ -394,9 +403,35 @@ export default {
         })
       })
     },
+    handleDeleteSelected(){
+      let items = this.selectedTasks
+       this.Confirm(`确定删除选定的<span style='color:red;margin:0 2px;'>${items.length}</span>个任务的所有资料。<br /><span style='color:red;font-size:10px'>(删除的任务数据不可恢复，已归档的资料不受影响，请谨慎操作)</span>`,()=>{
+        this.api.enterprise.DELETE_MORE_TASKS(items.map(v=>v.id)).then(res=>{
+          let id_list = items.map(v=>v.id)
+          setTimeout(() => {
+            this.Success('删除成功')
+            id_list.forEach(id=>{
+              let index = this.tasks.findIndex(v=>v.id == id)
+              if(index != -1)
+                this.tasks.splice(index,1)
+            })
+           
+              
+           
+            
+          }, (1000));
+          
+        }).catch(e=>{
+          this.Error('删除失败'+e)
+        })
+      })
+    },
      onTableEvent(e){
       if(!e.data)
         return
+      if(e.type == 'select'){
+        this.selectedTasks = e.data
+      }
       if(e.type == 'edit'){
        this.handleBeforeEdit(e.data.id)
       }else if(e.type == 'delete'){

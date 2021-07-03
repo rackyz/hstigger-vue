@@ -1,6 +1,13 @@
 <template>
-   <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="800" styles="padding:20px;" :fullscreen="fullscreen">
-     123
+   <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="600" styles="padding:20px;" :fullscreen="fullscreen">
+     {{task.name}}
+      <div>
+        任务说明
+      </div>
+      <div>
+        任务操作区
+      </div>
+      
   </Modal>
 </template>
 
