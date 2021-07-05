@@ -310,6 +310,14 @@ export default {
         }
       },{
         type:'time',
+        title:"开始时间",
+        width:120,
+        key:"start_at",
+        option:{
+          type:'date'
+        }
+      },{
+        type:'time',
         title:"完成时间",
         width:120,
         key:"finished_at",
