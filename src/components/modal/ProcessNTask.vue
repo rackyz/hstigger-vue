@@ -1,18 +1,26 @@
 <template>
-   <Modal v-model='value' title="任务内容" @on-cancel="handleExit" footer-hide width="600" :fullscreen="fullscreen">
-     <div style="padding:10px;">
-         <div>
-        {{task.title}}
+   <Modal v-model='value' title="任务处理" @on-cancel="handleExit" footer-hide width="600" :fullscreen="fullscreen">
+     <div>
+     <div style="padding:10px;background:#333;color:#fff;">
+         <div style="font-size:16px;">
+        {{focused.name || '任务标题'}}
       </div>
       <div>
-        任务说明
+        {{focused.desc}}
       </div>
-      <div>
-        任务操作区
-      </div>
+     
      </div>
-    
-
+     <div style="padding:10px;">
+        <hs-form :form="Form('task_purchase')"   
+         :env="{upload}"
+          :data="focused"
+           :editable="editable"
+         @submit="handleProcess" />
+        <div class="flex-wrap" style="justify-content:flex-end" v-if="task.finished_at">
+            <div>{{focused.charger}} 上传于 {{hs.moment(focused.finished_at).format('YYYY-MM-DD')}} <a style="color:#38f;margin-left:20px;" @click="CancelTask(focused)"><Icon type="md-arrow-back"  /> 撤回</a></div>
+        </div>
+      </div>
+</div>
   </Modal>
 </template>
 
@@ -27,19 +35,15 @@ export default {
     },
     task:{
       type:Object,
-    default:()=>{}
+      default:()=>{}
     }
   },
   watch:{
     task:{
       handler(v = {}){
-        v.state = v.task_state
-        this.focused = v
-        if(v.state == 0){
-          this.tabIndex = 'content'
-        }else{
-          this.tabIndex = 'process'
-        }
+        this.focused = Object.assign({},v || {})
+        this.focused.type1 = v.type1 || v.business_type
+        this.focused.files = v.result
       },
       deep:true,
       immediate:true
@@ -47,7 +51,7 @@ export default {
   },
   mounted(){
     if(this.task && this.task.id){
-       this.focused = this.task
+        this.focused = Object.assign({},this.task)
     // if(this.task.children && this.task.children.length > 0)
     //   this.focused.splited = true
     }
@@ -89,7 +93,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['session','getTypeByValue']),
+    ...mapGetters('core',['session','getTypeByValue','uid']),
      ...mapGetters('file',['files','uploadingFiles','makeURL']),
     dep(){
       return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
@@ -99,6 +103,9 @@ export default {
         percent:this.focused.enabled_percent,
         dis_percent:!this.focused.enabled_percent
       }
+    },
+    editable(){
+      return this.task.state < 2 && this.uid == this.task.charger
     },
     filterTasks(){
       if(this.focused && this.focused.children){
@@ -329,8 +336,9 @@ export default {
         return
       this.api.enterprise.PROCESS_TASK(data,{param:{id}}).then(res=>{
           let updateInfo = res.data.data
-          this.$set(this,'focused',Object.assign({},this.focused,updateInfo))
-          this.$emit('change-state',updateInfo.state)
+          let model= Object.assign({},this.focused,updateInfo)
+          this.$set(this,'focused',model)
+          this.$emit('change',model)
       }).catch(e=>{
         this.Error("处理失败:",)
       })
@@ -340,10 +348,11 @@ export default {
        let id = this.focused.id
       if(!id)
         return
-      this.api.enterprise.PATCH_TASKS({},{param:{id},query:{q:'cancel'}}).then(res=>{
+      this.api.enterprise.PATCH_TASKS({},{param:{id},query:{q:'cancel',t:'task'}}).then(res=>{
           let updateInfo = res.data.data || {}
-          this.$set(this,'focused',Object.assign({},this.focused,updateInfo,{state:1}))
-          this.Success('撤回成功')
+           let model= Object.assign({},this.focused,updateInfo,{state:1})
+          this.$set(this,'focused',model)
+          this.$emit('change',model)
       })
     },
     SubmitTask(){
@@ -371,7 +380,14 @@ export default {
 				let ext = url.substring(url.lastIndexOf(".") + 1);
 				return ext;
 			}
-		},
+		},async upload(files,onFilesProgress){
+     return new Promise((resolve,reject)=>{
+       this.$store.dispatch("file/upload",{files,onProgress:onFilesProgress}).then(files=>{
+       
+         resolve(files.map(v=>v.url))
+       }).catch(reject)
+     })
+    },
     Cancel(){
 
     }

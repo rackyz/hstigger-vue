@@ -37,7 +37,14 @@
             <div style="font-size:10px;"><Icon type="md-trash" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>删除</div>
             </div>
+            
             </div>
+          
+            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;background:#272"  @click="modalCharger=true" v-if="selectedTasks.length > 1">
+            <div style="font-size:10px;"><Icon type="md-person" size="20" /></div>
+            <div style='font-size:10px;margin-top:2px;'>指派</div>
+            </div>
+
             <div class="flex-wrap flex-group">
         <div class='l-group ' :key="ph" style="width:120px;height:54px;text-align:center;margin:0 5px;padding:5px;border-radius:5px;" :class="selected == -1?'l-group-selected':''" @click="selected = -1">
             <div style="font-size:10px;">全部 ({{finished.length}}/{{tasks.length}})</div>
@@ -113,7 +120,11 @@
         <div class='flex-wrap'><Button type='primary' style='margin-right:10px;' @click="handleCreateWithTmpl">提交</Button><Button @click='handleCancelTmpl'>取消</Button></div></div>
     </Modal>
 
-     <ModalProcessNTask v-model="modalProcess" :task="model" />
+     <ModalProcessNTask v-model="modalProcess" :task="model" @change="handleProcessTask" />
+
+  
+        <hs-modal-form v-model="modalCharger" title="选定负责人" :form="formSelector" @on-submit="handleChangeChargar" editable />
+    
   </div>
 </template>
 
@@ -128,6 +139,7 @@ export default {
       model:{},
       tmpls:[],
       modalCreate:false,
+      modalCharger:false,
       loading:false,
       modalCreateTeml:false,
        selectedTmplClass:0,
@@ -151,6 +163,26 @@ export default {
   computed:{
      id(){
       return this.$route.params.id
+    },
+    formSelector(){
+      return {
+        def:{
+          charger:{
+            label:"负责人",
+            control:'select',
+            option:{
+              getters:'core/employees',
+              idKey:'id',
+              labelKey:'name'
+            }
+          }
+        },
+        layout:'<div>{{charger}}</div>',
+        option:{
+          hideCancel:true,
+          hideReset:true
+        }
+      }
     },
     project(){
       return this.$store.getters['project/get'](this.id)
@@ -264,14 +296,15 @@ export default {
       },{
         title:"结果",
         sortable:false,
-        width:120,
+        width:100,
         render(h,p){
         
           let btnProcess = h('Button',{props:{size:'small',type:"primary",icon:"md-create"},on:{click:()=>{
-            this.model = p.row
+            that.model = p.row
             that.modalProcess = true
             }}},'处理')
-          let btnView = h('Button',{props:{size:'small',type:'success',icon:"md-eye"},on:{click:()=>{
+          let btnView = h('Button',{props:{size:'small',type:'success',icon:"md-eye"},on:{click:()=>{ that.model = p.row
+            that.modalProcess = true
           }}},'查阅')
           return p.row.state < 2 ? btnProcess : btnView
         }
@@ -279,8 +312,18 @@ export default {
         type:'time',
         title:"完成时间",
         width:120,
-        key:"submitted_at"
+        key:"finished_at",
+        option:{
+          type:'date'
+        }
       },{title:"资料归档",
+      option:{
+        align:'left'
+      },
+      render:(h,param)=>{
+        let icon = h('Icon',{props:{type:'md-cube',size:'14'},style:{marginRight:'5px'}})
+        return h('a',{style:{float:'left',color:"#3af"}},[icon,'资料归档 | '+param.row.name])
+      },
       sortable:false},{
         type:"time",
         width:80,
@@ -318,6 +361,14 @@ export default {
     },
     handleCreateTask(e){
       this.modalCreate = true
+    },
+    handleProcessTask(item){
+        
+      let index = this.tasks.findIndex(v=>v.id == item.id)
+      if(index != -1){
+        this.tasks.splice(index,1,item)
+      }
+      this.modalProcess = false
     },
     handleSubmitTask(item){
        if(item.id){
@@ -426,6 +477,11 @@ export default {
         })
       })
     },
+    handleChangeChargar(e){
+      // 修改选中的工作的负责人为e
+      this.modalCharger = false
+      this.Success("修改成功")
+    },
      onTableEvent(e){
       if(!e.data)
         return
@@ -487,6 +543,7 @@ export default {
 }
 .l-group-btn:hover{
    background:rgb(0, 98, 174);
+   filter:brightness(1.1);
 }
 
 .l-group-selected:hover{
