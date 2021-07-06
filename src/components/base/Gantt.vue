@@ -1,10 +1,18 @@
+<style lang="less">
+.hs-gantt{
+  .gantt_layout_cell{
+    border-left:none !important;
+  }
+}
+</style>
 <template>
-  <div ref="gantt" style="min-height:600px;padding:0;"></div>
+  <div class='hs-gantt' ref="gantt" style="min-height:600px;padding:0;"></div>
 </template>
 
 <script>
 import {gantt} from 'dhtmlx-gantt'
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css"
+import { mapGetters } from 'vuex'
 export default {
   name:"gantt",
   data(){
@@ -44,15 +52,24 @@ export default {
     }
   },
   computed:{
+    ...mapGetters('core',['getUser']),
     columns(){
+      function formatEndDate(date, template){ 
+    // get 23:59:59 instead of 00:00:00 for the end date
+    return template(new Date(date.valueOf() - 1));  
+}
       let cols =  [
-        {name:"name",width:'*',align:'left',resize:true,label:'任务名称'},
-        {name:"charger",width:100,align:'left',label:'负责人'},
+        {name:"name",width:'*',align:'left',resize:true,label:'任务名称',tree: true,},
+        {name:"charger",width:100,align:'center',label:'负责人'},
+      
+        {
+          name:'duration',label:"工期 (日)",align:'center',width:80
+        },
         {name:"percent",width:100,align:'center',label:'工作量'}
       ]
      
 
-      return this.enable_percent?cols:cols.slice(0,2)
+      return this.enable_percent?cols:cols.slice(0,3)
     }
   },
   mounted(){
@@ -74,7 +91,7 @@ export default {
        gantt.config.columns = this.columns
         gantt.config.scale_unit ="day"
         gantt.config.date_scale ="%d号, 星期%D";
-        gantt.config.min_column_width = 60;
+        gantt.config.min_column_width = 40;
         gantt.config.duration_unit ="day";
         gantt.config.scale_height = 20 * 3;
         gantt.config.row_height = 28;
@@ -98,17 +115,25 @@ export default {
       
       gantt.parse(this.formattedTasks)
       })
-     
-      this.formattedTasks = {
-        data:this.tasks.map((v,i)=>{
+      let formatted = this.tasks.map((v,i)=>{
+        let parent = this.tasks.findIndex(t=>t.id == v.parent_id)
         return {
             id:i+1,
             name:v.name,
+            charger:v.charger?this.getUser(v.charger).name:'无',
+            text:v.name,
             start_date:v.end_date ? v.end_date : (v.start_date || moment().format("DD-MM-YYYY")),
+            ent_date:v.end_date || moment().format("DD-MM-YYYY"),
             duration:v.plan_duration || 1,
-            progress:v.state>1?1:0
+            type:v.base_type==0?'task':'project',
+            progress:v.state>1?1:0,
+            readonly:v.state>0,
+            parent:parent==-1?undefined:parent+1 
           }
-          }),
+        })
+     
+      this.formattedTasks = {
+        data:formatted,
           links:[]
         }
 

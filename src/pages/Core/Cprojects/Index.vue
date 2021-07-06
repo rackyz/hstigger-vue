@@ -78,8 +78,13 @@ export default {
         //    key:'notice'
         //  },
          {
-          name:'工作管理',
+          name:'进度管理',
           icon:'xiangmu',
+          key:'progress'
+        },
+         {
+          name:'工作管理',
+          icon:'history',
           key:'task'
         },
         // {name:'人员管理',

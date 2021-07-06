@@ -1,11 +1,18 @@
 <template>
   <div class="l-dep-item flex-wrap flex-between" @click="RouteTo(`/core/deps/${dep.id}/dashboard`)">
     <div class="flex-wrap">
-      <Icon type="md-easel" style="margin-right:5px" /> {{dep.name}}
+      
+      <Icon type="md-easel" style="margin-right:8px" size="35" />
+      <div style='line-height:17px;'>
+        {{dep.name}}
+        <br />
+         <span style='font-size:10px;color:yellow;'>{{dep.count || 1}}人</span>
+      </div>
+     
     </div>
-    <!-- <div class="flex-wrap" style='font-family:consolas;font-size:10px;'>
+    <div class="flex-wrap" style='font-family:consolas;font-size:10px;'>
       ENTER >
-    </div> -->
+    </div>
     
   </div>
 </template>
@@ -24,17 +31,18 @@ export default {
 </script>
 <style lang="less" scoped>
 .l-dep-item{
-  width:calc(50% - 10px);
-  height:30px;
+  width:100%;
+  height:50px;
   display: flex;
   align-items: center;
-  background:#eee;
+  background:linear-gradient(to bottom left,rgb(50, 82, 177),rgb(28, 123, 213));
+  border-radius:5px;
+  color:#fff;
   padding:0 10px;
 }
 
 .l-dep-item:hover{
   filter:brightness(1.1);
-  background:#3af;
   color:#fff;
   transition:all 0.3s;
 }

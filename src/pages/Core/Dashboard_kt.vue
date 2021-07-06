@@ -13,7 +13,23 @@
         :md='12'
         :lg="5"
       >
-    
+      <Card
+        class="panel"
+        style='width:100%;border:none;background:#235;'
+        padding="0"
+      >
+      
+        <BaseMyStatus  />
+        <div style='height:25px;width:100%;padding:0 10px;background:#14233c;border-bottom-left-radius:5px;border-bottom-right-radius:5px;'>
+          <a
+            style='float:right;font-size:12px;color:#3af;'
+            @click.stop="RouteTo('/core/self')"
+          >个人中心
+            <Icon type="ios-arrow-forward" />
+          </a>
+        </div>
+
+      </Card>
           <Card
         class="panel"
         style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;border:1px solid #dfdfdf;"
@@ -62,7 +78,7 @@
      
        <Card
         class="panel"
-        style="width:100%;border:none;margin-top:10px;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;border:1px solid #dfdfdf;"
+        style="width:100%;border:none;position:relative;border-bottom-left-radius:0;border-bottom-right-radius:0;border:1px solid #dfdfdf;"
         padding='0'
       >
         
@@ -88,7 +104,7 @@
         :md='24'
         :lg="4"
       >
- <div class="flex-wrap" style="margin-top:10px;">
+ <div class="flex-wrap">
         <Card
               padding='0'
               style='height:90px;margin-right:10px;width:90px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'

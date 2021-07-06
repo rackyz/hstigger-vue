@@ -40,7 +40,7 @@
             
             </div>
           
-            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;background:#272"  @click="modalCharger=true" v-if="selectedTasks.length > 1">
+            <div class='l-group l-group-btn' :key="ph" style="width:70px;height:54px;text-align:center;margin-left:0;padding:5px;border-radius:5px;color:#fff;background:#272"  @click="handleChangeCharger" v-if="selectedTasks.length > 1">
             <div style="font-size:10px;"><Icon type="md-person" size="20" /></div>
             <div style='font-size:10px;margin-top:2px;'>指派</div>
             </div>
@@ -53,7 +53,7 @@
         <template v-for="(ph,i) in types">
           <div class='l-group' v-if="ph.task_count" :key="ph" style="width:120px;height:54px;text-align:center;margin:0 2px;padding:5px;border-radius:5px;" :class="selected == ph.value?'l-group-selected':''" @click="selected = ph.value">
             <div style="font-size:10px;">{{ph.name}} ({{ph.finished_count}}/{{ph.task_count}})</div>
-            <div><Progress :percent="ph.task_count!=0?parseInt(ph.finished_count/ph.task_count):0" /></div>
+            <div><Progress :percent="ph.task_count!=0?parseInt(ph.finished_count*100/ph.task_count):0" /></div>
             </div>
           
         </template>
@@ -123,7 +123,7 @@
      <ModalProcessNTask v-model="modalProcess" :task="model" @change="handleProcessTask" />
 
   
-        <hs-modal-form v-model="modalCharger" title="选定负责人" :form="formSelector" @on-submit="handleChangeChargar" editable />
+        <hs-modal-form v-model="modalCharger" title="选定负责人" :form="formSelector" @on-submit="handleChangeChargar" editable  width="300" />
     
   </div>
 </template>
@@ -172,12 +172,13 @@ export default {
             control:'select',
             option:{
               getters:'core/employees',
+              required:true,
               idKey:'id',
               labelKey:'name'
             }
           }
         },
-        layout:'<div>{{charger}}</div>',
+        layout:'<div><div style="color:red;font-size:12px;padding:5px 0;">请注意，更换负责人会使已完成的任务状态切换至进行中，需要重新提交</div><div>{{charger}}</div></div>',
         option:{
           hideCancel:true,
           hideReset:true
@@ -350,6 +351,10 @@ export default {
     }
   },
   methods:{
+    handleChangeCharger(){
+        this.modalCharger=true
+      
+    },
     getData(){
        this.loading = true
        this.api.enterprise.LIST_TASKS({query:{project_id:this.id,parent_id:-1}}).then(res=>{
@@ -487,8 +492,26 @@ export default {
     },
     handleChangeChargar(e){
       // 修改选中的工作的负责人为e
-      this.modalCharger = false
-      this.Success("修改成功")
+      let data = {
+        idlist:this.selectedTasks.map(v=>v.id),
+        charger:e.charger
+      }
+
+
+     
+          
+         
+      this.api.enterprise.POSTACTION_TASKS(data,{param:{action:'charger'}}).then(res=>{
+         
+           this.selectedTasks.forEach(t=>{
+         let index = this.tasks.findIndex(v=>v.id == t.id)
+         if(index != -1)
+          this.tasks.splice(index,1,Object.assign({},this.tasks[index],e,{state:1}))
+       })
+        this.Success("修改成功")
+         this.modalCharger = false
+      })
+   
     },
      onTableEvent(e){
       if(!e.data)

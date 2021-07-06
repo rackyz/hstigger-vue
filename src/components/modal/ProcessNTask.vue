@@ -16,10 +16,11 @@
           :data="focused"
            :editable="editable"
          @submit="handleProcess" />
-        <div class="flex-wrap" style="justify-content:flex-end" v-if="task.finished_at">
-            <div>{{focused.charger}} 上传于 {{hs.moment(focused.finished_at).format('YYYY-MM-DD')}} <a style="color:#38f;margin-left:20px;" @click="CancelTask(focused)"><Icon type="md-arrow-back"  /> 撤回</a></div>
-        </div>
+       
       </div>
+       <div class="flex-wrap" style="justify-content:flex-end;background:#ddd;color:#333;padding:10px;font-size:10px;" v-if="task.finished_at">
+            <div class="flex-wrap"><hs-avatar size="16" style="margin-right:5px;" :userinfo="getUser(focused.charger)"></hs-avatar><span style='color:#38f'>{{getUser(focused.charger).name}}</span> 上传于 {{hs.moment(focused.finished_at).format('YYYY-MM-DD')}} <a style="color:red;margin-left:20px;" @click="CancelTask(focused)"><Icon type="md-arrow-back"  /> 撤回</a></div>
+        </div>
 </div>
   </Modal>
 </template>
@@ -93,7 +94,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['session','getTypeByValue','uid']),
+    ...mapGetters('core',['session','getTypeByValue','uid','getUser']),
      ...mapGetters('file',['files','uploadingFiles','makeURL']),
     dep(){
       return this.$store.getters["core/deps"].find(v=>v.id == this.task.dep_id) || {}
