@@ -64,12 +64,17 @@
             <div>状态</div>
             <div style="text-align:right;color:#3af;" :style="{color:getTypeByValue('TASK_STATE',item.state || 0).color || 'orange'}">{{getTypeByValue('TASK_STATE',item.state || 0).name}}</div>
           </div>
-
-         <Button type="warning" v-if="isCharger" style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">管理后台<p style='font-size:10px;color:#fff;'>已报 {{item.count || 0}}</p></Button>
-          <Button type="primary" v-if="!isMember" style="width:80%;height:50px;margin-top:20px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
+        
+          <div id="qrCode" ref="qrCodeDiv"></div>
+            <a :href="`/public/${current_enterprise}/trainings/${id}`">外部报名入口</a>
+            <div class="flex-wrap flex-around" style="margin-top:20px;width:100%;">
+                 <Button type="warning" v-if="isCharger" style="width:120px;height:50px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">管理后台<p style='font-size:10px;color:#fff;'>已报 {{item.count || 0}}</p></Button>
+          <Button type="primary" v-if="!isMember" style="width:120px;height:50px;" :disabled="!item.enable_join" @click="Join">我要报名<p style='font-size:10px;'>{{item.enable_join?`已报 ${item.count || 0}`:'报名已关闭'}}</p></Button>
           
-          <Button type="success" v-else style="width:80%;height:50px;margin-top:20px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
-          <a style="color:red;margin-top:10px;" @click="unjoin" v-if="isMember">取消报名</a>
+          <Button type="success" v-else style="width:120px;height:50px;" @click="RouteTo(`/core/classes/${id}/dashboard`)">进入课堂<p style='font-size:10px;color:#fff;'>已报名</p></Button>
+          
+            </div>
+        <a style="color:red;margin-top:10px;" @click="unjoin" v-if="isMember">取消报名</a>
           
         </div>
         </Col>
@@ -86,6 +91,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import moment from 'moment'
+import QRCode from 'qrcodejs2';
 export default {
   metaInfo:{
     title:"培训",
@@ -100,7 +106,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters('core',['getUser','getTypeByValue','uid','session']),
+    ...mapGetters('core',['getUser','getTypeByValue','uid','session','current_enterprise']),
     charger(){
       return this.getUser(this.item.charger) || {}
     },
@@ -116,6 +122,14 @@ export default {
   },
   mounted(){
     this.getData()
+    new QRCode(this.$refs.qrCodeDiv, {
+          text: `https://www.inbgz.com/public/${this.current_enterprise}/trainings/${this.id}`,
+          width: 200,
+          height: 200,
+          colorDark: "#333333", //二维码颜色
+          colorLight: "#ffffff", //二维码背景色
+          correctLevel: QRCode.CorrectLevel.L//容错率，L/M/H
+        })
   },
   methods:{
     FormatDate(e){

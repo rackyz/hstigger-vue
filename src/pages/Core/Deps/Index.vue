@@ -76,10 +76,11 @@ export default {
           icon:'xiangmu',
           key:'task'
         },
-        {name:'人员管理',
-        icon:'user',
-        key:'employee'}
-        ,{
+        // {name:'人员管理',
+        // icon:'user',
+        // key:'employee'}
+        // ,
+        {
           name:'档案管理',
           icon:'xiangmu2',
           key:'archive',

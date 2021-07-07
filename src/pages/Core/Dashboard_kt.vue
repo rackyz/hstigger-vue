@@ -104,34 +104,21 @@
         :md='24'
         :lg="4"
       >
- <div class="flex-wrap">
-        <Card
+ 
+       <Card
               padding='0'
-              style='height:90px;margin-right:10px;width:90px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
+              style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
             >
-              <div @click.stop="RouteTo('/core/archivemanagement')" class="g-hover-lightness" style="width:90px;text-align:center;height:90px;position:relative;color:#fff;padding:0;font-size:15px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
-              <span style='font-size:40px;color:#3af;'><Icon type="md-add" /></span> <br />
-              项目立项 
+              <div @click.stop="RouteTo('/core/PM')" class="g-hover-lightness" style="width:100%;height:90px;position:relative;color:#fff;padding:10px 20px;font-size:18px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
+              <span style='font-size:25px;color:#3af;'>项目库</span> <br />
+              项目查询及统计 <Icon type="md-arrow-forward" />
               
-            
+              <Icon type="md-settings" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-build" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
               </div>
 
 
             </Card>
-               <Card
-              padding='0'
-              style='height:90px;margin-right:10px;width:90px;border-radius:5px;border:1px solid #ddd;overflow:hidden;'
-            >
-              <div @click.stop="RouteTo('/core/archivemanagement')" class="g-hover-lightness" style="width:90px;text-align:center;height:90px;position:relative;color:#fff;padding:0;font-size:15px;cursor:pointer;background:linear-gradient(to bottom right,#23334c,#334562);">
-              <span style='font-size:40px;color:#3af;'><Icon type="md-add" /></span> <br />
-              项目立项 
-              
-            
-              </div>
-
-
-            </Card>
-     </div>
       <Card
               padding='0'
               style='height:90px;margin-bottom:10px;border-radius:5px;border:1px solid #ddd;overflow:hidden;margin-top:10px;'
@@ -140,13 +127,13 @@
               <span style='font-size:25px;color:#3af;'>档案库</span> <br />
               资料查询与归档 <Icon type="md-arrow-forward" />
               
-              <Icon type="md-ice-cream" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
-              <Icon type="md-pizza" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
+              <Icon type="md-document" color="#3af" size="100" style="position:absolute;right:130px;top:-13px;opacity:0.3;"></Icon>
+              <Icon type="md-folder-open" color="#fff" size="140" style="position:absolute;right:10px;top:10px;opacity:0.3;"></Icon>
               </div>
 
 
             </Card>
-     
+   
    
 
       </Col>

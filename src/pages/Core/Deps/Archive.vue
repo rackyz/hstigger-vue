@@ -1,12 +1,19 @@
 <template>
-  <div class="hs-container" style="padding:20px;">
-    档案
-  </div>
+  <Archive :filter="{f_dep_id:id}" />
 </template>
 
 <script>
+import Archive from '../ArchiveManagement'
 export default {
-   metaInfo:{
+  components:{
+    Archive
+  },
+  computed:{
+     id(){
+    return this.$route.params.id
+    },
+  },
+  metaInfo:{
     title:'部门',
      route:"/:id"
   },

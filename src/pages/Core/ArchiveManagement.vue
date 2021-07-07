@@ -1,6 +1,6 @@
 <template>
   <Layout class="hs-container hs-container-full statistics" >
-   
+  
     <Content style="padding:5px;">
     <div class="filter-box flex-between" style="margin:5px 0;margin-top:0;">
       <div class="flex-wrap">
@@ -230,10 +230,11 @@ export default {
     this.$nextTick(()=>{
       this.$refs.table.calcTableHeight()
     })
-    this.getData()
     for(let key in this.filter){
       this[key] = this.filter[key]
     }
+    this.getData()
+    
   },
   props:{filter:{
     type:Object,
@@ -250,7 +251,7 @@ export default {
         return this.columns.filter(v=>!filteredKeys.includes(v.key))
       },
       isFiltering(){
-        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null || (!this.filter.f_project_id && this.f_project_id != null) ||  this.f_dep_id != null 
+        return this.f_search_text || this.f_type_1 != null ||  this.f_type_2 != null ||  this.f_type_3 != null || (!this.filter.f_project_id && this.f_project_id != null) ||  (!this.filter.f_dep_id && this.f_dep_id != null)
       },
       filterInitData(){
         return {
@@ -266,10 +267,10 @@ export default {
           let search_text = this.f_search_text ? this.f_search_text.trim() : ""
           if(search_text && (!v.name || !v.name.includes(search_text)) && (!v.code || !v.code.includes(search_text)))
             return false
-          if(this.f_project_id && v.project_id !== this.f_project_id)
+          if(this.f_project_id && v.project_id != this.f_project_id)
             return false
-          
-          if(this.f_dep_id &&  v.dep_id !== this.f_dep_id)
+            
+          if(this.f_dep_id &&  v.dep_id != this.f_dep_id)
             return false
 
           if(this.f_type_1 != undefined && (v.type1 === null || v.type1 !== this.f_type_1))
@@ -428,7 +429,12 @@ export default {
     },
     getData(){
        this.loading = true
-       this.api.enterprise.LIST_ARCHIVES().then(res=>{
+       let query = {}
+       if(this.f_dep_id)
+        query.dep_id = this.f_dep_id
+       if(this.f_project_id)
+        query.project_id = this.f_project_id
+       this.api.enterprise.LIST_ARCHIVES({query}).then(res=>{
          let items = res.data.data
          items.sort((a,b)=>(moment(a.created_at).isBefore(moment(b.created_at)?1:-1)))
          this.items = items

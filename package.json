@@ -23,6 +23,7 @@
     "lodash": "^4.17.19",
     "mavon-editor": "^2.9.0",
     "moment": "^2.27.0",
+    "qrcodejs2": "^0.0.2",
     "vue-meta": "^2.4.0",
     "vue-puzzle-verification": "^1.0.2",
     "vue-splitpane": "^1.0.6",

@@ -2,7 +2,7 @@
   <div class="l-dep-item flex-wrap flex-between" @click="RouteTo(`/core/deps/${dep.id}/dashboard`)">
     <div class="flex-wrap">
       
-      <Icon type="md-easel" style="margin-right:8px" size="35" />
+      <Icon custom="gzicon gzi-group1" style="margin-right:8px" size="30" />
       <div style='line-height:17px;'>
         {{dep.name}}
         <br />
@@ -35,7 +35,7 @@ export default {
   height:50px;
   display: flex;
   align-items: center;
-  background:linear-gradient(to bottom left,rgb(50, 82, 177),rgb(28, 123, 213));
+  background:linear-gradient(to bottom left,rgb(85, 95, 124),rgb(3, 60, 112));
   border-radius:5px;
   color:#fff;
   padding:0 10px;

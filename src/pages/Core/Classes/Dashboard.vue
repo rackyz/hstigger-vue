@@ -122,6 +122,8 @@
              <div style="margin-bottom:10px;background:#fff;color:#aaa;border:none;padding:15px;padding-top:0;height:200px;font-size:12px;"> 
                下一节课
       </div> -->
+          <div id="qrCode" ref="qrCodeDiv"></div>
+            <a :href="`/public/${current_enterprise}/trainings/${id}`">外部报名入口</a>
         <div class="l-caption" style="background:rgb(20, 35, 60);padding:5px 10px;padding-left:15px;color:#eee;font-weight:normal;margin:0;">
             <Icon type="ios-photos" /> 
             培训风采
@@ -206,6 +208,8 @@ const SetTrainingStateFromDuratin = (item={})=>{
   return item
 
 }
+
+import QRCode from 'qrcodejs2';
 export default {
   data(){
     return {
@@ -222,9 +226,18 @@ export default {
   mounted(){
     this.getData()
     this.getTopics()
+      new QRCode(this.$refs.qrCodeDiv, {
+          text: `https://www.inbgz.com/public/${this.current_enterprise}/trainings/${this.id}`,
+          width: 200,
+          height: 200,
+          colorDark: "#333333", //二维码颜色
+          colorLight: "#ffffff", //二维码背景色
+          correctLevel: QRCode.CorrectLevel.L//容错率，L/M/H
+        })
+    
   },
   computed:{
-    ...mapGetters("core",['getUser']),
+    ...mapGetters("core",['getUser','current_enterprise']),
     id(){
       return this.$route.params.id
     },

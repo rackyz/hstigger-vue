@@ -1,7 +1,7 @@
 <template>
   <div class="l-wrapper">
     <div class="l-status">
-        English
+        宁波高专建设监理有限公司
     </div>
     
   
@@ -24,7 +24,6 @@
 
 <script>
 export default {
-
 }
 </script>
 
@@ -65,10 +64,12 @@ export default {
    .l-footer{
      background:linear-gradient(to bottom right,#345,#357);
      height:200px;
+     width:100% !important;
      position: relative;
      margin:0 !important;
-     margin-top:20px !important;
+     margin-top:10px !important;
      color:#fff;
+     max-width: 100% !important;
      
    }
 }

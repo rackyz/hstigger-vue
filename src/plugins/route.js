@@ -112,6 +112,9 @@ for (const rawfilePath of files.keys()) {
 export let APP_ROUTES = []
 Object.keys(fileMap).forEach(k => {
   let route = fileMap[k]
+  if (route.path.includes('/public')) {
+    route.path = route.path.replace('/public', '/public/:entid')
+  }
   if (route.parent) {
     let parentRoute = fileMap[route.parent]
     if (!parentRoute){
@@ -138,6 +141,7 @@ Object.keys(fileMap).forEach(k => {
       }
     }
   } else {
+    
     APP_ROUTES.push(route)
   }
 })
